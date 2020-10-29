@@ -53,33 +53,33 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 * _discordgo 0.19.0 rather than 0.16.1_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
 * Somewhat different organization than original project; was initially created from scratch then features ported over.
-* Cleaner Logging
-* **Added Support For:** Facebook
+* Cleaner Logging, Color-Coded Logging
+* **Added Support For:** Facebook Videos
 * **Removed Support For:** Tistory, Google Drive - These seemed to require some extra configuration and be for rather specific-case use, so I took them out. If anyone can neatly integrate them, feel free to make a pull request.
 * Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. Was due to some people having xurls v2 installed while the project required v1.
 
-I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
+> I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
 ## Settings / Configuration Guide
-I tried to make the config as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All options specified below labeled "OPTIONAL" will use default values if they're missing from the settings file.
+> I tried to make the config as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All options specified below labeled "OPTIONAL" will use default values if they're missing from the settings file.
 
 * **Credentials...** `[key/value object]`
     * **Token** `[string]`
-        * _Required for Bot Login, don't include if using User Login._
+        * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
     * **Email** `[string]`
-        * _Required for User Login, don't include if using Bot Login._
+        * _Required for User Login without 2FA, don't include if using Bot Login._
     * **Password** `[string]`
-        * _Required for User Login, don't include if using Bot Login._
+        * _Required for User Login without 2FA, don't include if using Bot Login._
     * _OPTIONAL:_ TwitterAccessToken `[string]`
-        * Won't use Twitter API for fetching media from tweets if credentials are missing.
+        * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _OPTIONAL:_ TwitterAccessTokenSecret `[string]`
-        * Won't use Twitter API for fetching media from tweets if credentials are missing.
+        * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _OPTIONAL:_ TwitterConsumerKey `[string]`
-        * Won't use Twitter API for fetching media from tweets if credentials are missing.
+        * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _OPTIONAL:_ TwitterConsumerSecret `[string]`
-        * Won't use Twitter API for fetching media from tweets if credentials are missing.
+        * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _OPTIONAL:_ FlickrApiKey `[string]`
-        * Won't use Flickr API for fetching media from posts/albums if credentials are missing.
+        * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
 * _OPTIONAL:_ **Admins** `[array of strings]`
     * Array of User ID strings for users allowed to use admin commands
 * _OPTIONAL:_ DownloadRetryMax `[int]`
