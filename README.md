@@ -13,7 +13,7 @@ This is a program to download files posted in specified Discord channels to loca
 ## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
-_NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
+> _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
 ## Setup
 Edit the `settings.json` file and enter your credentials & configuration. If the file is missing or critically corrupt, it will replace it with a new file. Ensure you follow proper JSON syntax to avoid any unexpected errors.
@@ -41,9 +41,9 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
     * Streamable
     * Gfycat
 * ***Commands:***
-    * Help _(<prefix>help - Aliases: commands)_
-    * Ping _(<prefix>ping - Aliases: test)_
-    * Status: Get an output of the current status of the bot _(<prefix>status - Aliases: info)_
+    * Help _(<prefix>help - Alias: commands)_
+    * Ping _(<prefix>ping - Alias: test)_
+    * Status: Get an output of the current status of the bot _(<prefix>status - Alias: info)_
     * Stats: Have the bot dump stats _(<prefix>stats)_
     * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
     * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
@@ -107,20 +107,24 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
     * _Unused by Default_
     * Replace counter status with custom string.
     * Embedded Placeholders:
-        * `{dgVersion}`: Replaces with discord-go version
-        * `{ddgVersion}`: Replaces with project version
-        * `{apiVersion}`: Replaces with Discord API version
-        * `{Count}`: Replaces with raw total count of downloads
-        * `{CountShort}`: Replaces with shortened total count of downloads
-        * `{Guilds}`: Replaces with number of guilds bot is a member of
-        * `{Channels}`: Replaces with number of bound channels
-        * `{AdminChannels}`: Replaces with number of admin channels
-        * `{Admins}`: Replaces with number of designated admins
-        * `{TimeShort}`: Replaces with `3:04pm` time format
-        * `{TimeLong}`: Replaces with `3:04:05pm MST - January 1, 2006` time format
-        * `{TimeShort24}`: Replaces with `15:04` time format
-        * `{TimeLong24}`: Replaces with `15:04:05 MST - 1 January, 2006` time format
-        * `{Uptime}`: Replaces with shortened duration of bot uptime
+        * `{{dgVersion}}`: discord-go version
+        * `{{ddgVersion}}`: Project version
+        * `{{apiVersion}}`: Discord API version
+        * `{{count}}`: Raw total count of downloads
+        * `{{countShort}}`: Shortened total count of downloads
+        * `{{numGuilds}}`: Number of guilds bot is a member of
+        * `{{numChannels}}`: Number of bound channels
+        * `{{numAdminChannels}}`: Number of admin channels
+        * `{{numAdmins}}`: Number of designated admins
+        * `{{timeSavedShort}}`: Last save time formatted as `3:04pm`
+        * `{{timeSavedLong}}`: Last save time formatted as `3:04:05pm MST - January 1, 2006`
+        * `{{timeSavedShort24}}`: Last save time formatted as `15:04`
+        * `{{timeSavedLong24}}`: Last save time formatted as `15:04:05 MST - 1 January, 2006`
+        * `{{timeNowShort}}`: Current time formatted as `3:04pm`
+        * `{{timeNowLong}}`: Current time formatted as `3:04:05pm MST - January 1, 2006`
+        * `{{timeNowShort24}}`: Current time formatted as `15:04`
+        * `{{timeNowLong24}}`: Current time formatted as `15:04:05 MST - 1 January, 2006`
+        * `{{uptime}}`: Shortened duration of bot uptime
 * _OPTIONAL:_ PresenceOverwriteDetails `[string]`
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
