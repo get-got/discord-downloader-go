@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master)](https://travis-ci.com/get-got/discord-downloader-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/get-got/discord-downloader-go)](https://goreportcard.com/report/github.com/get-got/discord-downloader-go)
 
 # discord-downloader-go
 
@@ -7,7 +8,12 @@
 
 ## [**DOWNLOAD LATEST RELEASE BUILDS**](https://github.com/get-got/discord-downloader-go/releases/latest)
 
-This is a program to download files posted in specified Discord channels to local folders. It can fetch highest possible quality files from various sources (listed below), aside from downloading any file directly linked or attached. _See "Features" below for full list._
+This is a program to download files posted in specified Discord channels to local folders. It can fetch highest possible quality files from various sources (listed below), aside from downloading any file directly linked or attached. _See [Features](#Features) below for full list._
+
+## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots)
+[Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
+
+_NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
 ## Setup
 Edit the `settings.json` file and enter your credentials & configuration. If the file is missing or critically corrupt, it will replace it with a new file. Ensure you follow proper JSON syntax to avoid any unexpected errors.
@@ -23,13 +29,8 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 * **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
 * **Finding Emoji ID:** _Enable Discord Developer Mode (see above),_ right click on the emoji and `Copy ID`.
 
-## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots)
-[Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
-
-_NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
-
 ## Features
-* **Supported File Downloading:**
+* ***Supported File Downloading:***
     * Discord File Attachments
     * Direct Links to Files
     * Twitter _(Images & Videos)_
@@ -39,20 +40,23 @@ _NOTE: This only applies to real User Accounts, not Bot users. This program curr
     * Flickr _(requires API key, see config section)_
     * Streamable
     * Gfycat
-* **Commands:**
-    * Help _(<prefix>help)_
-    * Ping _(<prefix>ping)_
-    * Status: Get an output of the current status of the bot _(<prefix>status)_
+* ***Commands:***
+    * Help _(<prefix>help - Aliases: commands)_
+    * Ping _(<prefix>ping - Aliases: test)_
+    * Status: Get an output of the current status of the bot _(<prefix>status - Aliases: info)_
     * Stats: Have the bot dump stats _(<prefix>stats)_
-    * History: Process all old messages in channel _(<prefix>history)_
-    * Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit)_
+    * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
+    * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
 
 ### Key Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
+* _Go 1.15 rather than 1.13_
+* _discordgo 0.19.0 rather than 0.16.1_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
 * Somewhat different organization than original project; was initially created from scratch then features ported over.
 * Cleaner Logging
-* **Added:** Facebook
-* **Removed:** Tistory, Google Drive - These seemed to require some extra configuration and be for rather specific-case use, so I took them out. If anyone can neatly integrate them, feel free to make a pull request.
+* **Added Support For:** Facebook
+* **Removed Support For:** Tistory, Google Drive - These seemed to require some extra configuration and be for rather specific-case use, so I took them out. If anyone can neatly integrate them, feel free to make a pull request.
+* Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. Was due to some people having xurls v2 installed while the project required v1.
 
 I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 

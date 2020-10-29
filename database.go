@@ -83,19 +83,6 @@ func dbDownloadCount() int {
 	return i
 }
 
-func dbDownloadCountByUser(userID string) int {
-	var query interface{}
-	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["UserID"]}]`, userID)), &query)
-	queryResult := make(map[int]struct{})
-	db.EvalQuery(query, myDB.Use("Downloads"), &queryResult)
-
-	downloadedImages := make([]*Download, 0)
-	for id := range queryResult {
-		downloadedImages = append(downloadedImages, dbFindDownloadByID(id))
-	}
-	return len(downloadedImages)
-}
-
 func dbDownloadCountByChannel(channelID string) int {
 	var query interface{}
 	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["ChannelID"]}]`, channelID)), &query)
@@ -109,6 +96,20 @@ func dbDownloadCountByChannel(channelID string) int {
 	return len(downloadedImages)
 }
 
+func dbDownloadCountByUser(userID string) int {
+	var query interface{}
+	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["UserID"]}]`, userID)), &query)
+	queryResult := make(map[int]struct{})
+	db.EvalQuery(query, myDB.Use("Downloads"), &queryResult)
+
+	downloadedImages := make([]*Download, 0)
+	for id := range queryResult {
+		downloadedImages = append(downloadedImages, dbFindDownloadByID(id))
+	}
+	return len(downloadedImages)
+}
+
+//TODO: Implement
 func dbDownloadCountBySource(domain string) int {
 	var query interface{}
 	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["SourceDomain"]}]`, domain)), &query)

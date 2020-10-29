@@ -60,6 +60,7 @@ func main() {
 	}
 
 	// Initialize Database
+	log.Println(color.YellowString("Opening database..."))
 	myDB, err = db.OpenDB(LOC_DATABASE_DIR)
 	if err != nil {
 		log.Println(color.HiRedString("Unable to open database: %s", err))
@@ -415,6 +416,8 @@ func updateDiscordPresence() {
 		timeShort := timeLastUpdated.Format("3:04pm")
 		timeLong := timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")
 		timeNow := time.Now()
+		//TODO: Optimize keys so values are only fetched when being used.
+		//TODO: Case-insensitive key replacement.
 		keys := [][]string{
 			{"{dgVersion}", discordgo.VERSION},
 			{"{ddgVersion}", PROJECT_VERSION},
