@@ -99,8 +99,11 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
     * _Default:_ `true`
 * _OPTIONAL:_ PresenceStatus `[string]`
     * _Default:_ `"idle"`
+    * Presence status type.
+    * `"online"`, `"idle"`, `"dnd"`, `"invisible"`, `"offline"`
 * _OPTIONAL:_ PresenceType `[int]`
     * _Default:_ `0`
+    * Presence label type. _(Playing <thing>, Listening to <thing>, etc)_
     * `Game = 0, Streaming = 1, Listening = 2, Watching = 3, Custom = 4`
         * If Bot User, Streaming & Custom won't work properly.
 * _OPTIONAL:_ PresenceOverwrite `[string]`

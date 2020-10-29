@@ -66,7 +66,7 @@ var (
 	SETTING_DEFAULT_AllowSkipping        bool               = true
 	SETTING_DEFAULT_ScanOwnMessages      bool               = false
 	SETTING_DEFAULT_PresenceEnabled      bool               = true
-	SETTING_DEFAULT_PresenceStatus       string             = "idle"
+	SETTING_DEFAULT_PresenceStatus       string             = string(discordgo.StatusIdle)
 	SETTING_DEFAULT_PresenceType         discordgo.GameType = discordgo.GameTypeGame
 	SETTING_DEFAULT_FilenameDateFormat   string             = "2006-01-02_15-04-05"
 	SETTING_DEFAULT_GithubUpdateChecking bool               = true
@@ -166,7 +166,7 @@ type ConfigurationChannel struct {
 type ConfigurationAdminChannel struct {
 	// Required
 	ChannelID string `json:"channel"` // required
-	/* TODO: Add?
+	/* TODO: Add & Implement?
 	* UnrestrictAdminCommands bool // optional, defaults
 	* SendLogs bool // optional, unused if nil
 	 */
