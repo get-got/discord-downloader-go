@@ -360,9 +360,14 @@ func main() {
 		} else {
 			log.Println(color.HiGreenString("Discord logged into %s", userDisplay(*user)))
 			if user.Bot {
-				log.Println(logPrefixHelper, color.MagentaString("This is a Bot User...\n- Status presence details are limited.\n- Server access is restricted to servers you have permission to add the bot to."))
+				log.Println(logPrefixHelper, color.MagentaString("This is a Bot User..."))
+				log.Println(logPrefixHelper, color.MagentaString("- Status presence details are limited."))
+				log.Println(logPrefixHelper, color.MagentaString("- Server access is restricted to servers you have permission to add the bot to."))
 			} else {
-				log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)...\n- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination.\n- See GitHub page for link to Discord's official statement.\n- If you wish to avoid this, use a Bot account if possible."))
+				log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)..."))
+				log.Println(logPrefixHelper, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
+				log.Println(logPrefixHelper, color.MagentaString("- See GitHub page for link to Discord's official statement."))
+				log.Println(logPrefixHelper, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
 			}
 		}
 	} else {

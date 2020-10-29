@@ -23,7 +23,7 @@ func uptime() time.Duration {
 
 func delayedExit() {
 	// Not formatting string because I only want the exit message to be red.
-	log.Println(color.HiRedString("Exiting in 15 seconds"), ", uptime was ", durafmt.Parse(time.Since(startTime)).String(), "...")
+	log.Println(color.HiRedString("Exiting in 15 seconds"), "- uptime was ", durafmt.Parse(time.Since(startTime)).String(), "...")
 	time.Sleep(15 * time.Second)
 	os.Exit(1)
 }

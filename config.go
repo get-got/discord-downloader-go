@@ -20,42 +20,42 @@ var (
 // JSON casing is camelCase standard but I prefer ProperCase, it'll stay as that for now.
 
 type ConfigurationCredentials struct {
-	Token                    string // required for bot token (this or login)
-	Email                    string // required for login (this or token)
-	Password                 string // required for login (this or token)
-	TwitterAccessToken       string `json:",omitempty"` // optional
-	TwitterAccessTokenSecret string `json:",omitempty"` // optional
-	TwitterConsumerKey       string `json:",omitempty"` // optional
-	TwitterConsumerSecret    string `json:",omitempty"` // optional
-	FlickrApiKey             string `json:",omitempty"` // optional
+	Token                    string `json:"token"`                              // required for bot token (this or login)
+	Email                    string `json:"email"`                              // required for login (this or token)
+	Password                 string `json:"password"`                           // required for login (this or token)
+	TwitterAccessToken       string `json:"twitterAccessToken,omitempty"`       // optional
+	TwitterAccessTokenSecret string `json:"twitterAccessTokenSecret,omitempty"` // optional
+	TwitterConsumerKey       string `json:"twitterConsumerKey,omitempty"`       // optional
+	TwitterConsumerSecret    string `json:"twitterConsumerSecret,omitempty"`    // optional
+	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
 }
 
 type Configuration struct {
-	Credentials ConfigurationCredentials // required
-	Admins      []string                 // optional
+	Credentials ConfigurationCredentials `json:"credentials"` // required
+	Admins      []string                 `json:"admins"`      // optional
 
-	DownloadRetryMax int    `json:",omitempty"` // optional, defaults
-	DownloadTimeout  int    `json:",omitempty"` // optional, defaults
-	CommandPrefix    string // optional, defaults
-	AllowSkipping    bool   // optional, defaults
-	ScanOwnMessages  bool   // optional, defaults
+	DownloadRetryMax int    `json:"downloadRetryMax,omitempty"` // optional, defaults
+	DownloadTimeout  int    `json:"downloadTimeout,omitempty"`  // optional, defaults
+	CommandPrefix    string `json:"commandPrefix"`              // optional, defaults
+	AllowSkipping    bool   `json:"allowSkipping"`              // optional, defaults
+	ScanOwnMessages  bool   `json:"scanOwnMessages"`            // optional, defaults
 
-	PresenceEnabled          bool               // optional, defaults
-	PresenceStatus           string             // optional, defaults
-	PresenceType             discordgo.GameType `json:",omitempty"` // optional, defaults
-	PresenceOverwrite        *string            `json:",omitempty"` // optional, unused if undefined
-	PresenceOverwriteDetails *string            `json:",omitempty"` // optional, unused if undefined
-	PresenceOverwriteState   *string            `json:",omitempty"` // optional, unused if undefined
+	PresenceEnabled          bool               `json:"presenceEnabled"`                    // optional, defaults
+	PresenceStatus           string             `json:"presenceStatus"`                     // optional, defaults
+	PresenceType             discordgo.GameType `json:"presenceType,omitempty"`             // optional, defaults
+	PresenceOverwrite        *string            `json:"presenceOverwrite,omitempty"`        // optional, unused if undefined
+	PresenceOverwriteDetails *string            `json:"presenceOverwriteDetails,omitempty"` // optional, unused if undefined
+	PresenceOverwriteState   *string            `json:"presenceOverwriteState,omitempty"`   // optional, unused if undefined
 
-	FilenameDateFormat   string `json:",omitempty"` // optional, defaults
-	GithubUpdateChecking bool   // optional, defaults
-	DebugOutput          bool   // optional, defaults
+	FilenameDateFormat   string `json:"filenameDateFormat,omitempty"` // optional, defaults
+	GithubUpdateChecking bool   `json:"githubUpdateChecking"`         // optional, defaults
+	DebugOutput          bool   `json:"debugOutput"`                  // optional, defaults
 
-	EmbedColor   *string `json:",omitempty"` // optional, defaults to role if undefined, then defaults random if no role color
-	InflateCount *int64  `json:",omitempty"` // optional, defaults to 0 if undefined
+	EmbedColor   *string `json:"embedColor,omitempty"`   // optional, defaults to role if undefined, then defaults random if no role color
+	InflateCount *int64  `json:"inflateCount,omitempty"` // optional, defaults to 0 if undefined
 
-	AdminChannels []ConfigurationAdminChannel // optional
-	Channels      []ConfigurationChannel      // required
+	AdminChannels []ConfigurationAdminChannel `json:"adminChannels"` // optional
+	Channels      []ConfigurationChannel      `json:"channels"`      // required
 }
 
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
@@ -136,36 +136,36 @@ var (
 
 type ConfigurationChannel struct {
 	// Required
-	ChannelID   string // required
-	Destination string // required
+	ChannelID   string `json:"channel"`     // required
+	Destination string `json:"destination"` // required
 	// Main
-	Enabled       *bool `json:",omitempty"` // optional, defaults
-	AllowCommands *bool `json:",omitempty"` // optional, defaults
-	ErrorMessages *bool `json:",omitempty"` // optional, defaults
-	ScanEdits     *bool `json:",omitempty"` // optional, defaults
+	Enabled       *bool `json:"enabled,omitempty"`       // optional, defaults
+	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
+	ErrorMessages *bool `json:"errorMessages,omitempty"` // optional, defaults
+	ScanEdits     *bool `json:"scanEdits,omitempty"`     // optional, defaults
 	// Appearance
-	UpdatePresence           *bool     `json:",omitempty"` // optional, defaults
-	ReactWhenDownloaded      *bool     `json:",omitempty"` // optional, defaults
-	ReactWhenDownloadedEmoji *string   `json:",omitempty"` // optional, defaults
-	BlacklistReactEmojis     *[]string `json:",omitempty"` // optional
+	UpdatePresence           *bool     `json:"updatePresence,omitempty"`           // optional, defaults
+	ReactWhenDownloaded      *bool     `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
+	ReactWhenDownloadedEmoji *string   `json:"reactWhenDownloadedEmoji,omitempty"` // optional, defaults
+	BlacklistReactEmojis     *[]string `json:"blacklistReactEmojis,omitempty"`     // optional
 	// Overwrites
-	OverwriteFilenameDateFormat *string `json:",omitempty"` // optional
-	OverwriteAllowSkipping      *bool   `json:",omitempty"` // optional
-	OverwriteEmbedColor         *string `json:",omitempty"` // optional, defaults to role if undefined, then defaults random if no role color
+	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
+	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
+	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
 	// Saving
-	DivideFoldersByType    *bool     `json:",omitempty"` // optional, defaults
-	SaveImages             *bool     `json:",omitempty"` // optional, defaults
-	SaveVideos             *bool     `json:",omitempty"` // optional, defaults
-	SaveAudioFiles         *bool     `json:",omitempty"` // optional, defaults
-	SaveTextFiles          *bool     `json:",omitempty"` // optional, defaults
-	SaveOtherFiles         *bool     `json:",omitempty"` // optional, defaults
-	SavePossibleDuplicates *bool     `json:",omitempty"` // optional, defaults
-	BlacklistedExtensions  *[]string `json:",omitempty"` // optional, defaults
+	DivideFoldersByType    *bool     `json:"divideFoldersByType,omitempty"`    // optional, defaults
+	SaveImages             *bool     `json:"saveImages,omitempty"`             // optional, defaults
+	SaveVideos             *bool     `json:"saveVideos,omitempty"`             // optional, defaults
+	SaveAudioFiles         *bool     `json:"saveAudioFiles,omitempty"`         // optional, defaults
+	SaveTextFiles          *bool     `json:"saveTextFiles,omitempty"`          // optional, defaults
+	SaveOtherFiles         *bool     `json:"saveOtherFiles,omitempty"`         // optional, defaults
+	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates,omitempty"` // optional, defaults
+	BlacklistedExtensions  *[]string `json:"blacklistedExtensions,omitempty"`  // optional, defaults
 }
 
 type ConfigurationAdminChannel struct {
 	// Required
-	ChannelID string // required
+	ChannelID string `json:"channel"` // required
 	/* TODO: Add?
 	* UnrestrictAdminCommands bool // optional, defaults
 	* SendLogs bool // optional, unused if nil
@@ -323,7 +323,7 @@ func createConfig() {
 	defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
 
 	log.Println(logPrefixHelper, color.MagentaString("The default settings will be missing some options to avoid clutter."))
-	log.Println(logPrefixHelper, color.MagentaString("If you would like to maximize customization, see the README for all available settings."))
+	log.Println(logPrefixHelper, color.HiMagentaString("There are MANY MORE SETTINGS! If you would like to maximize customization, see the GitHub README for all available settings."))
 
 	defaultJSON, err := json.MarshalIndent(defaultConfig, "", "\t")
 	if err != nil {
@@ -392,17 +392,3 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	}
 	return false
 }
-
-/*func isChannelRegisteredEither(ChannelID string) bool {
-	return isChannelRegistered(ChannelID) || isAdminChannelRegistered(ChannelID)
-}
-
-func getChannelConfigEither(ChannelID string) interface{} {
-	if isChannelRegistered(ChannelID) {
-		return getChannelConfig(ChannelID)
-	}
-	if isAdminChannelRegistered(ChannelID) {
-		return getAdminChannelConfig(ChannelID)
-	}
-	return nil
-}*/
