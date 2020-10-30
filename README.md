@@ -62,7 +62,7 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
 ## Settings / Configuration Guide
-> I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled "OPTIONAL" will use default values if they're missing from the settings file.
+> I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[OPTIONAL]` will use default values if they're missing from the settings file.
 
 All JSON settings follow camelCase format.
 
