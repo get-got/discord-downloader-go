@@ -344,6 +344,7 @@ func main() {
 	bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		router.FindAndExecute(bot, config.CommandPrefix, bot.State.User.ID, m.Message)
 	})
+	//TODO: Case insensitive commands & prefix
 
 	// Handle Events
 	bot.AddHandler(messageCreate)
