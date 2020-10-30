@@ -13,10 +13,12 @@ func userDisplay(usr discordgo.User) string {
 	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
 
+// Checks if message author is a specified bot admin.
 func adminCheck(m *discordgo.Message) bool {
 	return m.Author.ID == user.ID || stringInSlice(m.Author.ID, config.Admins)
 }
 
+// Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
 func adminCheckLocal(m *discordgo.Message) bool {
 	guild, _ := bot.State.Guild(m.GuildID)
 	localPerms, _ := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
@@ -48,74 +50,53 @@ func getChannelName(channelID string) string {
 	return sourceChannelName
 }
 
-func isDiscordEmoji(link string) bool {
-	// always match discord emoji URLs, eg https://cdn.discordapp.com/emojis/340989430460317707.png
-	if strings.HasPrefix(link, BASE_URL_DISCORD_EMOJI) {
-		return true
-	}
-	return false
-}
-
 func embedColor(channelID string) int {
-	// Defined Color
+	var color *string
+	// Assign Defined Color
+	if config.EmbedColor != nil {
+		if *config.EmbedColor != "" {
+			color = config.EmbedColor
+		}
+	}
+	// Overwrite with Defined Color for Channel
 	if isChannelRegistered(channelID) {
 		channelConfig := getChannelConfig(channelID)
 		if channelConfig.OverwriteEmbedColor != nil {
 			if *channelConfig.OverwriteEmbedColor != "" {
-				if *channelConfig.OverwriteEmbedColor == "role" || *channelConfig.OverwriteEmbedColor == "user" {
-					botColor := bot.State.UserColor(user.ID, channelID)
-					if botColor != 0 {
-						return botColor
-					}
-					goto color_random
-				}
-				if *channelConfig.OverwriteEmbedColor == "random" || *channelConfig.OverwriteEmbedColor == "rand" {
-					goto color_random
-				}
-
-				var colorString string = *channelConfig.OverwriteEmbedColor
-
-				// Input is Hex
-				colorString = strings.ReplaceAll(colorString, "#", "")
-				if convertedHex, err := strconv.ParseUint(colorString, 16, 64); err == nil {
-					return int(convertedHex)
-				}
-
-				// Input is Int
-				if convertedInt, err := strconv.Atoi(colorString); err == nil {
-					return convertedInt
-				}
+				color = channelConfig.OverwriteEmbedColor
 			}
 		}
 	}
-	// Defined Color
-	if config.EmbedColor != nil {
-		if *config.EmbedColor != "" {
 
-			if *config.EmbedColor == "role" || *config.EmbedColor == "user" {
-				botColor := bot.State.UserColor(user.ID, channelID)
-				if botColor != 0 {
-					return botColor
-				}
-				goto color_random
+	// Use Defined Color
+	if color != nil {
+		// Defined as Role, fetch role color
+		if *color == "role" || *color == "user" {
+			botColor := bot.State.UserColor(user.ID, channelID)
+			if botColor != 0 {
+				return botColor
 			}
-			if *config.EmbedColor == "random" || *config.EmbedColor == "rand" {
-				goto color_random
-			}
-
-			var colorString string = *config.EmbedColor
-
-			// Input is Hex
-			colorString = strings.ReplaceAll(colorString, "#", "")
-			if convertedHex, err := strconv.ParseUint(colorString, 16, 64); err == nil {
-				return int(convertedHex)
-			}
-
-			// Input is Int
-			if convertedInt, err := strconv.Atoi(colorString); err == nil {
-				return convertedInt
-			}
+			goto color_random
 		}
+		// Defined as Random, jump below (not preferred method but seems to work flawlessly)
+		if *color == "random" || *color == "rand" {
+			goto color_random
+		}
+
+		var colorString string = *color
+
+		// Input is Hex
+		colorString = strings.ReplaceAll(colorString, "#", "")
+		if convertedHex, err := strconv.ParseUint(colorString, 16, 64); err == nil {
+			return int(convertedHex)
+		}
+
+		// Input is Int
+		if convertedInt, err := strconv.Atoi(colorString); err == nil {
+			return convertedInt
+		}
+
+		// Definition is invalid since hasn't returned, so defaults to below...
 	}
 
 	// User color
@@ -133,6 +114,7 @@ color_random:
 	return 16777215 // white
 }
 
+// Shortcut function for quickly constructing a styled embed with Title & Description
 func buildEmbed(channelID string, title string, description string) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Title:       title,
@@ -145,6 +127,7 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 	}
 }
 
+// Shortcut function for quickly replying a styled embed with Title & Description
 func sendEmbed(m *discordgo.Message, title string, description string) *discordgo.Message {
 	message, _ := bot.ChannelMessageSendComplex(m.ChannelID,
 		&discordgo.MessageSend{

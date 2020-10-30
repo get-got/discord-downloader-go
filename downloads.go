@@ -100,6 +100,14 @@ func getDownloadStatusString(status DownloadStatus) string {
 	return "Unknown Error"
 }
 
+func isDiscordEmoji(link string) bool {
+	// always match discord emoji URLs, eg https://cdn.discordapp.com/emojis/340989430460317707.png
+	if strings.HasPrefix(link, BASE_URL_DISCORD_EMOJI) {
+		return true
+	}
+	return false
+}
+
 var (
 	timeLastUpdated time.Time
 )

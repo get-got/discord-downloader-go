@@ -28,15 +28,18 @@ func delayedExit() {
 	os.Exit(1)
 }
 
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
+func filenameFromUrl(inputURL string) string {
+	base := path.Base(inputURL)
+	parts := strings.Split(base, "?")
+	return parts[0]
+}
+
+func filepathExtension(filepath string) string {
+	if strings.Contains(filepath, "?") {
+		filepath = strings.Split(filepath, "?")[0]
 	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return false, err
+	filepath = path.Ext(filepath)
+	return filepath
 }
 
 func stringInSlice(a string, list []string) bool {
@@ -82,20 +85,6 @@ func formatNumberShort(x int64) string {
 		return x_display
 	}
 	return fmt.Sprint(x)
-}
-
-func filenameFromUrl(inputURL string) string {
-	base := path.Base(inputURL)
-	parts := strings.Split(base, "?")
-	return parts[0]
-}
-
-func filepathExtension(filepath string) string {
-	if strings.Contains(filepath, "?") {
-		filepath = strings.Split(filepath, "?")[0]
-	}
-	filepath = path.Ext(filepath)
-	return filepath
 }
 
 func getJson(url string, target interface{}) error {
