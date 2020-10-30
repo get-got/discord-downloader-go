@@ -66,7 +66,7 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 
 All JSON settings follow camelCase format.
 
-* **credentials...** `[key/value object]`
+* **credentials** `[key/value object]`
     * **token** `[string]`
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
     * **email** `[string]`
@@ -156,9 +156,9 @@ All JSON settings follow camelCase format.
 * _`[OPTIONAL]`_ inflateCount `[int]`
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
-* **adminChannels...** `[array of key/value objects]`
+* **adminChannels** `[array of key/value objects]`
     * **channel** `[string]`
-* **channels...** `[array of key/value objects]`
+* **channels** `[array of key/value objects]`
     * **channel** `[string]`
         * Channel ID to monitor.
     * **destination** `[string]`
