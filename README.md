@@ -62,7 +62,7 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
 ## Settings / Configuration Guide
-> I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[NOT REQUIRED]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
+> I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
 
 All JSON settings follow camelCase format.
 
@@ -85,26 +85,26 @@ All JSON settings follow camelCase format.
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
 * _`[OPTIONAL]`_ **admins** `[array of strings]`
     * Array of User ID strings for users allowed to use admin commands
-* _`[NOT REQUIRED]`_ downloadRetryMax `[int]`
+* _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`
-* _`[NOT REQUIRED]`_ downloadTimeout `[int]`
+* _`[DEFAULTS]`_ downloadTimeout `[int]`
     * _Default:_ `60`
-* _`[NOT REQUIRED]`_ commandPrefix `[string]`
+* _`[DEFAULTS]`_ commandPrefix `[string]`
     * _Default:_ `"ddg "`
-* _`[NOT REQUIRED]`_ allowSkipping `[bool]`
+* _`[DEFAULTS]`_ allowSkipping `[bool]`
     * _Default:_ `true`
     * Allow scanning for keywords to skip content downloading.
     * `"skip", "ignore", "don't save", "no save"`
-* _`[NOT REQUIRED]`_ scanOwnMessages `[bool]`
+* _`[DEFAULTS]`_ scanOwnMessages `[bool]`
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
-* _`[NOT REQUIRED]`_ presenceEnabled `[bool]`
+* _`[DEFAULTS]`_ presenceEnabled `[bool]`
     * _Default:_ `true`
-* _`[NOT REQUIRED]`_ presenceStatus `[string]`
+* _`[DEFAULTS]`_ presenceStatus `[string]`
     * _Default:_ `"idle"`
     * Presence status type.
     * `"online"`, `"idle"`, `"dnd"`, `"invisible"`, `"offline"`
-* _`[NOT REQUIRED]`_ presenceType `[int]`
+* _`[DEFAULTS]`_ presenceType `[int]`
     * _Default:_ `0`
     * Presence label type. _(Playing <thing>, Listening to <thing>, etc)_
     * `Game = 0, Streaming = 1, Listening = 2, Watching = 3, Custom = 4`
@@ -141,13 +141,13 @@ All JSON settings follow camelCase format.
     * Replace counter status state with custom string (only works for User, not Bot).
     * Embedded Placeholders:
         * _See `presenceOverwrite` above..._
-* _`[NOT REQUIRED]`_ filenameDateFormat `[string]`
+* _`[DEFAULTS]`_ filenameDateFormat `[string]`
     * _Default:_ `"2006-01-02_15-04-05"`
     * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-* _`[NOT REQUIRED]`_ githubUpdateChecking `[bool]`
+* _`[DEFAULTS]`_ githubUpdateChecking `[bool]`
     * _Default:_ `true`
     * Check for updates from this repo.
-* _`[NOT REQUIRED]`_ debugOutput `[bool]`
+* _`[DEFAULTS]`_ debugOutput `[bool]`
     * _Default:_ `false`
     * Output debugging information.
 * _`[OPTIONAL]`_ embedColor `[string]`
@@ -163,22 +163,22 @@ All JSON settings follow camelCase format.
         * Channel ID to monitor.
     * **destination** `[string]`
         * Folder path for saving files, can be full path or local subfolder.
-    * _`[NOT REQUIRED]`_ enabled `[bool]`
+    * _`[DEFAULTS]`_ enabled `[bool]`
         * _Default:_ `true`
         * Toggles bot functionality for channel.
-    * _`[NOT REQUIRED]`_ allowCommands `[bool]`
+    * _`[DEFAULTS]`_ allowCommands `[bool]`
         * _Default:_ `true`
         * Allow use of commands like ping, help, etc.
-    * _`[NOT REQUIRED]`_ errorMessages `[bool]`
+    * _`[DEFAULTS]`_ errorMessages `[bool]`
         * _Default:_ `true`
         * Send response messages when downloads fail or other download-related errors are encountered.
-    * _`[NOT REQUIRED]`_ scanEdits `[bool]`
+    * _`[DEFAULTS]`_ scanEdits `[bool]`
         * _Default:_ `true`
         * Check edits for un-downloaded media.
-    * _`[NOT REQUIRED]`_ updatePresence `[bool]`
+    * _`[DEFAULTS]`_ updatePresence `[bool]`
         * _Default:_ `true`
         * Update Discord Presence when download succeeds within this channel.
-    * _`[NOT REQUIRED]`_ reactWhenDownloaded `[bool]`
+    * _`[DEFAULTS]`_ reactWhenDownloaded `[bool]`
         * _Default:_ `true`
         * Confirmation reaction that file(s) successfully downloaded.
     * _`[OPTIONAL]`_ reactWhenDownloadedEmoji `[string]`
@@ -195,21 +195,21 @@ All JSON settings follow camelCase format.
     * _`[OPTIONAL]`_ overwriteEmbedColor `[string]`
         * _Unused by Default_
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
-    * _`[NOT REQUIRED]`_ divideFoldersByType `[bool]`
+    * _`[DEFAULTS]`_ divideFoldersByType `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
-    * _`[NOT REQUIRED]`_ saveImages `[bool]`
+    * _`[DEFAULTS]`_ saveImages `[bool]`
         * _Default:_ `true`
-    * _`[NOT REQUIRED]`_ saveVideos `[bool]`
+    * _`[DEFAULTS]`_ saveVideos `[bool]`
         * _Default:_ `true`
-    * _`[NOT REQUIRED]`_ saveAudioFiles `[bool]`
+    * _`[DEFAULTS]`_ saveAudioFiles `[bool]`
         * _Default:_ `false`
-    * _`[NOT REQUIRED]`_ saveTextFiles `[bool]`
+    * _`[DEFAULTS]`_ saveTextFiles `[bool]`
         * _Default:_ `false`
-    * _`[NOT REQUIRED]`_ saveOtherFiles `[bool]`
+    * _`[DEFAULTS]`_ saveOtherFiles `[bool]`
         * _Default:_ `false`
-    * _`[NOT REQUIRED]`_ savePossibleDuplicates `[bool]`
+    * _`[DEFAULTS]`_ savePossibleDuplicates `[bool]`
         * _Default:_ `true`
-    * _`[NOT REQUIRED]`_ blacklistedExtensions `[array of strings]`
+    * _`[DEFAULTS]`_ blacklistedExtensions `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
