@@ -376,6 +376,8 @@ func startDownload(inputURL string, filename string, path string, messageID stri
 }
 
 func tryDownload(inputURL string, filename string, path string, messageID string, channelID string, guildID string, userID string, fileTime time.Time, historyCmd bool) DownloadStatusStruct {
+	//TODO: Short hash url to indicate which log is for which file
+	downloadStart := time.Now()
 	logPrefixErrorHere := color.HiRedString("[tryDownload]")
 	if isChannelRegistered(channelID) {
 		channelConfig := getChannelConfig(channelID)
@@ -410,6 +412,11 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			return mDownloadStatus(DownloadFailedDownloadingResponse, err)
 		}
 		defer response.Body.Close()
+
+		// Download duration
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("Took %s to download.", time.Since(downloadStart)))
+		}
 
 		// Filename
 		if filename == "" {
@@ -543,6 +550,11 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", inputURL, err))
 		}
 
+		// Write duration
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("Took %s to save.", time.Since(downloadStart)))
+		}
+
 		// Grab domain
 		urlParse, err := url.Parse(inputURL)
 		domain := ""
@@ -598,7 +610,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 						emoji_fmt := chosen_emoji.APIName()
 						if !chosen_emoji.Animated && !stringInSlice(emoji_fmt, *channelConfig.BlacklistReactEmojis) {
 							if config.DebugOutput {
-								log.Println(logPrefixDebug, color.YellowString("Random Server Emoji for React: "+emoji_fmt))
+								log.Println(logPrefixDebug, color.YellowString("Emoji for React: "+emoji_fmt))
 							}
 							bot.MessageReactionAdd(channelID, messageID, emoji_fmt)
 							break
