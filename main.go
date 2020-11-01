@@ -94,6 +94,9 @@ func main() {
 		log.Println(color.HiYellowString("Created database indexes..."))
 	}
 
+	// For download counter
+	cachedDownloadID = dbDownloadCount()
+
 	// Twitter API
 	if config.Credentials.TwitterAccessToken != "" &&
 		config.Credentials.TwitterAccessTokenSecret != "" &&

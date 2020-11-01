@@ -17,6 +17,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
+	"github.com/hako/durafmt"
 	"mvdan.cc/xurls/v2"
 )
 
@@ -375,9 +376,16 @@ func startDownload(inputURL string, filename string, path string, messageID stri
 	return status
 }
 
+var (
+	cachedDownloadID int
+)
+
 func tryDownload(inputURL string, filename string, path string, messageID string, channelID string, guildID string, userID string, fileTime time.Time, historyCmd bool) DownloadStatusStruct {
-	//TODO: Short hash url to indicate which log is for which file
-	downloadStart := time.Now()
+	cachedDownloadID++
+	thisDownloadID := cachedDownloadID
+
+	startTime := time.Now()
+
 	logPrefixErrorHere := color.HiRedString("[tryDownload]")
 	if isChannelRegistered(channelID) {
 		channelConfig := getChannelConfig(channelID)
@@ -415,8 +423,9 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 
 		// Download duration
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("Took %s to download.", time.Since(downloadStart)))
+			log.Println(logPrefixDebug, color.YellowString("#%d - %s to download.", thisDownloadID, durafmt.ParseShort(time.Since(startTime)).String()))
 		}
+		downloadTime := time.Now()
 
 		// Filename
 		if filename == "" {
@@ -512,7 +521,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			}
 		}
 		newFilename := time.Now().Format(filenameDateFormat) + " " + filename
-		// This was causing failure, I have no idea what I'm doing but changing it seems to work fine
+		//TODO: Fix -- This was causing failure due to unnecessary separator (on windows at least), I have no idea what I'm doing but changing it seems to work fine on linux
 		//completePath := path + string(os.PathSeparator) + subfolder + newFilename
 		completePath := path + subfolder + newFilename
 
@@ -552,8 +561,9 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 
 		// Write duration
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("Took %s to save.", time.Since(downloadStart)))
+			log.Println(logPrefixDebug, color.YellowString("#%d - %s to save.", thisDownloadID, durafmt.ParseShort(time.Since(downloadTime)).String()))
 		}
+		writeTime := time.Now()
 
 		// Grab domain
 		urlParse, err := url.Parse(inputURL)
@@ -596,8 +606,15 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			return mDownloadStatus(DownloadFailedWritingDatabase, err)
 		}
 
+		// Storage & output duration
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("#%d - %s to update database.", thisDownloadID, durafmt.ParseShort(time.Since(writeTime)).String()))
+		}
+		finishTime := time.Now()
+
 		// React
 		if !historyCmd && *channelConfig.ReactWhenDownloaded {
+			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
 				guild, err := bot.State.Guild(guildID)
 				if err != nil {
@@ -609,22 +626,33 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 						chosen_emoji := emojis[rand.Intn(len(emojis))]
 						emoji_fmt := chosen_emoji.APIName()
 						if !chosen_emoji.Animated && !stringInSlice(emoji_fmt, *channelConfig.BlacklistReactEmojis) {
-							if config.DebugOutput {
-								log.Println(logPrefixDebug, color.YellowString("Emoji for React: "+emoji_fmt))
-							}
-							bot.MessageReactionAdd(channelID, messageID, emoji_fmt)
+							reaction = emoji_fmt
 							break
 						}
 					}
 				}
 			} else {
-				bot.MessageReactionAdd(channelID, messageID, *channelConfig.ReactWhenDownloadedEmoji)
+				reaction = *channelConfig.ReactWhenDownloadedEmoji
 			}
+			bot.MessageReactionAdd(channelID, messageID, reaction)
+			// React duration
+			if config.DebugOutput {
+				log.Println(logPrefixDebug, color.YellowString("#%d - %s to react with \"%s\".", thisDownloadID, durafmt.ParseShort(time.Since(finishTime)).String(), reaction))
+			}
+			finishTime = time.Now()
 		}
 
 		timeLastUpdated = time.Now()
 		if *channelConfig.UpdatePresence {
 			updateDiscordPresence()
+			// Presence duration
+			/*if config.DebugOutput {
+				log.Println(logPrefixDebug, color.YellowString("#%d - %s to update presence.", thisDownloadID, durafmt.ParseShort(time.Since(finishTime)).String()))
+			}*/
+		}
+
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("#%d - %s total.", thisDownloadID, time.Since(startTime)))
 		}
 
 		return mDownloadStatus(DownloadSuccess)

@@ -17,7 +17,6 @@ var (
 )
 
 // `json:",omitempty"` is for settings not to be included into intially written settings file
-// JSON casing is camelCase standard but I prefer ProperCase, it'll stay as that for now.
 
 type ConfigurationCredentials struct {
 	Token                    string `json:"token"`                              // required for bot token (this or login)
