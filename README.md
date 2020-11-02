@@ -116,7 +116,7 @@ All JSON settings follow camelCase format.
     * `"online"`, `"idle"`, `"dnd"`, `"invisible"`, `"offline"`
 * _`[DEFAULTS]`_ presenceType `[int]`
     * _Default:_ `0`
-    * Presence label type. _(Playing <thing>, Listening to <thing>, etc)_
+    * Presence label type. _("Playing \<thing\>", "Listening to \<thing\>", etc)_
     * `Game = 0, Streaming = 1, Listening = 2, Watching = 3, Custom = 4`
         * If Bot User, Streaming & Custom won't work properly.
 * _`[OPTIONAL]`_ presenceOverwrite `[string]`
