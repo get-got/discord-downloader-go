@@ -639,7 +639,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		}
 
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("#%d finished, %s total.", thisDownloadID, time.Since(startTime)))
+			log.Println(logPrefixDebug, color.YellowString("#%d - %s total.", thisDownloadID, time.Since(startTime)))
 		}
 
 		return mDownloadStatus(DownloadSuccess)
