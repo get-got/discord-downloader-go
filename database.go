@@ -32,13 +32,12 @@ func trimDownloadedLinks(linkList map[string]string, channelID string) map[strin
 
 func dbInsertDownload(download *Download) error {
 	_, err := myDB.Use("Downloads").Insert(map[string]interface{}{
-		"URL":          download.URL,
-		"Time":         download.Time.String(),
-		"Destination":  download.Destination,
-		"Filename":     download.Filename,
-		"ChannelID":    download.ChannelID,
-		"UserID":       download.UserID,
-		"SourceDomain": download.SourceDomain,
+		"URL":         download.URL,
+		"Time":        download.Time.String(),
+		"Destination": download.Destination,
+		"Filename":    download.Filename,
+		"ChannelID":   download.ChannelID,
+		"UserID":      download.UserID,
 	})
 	return err
 }
@@ -51,13 +50,12 @@ func dbFindDownloadByID(id int) *Download {
 	}
 	timeT, _ := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", readBack["Time"].(string))
 	return &Download{
-		URL:          readBack["URL"].(string),
-		Time:         timeT,
-		Destination:  readBack["Destination"].(string),
-		Filename:     readBack["Filename"].(string),
-		ChannelID:    readBack["ChannelID"].(string),
-		UserID:       readBack["UserID"].(string),
-		SourceDomain: readBack["SourceDomain"].(string),
+		URL:         readBack["URL"].(string),
+		Time:        timeT,
+		Destination: readBack["Destination"].(string),
+		Filename:    readBack["Filename"].(string),
+		ChannelID:   readBack["ChannelID"].(string),
+		UserID:      readBack["UserID"].(string),
 	}
 }
 
@@ -99,20 +97,6 @@ func dbDownloadCountByChannel(channelID string) int {
 func dbDownloadCountByUser(userID string) int {
 	var query interface{}
 	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["UserID"]}]`, userID)), &query)
-	queryResult := make(map[int]struct{})
-	db.EvalQuery(query, myDB.Use("Downloads"), &queryResult)
-
-	downloadedImages := make([]*Download, 0)
-	for id := range queryResult {
-		downloadedImages = append(downloadedImages, dbFindDownloadByID(id))
-	}
-	return len(downloadedImages)
-}
-
-//TODO: Implement
-func dbDownloadCountBySource(domain string) int {
-	var query interface{}
-	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["SourceDomain"]}]`, domain)), &query)
 	queryResult := make(map[int]struct{})
 	db.EvalQuery(query, myDB.Use("Downloads"), &queryResult)
 

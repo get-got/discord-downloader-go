@@ -87,10 +87,6 @@ func main() {
 			log.Println(color.HiRedString("Unable to create database index for UserID: %s", err))
 			return
 		}
-		if err := myDB.Use("Downloads").Index([]string{"SourceDomain"}); err != nil {
-			log.Println(color.HiRedString("Unable to create database index for SourceDomain: %s", err))
-			return
-		}
 		log.Println(color.HiYellowString("Created database indexes..."))
 	}
 

@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"mime"
-	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -22,13 +21,12 @@ import (
 )
 
 type Download struct {
-	URL          string
-	Time         time.Time
-	Destination  string
-	Filename     string
-	ChannelID    string
-	UserID       string
-	SourceDomain string
+	URL         string
+	Time        time.Time
+	Destination string
+	Filename    string
+	ChannelID   string
+	UserID      string
 }
 
 type DownloadStatus int
@@ -565,16 +563,6 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		}
 		writeTime := time.Now()
 
-		// Grab domain
-		urlParse, err := url.Parse(inputURL)
-		domain := ""
-		if err == nil {
-			host, _, err := net.SplitHostPort(urlParse.Host)
-			if err == nil {
-				domain = host
-			}
-		}
-
 		// Output
 		sourceChannelName := channelID
 		sourceGuildName := "N/A"
@@ -593,13 +581,12 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 
 		// Store in db
 		err = dbInsertDownload(&Download{
-			URL:          inputURL,
-			Time:         time.Now(),
-			Destination:  completePath,
-			Filename:     filename,
-			ChannelID:    channelID,
-			UserID:       userID,
-			SourceDomain: domain,
+			URL:         inputURL,
+			Time:        time.Now(),
+			Destination: completePath,
+			Filename:    filename,
+			ChannelID:   channelID,
+			UserID:      userID,
 		})
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.HiRedString("Error writing to database: %s", err))
