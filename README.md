@@ -3,7 +3,7 @@
 
 # discord-downloader-go
 
-### **This project is a rework of [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go)**
+### **This project is a fork of [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go)**
 #### For list of differences and why I made an independent project, [**see below**](#key-differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this).
 
 ## [**DOWNLOAD LATEST RELEASE BUILDS**](https://github.com/get-got/discord-downloader-go/releases/latest)

@@ -185,22 +185,21 @@ func main() {
 
 	router.Default = router.On("help", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:help]")
-		//TODO: PRE-1.0.0 - Update/Improve
 		if isCommandableChannel(ctx.Msg) {
 			text := ""
 			for _, cmd := range router.Routes {
 				if cmd.Category != "Admin" || adminCheck(ctx.Msg) {
-					text += fmt.Sprintf("• %s : %s",
+					text += fmt.Sprintf("• \"%s\" : %s",
 						cmd.Name,
 						cmd.Description,
 					)
 					if len(cmd.Aliases) > 0 {
-						text += fmt.Sprintf("\n— Aliases: %s", strings.Join(cmd.Aliases, ", "))
+						text += fmt.Sprintf("\n— Aliases: \"%s\"", strings.Join(cmd.Aliases, "\", \""))
 					}
 					text += "\n\n"
 				}
 			}
-			sendEmbed(ctx.Msg, "Command — Help", "```"+text+"```")
+			sendEmbed(ctx.Msg, "Command — Help", fmt.Sprintf("Use commands as ``\"%s<command> <arguments?>\"``\n```%s```\n%s", config.CommandPrefix, text, PROJECT_URL))
 			//TODO: Message Send error checking
 			log.Println(logPrefixHere, color.HiCyanString("%s asked for help", userDisplay(*ctx.Msg.Author)))
 		}
@@ -238,15 +237,13 @@ func main() {
 		if isChannelRegistered(ctx.Msg.ChannelID) {
 			channelConfig := getChannelConfig(ctx.Msg.ChannelID)
 			if *channelConfig.AllowCommands {
-				//TODO: Count in channel by users
-				//TODO: Count in channel by domain
-				sendEmbed(ctx.Msg, "Command — Stats",
-					fmt.Sprintf("• **Total Downloads —** %s\n"+
-						"• **Downloads in this Channel —** %s",
-						formatNumber(int64(dbDownloadCount())),
-						formatNumber(int64(dbDownloadCountByChannel(ctx.Msg.ChannelID))),
-					),
+				content := fmt.Sprintf("• **Total Downloads —** %s\n"+
+					"• **Downloads in this Channel —** %s",
+					formatNumber(int64(dbDownloadCount())),
+					formatNumber(int64(dbDownloadCountByChannel(ctx.Msg.ChannelID))),
 				)
+				//TODO: Count in channel by users
+				sendEmbed(ctx.Msg, "Command — Stats", content)
 				//TODO: Message Send error checking
 				log.Println(logPrefixHere, color.HiCyanString("%s requested stats", userDisplay(*ctx.Msg.Author)))
 			}
@@ -341,16 +338,14 @@ func main() {
 	}).Alias("reload", "kill").Desc("Kills the bot").Cat("Admin")
 
 	// Establish Commands
+	//TODO: Case insensitive commands & prefix
 	bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		router.FindAndExecute(bot, config.CommandPrefix, bot.State.User.ID, m.Message)
 	})
-	//TODO: Case insensitive commands & prefix
 
 	// Handle Events
 	bot.AddHandler(messageCreate)
 	bot.AddHandler(messageUpdate)
-
-	//TODO: Debug messages while establishing above
 
 	// Check Bot
 	err = bot.Open()

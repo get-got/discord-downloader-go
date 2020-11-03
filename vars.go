@@ -8,6 +8,7 @@ const (
 	PROJECT_VERSION = "0.9.9"
 	PROJECT_ICON    = "https://discordguide.github.io/assets/Gopher.png"
 
+	PROJECT_URL             = "https://github.com/get-got/discord-downloader-go"
 	PROJECT_RELEASE_URL     = "https://github.com/get-got/discord-downloader-go/releases/latest"
 	PROJECT_RELEASE_API_URL = "https://api.github.com/repos/get-got/discord-downloader-go/releases/latest"
 
