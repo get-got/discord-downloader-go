@@ -4,6 +4,7 @@ import (
 	"regexp"
 )
 
+//TODO: I'm trash at regex syntax so the facebook expressions are very bad
 const (
 	REGEXP_FILENAME                 = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{2,4}$$`
 	REGEXP_URL_TWITTER              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`

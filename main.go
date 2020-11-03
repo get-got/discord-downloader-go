@@ -17,6 +17,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"github.com/hashicorp/go-version"
 )
 
 var (
@@ -420,29 +421,6 @@ func updateDiscordPresence() {
 		countShort := formatNumberShort(countInt)
 		timeShort := timeLastUpdated.Format("3:04pm")
 		timeLong := timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")
-		timeNow := time.Now()
-		//TODO: Optimize keys so values are only fetched when being used.
-		//TODO: Case-insensitive key replacement.
-		keys := [][]string{
-			{"{{dgVersion}}", discordgo.VERSION},
-			{"{{ddgVersion}}", PROJECT_VERSION},
-			{"{{apiVersion}}", discordgo.APIVersion},
-			{"{{count}}", count},
-			{"{{countShort}}", countShort},
-			{"{{numGuilds}}", fmt.Sprint(len(bot.State.Guilds))},
-			{"{{numChannels}}", fmt.Sprint(len(config.Channels))},
-			{"{{numAdminChannels}}", fmt.Sprint(len(config.AdminChannels))},
-			{"{{numAdmins}}", fmt.Sprint(len(config.Admins))},
-			{"{{timeSavedShort}}", timeShort},
-			{"{{timeSavedLong}}", timeLong},
-			{"{{timeSavedShort24}}", timeLastUpdated.Format("15:04")},
-			{"{{timeSavedLong24}}", timeLastUpdated.Format("15:04:05 MST - 1 January, 2006")},
-			{"{{timeNowShort}}", timeNow.Format("3:04pm")},
-			{"{{timeNowLong}}", timeNow.Format("3:04:05pm MST - January 1, 2006")},
-			{"{{timeNowShort24}}", timeNow.Format("15:04")},
-			{"{{timeNowLong24}}", timeNow.Format("15:04:05 MST - 1 January, 2006")},
-			{"{{uptime}}", durafmt.ParseShort(time.Since(startTime)).String()},
-		}
 
 		// Defaults
 		status_presence := fmt.Sprintf("%s - %s files", timeShort, countShort)
@@ -453,33 +431,21 @@ func updateDiscordPresence() {
 		if config.PresenceOverwrite != nil {
 			status_presence = *config.PresenceOverwrite
 			if status_presence != "" {
-				for _, key := range keys {
-					if strings.Contains(status_presence, key[0]) {
-						status_presence = strings.ReplaceAll(status_presence, key[0], key[1])
-					}
-				}
+				status_presence = varKeyReplacement(status_presence)
 			}
 		}
 		// Overwrite Details
 		if config.PresenceOverwriteDetails != nil {
 			status_details = *config.PresenceOverwriteDetails
 			if status_details != "" {
-				for _, key := range keys {
-					if strings.Contains(status_details, key[0]) {
-						status_details = strings.ReplaceAll(status_details, key[0], key[1])
-					}
-				}
+				status_details = varKeyReplacement(status_details)
 			}
 		}
 		// Overwrite State
 		if config.PresenceOverwriteState != nil {
 			status_state = *config.PresenceOverwriteState
 			if status_state != "" {
-				for _, key := range keys {
-					if strings.Contains(status_state, key[0]) {
-						status_state = strings.ReplaceAll(status_state, key[0], key[1])
-					}
-				}
+				status_state = varKeyReplacement(status_state)
 			}
 		}
 
@@ -496,27 +462,67 @@ func updateDiscordPresence() {
 	}
 }
 
+func varKeyReplacement(input string) string {
+	countInt := int64(dbDownloadCount()) + *config.InflateCount
+	timeNow := time.Now()
+	keys := [][]string{
+		{"{{dgVersion}}", discordgo.VERSION},
+		{"{{ddgVersion}}", PROJECT_VERSION},
+		{"{{apiVersion}}", discordgo.APIVersion},
+		{"{{count}}", formatNumber(countInt)},
+		{"{{countShort}}", formatNumberShort(countInt)},
+		{"{{numGuilds}}", fmt.Sprint(len(bot.State.Guilds))},
+		{"{{numChannels}}", fmt.Sprint(len(config.Channels))},
+		{"{{numAdminChannels}}", fmt.Sprint(len(config.AdminChannels))},
+		{"{{numAdmins}}", fmt.Sprint(len(config.Admins))},
+		{"{{timeSavedShort}}", timeLastUpdated.Format("3:04pm")},
+		{"{{timeSavedLong}}", timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")},
+		{"{{timeSavedShort24}}", timeLastUpdated.Format("15:04")},
+		{"{{timeSavedLong24}}", timeLastUpdated.Format("15:04:05 MST - 1 January, 2006")},
+		{"{{timeNowShort}}", timeNow.Format("3:04pm")},
+		{"{{timeNowLong}}", timeNow.Format("3:04:05pm MST - January 1, 2006")},
+		{"{{timeNowShort24}}", timeNow.Format("15:04")},
+		{"{{timeNowLong24}}", timeNow.Format("15:04:05 MST - 1 January, 2006")},
+		{"{{uptime}}", durafmt.ParseShort(time.Since(startTime)).String()},
+	}
+	//TODO: Case-insensitive key replacement.
+	for _, key := range keys {
+		if strings.Contains(input, key[0]) {
+			input = strings.ReplaceAll(input, key[0], key[1])
+		}
+	}
+	return input
+}
+
 type GithubReleaseApiObject struct {
 	TagName string `json:"tag_name"`
 }
 
 func isLatestRelease() bool {
-	return true
-	//TODO: PRE-1.0.0 - Fix/Improve?
-	/*githubReleaseApiObject := new(GithubReleaseApiObject)
-	getJson(PROJECT_RELEASE_API_URL, githubReleaseApiObject)
+	prefixHere := color.HiMagentaString("[Github Update Check]")
+
+	githubReleaseApiObject := new(GithubReleaseApiObject)
+	err := getJson(PROJECT_RELEASE_API_URL, githubReleaseApiObject)
+	if err != nil {
+		log.Println(prefixHere, color.RedString("Error fetching current Release JSON: %s", err))
+		return true
+	}
+
 	thisVersion, err := version.NewVersion(PROJECT_VERSION)
 	if err != nil {
-		log.Println(err)
+		log.Println(prefixHere, color.RedString("Error parsing current version: %s", err))
 		return true
 	}
+
 	latestVersion, err := version.NewVersion(githubReleaseApiObject.TagName)
 	if err != nil {
-		log.Println(err)
+		log.Println(prefixHere, color.RedString("Error parsing latest version: %s", err))
 		return true
 	}
+
 	if latestVersion.GreaterThan(thisVersion) {
 		return false
 	}
-	return true*/
+
+	return true
 }

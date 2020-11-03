@@ -16,6 +16,7 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/garyburd/go-oauth v0.0.0-20180319155456-bca2e7f09a17 // indirect
 	github.com/hako/durafmt v0.0.0-20200710122514-c0fb7b4da026
+	github.com/hashicorp/go-version v1.2.1
 	golang.org/x/net v0.0.0-20201016165138-7b1cca2348c0
 	mvdan.cc/xurls/v2 v2.2.0
 )
