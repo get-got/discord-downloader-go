@@ -2,8 +2,8 @@
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Build Status">
         <img src="https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
     </a>
-    <a href="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" alt="Go Report Card">
-        <img src="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" />
+    <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Report Card">
+        <img src="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" />
     </a>
     <a href="" alt="Go Version">
         <img src="https://img.shields.io/github/go-mod/go-version/get-got/discord-downloader-go" />
