@@ -1,6 +1,9 @@
 [![Build Status](https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master)](https://travis-ci.com/get-got/discord-downloader-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/get-got/discord-downloader-go)](https://goreportcard.com/report/github.com/get-got/discord-downloader-go)
 
+[![All Releases](https://img.shields.io/github/downloads/get-got/discord-downloader-go/total?label=all-releases&logo=GitHub)](https://github.com/get-got/discord-downloader-go/releases)
+[![Latest Release](https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub)](https://github.com/get-got/discord-downloader-go/releases/latest)
+
 # discord-downloader-go
 
 ### **This project is a fork of [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go)**
