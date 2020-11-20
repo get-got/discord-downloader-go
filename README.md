@@ -1,10 +1,20 @@
 <p align="center">
-    [![Build Status](https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master)](https://travis-ci.com/get-got/discord-downloader-go)
-    [![Go Report Card](https://goreportcard.com/badge/github.com/get-got/discord-downloader-go)](https://goreportcard.com/report/github.com/get-got/discord-downloader-go)
-    [![Go Version](https://img.shields.io/github/go-mod/go-version/get-got/discord-downloader-go)]()
-
-    [![All Releases](https://img.shields.io/github/downloads/get-got/discord-downloader-go/total?label=all-releases&logo=GitHub)](https://github.com/get-got/discord-downloader-go/releases)
-    [![Latest Release](https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub)](https://github.com/get-got/discord-downloader-go/releases/latest)
+    <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Build Status">
+        <img src="https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
+    </a>
+    <a href="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" alt="Go Report Card">
+        <img src="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" />
+    </a>
+    <a href="" alt="Go Version">
+        <img src="https://img.shields.io/github/go-mod/go-version/get-got/discord-downloader-go" />
+    </a>
+    <br>
+    <a href="https://github.com/get-got/discord-downloader-go/releases" alt="All Releases">
+        <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/total?label=all-releases&logo=GitHub" />
+    </a>
+    <a href="https://github.com/get-got/discord-downloader-go/releases/latest" alt="Latest Release">
+        <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub" />
+    </a>
 </p>
 
 # discord-downloader-go
