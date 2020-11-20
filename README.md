@@ -1,3 +1,7 @@
+<h1 align="center">
+    discord-downloader-go
+</h1>
+
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Build Status">
         <img src="https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
@@ -16,8 +20,6 @@
         <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub" />
     </a>
 </p>
-
-# discord-downloader-go
 
 ### **This project is a fork of [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go)**
 #### For list of differences and why I made an independent project, [**see below**](#key-differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this).
