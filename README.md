@@ -153,12 +153,20 @@ All JSON settings follow camelCase format.
         * `{{numAdminChannels}}`: Number of admin channels
         * `{{numAdmins}}`: Number of designated admins
         * `{{timeSavedShort}}`: Last save time formatted as `3:04pm`
+        * `{{timeSavedShortTZ}}`: Last save time formatted as `3:04pm MST`
+        * `{{timeSavedMid}}`: Last save time formatted as `3:04pm MST 1/2/2006`
         * `{{timeSavedLong}}`: Last save time formatted as `3:04:05pm MST - January 1, 2006`
         * `{{timeSavedShort24}}`: Last save time formatted as `15:04`
+        * `{{timeSavedShortTZ24}}`: Last save time formatted as `15:04 MST`
+        * `{{timeSavedMid24}}`: Last save time formatted as `15:04 MST 2/1/2006`
         * `{{timeSavedLong24}}`: Last save time formatted as `15:04:05 MST - 1 January, 2006`
         * `{{timeNowShort}}`: Current time formatted as `3:04pm`
+        * `{{timeNowShortTZ}}`: Current time formatted as `3:04pm MST`
+        * `{{timeNowMid}}`: Current time formatted as `3:04pm MST 1/2/2006`
         * `{{timeNowLong}}`: Current time formatted as `3:04:05pm MST - January 1, 2006`
         * `{{timeNowShort24}}`: Current time formatted as `15:04`
+        * `{{timeNowShortTZ24}}`: Current time formatted as `15:04 MST`
+        * `{{timeNowMid24}}`: Current time formatted as `15:04 MST 2/1/2006`
         * `{{timeNowLong24}}`: Current time formatted as `15:04:05 MST - 1 January, 2006`
         * `{{uptime}}`: Shortened duration of bot uptime
 * _`[OPTIONAL]`_ presenceOverwriteDetails `[string]`
