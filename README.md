@@ -216,7 +216,7 @@ All JSON settings follow camelCase format.
         * Uses specified emoji rather than random server emojis. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
     * _`[OPTIONAL]`_ overwriteFilenameDateFormat `[string]`
         * _Unused by Default_
-        * Overwrites the global setting `FilenameDateFormat` _(see above)_
+        * Overwrites the global setting `filenameDateFormat` _(see above)_
         * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
     * _`[OPTIONAL]`_ overwriteAllowSkipping `[bool]`
         * _Unused by Default_
