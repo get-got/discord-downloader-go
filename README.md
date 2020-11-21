@@ -1,5 +1,5 @@
 <h1 align="center">
-    discord-downloader-go
+    Discord Downloader
 </h1>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Build Status">
