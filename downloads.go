@@ -489,6 +489,13 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 				if stringInSlice(extension, []string{".mov"}) {
 					contentTypeFound = "video"
 					subfolder = "videos/"
+				} else if stringInSlice(extension, []string{".psd"}) ||
+					stringInSlice(extension, []string{".nef"}) ||
+					stringInSlice(extension, []string{".dng"}) ||
+					stringInSlice(extension, []string{".tif"}) ||
+					stringInSlice(extension, []string{".tiff"}) {
+					contentTypeFound = "image"
+					subfolder = "images/"
 				} else {
 					subfolder = "applications/"
 				}

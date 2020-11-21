@@ -76,7 +76,7 @@ func filepathExtension(filepath string) string {
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
-		if b == a {
+		if strings.ToLower(b) == strings.ToLower(a) {
 			return true
 		}
 	}
