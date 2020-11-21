@@ -5,7 +5,7 @@ import "github.com/fatih/color"
 const (
 	PROJECT_NAME    = "discord-downloader-go"
 	PROJECT_LABEL   = "Discord Download Bot"
-	PROJECT_VERSION = "0.9.9"
+	PROJECT_VERSION = "1.0.0"
 	PROJECT_ICON    = "https://discordguide.github.io/assets/Gopher.png"
 
 	PROJECT_URL             = "https://github.com/get-got/discord-downloader-go"
