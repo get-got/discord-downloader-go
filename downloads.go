@@ -599,14 +599,18 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 					log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", guildID, err))
 				} else {
 					emojis := guild.Emojis
-					for {
-						rand.Seed(time.Now().UnixNano())
-						chosen_emoji := emojis[rand.Intn(len(emojis))]
-						emoji_fmt := chosen_emoji.APIName()
-						if !chosen_emoji.Animated && !stringInSlice(emoji_fmt, *channelConfig.BlacklistReactEmojis) {
-							reaction = emoji_fmt
-							break
+					if len(emojis) > 1 {
+						for {
+							rand.Seed(time.Now().UnixNano())
+							chosen_emoji := emojis[rand.Intn(len(emojis))]
+							emoji_fmt := chosen_emoji.APIName()
+							if !chosen_emoji.Animated && !stringInSlice(emoji_fmt, *channelConfig.BlacklistReactEmojis) {
+								reaction = emoji_fmt
+								break
+							}
 						}
+					} else {
+						reaction = "✅"
 					}
 				}
 			} else {

@@ -222,6 +222,7 @@ func getChannelName(channelID string) string {
 	return sourceChannelName
 }
 
+// For command case-insensitivity
 func messageToLower(message *discordgo.Message) *discordgo.Message {
 	newMessage := *message
 	newMessage.Content = strings.ToLower(newMessage.Content)
