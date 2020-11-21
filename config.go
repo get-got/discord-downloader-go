@@ -18,7 +18,7 @@ var (
 	PLACEHOLDER_PASSWORD string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
 )
 
-// `json:",omitempty"` is for settings not to be included into intially written settings file
+// `json:",omitempty"` is for settings not to be included into initially written settings file
 
 type ConfigurationCredentials struct {
 	Token                    string `json:"token"`                              // required for bot token (this or login)
