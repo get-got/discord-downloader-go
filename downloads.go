@@ -623,10 +623,6 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		timeLastUpdated = time.Now()
 		if *channelConfig.UpdatePresence {
 			updateDiscordPresence()
-			// Presence duration
-			/*if config.DebugOutput {
-				log.Println(logPrefixDebug, color.YellowString("#%d - %s to update presence.", thisDownloadID, durafmt.ParseShort(time.Since(finishTime)).String()))
-			}*/
 		}
 
 		if config.DebugOutput {
