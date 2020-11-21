@@ -12,30 +12,30 @@ import (
 )
 
 func presenceKeyReplacement(input string) string {
-	countInt := int64(dbDownloadCount()) + *config.InflateCount
-	timeNow := time.Now()
-	keys := [][]string{
-		{"{{dgVersion}}", discordgo.VERSION},
-		{"{{ddgVersion}}", PROJECT_VERSION},
-		{"{{apiVersion}}", discordgo.APIVersion},
-		{"{{count}}", formatNumber(countInt)},
-		{"{{countShort}}", formatNumberShort(countInt)},
-		{"{{numGuilds}}", fmt.Sprint(len(bot.State.Guilds))},
-		{"{{numChannels}}", fmt.Sprint(len(config.Channels))},
-		{"{{numAdminChannels}}", fmt.Sprint(len(config.AdminChannels))},
-		{"{{numAdmins}}", fmt.Sprint(len(config.Admins))},
-		{"{{timeSavedShort}}", timeLastUpdated.Format("3:04pm")},
-		{"{{timeSavedLong}}", timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")},
-		{"{{timeSavedShort24}}", timeLastUpdated.Format("15:04")},
-		{"{{timeSavedLong24}}", timeLastUpdated.Format("15:04:05 MST - 1 January, 2006")},
-		{"{{timeNowShort}}", timeNow.Format("3:04pm")},
-		{"{{timeNowLong}}", timeNow.Format("3:04:05pm MST - January 1, 2006")},
-		{"{{timeNowShort24}}", timeNow.Format("15:04")},
-		{"{{timeNowLong24}}", timeNow.Format("15:04:05 MST - 1 January, 2006")},
-		{"{{uptime}}", durafmt.ParseShort(time.Since(startTime)).String()},
-	}
 	//TODO: Case-insensitive key replacement.
 	if strings.Contains(input, "{{") && strings.Contains(input, "}}") {
+		countInt := int64(dbDownloadCount()) + *config.InflateCount
+		timeNow := time.Now()
+		keys := [][]string{
+			{"{{dgVersion}}", discordgo.VERSION},
+			{"{{ddgVersion}}", PROJECT_VERSION},
+			{"{{apiVersion}}", discordgo.APIVersion},
+			{"{{count}}", formatNumber(countInt)},
+			{"{{countShort}}", formatNumberShort(countInt)},
+			{"{{numGuilds}}", fmt.Sprint(len(bot.State.Guilds))},
+			{"{{numChannels}}", fmt.Sprint(len(config.Channels))},
+			{"{{numAdminChannels}}", fmt.Sprint(len(config.AdminChannels))},
+			{"{{numAdmins}}", fmt.Sprint(len(config.Admins))},
+			{"{{timeSavedShort}}", timeLastUpdated.Format("3:04pm")},
+			{"{{timeSavedLong}}", timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")},
+			{"{{timeSavedShort24}}", timeLastUpdated.Format("15:04")},
+			{"{{timeSavedLong24}}", timeLastUpdated.Format("15:04:05 MST - 1 January, 2006")},
+			{"{{timeNowShort}}", timeNow.Format("3:04pm")},
+			{"{{timeNowLong}}", timeNow.Format("3:04:05pm MST - January 1, 2006")},
+			{"{{timeNowShort24}}", timeNow.Format("15:04")},
+			{"{{timeNowLong24}}", timeNow.Format("15:04:05 MST - 1 January, 2006")},
+			{"{{uptime}}", durafmt.ParseShort(time.Since(startTime)).String()},
+		}
 		for _, key := range keys {
 			if strings.Contains(input, key[0]) {
 				input = strings.ReplaceAll(input, key[0], key[1])
