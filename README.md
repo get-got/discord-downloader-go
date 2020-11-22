@@ -73,11 +73,15 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 * _discordgo 0.22.0 rather than 0.16.1_
 * _Implements dgrouter for commands_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
-* Log Formatting, Color-Coded Logging
-* Somewhat different organization than original project; initially created from scratch then features ported over.
-* **Added Support For:** Facebook Videos
-* **Removed Support For:** Tistory, Google Drive - _These seemed to require some extra configuration files in the original project and be for rather specific-case use, so I took them out. If anyone can neatly integrate them, feel free to make a pull request._
-* Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. The issue was due to some people having xurls v2 installed while the projects go.mod required v1.1.
+* (Optional) Reactions upon download success.
+* (Optional) Discord messages upon encountered errors.
+* Extensive bot status/presence customization.
+* Channel-specific control of downloaded filetypes / content types.
+* Consistent Log Formatting, Color-Coded Logging
+* Somewhat different organization than original project; initially created from scratch then components ported over.
+* **Added Download Support for:** Facebook Videos
+* **Removed Download Support for:** Tistory, Google Drive - _These seemed to require some extra configuration files in the original project and be for rather specific-case use, so I took them out. If anyone can neatly integrate them, feel free to make a pull request._
+* Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. The issue was due to some people having xurls v2 installed while the projects go.mod required v1.1; changing go.mod to require v2 specifically seems to be the correct fix.
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
