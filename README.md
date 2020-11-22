@@ -106,16 +106,91 @@ This setup exempts many options so they will use default values _(see below)_. I
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
 
-`settings.json:`
+`Barebones settings.json:`
 ```javascript
 {
     "credentials": {
-        "token": "REPLACE_WITH_YOUR_TOKEN",
+        "token": "REPLACE_WITH_YOUR_TOKEN"
     },
     "channels": [
         {
             "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
             "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
+        }
+    ]
+}
+```
+
+`Selfbot settings.json:`
+```javascript
+{
+    "credentials": {
+        "email": "REPLACE_WITH_YOUR_EMAIL",
+        "password": "REPLACE_WITH_YOUR_PASSWORD"
+    },
+    "scanOwnMessages": true,
+    "presenceEnabled": false,
+    "channels": [
+        {
+            "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
+            "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "allowCommands": false,
+            "errorMessages": false,
+            "reactWhenDownloaded": false
+        }
+    ]
+}
+```
+
+`Advanced settings.json:`
+```javascript
+{
+    "credentials": {
+        "token": "YOUR_TOKEN",
+        "twitterAccessToken": "",
+        "twitterAccessTokenSecret": "",
+        "twitterConsumerKey": "",
+        "twitterConsumerSecret": ""
+    },
+    "admins": [ "YOUR_DISCORD_USER_ID" ],
+    "downloadRetryMax": 5,
+    "downloadTimeout": 120,
+    "commandPrefix": "downloader ",
+    "allowSkipping": true,
+    "presenceStatus": "dnd",
+    "presenceType": 1,
+    "debugOutput": true,
+    "adminChannels": [
+        {
+            "channel": "ADMIN_CHANNEL_ID"
+        }
+    ],
+    "channels": [
+        {
+            "channel": "THIS_CHANNEL_DOWNLOADS_EVERYTHING",
+            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "saveImages": true,
+            "saveVideos": true,
+            "saveAudioFiles": true,
+            "saveTextFiles": true,
+            "saveOtherFiles": true
+        },
+        {
+            "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
+            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "saveImages": true,
+            "saveVideos": true,
+            "saveAudioFiles": true,
+            "saveTextFiles": false,
+            "saveOtherFiles": false
+        },
+        {
+            "channel": "THIS_CHANNEL_IS_STEALTHY",
+            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "allowCommands": false,
+            "errorMessages": false,
+            "updatePresence": false,
+            "reactWhenDownloaded": false
         }
     ]
 }
