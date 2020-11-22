@@ -94,8 +94,29 @@ You will need the Channel ID (see bottom of [Setup](#Setup)) if attempting to ca
 ## Settings / Configuration Guide
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
 
+### Basic Settings Example
+The following example is for a Bot Application _(using a token)_, bound to 1 channel.
+
+This setup exempts many options so they will use default values _(see above)_. It shows the bare minimum required settings for the bot to function.
+
+When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
+```json
+{
+    "credentials": {
+        "token": "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE",
+    },
+    "channels": [
+        {
+            "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
+            "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
+        }
+    ]
+}
+```
+
 All JSON settings follow camelCase format.
 
+### List of Settings
 * **credentials** `[key/value object]`
     * **token** `[string]`
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
@@ -251,23 +272,3 @@ All JSON settings follow camelCase format.
     * _`[DEFAULTS]`_ blacklistedExtensions `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
-
-### Basic Settings Example
-The following example is for a Bot Application _(using a token)_, bound to 1 channel.
-
-This setup exempts many options so they will use default values _(see above)_. It shows the bare minimum required settings for the bot to function.
-
-When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
-```json
-{
-    "credentials": {
-        "token": "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE",
-    },
-    "channels": [
-        {
-            "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
-            "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
-        }
-    ]
-}
-```
