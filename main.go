@@ -44,11 +44,12 @@ func init() {
 func main() {
 	var err error
 
-	// Initialize: Config
+	// Initialize Config
 	log.Println(color.YellowString("Loading settings from \"%s\"...", LOC_CONFIG_FILE))
 	loadConfig()
 	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s)", len(config.Channels)))
 
+	// Github
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
 			log.Println(color.HiCyanString("Update available on %s\n", PROJECT_RELEASE_URL))
@@ -117,7 +118,7 @@ func main() {
 	// Initialize Regex
 	err = compileRegex()
 	if err != nil {
-		log.Println(color.HiRedString("Error initializing Regex: %s", err.Error()))
+		log.Println(color.HiRedString("Error initializing Regex:\t%s", err))
 		return
 	}
 
@@ -207,7 +208,7 @@ func main() {
 				)
 			}
 		}
-	}).Alias("test").Desc("Pings the bot").Cat("Utility")
+	}).Cat("Utility").Alias("test").Desc("Pings the bot")
 
 	router.Default = router.On("help", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:help]")
@@ -232,7 +233,7 @@ func main() {
 			}
 			log.Println(logPrefixHere, color.HiCyanString("%s asked for help", getUserIdentifier(*ctx.Msg.Author)))
 		}
-	}).Alias("commands").Desc("Outputs this help menu").Cat("Utility")
+	}).Cat("Utility").Alias("commands").Desc("Outputs this help menu")
 
 	// Commands: Info
 	router.On("status", func(ctx *exrouter.Context) {
@@ -262,7 +263,7 @@ func main() {
 			}
 			log.Println(logPrefixHere, color.HiCyanString("%s requested status report", getUserIdentifier(*ctx.Msg.Author)))
 		}
-	}).Alias("info").Desc("Displays info regarding the current status of the bot").Cat("Info")
+	}).Cat("Info").Alias("info").Desc("Displays info regarding the current status of the bot")
 
 	router.On("stats", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:stats]")
@@ -283,7 +284,7 @@ func main() {
 				log.Println(logPrefixHere, color.HiCyanString("%s requested stats", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
-	}).Desc("Outputs statistics regarding this channel").Cat("Info")
+	}).Cat("Info").Desc("Outputs statistics regarding this channel")
 
 	// Commands: Admin
 	router.On("history", func(ctx *exrouter.Context) {
@@ -371,7 +372,7 @@ func main() {
 		} else {
 			log.Println(logPrefixHere, color.CyanString("%s tried to catalog history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channel))
 		}
-	}).Alias("catalog", "cache").Desc("Catalogs history for this channel").Cat("Admin")
+	}).Alias("catalog", "cache").Cat("Admin").Desc("Catalogs history for this channel")
 
 	router.On("exit", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:exit]")
@@ -391,7 +392,7 @@ func main() {
 				log.Println(logPrefixHere, color.HiCyanString("%s tried to exit but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
-	}).Alias("reload", "kill").Desc("Kills the bot").Cat("Admin")
+	}).Alias("reload", "kill").Cat("Admin").Desc("Kills the bot")
 
 	// Handler for Command Router
 	bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
@@ -424,7 +425,6 @@ func main() {
 
 	// Output: Startup Duration
 	if config.DebugOutput {
-		// fmt.Sprintf is used here to properly format Duration as a string, casting yields warnings.
 		log.Println(logPrefixDebug, color.YellowString("Startup finished, took %s...", uptime()))
 	}
 
