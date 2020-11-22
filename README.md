@@ -105,7 +105,7 @@ When initially launching the bot it will create a default settings file if you d
 ```javascript
 {
     "credentials": {
-        "token": "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE",
+        "token": "REPLACE_WITH_YOUR_TOKEN",
     },
     "channels": [
         {
