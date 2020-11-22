@@ -101,8 +101,8 @@ This setup exempts many options so they will use default values _(see below)_. I
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
 
-**`settings.json:`**
-```json
+`settings.json:`
+```javascript
 {
     "credentials": {
         "token": "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE",
