@@ -68,7 +68,7 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
     * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
     * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
 
-### Key Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
+### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
 * _Go 1.15 rather than 1.13_
 * _discordgo 0.22.0 rather than 0.16.1_
 * _Implements dgrouter for commands_
