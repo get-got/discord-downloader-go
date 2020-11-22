@@ -100,6 +100,8 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
+
+**`settings.json:`**
 ```json
 {
     "credentials": {
