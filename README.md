@@ -182,7 +182,11 @@ When initially launching the bot it will create a default settings file if you d
             "saveTextFiles": true,
             "saveOtherFiles": true,
             "savePossibleDuplicates": true,
-            "blacklistedExtensions": []
+            "blacklistedExtensions": [
+                ".htm",
+                ".html",
+                ".php"
+            ]
         },
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
