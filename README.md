@@ -251,3 +251,23 @@ All JSON settings follow camelCase format.
     * _`[DEFAULTS]`_ blacklistedExtensions `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
+
+### Basic Settings Example
+The following example is for a Bot Application _(using a token)_, bound to 1 channel.
+
+This setup exempts many options so they will use default values _(see above)_. It shows the bare minimum required settings for the bot to function.
+
+When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
+```json
+{
+    "credentials": {
+        "token": "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE",
+    },
+    "channels": [
+        {
+            "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
+            "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
+        }
+    ]
+}
+```
