@@ -280,6 +280,22 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			return trimDownloadedLinks(links, channelID)
 		}
 	}
+	if RegexpUrlGoogleDrive.MatchString(inputURL) {
+		links, err := getGoogleDriveUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Google Drive Album URL for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
+	if RegexpUrlGoogleDriveFolder.MatchString(inputURL) {
+		links, err := getGoogleDriveFolderUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Google Drive Folder URL for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
 	if RegexpUrlTistory.MatchString(inputURL) {
 		links, err := getTistoryUrls(inputURL)
 		if err != nil {

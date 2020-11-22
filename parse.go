@@ -16,6 +16,7 @@ import (
 	"github.com/Jeffail/gabs"
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
+	"google.golang.org/api/googleapi"
 )
 
 var (
@@ -480,6 +481,56 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 		return getFlickrAlbumUrls(result.Request.URL.String())
 	}
 	return nil, errors.New("Encountered invalid URL while trying to get long URL from short Flickr Album URL")
+}
+
+func getGoogleDriveUrls(url string) (map[string]string, error) {
+	parts := strings.Split(url, "/")
+	if len(parts) != 7 {
+		return nil, errors.New("unable to parse google drive url")
+	}
+	fileId := parts[len(parts)-2]
+	return map[string]string{"https://drive.google.com/uc?export=download&id=" + fileId: ""}, nil
+}
+
+func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
+	matches := RegexpUrlGoogleDriveFolder.FindStringSubmatch(url)
+	if len(matches) < 4 || matches[3] == "" {
+		return nil, errors.New("unable to find google drive folder ID in link")
+	}
+	if DriveService.BasePath == "" {
+		return nil, errors.New("please set up google credentials")
+	}
+	googleDriveFolderID := matches[3]
+
+	links := make(map[string]string)
+
+	driveQuery := fmt.Sprintf("\"%s\" in parents", googleDriveFolderID)
+	driveFields := "nextPageToken, files(id)"
+	result, err := DriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
+	if err != nil {
+		log.Println("driveQuery:", driveQuery)
+		log.Println("driveFields:", driveFields)
+		log.Println("err:", err)
+		return nil, err
+	}
+	for _, file := range result.Files {
+		fileUrl := "https://drive.google.com/uc?export=download&id=" + file.Id
+		links[fileUrl] = ""
+	}
+
+	for {
+		if result.NextPageToken == "" {
+			break
+		}
+		result, err = DriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).PageToken(result.NextPageToken).Do()
+		if err != nil {
+			return nil, err
+		}
+		for _, file := range result.Files {
+			links[file.Id] = ""
+		}
+	}
+	return links, nil
 }
 
 // getTistoryUrls downloads tistory URLs

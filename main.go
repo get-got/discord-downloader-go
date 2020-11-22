@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -17,6 +19,8 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v3"
 )
 
 var (
@@ -24,6 +28,8 @@ var (
 	user *discordgo.User
 	myDB *db.DB
 	loop chan os.Signal
+
+	DriveService *drive.Service
 
 	startTime        time.Time
 	timeLastUpdated  time.Time
@@ -113,6 +119,29 @@ func main() {
 		}
 	} else {
 		log.Println(color.MagentaString("Twitter API credentials missing, the bot won't use the Twitter API."))
+	}
+
+	// Initialize Google Drive Client
+	if config.Credentials.GoogleDriveCredentialsJSON != "" {
+		log.Println(color.MagentaString("Connecting to Google Drive Client..."))
+		ctx := context.Background()
+		authJson, err := ioutil.ReadFile(config.Credentials.GoogleDriveCredentialsJSON)
+		if err != nil {
+			log.Println(color.HiRedString("Error opening Google Credentials JSON:\t%s", err))
+		} else {
+			googleConfig, err := google.JWTConfigFromJSON(authJson, drive.DriveReadonlyScope)
+			if err != nil {
+				log.Println(color.HiRedString("Error parsing Google Credentials JSON:\t%s", err))
+			} else {
+				client := googleConfig.Client(ctx)
+				DriveService, err = drive.New(client)
+				if err != nil {
+					log.Println(color.HiRedString("Error setting up Google Drive Client:\t%s", err))
+				} else {
+					log.Println(color.HiMagentaString("Connected to Google Drive Client"))
+				}
+			}
+		}
 	}
 
 	// Initialize Regex

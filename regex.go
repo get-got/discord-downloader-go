@@ -18,11 +18,11 @@ const (
 	REGEXP_URL_IMGUR_ALBUM             = `^http(s?):\/\/imgur\.com\/(a\/|gallery\/|r\/[^\/]+\/)[A-Za-z0-9]+(#[A-Za-z0-9]+)?$`
 	REGEXP_URL_STREAMABLE              = `^http(s?):\/\/(www\.)?streamable\.com\/([0-9a-z]+)$`
 	REGEXP_URL_GFYCAT                  = `^http(s?):\/\/gfycat\.com\/(gifs\/detail\/)?[A-Za-z]+$`
-	REGEXP_URL_GOOGLEDRIVE             = `^http(s?):\/\/drive\.google\.com\/file\/d\/[^/]+\/view$`
-	REGEXP_URL_GOOGLEDRIVE_FOLDER      = `^http(s?):\/\/drive\.google\.com\/(drive\/folders\/|open\?id=)([^/]+)$`
 	REGEXP_URL_FLICKR_PHOTO            = `^http(s)?:\/\/(www\.)?flickr\.com\/photos\/([0-9]+)@([A-Z0-9]+)\/([0-9]+)(\/)?(\/in\/album-([0-9]+)(\/)?)?$`
 	REGEXP_URL_FLICKR_ALBUM            = `^http(s)?:\/\/(www\.)?flickr\.com\/photos\/(([0-9]+)@([A-Z0-9]+)|[A-Za-z0-9]+)\/(albums\/(with\/)?|(sets\/)?)([0-9]+)(\/)?$`
 	REGEXP_URL_FLICKR_ALBUM_SHORT      = `^http(s)?:\/\/((www\.)?flickr\.com\/gp\/[0-9]+@[A-Z0-9]+\/[A-Za-z0-9]+|flic\.kr\/s\/[a-zA-Z0-9]+)$`
+	REGEXP_URL_GOOGLEDRIVE             = `^http(s?):\/\/drive\.google\.com\/file\/d\/[^/]+\/view$`
+	REGEXP_URL_GOOGLEDRIVE_FOLDER      = `^http(s?):\/\/drive\.google\.com\/(drive\/folders\/|open\?id=)([^/]+)$`
 	REGEXP_URL_TISTORY                 = `^http(s?):\/\/t[0-9]+\.daumcdn\.net\/cfile\/tistory\/([A-Z0-9]+?)(\?original)?$`
 	REGEXP_URL_TISTORY_LEGACY          = `^http(s?):\/\/[a-z0-9]+\.uf\.tistory\.com\/(image|original)\/[A-Z0-9]+$`
 	REGEXP_URL_TISTORY_LEGACY_WITH_CDN = `^http(s)?:\/\/[0-9a-z]+.daumcdn.net\/[a-z]+\/[a-zA-Z0-9\.]+\/\?scode=mtistory&fname=http(s?)%3A%2F%2F[a-z0-9]+\.uf\.tistory\.com%2F(image|original)%2F[A-Z0-9]+$`
@@ -45,6 +45,8 @@ var (
 	RegexpUrlFlickrPhoto          *regexp.Regexp
 	RegexpUrlFlickrAlbum          *regexp.Regexp
 	RegexpUrlFlickrAlbumShort     *regexp.Regexp
+	RegexpUrlGoogleDrive          *regexp.Regexp
+	RegexpUrlGoogleDriveFolder    *regexp.Regexp
 	RegexpUrlTistory              *regexp.Regexp
 	RegexpUrlTistoryLegacy        *regexp.Regexp
 	RegexpUrlTistoryLegacyWithCDN *regexp.Regexp
@@ -111,6 +113,14 @@ func compileRegex() error {
 		return err
 	}
 	RegexpUrlFlickrAlbumShort, err = regexp.Compile(REGEXP_URL_FLICKR_ALBUM_SHORT)
+	if err != nil {
+		return err
+	}
+	RegexpUrlGoogleDrive, err = regexp.Compile(REGEXP_URL_GOOGLEDRIVE)
+	if err != nil {
+		return err
+	}
+	RegexpUrlGoogleDriveFolder, err = regexp.Compile(REGEXP_URL_GOOGLEDRIVE_FOLDER)
 	if err != nil {
 		return err
 	}

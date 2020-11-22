@@ -58,6 +58,8 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
     * Facebook Videos
     * Imgur _(Single Posts & Albums)_
     * Flickr _(requires API key, see config section)_
+    * Google Drive _(requires API Credentials, see config section)_
+    * Tistory
     * Streamable
     * Gfycat
 * ***Commands:***
@@ -80,7 +82,6 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 * Consistent Log Formatting, Color-Coded Logging
 * Somewhat different organization than original project; initially created from scratch then components ported over.
 * **Added Download Support for:** Facebook Videos
-* **Removed Download Support for:** Tistory, Google Drive - _These seemed to require some extra configuration files in the original project and be for rather specific-case use, so I took them out. If anyone can neatly integrate them, feel free to make a pull request._
 * Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. The issue was due to some people having xurls v2 installed while the projects go.mod required v1.1; changing go.mod to require v2 specifically seems to be the correct fix.
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
@@ -140,6 +141,9 @@ All JSON settings follow camelCase format.
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _`[OPTIONAL]`_ flickrApiKey `[string]`
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
+    * _`[OPTIONAL]`_ googleDriveCredentialsJSON `[string]`
+        * _Path for Google Drive API credentials JSON file._
+        * _Won't use Google Drive API for fetching files if credentials are missing._
 * _`[OPTIONAL]`_ admins `[array of strings]`
     * Array of User ID strings for users allowed to use admin commands
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`

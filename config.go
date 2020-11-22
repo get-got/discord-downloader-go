@@ -21,14 +21,15 @@ var (
 // `json:",omitempty"` is for settings not to be included into initially written settings file
 
 type ConfigurationCredentials struct {
-	Token                    string `json:"token"`                              // required for bot token (this or login)
-	Email                    string `json:"email"`                              // required for login (this or token)
-	Password                 string `json:"password"`                           // required for login (this or token)
-	TwitterAccessToken       string `json:"twitterAccessToken,omitempty"`       // optional
-	TwitterAccessTokenSecret string `json:"twitterAccessTokenSecret,omitempty"` // optional
-	TwitterConsumerKey       string `json:"twitterConsumerKey,omitempty"`       // optional
-	TwitterConsumerSecret    string `json:"twitterConsumerSecret,omitempty"`    // optional
-	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
+	Token                      string `json:"token"`                                // required for bot token (this or login)
+	Email                      string `json:"email"`                                // required for login (this or token)
+	Password                   string `json:"password"`                             // required for login (this or token)
+	TwitterAccessToken         string `json:"twitterAccessToken,omitempty"`         // optional
+	TwitterAccessTokenSecret   string `json:"twitterAccessTokenSecret,omitempty"`   // optional
+	TwitterConsumerKey         string `json:"twitterConsumerKey,omitempty"`         // optional
+	TwitterConsumerSecret      string `json:"twitterConsumerSecret,omitempty"`      // optional
+	FlickrApiKey               string `json:"flickrApiKey,omitempty"`               // optional
+	GoogleDriveCredentialsJSON string `json:"googleDriveCredentialsJSON,omitempty"` // optional
 }
 
 type Configuration struct {
