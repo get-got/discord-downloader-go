@@ -280,6 +280,31 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			return trimDownloadedLinks(links, channelID)
 		}
 	}
+	if RegexpUrlTistory.MatchString(inputURL) {
+		links, err := getTistoryUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Tistory URL failed for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
+	if RegexpUrlTistoryLegacy.MatchString(inputURL) {
+		links, err := getLegacyTistoryUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Legacy Tistory URL failed for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
+	// The original project has this as an option,
+	if RegexpUrlPossibleTistorySite.MatchString(inputURL) {
+		links, err := getPossibleTistorySiteUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Checking for Tistory site failed for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
 
 	if isDiscordEmoji(inputURL) {
 		log.Println(logPrefixFileSkip, color.GreenString("Skipped %s as it is a Discord emoji", inputURL))

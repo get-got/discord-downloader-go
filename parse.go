@@ -6,12 +6,15 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/Jeffail/gabs"
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 )
 
@@ -477,4 +480,103 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 		return getFlickrAlbumUrls(result.Request.URL.String())
 	}
 	return nil, errors.New("Encountered invalid URL while trying to get long URL from short Flickr Album URL")
+}
+
+// getTistoryUrls downloads tistory URLs
+// http://t1.daumcdn.net/cfile/tistory/[…] => http://t1.daumcdn.net/cfile/tistory/[…]
+// http://t1.daumcdn.net/cfile/tistory/[…]?original => as is
+func getTistoryUrls(link string) (map[string]string, error) {
+	if !strings.HasSuffix(link, "?original") {
+		link += "?original"
+	}
+	return map[string]string{link: ""}, nil
+}
+
+func getLegacyTistoryUrls(link string) (map[string]string, error) {
+	link = strings.Replace(link, "/image/", "/original/", -1)
+	return map[string]string{link: ""}, nil
+}
+
+func getTistoryWithCDNUrls(urlI string) (map[string]string, error) {
+	parameters, _ := url.ParseQuery(urlI)
+	if val, ok := parameters["fname"]; ok {
+		if len(val) > 0 {
+			if RegexpUrlTistoryLegacy.MatchString(val[0]) {
+				return getLegacyTistoryUrls(val[0])
+			}
+		}
+	}
+	return nil, nil
+}
+
+func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
+	client := new(http.Client)
+	request, err := http.NewRequest("HEAD", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Add("Accept-Encoding", "identity")
+	request.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+	respHead, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	contentType := ""
+	for headerKey, headerValue := range respHead.Header {
+		if headerKey == "Content-Type" {
+			contentType = headerValue[0]
+		}
+	}
+	if !strings.Contains(contentType, "text/html") {
+		return nil, nil
+	}
+
+	request, err = http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	request.Header.Add("Accept-Encoding", "identity")
+	request.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	doc, err := goquery.NewDocumentFromResponse(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var links = make(map[string]string)
+
+	doc.Find(".article img, #content img, div[role=main] img, .section_blogview img").Each(func(i int, s *goquery.Selection) {
+		foundUrl, exists := s.Attr("src")
+		if exists {
+			isTistoryCdnUrl := RegexpUrlTistoryLegacyWithCDN.MatchString(foundUrl)
+			isTistoryUrl := RegexpUrlTistoryLegacy.MatchString(foundUrl)
+			if isTistoryCdnUrl == true {
+				finalTistoryUrls, _ := getTistoryWithCDNUrls(foundUrl)
+				if len(finalTistoryUrls) > 0 {
+					for finalTistoryUrl := range finalTistoryUrls {
+						foundFilename := s.AttrOr("filename", "")
+						links[finalTistoryUrl] = foundFilename
+					}
+				}
+			} else if isTistoryUrl == true {
+				finalTistoryUrls, _ := getLegacyTistoryUrls(foundUrl)
+				if len(finalTistoryUrls) > 0 {
+					for finalTistoryUrl := range finalTistoryUrls {
+						foundFilename := s.AttrOr("filename", "")
+						links[finalTistoryUrl] = foundFilename
+					}
+				}
+			}
+		}
+	})
+
+	if len(links) > 0 {
+		log.Printf("[%s] Found tistory album with %d images (url: %s)\n", time.Now().Format(time.Stamp), len(links), url)
+	}
+	return links, nil
 }
