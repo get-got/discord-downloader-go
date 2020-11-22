@@ -152,23 +152,30 @@ When initially launching the bot it will create a default settings file if you d
         "twitterConsumerKey": "",
         "twitterConsumerSecret": ""
     },
-    "admins": [ "YOUR_DISCORD_USER_ID" ],
+    "admins": [ "YOUR_DISCORD_USER_ID", "YOUR_FRIENDS_DISCORD_USER_ID" ],
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "commandPrefix": "downloader ",
     "allowSkipping": true,
     "presenceStatus": "dnd",
     "presenceType": 1,
+    "presenceOverwrite": "{{count}} files",
+    "filenameDateFormat": "2006.01.02-15.04.05",
+    "githubUpdateChecking": true,
     "debugOutput": true,
+    "embedColor": "#29BEB0",
+    "inflateCount": 1000,
     "adminChannels": [
         {
-            "channel": "ADMIN_CHANNEL_ID"
+            "channel": "CHANNEL_ID_FOR_ADMIN_CONTROL"
         }
     ],
     "channels": [
         {
             "channel": "THIS_CHANNEL_DOWNLOADS_EVERYTHING",
             "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "overwriteEmbedColor": "#FF0000",
+            "divideFoldersByType": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
@@ -180,6 +187,7 @@ When initially launching the bot it will create a default settings file if you d
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
             "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "OverwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
