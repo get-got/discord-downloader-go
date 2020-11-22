@@ -76,7 +76,7 @@ If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter 
 * (Optional) Reactions upon download success.
 * (Optional) Discord messages upon encountered errors.
 * Extensive bot status/presence customization.
-* Channel-specific control of downloaded filetypes / content types.
+* Channel-specific control of downloaded filetypes / content types, Optional dividing of content types into separate folders.
 * Consistent Log Formatting, Color-Coded Logging
 * Somewhat different organization than original project; initially created from scratch then components ported over.
 * **Added Download Support for:** Facebook Videos
