@@ -173,7 +173,9 @@ When initially launching the bot it will create a default settings file if you d
             "saveVideos": true,
             "saveAudioFiles": true,
             "saveTextFiles": true,
-            "saveOtherFiles": true
+            "saveOtherFiles": true,
+            "savePossibleDuplicates": true,
+            "blacklistedExtensions": []
         },
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
