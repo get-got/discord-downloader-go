@@ -106,7 +106,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand.
 
-`Barebones settings.json:`
+`Example - Barebones settings.json:`
 ```javascript
 {
     "credentials": {
@@ -121,7 +121,7 @@ When initially launching the bot it will create a default settings file if you d
 }
 ```
 
-`Selfbot settings.json:`
+`Example - Selfbot settings.json:`
 ```javascript
 {
     "credentials": {
@@ -142,7 +142,7 @@ When initially launching the bot it will create a default settings file if you d
 }
 ```
 
-`Advanced settings.json:`
+`Example - Advanced settings.json:`
 ```javascript
 {
     "credentials": {
@@ -158,7 +158,7 @@ When initially launching the bot it will create a default settings file if you d
     "commandPrefix": "downloader ",
     "allowSkipping": true,
     "presenceStatus": "dnd",
-    "presenceType": 1,
+    "presenceType": 3,
     "presenceOverwrite": "{{count}} files",
     "filenameDateFormat": "2006.01.02-15.04.05",
     "githubUpdateChecking": true,
