@@ -269,8 +269,8 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 			}
 		}
 		// Final log
-		log.Println(color.HiCyanString("[handleHistory] Finished cataloging history for %s... started downloading %d files... (requested by %s)",
-			commandingMessage.ChannelID, i, getUserIdentifier(*commandingMessage.Author)),
+		log.Println(color.HiCyanString("[handleHistory] Finished cataloging history for %s (requested by %s): %d files...",
+			commandingMessage.ChannelID, getUserIdentifier(*commandingMessage.Author), i),
 		)
 	}
 

@@ -50,12 +50,12 @@ func init() {
 func main() {
 	var err error
 
-	// Initialize Config
+	// Config
 	log.Println(color.YellowString("Loading settings from \"%s\"...", LOC_CONFIG_FILE))
 	loadConfig()
 	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s)", len(config.Channels)))
 
-	// Github
+	// Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
 			log.Println(color.HiCyanString("Update available on %s\n", PROJECT_RELEASE_URL))
@@ -63,7 +63,7 @@ func main() {
 		}
 	}
 
-	// Initialize Database
+	// Database
 	log.Println(color.YellowString("Opening database..."))
 	myDB, err = db.OpenDB(LOC_DATABASE_DIR)
 	if err != nil {
@@ -96,7 +96,7 @@ func main() {
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
 
-	// Initialize Twitter API
+	// Twitter API
 	if config.Credentials.TwitterAccessToken != "" &&
 		config.Credentials.TwitterAccessTokenSecret != "" &&
 		config.Credentials.TwitterConsumerKey != "" &&
@@ -121,7 +121,7 @@ func main() {
 		log.Println(color.MagentaString("Twitter API credentials missing, the bot won't use the Twitter API."))
 	}
 
-	// Initialize Google Drive Client
+	// Google Drive Client
 	if config.Credentials.GoogleDriveCredentialsJSON != "" {
 		log.Println(color.MagentaString("Connecting to Google Drive Client..."))
 		ctx := context.Background()
@@ -144,7 +144,7 @@ func main() {
 		}
 	}
 
-	// Initialize Regex
+	// Regex
 	err = compileRegex()
 	if err != nil {
 		log.Println(color.HiRedString("Error initializing Regex:\t%s", err))
@@ -437,7 +437,7 @@ func main() {
 	timeLastUpdated = time.Now()
 	updateDiscordPresence()
 
-	// Initialize Tickers
+	// Tickers
 	if config.DebugOutput {
 		log.Println(logPrefixDebug, color.YellowString("Starting background loops..."))
 	}
@@ -452,15 +452,15 @@ func main() {
 		}
 	}()
 
-	// Output: Startup Duration
+	// Output Startup Duration
 	if config.DebugOutput {
 		log.Println(logPrefixDebug, color.YellowString("Startup finished, took %s...", uptime()))
 	}
 
-	// Output: Done
+	// Output Done
 	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", PROJECT_LABEL, len(bot.State.Guilds)))
 
-	// Loop & potentially logout
+	// Infinite loop until interrupted
 	log.Println(color.RedString("Ctrl+C to exit..."))
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
 	<-loop
