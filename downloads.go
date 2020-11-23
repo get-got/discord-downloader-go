@@ -558,7 +558,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
 			}
 		}
-		newFilename := time.Now().Format(filenameDateFormat) + " " + filename
+		newFilename := time.Now().Format(filenameDateFormat) + filename
 		//completePath := path + string(os.PathSeparator) + subfolder + newFilename
 		completePath := path + subfolder + newFilename
 

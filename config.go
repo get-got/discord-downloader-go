@@ -70,7 +70,7 @@ var (
 	SETTING_DEFAULT_PresenceEnabled      bool               = true
 	SETTING_DEFAULT_PresenceStatus       string             = string(discordgo.StatusIdle)
 	SETTING_DEFAULT_PresenceType         discordgo.GameType = discordgo.GameTypeGame
-	SETTING_DEFAULT_FilenameDateFormat   string             = "2006-01-02_15-04-05"
+	SETTING_DEFAULT_FilenameDateFormat   string             = "2006-01-02_15-04-05 "
 	SETTING_DEFAULT_GithubUpdateChecking bool               = true
 	SETTING_DEFAULT_DebugOutput          bool               = false
 	SETTING_DEFAULT_InflateCount         int64              = 0

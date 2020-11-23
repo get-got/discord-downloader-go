@@ -110,12 +110,12 @@ When initially launching the bot it will create a default settings file if you d
 ```javascript
 {
     "credentials": {
-        "token": "REPLACE_WITH_YOUR_TOKEN"
+        "token": "YOUR_TOKEN"
     },
     "channels": [
         {
-            "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
-            "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
+            "channel": "DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
+            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO"
         }
     ]
 }
@@ -132,8 +132,8 @@ When initially launching the bot it will create a default settings file if you d
     "presenceEnabled": false,
     "channels": [
         {
-            "channel": "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
-            "destination": "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "channel": "DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
+            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
             "allowCommands": false,
             "errorMessages": false,
             "reactWhenDownloaded": false
@@ -160,7 +160,7 @@ When initially launching the bot it will create a default settings file if you d
     "presenceStatus": "dnd",
     "presenceType": 3,
     "presenceOverwrite": "{{count}} files",
-    "filenameDateFormat": "2006.01.02-15.04.05",
+    "filenameDateFormat": "2006.01.02-15.04.05 ",
     "githubUpdateChecking": true,
     "debugOutput": true,
     "embedColor": "#29BEB0",
@@ -173,7 +173,7 @@ When initially launching the bot it will create a default settings file if you d
     "channels": [
         {
             "channel": "THIS_CHANNEL_DOWNLOADS_EVERYTHING",
-            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "destination": "EVERYTHING",
             "overwriteEmbedColor": "#FF0000",
             "divideFoldersByType": false,
             "saveImages": true,
@@ -190,8 +190,8 @@ When initially launching the bot it will create a default settings file if you d
         },
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
-            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
-            "OverwriteAllowSkipping": false,
+            "destination": "media",
+            "overwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
@@ -200,7 +200,7 @@ When initially launching the bot it will create a default settings file if you d
         },
         {
             "channel": "THIS_CHANNEL_IS_STEALTHY",
-            "destination": "FOLDER_LOCATION_TO_DOWNLOAD_TO",
+            "destination": "stealthy files",
             "allowCommands": false,
             "errorMessages": false,
             "updatePresence": false,
@@ -300,7 +300,7 @@ All JSON settings follow camelCase format.
     * Embedded Placeholders:
         * _See `presenceOverwrite` above..._
 * _`[DEFAULTS]`_ filenameDateFormat `[string]`
-    * _Default:_ `"2006-01-02_15-04-05"`
+    * _Default:_ `"2006-01-02_15-04-05 "`
     * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
 * _`[DEFAULTS]`_ githubUpdateChecking `[bool]`
     * _Default:_ `true`
