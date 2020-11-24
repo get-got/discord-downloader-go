@@ -214,19 +214,21 @@ func main() {
 					latency,
 					roundtrip,
 				)
-				_, err := bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-					ID:      pong.ID,
-					Channel: pong.ChannelID,
-					Content: &mention,
-					Embed:   buildEmbed(ctx.Msg.ChannelID, "Command — Ping", content),
-				})
-				// Failed to edit pong
-				if err != nil {
-					log.Println(logPrefixHere, color.HiRedString("Failed to edit pong message, sending new one:\t%s", err))
-					_, err := replyEmbed(pong, "Command — Ping", content)
-					// Failed to send new pong
+				if pong != nil {
+					_, err := bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+						ID:      pong.ID,
+						Channel: pong.ChannelID,
+						Content: &mention,
+						Embed:   buildEmbed(ctx.Msg.ChannelID, "Command — Ping", content),
+					})
+					// Failed to edit pong
 					if err != nil {
-						log.Println(logPrefixHere, color.HiRedString("Failed to send replacement pong message:\t%s", err))
+						log.Println(logPrefixHere, color.HiRedString("Failed to edit pong message, sending new one:\t%s", err))
+						_, err := replyEmbed(pong, "Command — Ping", content)
+						// Failed to send new pong
+						if err != nil {
+							log.Println(logPrefixHere, color.HiRedString("Failed to send replacement pong message:\t%s", err))
+						}
 					}
 				}
 				// Log

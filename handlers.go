@@ -159,11 +159,13 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 				// Status update
 				content := fmt.Sprintf("``%s:`` %d files cataloged\n_Requesting more messages, please wait..._",
 					durafmt.ParseShort(time.Since(historyStartTime)).String(), i)
-				message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-					ID:      message.ID,
-					Channel: message.ChannelID,
-					Embed:   buildEmbed(message.ChannelID, "Command — History", content),
-				})
+				if message != nil {
+					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+						ID:      message.ID,
+						Channel: message.ChannelID,
+						Embed:   buildEmbed(message.ChannelID, "Command — History", content),
+					})
+				}
 				// Edit failure
 				if err != nil {
 					log.Println(color.RedString("[handleHistory] Failed to edit status message, sending new one:\t%s", err))
@@ -255,11 +257,13 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 			commandingMessage.ChannelID,
 			durafmt.Parse(time.Since(historyStartTime)).String(),
 		)
-		message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-			ID:      message.ID,
-			Channel: message.ChannelID,
-			Embed:   buildEmbed(message.ID, "Command — History", contentFinal),
-		})
+		if message != nil {
+			message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+				ID:      message.ID,
+				Channel: message.ChannelID,
+				Embed:   buildEmbed(message.ID, "Command — History", contentFinal),
+			})
+		}
 		// Edit failure
 		if err != nil {
 			log.Println(color.RedString("[handleHistory] Failed to edit status message, sending new one:\t%s", err))
