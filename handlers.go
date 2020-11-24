@@ -157,22 +157,24 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 				log.Println(color.CyanString("[handleHistory] Requesting 100 more messages, %d cataloged, (before %s)",
 					i, lastBeforeTime))
 				// Status update
-				content := fmt.Sprintf("``%s:`` %d files cataloged\n_Requesting more messages, please wait..._",
-					durafmt.ParseShort(time.Since(historyStartTime)).String(), i)
 				if message != nil {
+					content := fmt.Sprintf("``%s:`` %d files cataloged\n_Requesting more messages, please wait..._",
+						durafmt.ParseShort(time.Since(historyStartTime)).String(), i)
 					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 						ID:      message.ID,
 						Channel: message.ChannelID,
 						Embed:   buildEmbed(message.ChannelID, "Command — History", content),
 					})
-				}
-				// Edit failure
-				if err != nil {
-					log.Println(color.RedString("[handleHistory] Failed to edit status message, sending new one:\t%s", err))
-					message, err = replyEmbed(message, "Command — History", content)
+					// Edit failure
 					if err != nil {
-						log.Println(color.HiRedString("[handleHistory] Failed to send replacement status message:\t%s", err))
+						log.Println(color.RedString("[handleHistory] Failed to edit status message, sending new one:\t%s", err))
+						message, err = replyEmbed(message, "Command — History", content)
+						if err != nil {
+							log.Println(color.HiRedString("[handleHistory] Failed to send replacement status message:\t%s", err))
+						}
 					}
+				} else {
+					log.Println(color.HiRedString("[handleHistory] Tried to edit status message but it doesn't exist."))
 				}
 			}
 			messages, err := bot.ChannelMessages(subjectChannelID, 100, lastBefore, "", "")
@@ -250,28 +252,32 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 				break MessageRequestingLoop
 			}
 		}
+
 		// Final status update
-		contentFinal := fmt.Sprintf("``%s:`` **%s total files saved!**\n\nFinished cataloging history for ``%s``\n\n_Duration was %s_",
-			durafmt.ParseShort(time.Since(historyStartTime)).String(),
-			formatNumber(int64(i)),
-			commandingMessage.ChannelID,
-			durafmt.Parse(time.Since(historyStartTime)).String(),
-		)
 		if message != nil {
+			contentFinal := fmt.Sprintf("``%s:`` **%s total files saved!**\n\nFinished cataloging history for ``%s``\n\n_Duration was %s_",
+				durafmt.ParseShort(time.Since(historyStartTime)).String(),
+				formatNumber(int64(i)),
+				commandingMessage.ChannelID,
+				durafmt.Parse(time.Since(historyStartTime)).String(),
+			)
 			message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 				ID:      message.ID,
 				Channel: message.ChannelID,
 				Embed:   buildEmbed(message.ID, "Command — History", contentFinal),
 			})
-		}
-		// Edit failure
-		if err != nil {
-			log.Println(color.RedString("[handleHistory] Failed to edit status message, sending new one:\t%s", err))
-			message, err = replyEmbed(message, "Command — History", contentFinal)
+			// Edit failure
 			if err != nil {
-				log.Println(color.HiRedString("[handleHistory] Failed to send replacement status message:\t%s", err))
+				log.Println(color.RedString("[handleHistory] Failed to edit status message, sending new one:\t%s", err))
+				message, err = replyEmbed(message, "Command — History", contentFinal)
+				if err != nil {
+					log.Println(color.HiRedString("[handleHistory] Failed to send replacement status message:\t%s", err))
+				}
 			}
+		} else {
+			log.Println(color.HiRedString("[handleHistory] Tried to edit status message but it doesn't exist."))
 		}
+
 		// Final log
 		log.Println(color.HiCyanString("[handleHistory] Finished cataloging history for %s (requested by %s): %d files...",
 			commandingMessage.ChannelID, getUserIdentifier(*commandingMessage.Author), i),
