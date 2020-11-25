@@ -140,21 +140,23 @@ type ConfigurationChannel struct {
 	// Required
 	ChannelID   string `json:"channel"`     // required
 	Destination string `json:"destination"` // required
-	// Main
+	// Setup
 	Enabled       *bool `json:"enabled,omitempty"`       // optional, defaults
 	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
 	ErrorMessages *bool `json:"errorMessages,omitempty"` // optional, defaults
 	ScanEdits     *bool `json:"scanEdits,omitempty"`     // optional, defaults
+	// Rules
+	BlacklistedUsers *[]string `json:"blacklistedUsers,omitempty"` // optional
 	// Appearance
 	UpdatePresence           *bool     `json:"updatePresence,omitempty"`           // optional, defaults
 	ReactWhenDownloaded      *bool     `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
 	ReactWhenDownloadedEmoji *string   `json:"reactWhenDownloadedEmoji,omitempty"` // optional, defaults
 	BlacklistReactEmojis     *[]string `json:"blacklistReactEmojis,omitempty"`     // optional
-	// Overwrites
+	// Overwrite Global Settings
 	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
 	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
-	// Saving
+	// Rules for Saving
 	DivideFoldersByType    *bool     `json:"divideFoldersByType,omitempty"`    // optional, defaults
 	SaveImages             *bool     `json:"saveImages,omitempty"`             // optional, defaults
 	SaveVideos             *bool     `json:"saveVideos,omitempty"`             // optional, defaults

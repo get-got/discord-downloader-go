@@ -31,25 +31,25 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if (m.Author.ID == user.ID && !config.ScanOwnMessages) || !isChannelRegistered(m.ChannelID) {
 		return
 	}
-
 	channelConfig := getChannelConfig(m.ChannelID)
 	if !*channelConfig.Enabled {
 		return
 	}
 
+	// Log
 	var sendLabel string
 	if config.DebugOutput {
 		sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
 	} else {
 		sendLabel = fmt.Sprintf("%s in \"%s\"#%s", getUserIdentifier(*m.Author), getGuildName(m.GuildID), getChannelName(m.ChannelID))
 	}
-
 	content := m.Content
 	if len(m.Attachments) > 0 {
 		content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
 	}
 	log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
 
+	// Skipping
 	canSkip := config.AllowSkipping
 	if channelConfig.OverwriteAllowSkipping != nil {
 		canSkip = *channelConfig.OverwriteAllowSkipping
@@ -63,6 +63,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+	// User Blacklisting
+	if channelConfig.BlacklistedUsers != nil {
+		if stringInSlice(m.Author.ID, *channelConfig.BlacklistedUsers) {
+			log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
+			return
+		}
+	}
+
 	handleMessage(m.Message)
 }
 
@@ -71,25 +79,25 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 		if (m.Author.ID == user.ID && !config.ScanOwnMessages) || !isChannelRegistered(m.ChannelID) {
 			return
 		}
-
 		channelConfig := getChannelConfig(m.ChannelID)
 		if !*channelConfig.Enabled || !*channelConfig.ScanEdits {
 			return
 		}
 
+		// Log
 		var sendLabel string
 		if config.DebugOutput {
 			sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
 		} else {
 			sendLabel = fmt.Sprintf("%s in \"%s\"#%s", getUserIdentifier(*m.Author), getGuildName(m.GuildID), getChannelName(m.ChannelID))
 		}
-
 		content := m.Content
 		if len(m.Attachments) > 0 {
 			content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
 		}
 		log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
 
+		// Skipping
 		canSkip := config.AllowSkipping
 		if channelConfig.OverwriteAllowSkipping != nil {
 			canSkip = *channelConfig.OverwriteAllowSkipping
@@ -100,6 +108,14 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 					log.Println(color.HiYellowString("Message handling skipped due to use of skip command."))
 					return
 				}
+			}
+		}
+
+		// User Blacklisting
+		if channelConfig.BlacklistedUsers != nil {
+			if stringInSlice(m.Author.ID, *channelConfig.BlacklistedUsers) {
+				log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
+				return
 			}
 		}
 
