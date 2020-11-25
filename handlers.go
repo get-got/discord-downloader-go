@@ -63,9 +63,16 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
+	// User Whitelisting
+	if !*channelConfig.UsersAllWhitelisted && channelConfig.UserWhitelist != nil {
+		if !stringInSlice(m.Author.ID, *channelConfig.UserWhitelist) {
+			log.Println(color.HiYellowString("Message handling skipped due to user not being whitelisted."))
+			return
+		}
+	}
 	// User Blacklisting
-	if channelConfig.BlacklistedUsers != nil {
-		if stringInSlice(m.Author.ID, *channelConfig.BlacklistedUsers) {
+	if channelConfig.UserBlacklist != nil {
+		if stringInSlice(m.Author.ID, *channelConfig.UserBlacklist) {
 			log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
 			return
 		}
@@ -111,9 +118,16 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 			}
 		}
 
+		// User Whitelisting
+		if !*channelConfig.UsersAllWhitelisted && channelConfig.UserWhitelist != nil {
+			if !stringInSlice(m.Author.ID, *channelConfig.UserWhitelist) {
+				log.Println(color.HiYellowString("Message handling skipped due to user not being whitelisted."))
+				return
+			}
+		}
 		// User Blacklisting
-		if channelConfig.BlacklistedUsers != nil {
-			if stringInSlice(m.Author.ID, *channelConfig.BlacklistedUsers) {
+		if channelConfig.UserBlacklist != nil {
+			if stringInSlice(m.Author.ID, *channelConfig.UserBlacklist) {
 				log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
 				return
 			}

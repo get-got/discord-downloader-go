@@ -153,28 +153,29 @@ When initially launching the bot it will create a default settings file if you d
         "twitterConsumerSecret": ""
     },
     "admins": [ "YOUR_DISCORD_USER_ID", "YOUR_FRIENDS_DISCORD_USER_ID" ],
-    "downloadRetryMax": 5,
-    "downloadTimeout": 120,
-    "commandPrefix": "downloader ",
-    "allowSkipping": true,
-    "presenceStatus": "dnd",
-    "presenceType": 3,
-    "presenceOverwrite": "{{count}} files",
-    "filenameDateFormat": "2006.01.02-15.04.05 ",
-    "githubUpdateChecking": true,
-    "debugOutput": true,
-    "embedColor": "#29BEB0",
-    "inflateCount": 1000,
     "adminChannels": [
         {
             "channel": "CHANNEL_ID_FOR_ADMIN_CONTROL"
         }
     ],
+    "debugOutput": true,
+    "commandPrefix": "downloader ",
+    "allowSkipping": true,
+    "downloadRetryMax": 5,
+    "downloadTimeout": 120,
+    "githubUpdateChecking": true,
+    "presenceStatus": "dnd",
+    "presenceType": 3,
+    "presenceOverwrite": "{{count}} files",
+    "filenameDateFormat": "2006.01.02-15.04.05 ",
+    "embedColor": "#29BEB0",
+    "inflateCount": 1000,
     "channels": [
         {
             "channel": "THIS_CHANNEL_DOWNLOADS_EVERYTHING",
             "destination": "EVERYTHING",
             "overwriteEmbedColor": "#FF0000",
+            "userBlacklist": [ "USER_ID_FOR_PERSON_I_DONT_LIKE" ],
             "divideFoldersByType": false,
             "saveImages": true,
             "saveVideos": true,
@@ -235,10 +236,11 @@ All JSON settings follow camelCase format.
         * _Won't use Google Drive API for fetching files if credentials are missing._
 * _`[OPTIONAL]`_ admins `[array of strings]`
     * Array of User ID strings for users allowed to use admin commands
-* _`[DEFAULTS]`_ downloadRetryMax `[int]`
-    * _Default:_ `3`
-* _`[DEFAULTS]`_ downloadTimeout `[int]`
-    * _Default:_ `60`
+* _`[OPTIONAL]`_ adminChannels `[array of key/value objects]`
+    * **channel** `[string]`
+* _`[DEFAULTS]`_ debugOutput `[bool]`
+    * _Default:_ `false`
+    * Output debugging information.
 * _`[DEFAULTS]`_ commandPrefix `[string]`
     * _Default:_ `"ddg "`
 * _`[DEFAULTS]`_ allowSkipping `[bool]`
@@ -248,6 +250,13 @@ All JSON settings follow camelCase format.
 * _`[DEFAULTS]`_ scanOwnMessages `[bool]`
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
+* _`[DEFAULTS]`_ downloadRetryMax `[int]`
+    * _Default:_ `3`
+* _`[DEFAULTS]`_ downloadTimeout `[int]`
+    * _Default:_ `60`
+* _`[DEFAULTS]`_ githubUpdateChecking `[bool]`
+    * _Default:_ `true`
+    * Check for updates from this repo.
 * _`[DEFAULTS]`_ presenceEnabled `[bool]`
     * _Default:_ `true`
 * _`[DEFAULTS]`_ presenceStatus `[string]`
@@ -302,20 +311,12 @@ All JSON settings follow camelCase format.
 * _`[DEFAULTS]`_ filenameDateFormat `[string]`
     * _Default:_ `"2006-01-02_15-04-05 "`
     * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-* _`[DEFAULTS]`_ githubUpdateChecking `[bool]`
-    * _Default:_ `true`
-    * Check for updates from this repo.
-* _`[DEFAULTS]`_ debugOutput `[bool]`
-    * _Default:_ `false`
-    * Output debugging information.
 * _`[OPTIONAL]`_ embedColor `[string]`
     * _Unused by Default_
     * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
 * _`[OPTIONAL]`_ inflateCount `[int]`
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
-* _`[OPTIONAL]`_ **adminChannels** `[array of key/value objects]`
-    * **channel** `[string]`
 * **channels** `[array of key/value objects]`
     * **channel** `[string]`
         * Channel ID to monitor.
@@ -353,6 +354,13 @@ All JSON settings follow camelCase format.
     * _`[OPTIONAL]`_ overwriteEmbedColor `[string]`
         * _Unused by Default_
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
+    * _`[DEFAULTS]`_ usersAllWhitelisted `[bool]`
+        * _Default:_ `true`
+        * Allow messages from all users to be handled. Set to `false` if you wish to use `userWhitelist` to only permit specific users messages to be handled.
+    * _`[OPTIONAL]`_ userWhitelist `[array of strings]`
+        * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot.
+    * _`[OPTIONAL]`_ userBlacklist `[array of strings]`
+        * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot.
     * _`[DEFAULTS]`_ divideFoldersByType `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_

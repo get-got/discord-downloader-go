@@ -21,9 +21,11 @@ var (
 // `json:",omitempty"` is for settings not to be included into initially written settings file
 
 type ConfigurationCredentials struct {
-	Token                      string `json:"token"`                                // required for bot token (this or login)
-	Email                      string `json:"email"`                                // required for login (this or token)
-	Password                   string `json:"password"`                             // required for login (this or token)
+	// Login
+	Token    string `json:"token"`    // required for bot token (this or login)
+	Email    string `json:"email"`    // required for login (this or token)
+	Password string `json:"password"` // required for login (this or token)
+	// APIs
 	TwitterAccessToken         string `json:"twitterAccessToken,omitempty"`         // optional
 	TwitterAccessTokenSecret   string `json:"twitterAccessTokenSecret,omitempty"`   // optional
 	TwitterConsumerKey         string `json:"twitterConsumerKey,omitempty"`         // optional
@@ -32,79 +34,89 @@ type ConfigurationCredentials struct {
 	GoogleDriveCredentialsJSON string `json:"googleDriveCredentialsJSON,omitempty"` // optional
 }
 
+// Needed for settings used without redundant nil checks, and settings defaulting + creation
+var (
+	// Setup
+	SETTING_DEFAULT_DebugOutput          bool   = false
+	SETTING_DEFAULT_CommandPrefix        string = "ddg "
+	SETTING_DEFAULT_AllowSkipping        bool   = true
+	SETTING_DEFAULT_ScanOwnMessages      bool   = false
+	SETTING_DEFAULT_DownloadRetryMax     int    = 3
+	SETTING_DEFAULT_DownloadTimeout      int    = 60
+	SETTING_DEFAULT_GithubUpdateChecking bool   = true
+	// Appearance
+	SETTING_DEFAULT_PresenceEnabled    bool               = true
+	SETTING_DEFAULT_PresenceStatus     string             = string(discordgo.StatusIdle)
+	SETTING_DEFAULT_PresenceType       discordgo.GameType = discordgo.GameTypeGame
+	SETTING_DEFAULT_FilenameDateFormat string             = "2006-01-02_15-04-05 "
+	SETTING_DEFAULT_InflateCount       int64              = 0
+)
+
+func DefaultConfiguration() Configuration {
+	return Configuration{
+		// Required
+		Credentials: ConfigurationCredentials{
+			Token:    PLACEHOLDER_TOKEN,
+			Email:    PLACEHOLDER_EMAIL,
+			Password: PLACEHOLDER_PASSWORD,
+		},
+		// Setup
+		Admins:               []string{},
+		AdminChannels:        nil,
+		DebugOutput:          SETTING_DEFAULT_DebugOutput,
+		CommandPrefix:        SETTING_DEFAULT_CommandPrefix,
+		AllowSkipping:        SETTING_DEFAULT_AllowSkipping,
+		ScanOwnMessages:      SETTING_DEFAULT_ScanOwnMessages,
+		DownloadRetryMax:     SETTING_DEFAULT_DownloadRetryMax,
+		DownloadTimeout:      SETTING_DEFAULT_DownloadTimeout,
+		GithubUpdateChecking: SETTING_DEFAULT_GithubUpdateChecking,
+		// Appearance
+		PresenceEnabled:    SETTING_DEFAULT_PresenceEnabled,
+		PresenceStatus:     SETTING_DEFAULT_PresenceStatus,
+		PresenceType:       SETTING_DEFAULT_PresenceType,
+		FilenameDateFormat: SETTING_DEFAULT_FilenameDateFormat,
+		InflateCount:       &SETTING_DEFAULT_InflateCount,
+		// Channels
+		Channels: nil,
+	}
+}
+
 type Configuration struct {
+	// Required
 	Credentials ConfigurationCredentials `json:"credentials"` // required
-	Admins      []string                 `json:"admins"`      // optional
-
-	DownloadRetryMax int    `json:"downloadRetryMax,omitempty"` // optional, defaults
-	DownloadTimeout  int    `json:"downloadTimeout,omitempty"`  // optional, defaults
-	CommandPrefix    string `json:"commandPrefix"`              // optional, defaults
-	AllowSkipping    bool   `json:"allowSkipping"`              // optional, defaults
-	ScanOwnMessages  bool   `json:"scanOwnMessages"`            // optional, defaults
-
+	// Setup
+	Admins               []string                    `json:"admins"`                     // optional
+	AdminChannels        []ConfigurationAdminChannel `json:"adminChannels"`              // optional
+	DebugOutput          bool                        `json:"debugOutput"`                // optional, defaults
+	CommandPrefix        string                      `json:"commandPrefix"`              // optional, defaults
+	AllowSkipping        bool                        `json:"allowSkipping"`              // optional, defaults
+	ScanOwnMessages      bool                        `json:"scanOwnMessages"`            // optional, defaults
+	DownloadRetryMax     int                         `json:"downloadRetryMax,omitempty"` // optional, defaults
+	DownloadTimeout      int                         `json:"downloadTimeout,omitempty"`  // optional, defaults
+	GithubUpdateChecking bool                        `json:"githubUpdateChecking"`       // optional, defaults
+	// Appearance
 	PresenceEnabled          bool               `json:"presenceEnabled"`                    // optional, defaults
 	PresenceStatus           string             `json:"presenceStatus"`                     // optional, defaults
 	PresenceType             discordgo.GameType `json:"presenceType,omitempty"`             // optional, defaults
 	PresenceOverwrite        *string            `json:"presenceOverwrite,omitempty"`        // optional, unused if undefined
 	PresenceOverwriteDetails *string            `json:"presenceOverwriteDetails,omitempty"` // optional, unused if undefined
 	PresenceOverwriteState   *string            `json:"presenceOverwriteState,omitempty"`   // optional, unused if undefined
+	FilenameDateFormat       string             `json:"filenameDateFormat,omitempty"`       // optional, defaults
+	EmbedColor               *string            `json:"embedColor,omitempty"`               // optional, defaults to role if undefined, then defaults random if no role color
+	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
+	// Channels
+	Channels []ConfigurationChannel `json:"channels"` // required
 
-	FilenameDateFormat   string `json:"filenameDateFormat,omitempty"` // optional, defaults
-	GithubUpdateChecking bool   `json:"githubUpdateChecking"`         // optional, defaults
-	DebugOutput          bool   `json:"debugOutput"`                  // optional, defaults
+	/* IDEAS / TODO:
 
-	EmbedColor   *string `json:"embedColor,omitempty"`   // optional, defaults to role if undefined, then defaults random if no role color
-	InflateCount *int64  `json:"inflateCount,omitempty"` // optional, defaults to 0 if undefined
+	*
 
-	AdminChannels []ConfigurationAdminChannel `json:"adminChannels"` // optional
-	Channels      []ConfigurationChannel      `json:"channels"`      // required
+	 */
 }
 
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
-	SETTING_DEFAULT_DownloadRetryMax     int                = 3
-	SETTING_DEFAULT_DownloadTimeout      int                = 60
-	SETTING_DEFAULT_CommandPrefix        string             = "ddg "
-	SETTING_DEFAULT_AllowSkipping        bool               = true
-	SETTING_DEFAULT_ScanOwnMessages      bool               = false
-	SETTING_DEFAULT_PresenceEnabled      bool               = true
-	SETTING_DEFAULT_PresenceStatus       string             = string(discordgo.StatusIdle)
-	SETTING_DEFAULT_PresenceType         discordgo.GameType = discordgo.GameTypeGame
-	SETTING_DEFAULT_FilenameDateFormat   string             = "2006-01-02_15-04-05 "
-	SETTING_DEFAULT_GithubUpdateChecking bool               = true
-	SETTING_DEFAULT_DebugOutput          bool               = false
-	SETTING_DEFAULT_InflateCount         int64              = 0
-)
-
-func DefaultConfiguration() Configuration {
-	return Configuration{
-		Credentials: ConfigurationCredentials{
-			Token:    PLACEHOLDER_TOKEN,
-			Email:    PLACEHOLDER_EMAIL,
-			Password: PLACEHOLDER_PASSWORD,
-		},
-		Admins:               []string{},
-		DownloadRetryMax:     SETTING_DEFAULT_DownloadRetryMax,
-		DownloadTimeout:      SETTING_DEFAULT_DownloadTimeout,
-		CommandPrefix:        SETTING_DEFAULT_CommandPrefix,
-		AllowSkipping:        SETTING_DEFAULT_AllowSkipping,
-		ScanOwnMessages:      SETTING_DEFAULT_ScanOwnMessages,
-		PresenceEnabled:      SETTING_DEFAULT_PresenceEnabled,
-		PresenceStatus:       SETTING_DEFAULT_PresenceStatus,
-		PresenceType:         SETTING_DEFAULT_PresenceType,
-		FilenameDateFormat:   SETTING_DEFAULT_FilenameDateFormat,
-		GithubUpdateChecking: SETTING_DEFAULT_GithubUpdateChecking,
-		DebugOutput:          SETTING_DEFAULT_DebugOutput,
-
-		InflateCount: &SETTING_DEFAULT_InflateCount,
-
-		AdminChannels: nil,
-		Channels:      nil,
-	}
-}
-
-// Needed for settings used without redundant nil checks, and settings defaulting + creation
-var (
+	// Setup
 	SETTING_DEFAULT_CHANNEL_Enabled       bool = true
 	SETTING_DEFAULT_CHANNEL_AllowCommands bool = true
 	SETTING_DEFAULT_CHANNEL_ErrorMessages bool = true
@@ -114,7 +126,9 @@ var (
 	SETTING_DEFAULT_CHANNEL_ReactWhenDownloaded      bool     = true
 	SETTING_DEFAULT_CHANNEL_ReactWhenDownloadedEmoji string   = ""
 	SETTING_DEFAULT_CHANNEL_BlacklistReactEmojis     []string = []string{}
-	// Saving
+	// Rules for Access
+	SETTING_DEFAULT_CHANNEL_UsersAllWhitelisted bool = true
+	// Rules for Saving
 	SETTING_DEFAULT_CHANNEL_DivideFoldersByType    bool = true
 	SETTING_DEFAULT_CHANNEL_SaveImages             bool = true
 	SETTING_DEFAULT_CHANNEL_SaveVideos             bool = true
@@ -145,8 +159,6 @@ type ConfigurationChannel struct {
 	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
 	ErrorMessages *bool `json:"errorMessages,omitempty"` // optional, defaults
 	ScanEdits     *bool `json:"scanEdits,omitempty"`     // optional, defaults
-	// Rules
-	BlacklistedUsers *[]string `json:"blacklistedUsers,omitempty"` // optional
 	// Appearance
 	UpdatePresence           *bool     `json:"updatePresence,omitempty"`           // optional, defaults
 	ReactWhenDownloaded      *bool     `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
@@ -156,6 +168,10 @@ type ConfigurationChannel struct {
 	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
 	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
+	// Rules for Access
+	UsersAllWhitelisted *bool     `json:"usersAllWhitelisted,omitempty"` // optional, defaults to true
+	UserWhitelist       *[]string `json:"userWhitelist,omitempty"`       // optional, only relevant if above is false
+	UserBlacklist       *[]string `json:"userBlacklist,omitempty"`       // optional
 	// Rules for Saving
 	DivideFoldersByType    *bool     `json:"divideFoldersByType,omitempty"`    // optional, defaults
 	SaveImages             *bool     `json:"saveImages,omitempty"`             // optional, defaults
@@ -165,15 +181,25 @@ type ConfigurationChannel struct {
 	SaveOtherFiles         *bool     `json:"saveOtherFiles,omitempty"`         // optional, defaults
 	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	BlacklistedExtensions  *[]string `json:"blacklistedExtensions,omitempty"`  // optional, defaults
+
+	/* IDEAS / TODO:
+
+	* RolesAllWhitelisted *bool     `json:"rolesAllWhitelisted,omitempty"` // optional, defaults to true
+	* RoleWhitelist       *[]string `json:"roleWhitelist,omitempty"`       // optional
+	* RoleBlacklist       *[]string `json:"roleBlacklist,omitempty"`       // optional
+
+	 */
 }
 
 type ConfigurationAdminChannel struct {
 	// Required
 	ChannelID string `json:"channel"` // required
-	//TODO: Implement options
-	/*
+
+	/* IDEAS / TODO:
+
 	* UnrestrictAdminCommands bool // optional, defaults
 	* SendLogs bool // optional, unused if nil
+
 	 */
 }
 
@@ -229,8 +255,9 @@ func loadConfig() {
 	}
 }
 
+// These have to use the default variables since literal values and consts can't be set to the pointers
 func channelDefault(channel *ConfigurationChannel) {
-	// These have to use the default variables since literal values and consts can't be set to the pointers
+	// Setup
 	if channel.Enabled == nil {
 		channel.Enabled = &SETTING_DEFAULT_CHANNEL_Enabled
 	}
@@ -243,6 +270,7 @@ func channelDefault(channel *ConfigurationChannel) {
 	if channel.ScanEdits == nil {
 		channel.ScanEdits = &SETTING_DEFAULT_CHANNEL_ScanEdits
 	}
+	// Appearance
 	if channel.UpdatePresence == nil {
 		channel.UpdatePresence = &SETTING_DEFAULT_CHANNEL_UpdatePresence
 	}
@@ -255,6 +283,11 @@ func channelDefault(channel *ConfigurationChannel) {
 	if channel.BlacklistReactEmojis == nil {
 		channel.BlacklistReactEmojis = &SETTING_DEFAULT_CHANNEL_BlacklistReactEmojis
 	}
+	// Rules for Access
+	if channel.UsersAllWhitelisted == nil {
+		channel.UsersAllWhitelisted = &SETTING_DEFAULT_CHANNEL_UsersAllWhitelisted
+	}
+	// Rules for Saving
 	if channel.DivideFoldersByType == nil {
 		channel.DivideFoldersByType = &SETTING_DEFAULT_CHANNEL_DivideFoldersByType
 	}
@@ -293,6 +326,7 @@ func createConfig() {
 	INPUT_BASE_CHANNEL_ID := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
 	INPUT_BASE_CHANNEL_DEST := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
 
+	//TODO: Improve, this is very crude, I just wanted *something* for this.
 	log.Print(color.HiCyanString("Would you like to enter settings info now? [Y/N]: "))
 	reader := bufio.NewReader(os.Stdin)
 	read_creds_yn, _ := reader.ReadString('\n')
