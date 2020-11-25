@@ -358,9 +358,9 @@ All JSON settings follow camelCase format.
         * _Default:_ `true`
         * Allow messages from all users to be handled. Set to `false` if you wish to use `userWhitelist` to only permit specific users messages to be handled.
     * _`[OPTIONAL]`_ userWhitelist `[array of strings]`
-        * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot.
+        * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot. **Only accepts User ID's in the array.**
     * _`[OPTIONAL]`_ userBlacklist `[array of strings]`
-        * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot.
+        * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the array.**
     * _`[DEFAULTS]`_ divideFoldersByType `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
