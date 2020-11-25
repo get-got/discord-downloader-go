@@ -32,20 +32,22 @@ type Download struct {
 type DownloadStatus int
 
 const (
+	//TODO: Make this not stupid
 	DownloadSuccess DownloadStatus = 0
 
 	DownloadSkippedDuplicate            DownloadStatus = 1
-	DownloadSkippedUnpermittedType      DownloadStatus = 2
-	DownloadSkippedUnpermittedExtension DownloadStatus = 3
+	DownloadSkippedUnpermittedDomain    DownloadStatus = 2
+	DownloadSkippedUnpermittedType      DownloadStatus = 3
+	DownloadSkippedUnpermittedExtension DownloadStatus = 4
 
-	DownloadFailed                    DownloadStatus = 4
-	DownloadFailedCreatingFolder      DownloadStatus = 5
-	DownloadFailedRequesting          DownloadStatus = 6
-	DownloadFailedDownloadingResponse DownloadStatus = 7
-	DownloadFailedReadResponse        DownloadStatus = 8
-	DownloadFailedCreatingSubfolder   DownloadStatus = 9
-	DownloadFailedWritingFile         DownloadStatus = 10
-	DownloadFailedWritingDatabase     DownloadStatus = 11
+	DownloadFailed                    DownloadStatus = 5
+	DownloadFailedCreatingFolder      DownloadStatus = 6
+	DownloadFailedRequesting          DownloadStatus = 7
+	DownloadFailedDownloadingResponse DownloadStatus = 8
+	DownloadFailedReadResponse        DownloadStatus = 9
+	DownloadFailedCreatingSubfolder   DownloadStatus = 10
+	DownloadFailedWritingFile         DownloadStatus = 11
+	DownloadFailedWritingDatabase     DownloadStatus = 12
 )
 
 type DownloadStatusStruct struct {
@@ -74,6 +76,8 @@ func getDownloadStatusString(status DownloadStatus) string {
 	//
 	case DownloadSkippedDuplicate:
 		return "Download Skipped - Duplicate"
+	case DownloadSkippedUnpermittedDomain:
+		return "Download Skipped - Unpermitted Domain"
 	case DownloadSkippedUnpermittedType:
 		return "Download Skipped - Unpermitted File Type"
 	case DownloadSkippedUnpermittedExtension:
@@ -497,6 +501,17 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			}
 		}
 
+		// Check Domain
+		if channelConfig.DomainBlacklist != nil {
+			u, err := url.Parse(inputURL)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.RedString("Error while parsing url for DomainBlacklist:\t%s", err))
+			} else if stringInSlice(u.Hostname(), *channelConfig.DomainBlacklist) {
+				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", u.Hostname(), inputURL))
+				return mDownloadStatus(DownloadSkippedUnpermittedDomain)
+			}
+		}
+
 		// Check content type
 		if !((*channelConfig.SaveImages && contentTypeFound == "image") ||
 			(*channelConfig.SaveVideos && contentTypeFound == "video") ||
@@ -509,7 +524,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 
 		// Check extension
 		extension := filepath.Ext(filename)
-		if stringInSlice(extension, *channelConfig.BlacklistedExtensions) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
+		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
 			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
 			return mDownloadStatus(DownloadSkippedUnpermittedExtension)
 		}

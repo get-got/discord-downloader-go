@@ -136,7 +136,7 @@ var (
 	SETTING_DEFAULT_CHANNEL_SaveTextFiles          bool = false
 	SETTING_DEFAULT_CHANNEL_SaveOtherFiles         bool = false
 	SETTING_DEFAULT_CHANNEL_SavePossibleDuplicates bool = true
-	SETTING_DEFAULT_CHANNEL_BlacklistedExtensions       = []string{
+	SETTING_DEFAULT_CHANNEL_ExtensionBlacklist          = []string{
 		".htm",
 		".html",
 		".php",
@@ -180,7 +180,8 @@ type ConfigurationChannel struct {
 	SaveTextFiles          *bool     `json:"saveTextFiles,omitempty"`          // optional, defaults
 	SaveOtherFiles         *bool     `json:"saveOtherFiles,omitempty"`         // optional, defaults
 	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates,omitempty"` // optional, defaults
-	BlacklistedExtensions  *[]string `json:"blacklistedExtensions,omitempty"`  // optional, defaults
+	ExtensionBlacklist     *[]string `json:"extensionBlacklist,omitempty"`     // optional, defaults
+	DomainBlacklist        *[]string `json:"domainBlacklist,omitempty"`        // optional, defaults
 	SaveAllLinksToFile     *string   `json:"saveAllLinksToFile,omitempty"`     // optional
 
 	/* IDEAS / TODO:
@@ -311,8 +312,8 @@ func channelDefault(channel *ConfigurationChannel) {
 	if channel.SavePossibleDuplicates == nil {
 		channel.SavePossibleDuplicates = &SETTING_DEFAULT_CHANNEL_SavePossibleDuplicates
 	}
-	if channel.BlacklistedExtensions == nil {
-		channel.BlacklistedExtensions = &SETTING_DEFAULT_CHANNEL_BlacklistedExtensions
+	if channel.ExtensionBlacklist == nil {
+		channel.ExtensionBlacklist = &SETTING_DEFAULT_CHANNEL_ExtensionBlacklist
 	}
 }
 

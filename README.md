@@ -194,7 +194,7 @@ When initially launching the bot it will create a default settings file if you d
             "saveTextFiles": true,
             "saveOtherFiles": true,
             "savePossibleDuplicates": true,
-            "blacklistedExtensions": [
+            "extensionBlacklist": [
                 ".htm",
                 ".html",
                 ".php"
@@ -387,9 +387,11 @@ All JSON settings follow camelCase format.
         * _Default:_ `false`
     * _`[DEFAULTS]`_ savePossibleDuplicates `[bool]`
         * _Default:_ `true`
-    * _`[DEFAULTS]`_ blacklistedExtensions `[array of strings]`
+    * _`[DEFAULTS]`_ extensionBlacklist `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
+    * _`[OPTIONAL]`_ domainBlacklist `[array of strings]`
+        * Ignores files from specified domains. Ensure you use proper formatting.
     * _`[OPTIONAL]`_ saveAllLinksToFile `[string]`
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
 
