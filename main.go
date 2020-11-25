@@ -279,7 +279,7 @@ func main() {
 				durafmt.Parse(time.Since(startTime)).String(),
 				startTime.Format("03:04:05pm on Monday, January 2, 2006 (MST)"),
 				len(bot.State.Guilds),
-				len(config.Channels),
+				getBoundChannelsCount(),
 				len(config.AdminChannels),
 				bot.HeartbeatLatency().Milliseconds(),
 			)
@@ -424,6 +424,12 @@ func main() {
 			}
 		}
 	}).Alias("reload", "kill").Cat("Admin").Desc("Kills the bot")
+
+	//TODO: add_channel command
+	//TODO: edit_channel command
+	//TODO: delete_channel command
+	//NOTE: The problem with these is opeaning, modifying, then saving the JSON without adding unwanted junk.
+	// Also the hoops the user will have to jump through to edit these via commands.
 
 	// Handler for Command Router
 	bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
