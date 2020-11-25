@@ -12,13 +12,13 @@ import (
 	"github.com/fatih/color"
 )
 
+// `json:",omitempty"` is for settings not to be included into initially written settings file
+
 var (
 	PLACEHOLDER_TOKEN    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
 	PLACEHOLDER_EMAIL    string = "REPLACE_WITH_YOUR_EMAIL_OR_DELETE_LINE"
 	PLACEHOLDER_PASSWORD string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
 )
-
-// `json:",omitempty"` is for settings not to be included into initially written settings file
 
 type ConfigurationCredentials struct {
 	// Login
@@ -186,7 +186,7 @@ type ConfigurationChannel struct {
 
 	/* IDEAS / TODO:
 
-	// These require an efficient way, to check roles. I haven't really looked into it.
+	// These require an efficient way to check roles. I haven't really looked into it.
 	* RolesAllWhitelisted *bool     `json:"rolesAllWhitelisted,omitempty"` // optional, defaults to true
 	* RoleWhitelist       *[]string `json:"roleWhitelist,omitempty"`       // optional
 	* RoleBlacklist       *[]string `json:"roleBlacklist,omitempty"`       // optional
@@ -200,8 +200,10 @@ type ConfigurationAdminChannel struct {
 
 	/* IDEAS / TODO:
 
-	* UnrestrictAdminCommands bool // optional, defaults
-	* SendLogs bool // optional, unused if nil
+	* UnrestrictAdminCommands *bool `json:"unrestrictAdminCommands,omitempty"` // optional, defaults
+	* SendErrorLogs *bool `json:"sendErrorLogs,omitempty"` // optional
+	* SendHourlyDigest *bool `json:"sendHourlyDigest,omitempty"` // optional
+	* SendDailyDigest *bool `json:"sendDailyDigest,omitempty"` // optional
 
 	 */
 }

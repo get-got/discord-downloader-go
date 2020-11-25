@@ -211,6 +211,18 @@ When initially launching the bot it will create a default settings file if you d
             "saveOtherFiles": false
         },
         {
+            "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA_FROM_ME_EXCEPT_DISCORD_FILES",
+            "destination": "media2",
+            "usersAllWhitelisted": false,
+            "userWhitelist": [ "MY_USER_ID" ],
+            "saveImages": true,
+            "saveVideos": true,
+            "saveAudioFiles": true,
+            "saveTextFiles": false,
+            "saveOtherFiles": false,
+            "domainBlacklist": [ "cdn.discordapp.com" ]
+        },
+        {
             "channel": "THIS_CHANNEL_IS_STEALTHY",
             "destination": "stealthy files",
             "allowCommands": false,
