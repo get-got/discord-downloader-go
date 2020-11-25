@@ -382,6 +382,6 @@ All JSON settings follow camelCase format.
 
 ## Info for Developers
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
-* Versioning is <MAJOR>.<MINOR>.<PATCH>
+* Versioning is `[MAJOR].[MINOR].[PATCH]`
 * I try to be consistent with annotation but it's not perfect.
 * Logging generally follows certain standards and patterns with formatting and color-coding.
