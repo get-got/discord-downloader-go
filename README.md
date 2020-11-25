@@ -8,9 +8,6 @@
     <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" />
     </a>
-    <a href="" alt="Go Version">
-        <img src="https://img.shields.io/github/go-mod/go-version/get-got/discord-downloader-go" />
-    </a>
     <br>
     <a href="https://github.com/get-got/discord-downloader-go/releases" alt="All Releases">
         <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/total?label=all-releases&logo=GitHub" />
