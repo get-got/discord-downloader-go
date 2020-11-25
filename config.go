@@ -181,14 +181,16 @@ type ConfigurationChannel struct {
 	SaveOtherFiles         *bool     `json:"saveOtherFiles,omitempty"`         // optional, defaults
 	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	BlacklistedExtensions  *[]string `json:"blacklistedExtensions,omitempty"`  // optional, defaults
+	SaveAllLinksToFile     *string   `json:"saveAllLinksToFile,omitempty"`     // optional
 
 	/* IDEAS / TODO:
 
+	// These require an efficient way, to check roles. I haven't really looked into it.
 	* RolesAllWhitelisted *bool     `json:"rolesAllWhitelisted,omitempty"` // optional, defaults to true
 	* RoleWhitelist       *[]string `json:"roleWhitelist,omitempty"`       // optional
 	* RoleBlacklist       *[]string `json:"roleBlacklist,omitempty"`       // optional
 
-	 */
+	*/
 }
 
 type ConfigurationAdminChannel struct {

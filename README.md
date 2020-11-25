@@ -390,6 +390,8 @@ All JSON settings follow camelCase format.
     * _`[DEFAULTS]`_ blacklistedExtensions `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
+    * _`[OPTIONAL]`_ saveAllLinksToFile `[string]`
+        * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
 
 ## Info for Developers
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
