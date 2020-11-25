@@ -18,6 +18,10 @@
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest" alt="Latest Release">
         <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub" />
     </a>
+    <br>
+    <a href="https://discord.gg/6Z6FJZVaDV">
+        <img src="https://img.shields.io/discord/780985109608005703?logo=discord"alt="Join the Discord">
+    </a>
 </p>
 <h2 align="center">
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
