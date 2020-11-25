@@ -2,18 +2,18 @@
     Discord Downloader 💾
 </h1>
 <p align="center">
-    <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Build Status">
-        <img src="https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
-    </a>
-    <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Report Card">
-        <img src="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" />
-    </a>
-    <br>
     <a href="https://github.com/get-got/discord-downloader-go/releases" alt="All Releases">
         <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/total?label=all-releases&logo=GitHub" />
     </a>
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest" alt="Latest Release">
         <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub" />
+    </a>
+    <br>
+    <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Build Status">
+        <img src="https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
+    </a>
+    <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Report Card">
+        <img src="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" />
     </a>
     <br>
     <a href="https://discord.gg/6Z6FJZVaDV">
