@@ -53,7 +53,7 @@ func main() {
 	// Config
 	log.Println(color.YellowString("Loading settings from \"%s\"...", LOC_CONFIG_FILE))
 	loadConfig()
-	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s)", len(config.Channels)))
+	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s)", getBoundChannelsCount()))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {

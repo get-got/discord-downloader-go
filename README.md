@@ -341,8 +341,10 @@ All JSON settings follow camelCase format.
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
 * **channels** `[array of key/value objects]`
-    * **channel** `[string]`
+    * _`[THIS OR BELOW]`_ **channel** `[string]`
         * Channel ID to monitor.
+    * _`[THIS OR ABOVE]`_ **channels** `[array of strings]`
+        * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     * **destination** `[string]`
         * Folder path for saving files, can be full path or local subfolder.
     * _`[DEFAULTS]`_ enabled `[bool]`

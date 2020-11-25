@@ -152,8 +152,9 @@ var (
 
 type ConfigurationChannel struct {
 	// Required
-	ChannelID   string `json:"channel"`     // required
-	Destination string `json:"destination"` // required
+	ChannelID   string    `json:"channel"`            // required
+	ChannelIDs  *[]string `json:"channels,omitempty"` // alternative to ChannelID
+	Destination string    `json:"destination"`        // required
 	// Setup
 	Enabled       *bool `json:"enabled,omitempty"`       // optional, defaults
 	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
@@ -461,10 +462,37 @@ func createConfig() {
 	}
 }
 
+func getBoundChannelsCount() int {
+	var channels []string
+	for _, item := range config.Channels {
+		if item.ChannelID != "" {
+			if !stringInSlice(item.ChannelID, channels) {
+				channels = append(channels, item.ChannelID)
+			}
+		} else if *item.ChannelIDs != nil {
+			for _, subchannel := range *item.ChannelIDs {
+				if !stringInSlice(subchannel, channels) {
+					channels = append(channels, subchannel)
+				}
+			}
+		}
+	}
+	return len(channels)
+}
+
 func isChannelRegistered(ChannelID string) bool {
 	for _, item := range config.Channels {
+		// Single Channel Config
 		if ChannelID == item.ChannelID {
 			return true
+		}
+		// Multi-Channel Config
+		if item.ChannelIDs != nil {
+			for _, subchannel := range *item.ChannelIDs {
+				if ChannelID == subchannel {
+					return true
+				}
+			}
 		}
 	}
 	return false
@@ -472,8 +500,17 @@ func isChannelRegistered(ChannelID string) bool {
 
 func getChannelConfig(ChannelID string) ConfigurationChannel {
 	for _, item := range config.Channels {
+		// Single Channel Config
 		if ChannelID == item.ChannelID {
 			return item
+		}
+		// Multi-Channel Config
+		if item.ChannelIDs != nil {
+			for _, subchannel := range *item.ChannelIDs {
+				if ChannelID == subchannel {
+					return item
+				}
+			}
 		}
 	}
 	return ConfigurationChannel{}
