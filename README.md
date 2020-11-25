@@ -297,6 +297,7 @@ All JSON settings follow camelCase format.
         * `{{dgVersion}}`: discord-go version
         * `{{ddgVersion}}`: Project version
         * `{{apiVersion}}`: Discord API version
+        * `{{countNoCommas}}`: Raw total count of downloads (without comma formatting)
         * `{{count}}`: Raw total count of downloads
         * `{{countShort}}`: Shortened total count of downloads
         * `{{numGuilds}}`: Number of guilds bot is a member of

@@ -20,6 +20,7 @@ func presenceKeyReplacement(input string) string {
 			{"{{dgVersion}}", discordgo.VERSION},
 			{"{{ddgVersion}}", PROJECT_VERSION},
 			{"{{apiVersion}}", discordgo.APIVersion},
+			{"{{countNoCommas}}", fmt.Sprint(countInt)},
 			{"{{count}}", formatNumber(countInt)},
 			{"{{countShort}}", formatNumberShort(countInt)},
 			{"{{numGuilds}}", fmt.Sprint(len(bot.State.Guilds))},
