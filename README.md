@@ -35,15 +35,22 @@ This is a Discord bot program to download files posted in specified Discord chan
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
-## Setup
-Edit the `settings.json` file and enter your credentials & configuration. If the file is missing or critically corrupt, it will replace it with a new file. Ensure you follow proper JSON syntax to avoid any unexpected errors.
+## Getting Started (Basic Setup)
+Obviously, download the bot program (or compile yourself with Go) and put it in a folder of your choice.
 
-If using a **Bot User,** enter the token into the `"Token"` setting. Remove the lines for `"Username"` and `"Password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
+You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file). Ensure you follow proper JSON syntax to avoid any unexpected errors.
 
-If using a **Real User (Self-Bot),** fill out the `"Username"` and `"Password"` settings. Remove the line for `"Token"` or leave blank (`""`).
+### For Credentials...
+* If using a **Bot User,** enter the token into the `"Token"` setting. Remove the lines for `"Username"` and `"Password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
+* If using a **Real User (Self-Bot),** fill out the `"Username"` and `"Password"` settings. Remove the line for `"Token"` or leave blank (`""`).
+* If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"Token"` setting. Remove the lines for `"Username"` and `"Password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
 
-If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"Token"` setting. Remove the lines for `"Username"` and `"Password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
+### Bot Permissions in Channels/Servers
+* In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
+* In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
+* In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
 
+#### How to Find Discord ID's
 * **Discord Developer Mode:** Enable `Developer Mode` in Discord settings under `Appearance`.
 * **Finding Channel ID:** _Enable Discord Developer Mode (see above),_ right click on the channel and `Copy ID`.
 * **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
