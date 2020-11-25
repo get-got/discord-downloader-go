@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -29,11 +28,27 @@ var (
 )
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if (m.Author.ID == user.ID && !config.ScanOwnMessages) || !isChannelRegistered(m.ChannelID) {
+	handleMessage(m.Message, false)
+}
+
+func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
+	if m.EditedTimestamp != discordgo.Timestamp("") {
+		handleMessage(m.Message, true)
+	}
+}
+
+func handleMessage(m *discordgo.Message, edited bool) {
+	if !isChannelRegistered(m.ChannelID) {
 		return
 	}
 	channelConfig := getChannelConfig(m.ChannelID)
-	if !*channelConfig.Enabled {
+
+	// Ignore own messages unless told not to
+	if m.Author.ID == user.ID && !config.ScanOwnMessages {
+		return
+	}
+	// Ignore if told so by config
+	if !*channelConfig.Enabled || (edited && !*channelConfig.ScanEdits) {
 		return
 	}
 
@@ -48,20 +63,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if len(m.Attachments) > 0 {
 		content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
 	}
-	log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
-
-	// Skipping
-	canSkip := config.AllowSkipping
-	if channelConfig.OverwriteAllowSkipping != nil {
-		canSkip = *channelConfig.OverwriteAllowSkipping
-	}
-	if canSkip {
-		for _, cmd := range skipCommands {
-			if strings.Contains(m.Content, cmd) {
-				log.Println(color.HiYellowString("Message handling skipped due to use of skip command."))
-				return
-			}
-		}
+	if edited {
+		log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
+	} else {
+		log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
 	}
 
 	// User Whitelisting
@@ -79,107 +84,59 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		}
 	}
 
-	handleMessage(m.Message)
-}
-
-func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	if m.EditedTimestamp != discordgo.Timestamp("") {
-		if (m.Author.ID == user.ID && !config.ScanOwnMessages) || !isChannelRegistered(m.ChannelID) {
-			return
-		}
-		channelConfig := getChannelConfig(m.ChannelID)
-		if !*channelConfig.Enabled || !*channelConfig.ScanEdits {
-			return
-		}
-
-		// Log
-		var sendLabel string
-		if config.DebugOutput {
-			sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
-		} else {
-			sendLabel = fmt.Sprintf("%s in \"%s\"#%s", getUserIdentifier(*m.Author), getGuildName(m.GuildID), getChannelName(m.ChannelID))
-		}
-		content := m.Content
-		if len(m.Attachments) > 0 {
-			content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
-		}
-		log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
-
-		// Skipping
-		canSkip := config.AllowSkipping
-		if channelConfig.OverwriteAllowSkipping != nil {
-			canSkip = *channelConfig.OverwriteAllowSkipping
-		}
-		if canSkip {
-			for _, cmd := range skipCommands {
-				if m.Content == cmd {
-					log.Println(color.HiYellowString("Message handling skipped due to use of skip command."))
-					return
-				}
-			}
-		}
-
-		// User Whitelisting
-		if !*channelConfig.UsersAllWhitelisted && channelConfig.UserWhitelist != nil {
-			if !stringInSlice(m.Author.ID, *channelConfig.UserWhitelist) {
-				log.Println(color.HiYellowString("Message handling skipped due to user not being whitelisted."))
-				return
-			}
-		}
-		// User Blacklisting
-		if channelConfig.UserBlacklist != nil {
-			if stringInSlice(m.Author.ID, *channelConfig.UserBlacklist) {
-				log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
-				return
-			}
-		}
-
-		handleMessage(m.Message)
+	// Skipping
+	canSkip := config.AllowSkipping
+	if channelConfig.OverwriteAllowSkipping != nil {
+		canSkip = *channelConfig.OverwriteAllowSkipping
 	}
-}
-
-func handleMessage(m *discordgo.Message) {
-	if isChannelRegistered(m.ChannelID) {
-		channelConfig := getChannelConfig(m.ChannelID)
-		files := getFileLinks(m)
-		for _, file := range files {
-			log.Println(color.CyanString("> FILE: " + file.Link))
-
-			startDownload(
-				file.Link,
-				file.Filename,
-				channelConfig.Destination,
-				m.ID,
-				m.ChannelID,
-				m.GuildID,
-				m.Author.ID,
-				file.Time,
-				false,
-			)
+	if canSkip {
+		for _, cmd := range skipCommands {
+			if m.Content == cmd {
+				log.Println(color.HiYellowString("Message handling skipped due to use of skip command."))
+				return
+			}
 		}
+	}
 
-		// Save All Links to File
-		if channelConfig.SaveAllLinksToFile != nil {
-			filepath := *channelConfig.SaveAllLinksToFile
-			if filepath != "" {
-				f, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-				if err != nil {
-					log.Println(color.RedString("[SaveAllLinksToFile] Failed to open file:\t%s", err))
-					f.Close()
-					return
-				}
-				defer f.Close()
+	// Process Files
+	files := getFileLinks(m)
+	for _, file := range files {
+		log.Println(color.CyanString("> FILE: " + file.Link))
 
-				var addedContent string
-				rawLinks := getRawLinks(m)
-				for _, rawLink := range rawLinks {
-					addedContent = addedContent + "\n" + rawLink.Link
-				}
+		startDownload(
+			file.Link,
+			file.Filename,
+			channelConfig.Destination,
+			m.ID,
+			m.ChannelID,
+			m.GuildID,
+			m.Author.ID,
+			file.Time,
+			false,
+		)
+	}
 
-				if _, err = f.WriteString(addedContent); err != nil {
-					log.Println(color.RedString("[SaveAllLinksToFile] Failed to append file:\t%s", err))
-					return
-				}
+	// Save All Links to File
+	if channelConfig.SaveAllLinksToFile != nil {
+		filepath := *channelConfig.SaveAllLinksToFile
+		if filepath != "" {
+			f, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+			if err != nil {
+				log.Println(color.RedString("[SaveAllLinksToFile] Failed to open file:\t%s", err))
+				f.Close()
+				return
+			}
+			defer f.Close()
+
+			var addedContent string
+			rawLinks := getRawLinks(m)
+			for _, rawLink := range rawLinks {
+				addedContent = addedContent + "\n" + rawLink.Link
+			}
+
+			if _, err = f.WriteString(addedContent); err != nil {
+				log.Println(color.RedString("[SaveAllLinksToFile] Failed to append file:\t%s", err))
+				return
 			}
 		}
 	}

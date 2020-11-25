@@ -462,24 +462,6 @@ func createConfig() {
 	}
 }
 
-func getBoundChannelsCount() int {
-	var channels []string
-	for _, item := range config.Channels {
-		if item.ChannelID != "" {
-			if !stringInSlice(item.ChannelID, channels) {
-				channels = append(channels, item.ChannelID)
-			}
-		} else if *item.ChannelIDs != nil {
-			for _, subchannel := range *item.ChannelIDs {
-				if !stringInSlice(subchannel, channels) {
-					channels = append(channels, subchannel)
-				}
-			}
-		}
-	}
-	return len(channels)
-}
-
 func isChannelRegistered(ChannelID string) bool {
 	for _, item := range config.Channels {
 		// Single Channel Config
@@ -548,4 +530,22 @@ func isCommandableChannel(m *discordgo.Message) bool {
 		}
 	}
 	return false
+}
+
+func getBoundChannelsCount() int {
+	var channels []string
+	for _, item := range config.Channels {
+		if item.ChannelID != "" {
+			if !stringInSlice(item.ChannelID, channels) {
+				channels = append(channels, item.ChannelID)
+			}
+		} else if *item.ChannelIDs != nil {
+			for _, subchannel := range *item.ChannelIDs {
+				if !stringInSlice(subchannel, channels) {
+					channels = append(channels, subchannel)
+				}
+			}
+		}
+	}
+	return len(channels)
 }
