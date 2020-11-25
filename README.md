@@ -228,6 +228,10 @@ When initially launching the bot it will create a default settings file if you d
             "errorMessages": false,
             "updatePresence": false,
             "reactWhenDownloaded": false
+        },
+        {
+            "channels": [ "CHANNEL_1", "CHANNEL_2", "CHANNEL_3", "CHANNEL_4", "CHANNEL_5" ],
+            "destination": "lots of stuff"
         }
     ]
 }
