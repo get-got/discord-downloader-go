@@ -169,7 +169,7 @@ When initially launching the bot it will create a default settings file if you d
         }
     ],
     "debugOutput": true,
-    "commandPrefix": "downloader ",
+    "commandPrefix": "downloader_",
     "allowSkipping": true,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
@@ -177,9 +177,9 @@ When initially launching the bot it will create a default settings file if you d
     "presenceStatus": "dnd",
     "presenceType": 3,
     "presenceOverwrite": "{{count}} files",
-    "filenameDateFormat": "2006.01.02-15.04.05 ",
+    "filenameDateFormat": "2006.01.02-15.04.05_",
     "embedColor": "#29BEB0",
-    "inflateCount": 1000,
+    "inflateCount": 123456,
     "channels": [
         {
             "channel": "THIS_CHANNEL_DOWNLOADS_EVERYTHING",
@@ -231,7 +231,10 @@ When initially launching the bot it will create a default settings file if you d
         },
         {
             "channels": [ "CHANNEL_1", "CHANNEL_2", "CHANNEL_3", "CHANNEL_4", "CHANNEL_5" ],
-            "destination": "lots of stuff"
+            "destination": "lots of stuff",
+            "allowCommands": false,
+            "errorMessages": false,
+            "updatePresence": false
         }
     ]
 }
