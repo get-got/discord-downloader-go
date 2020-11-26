@@ -41,15 +41,12 @@ var (
 	SETTING_DEFAULT_CommandPrefix        string = "ddg "
 	SETTING_DEFAULT_AllowSkipping        bool   = true
 	SETTING_DEFAULT_ScanOwnMessages      bool   = false
-	SETTING_DEFAULT_DownloadRetryMax     int    = 3
-	SETTING_DEFAULT_DownloadTimeout      int    = 60
 	SETTING_DEFAULT_GithubUpdateChecking bool   = true
 	// Appearance
-	SETTING_DEFAULT_PresenceEnabled    bool               = true
-	SETTING_DEFAULT_PresenceStatus     string             = string(discordgo.StatusIdle)
-	SETTING_DEFAULT_PresenceType       discordgo.GameType = discordgo.GameTypeGame
-	SETTING_DEFAULT_FilenameDateFormat string             = "2006-01-02_15-04-05 "
-	SETTING_DEFAULT_InflateCount       int64              = 0
+	SETTING_DEFAULT_PresenceEnabled bool               = true
+	SETTING_DEFAULT_PresenceStatus  string             = string(discordgo.StatusIdle)
+	SETTING_DEFAULT_PresenceType    discordgo.GameType = discordgo.GameTypeGame
+	SETTING_DEFAULT_InflateCount    int64              = 0
 )
 
 func DefaultConfiguration() configuration {
@@ -62,22 +59,19 @@ func DefaultConfiguration() configuration {
 		},
 		// Setup
 		Admins:               []string{},
-		AdminChannels:        nil,
 		DebugOutput:          SETTING_DEFAULT_DebugOutput,
 		CommandPrefix:        SETTING_DEFAULT_CommandPrefix,
 		AllowSkipping:        SETTING_DEFAULT_AllowSkipping,
 		ScanOwnMessages:      SETTING_DEFAULT_ScanOwnMessages,
-		DownloadRetryMax:     SETTING_DEFAULT_DownloadRetryMax,
-		DownloadTimeout:      SETTING_DEFAULT_DownloadTimeout,
+		DownloadRetryMax:     3,
+		DownloadTimeout:      60,
 		GithubUpdateChecking: SETTING_DEFAULT_GithubUpdateChecking,
 		// Appearance
 		PresenceEnabled:    SETTING_DEFAULT_PresenceEnabled,
 		PresenceStatus:     SETTING_DEFAULT_PresenceStatus,
 		PresenceType:       SETTING_DEFAULT_PresenceType,
-		FilenameDateFormat: SETTING_DEFAULT_FilenameDateFormat,
+		FilenameDateFormat: "2006-01-02_15-04-05 ",
 		InflateCount:       &SETTING_DEFAULT_InflateCount,
-		// Channels
-		Channels: nil,
 	}
 }
 
