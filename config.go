@@ -20,7 +20,7 @@ var (
 	PLACEHOLDER_PASSWORD string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
 )
 
-type ConfigurationCredentials struct {
+type configurationCredentials struct {
 	// Login
 	Token    string `json:"token"`    // required for bot token (this or login)
 	Email    string `json:"email"`    // required for login (this or token)
@@ -53,9 +53,9 @@ var (
 )
 
 func DefaultConfiguration() Configuration {
-	return Configuration{
+	return configuration{
 		// Required
-		Credentials: ConfigurationCredentials{
+		Credentials: configurationCredentials{
 			Token:    PLACEHOLDER_TOKEN,
 			Email:    PLACEHOLDER_EMAIL,
 			Password: PLACEHOLDER_PASSWORD,
@@ -81,12 +81,12 @@ func DefaultConfiguration() Configuration {
 	}
 }
 
-type Configuration struct {
+type configuration struct {
 	// Required
-	Credentials ConfigurationCredentials `json:"credentials"` // required
+	Credentials configurationCredentials `json:"credentials"` // required
 	// Setup
 	Admins               []string                    `json:"admins"`                     // optional
-	AdminChannels        []ConfigurationAdminChannel `json:"adminChannels"`              // optional
+	AdminChannels        []configurationAdminChannel `json:"adminChannels"`              // optional
 	DebugOutput          bool                        `json:"debugOutput"`                // optional, defaults
 	CommandPrefix        string                      `json:"commandPrefix"`              // optional, defaults
 	AllowSkipping        bool                        `json:"allowSkipping"`              // optional, defaults
@@ -105,7 +105,7 @@ type Configuration struct {
 	EmbedColor               *string            `json:"embedColor,omitempty"`               // optional, defaults to role if undefined, then defaults random if no role color
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
 	// Channels
-	Channels []ConfigurationChannel `json:"channels"` // required
+	Channels []configurationChannel `json:"channels"` // required
 
 	/* IDEAS / TODO:
 
@@ -150,7 +150,7 @@ var (
 	}
 )
 
-type ConfigurationChannel struct {
+type configurationChannel struct {
 	// Required
 	ChannelID   string    `json:"channel"`            // required
 	ChannelIDs  *[]string `json:"channels,omitempty"` // alternative to ChannelID
@@ -195,7 +195,7 @@ type ConfigurationChannel struct {
 	*/
 }
 
-type ConfigurationAdminChannel struct {
+type configurationAdminChannel struct {
 	// Required
 	ChannelID string `json:"channel"` // required
 
@@ -262,7 +262,7 @@ func loadConfig() {
 }
 
 // These have to use the default variables since literal values and consts can't be set to the pointers
-func channelDefault(channel *ConfigurationChannel) {
+func channelDefault(channel *configurationChannel) {
 	// Setup
 	if channel.Enabled == nil {
 		channel.Enabled = &SETTING_DEFAULT_CHANNEL_Enabled
@@ -400,9 +400,9 @@ func createConfig() {
 		//TODO: Admin channel setup?
 	}
 
-	// Separate from DefaultConfiguration because there's some elements we want to strip for settings creation
-	defaultConfig := Configuration{
-		Credentials: ConfigurationCredentials{
+	// Separate from Defaultconfiguration because there's some elements we want to strip for settings creation
+	defaultConfig := configuration{
+		Credentials: configurationCredentials{
 			Token:    INPUT_TOKEN,
 			Email:    INPUT_EMAIL,
 			Password: INPUT_PASSWORD,
@@ -420,7 +420,7 @@ func createConfig() {
 		DebugOutput:          SETTING_DEFAULT_DebugOutput,
 	}
 
-	baseChannel := ConfigurationChannel{
+	baseChannel := configurationChannel{
 		ChannelID:   INPUT_BASE_CHANNEL_ID,
 		Destination: INPUT_BASE_CHANNEL_DEST,
 
@@ -438,7 +438,7 @@ func createConfig() {
 	}
 	defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
 
-	baseAdminChannel := ConfigurationAdminChannel{
+	baseAdminChannel := configurationAdminChannel{
 		ChannelID: "REPLACE_WITH_DISCORD_CHANNEL_ID_FOR_ADMIN_COMMANDS",
 	}
 	defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
@@ -480,7 +480,7 @@ func isChannelRegistered(ChannelID string) bool {
 	return false
 }
 
-func getChannelConfig(ChannelID string) ConfigurationChannel {
+func getChannelConfig(ChannelID string) configurationChannel {
 	for _, item := range config.Channels {
 		// Single Channel Config
 		if ChannelID == item.ChannelID {
@@ -495,7 +495,7 @@ func getChannelConfig(ChannelID string) ConfigurationChannel {
 			}
 		}
 	}
-	return ConfigurationChannel{}
+	return configurationChannel{}
 }
 
 func isAdminChannelRegistered(ChannelID string) bool {
@@ -509,7 +509,7 @@ func isAdminChannelRegistered(ChannelID string) bool {
 	return false
 }
 
-func getAdminChannelConfig(ChannelID string) ConfigurationAdminChannel {
+func getAdminChannelConfig(ChannelID string) configurationAdminChannel {
 	if config.AdminChannels != nil {
 		for _, item := range config.AdminChannels {
 			if ChannelID == item.ChannelID {
@@ -517,7 +517,7 @@ func getAdminChannelConfig(ChannelID string) ConfigurationAdminChannel {
 			}
 		}
 	}
-	return ConfigurationAdminChannel{}
+	return configurationAdminChannel{}
 }
 
 func isCommandableChannel(m *discordgo.Message) bool {

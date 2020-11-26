@@ -16,14 +16,14 @@ import (
 	"github.com/hashicorp/go-version"
 )
 
-type GithubReleaseApiObject struct {
+type githubReleaseApiObject struct {
 	TagName string `json:"tag_name"`
 }
 
 func isLatestGithubRelease() bool {
 	prefixHere := color.HiMagentaString("[Github Update Check]")
 
-	githubReleaseApiObject := new(GithubReleaseApiObject)
+	githubReleaseApiObject := new(githubReleaseApiObject)
 	err := getJSON(PROJECT_RELEASE_API_URL, githubReleaseApiObject)
 	if err != nil {
 		log.Println(prefixHere, color.RedString("Error fetching current Release JSON: %s", err))
