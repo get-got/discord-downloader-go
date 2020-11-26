@@ -317,77 +317,77 @@ func channelDefault(channel *configurationChannel) {
 func createConfig() {
 	log.Println(color.YellowString("Creating new settings file..."))
 
-	INPUT_TOKEN := PLACEHOLDER_TOKEN
-	INPUT_EMAIL := PLACEHOLDER_EMAIL
-	INPUT_PASSWORD := PLACEHOLDER_PASSWORD
+	enteredToken := PLACEHOLDER_TOKEN
+	enteredEmail := PLACEHOLDER_EMAIL
+	enteredPassword := PLACEHOLDER_PASSWORD
 
-	INPUT_ADMIN := "REPLACE_WITH_YOUR_DISCORD_USER_ID"
+	enteredAdmin := "REPLACE_WITH_YOUR_DISCORD_USER_ID"
 
-	INPUT_BASE_CHANNEL_ID := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
-	INPUT_BASE_CHANNEL_DEST := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
+	enteredBaseChannel := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
+	enteredBaseDestination := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
 
 	//TODO: Improve, this is very crude, I just wanted *something* for this.
 	log.Print(color.HiCyanString("Would you like to enter settings info now? [Y/N]: "))
 	reader := bufio.NewReader(os.Stdin)
-	read_creds_yn, _ := reader.ReadString('\n')
-	read_creds_yn = strings.ReplaceAll(read_creds_yn, "\n", "")
-	read_creds_yn = strings.ReplaceAll(read_creds_yn, "\r", "")
-	if strings.Contains(strings.ToLower(read_creds_yn), "y") {
-	input_creds:
+	inputCredsYN, _ := reader.ReadString('\n')
+	inputCredsYN = strings.ReplaceAll(inputCredsYN, "\n", "")
+	inputCredsYN = strings.ReplaceAll(inputCredsYN, "\r", "")
+	if strings.Contains(strings.ToLower(inputCredsYN), "y") {
+	EnterCreds:
 		log.Print(color.HiCyanString("Token or Login? [\"token\"/\"login\"]: "))
-		read_creds, _ := reader.ReadString('\n')
-		read_creds = strings.ReplaceAll(read_creds, "\n", "")
-		read_creds = strings.ReplaceAll(read_creds, "\r", "")
-		if strings.Contains(strings.ToLower(read_creds), "token") {
-		input_token:
+		inputCreds, _ := reader.ReadString('\n')
+		inputCreds = strings.ReplaceAll(inputCreds, "\n", "")
+		inputCreds = strings.ReplaceAll(inputCreds, "\r", "")
+		if strings.Contains(strings.ToLower(inputCreds), "token") {
+		EnterToken:
 			log.Print(color.HiCyanString("Enter token: "))
-			read_token, _ := reader.ReadString('\n')
-			read_token = strings.ReplaceAll(read_token, "\n", "")
-			read_token = strings.ReplaceAll(read_token, "\r", "")
-			if read_token != "" {
-				INPUT_TOKEN = read_token
+			inputToken, _ := reader.ReadString('\n')
+			inputToken = strings.ReplaceAll(inputToken, "\n", "")
+			inputToken = strings.ReplaceAll(inputToken, "\r", "")
+			if inputToken != "" {
+				enteredToken = inputToken
 			} else {
 				log.Println(color.HiRedString("Please input token..."))
-				goto input_token
+				goto EnterToken
 			}
-		} else if strings.Contains(strings.ToLower(read_creds), "login") {
-		input_email:
+		} else if strings.Contains(strings.ToLower(inputCreds), "login") {
+		EnterEmail:
 			log.Print(color.HiCyanString("Enter email: "))
-			read_email, _ := reader.ReadString('\n')
-			read_email = strings.ReplaceAll(read_email, "\n", "")
-			read_email = strings.ReplaceAll(read_email, "\r", "")
-			if strings.Contains(read_email, "@") {
-				INPUT_EMAIL = read_email
-			input_password:
+			inputEmail, _ := reader.ReadString('\n')
+			inputEmail = strings.ReplaceAll(inputEmail, "\n", "")
+			inputEmail = strings.ReplaceAll(inputEmail, "\r", "")
+			if strings.Contains(inputEmail, "@") {
+				enteredEmail = inputEmail
+			EnterPassword:
 				log.Print(color.HiCyanString("Enter password: "))
-				read_password, _ := reader.ReadString('\n')
-				read_password = strings.ReplaceAll(read_password, "\n", "")
-				read_password = strings.ReplaceAll(read_password, "\r", "")
-				if read_password != "" {
-					INPUT_PASSWORD = read_password
+				inputPassword, _ := reader.ReadString('\n')
+				inputPassword = strings.ReplaceAll(inputPassword, "\n", "")
+				inputPassword = strings.ReplaceAll(inputPassword, "\r", "")
+				if inputPassword != "" {
+					enteredPassword = inputPassword
 				} else {
 					log.Println(color.HiRedString("Please input password..."))
-					goto input_password
+					goto EnterPassword
 				}
 			} else {
 				log.Println(color.HiRedString("Please input email..."))
-				goto input_email
+				goto EnterEmail
 			}
 		} else {
 			log.Println(color.HiRedString("Please input \"token\" or \"login\"..."))
-			goto input_creds
+			goto EnterCreds
 		}
 
-	input_admin_id:
+	EnterAdmin:
 		log.Print(color.HiCyanString("Input your Discord User ID: "))
-		read_admin, _ := reader.ReadString('\n')
-		read_admin = strings.ReplaceAll(read_admin, "\n", "")
-		read_admin = strings.ReplaceAll(read_admin, "\r", "")
-		if isNumeric(read_admin) {
-			INPUT_ADMIN = read_admin
+		inputAdmin, _ := reader.ReadString('\n')
+		inputAdmin = strings.ReplaceAll(inputAdmin, "\n", "")
+		inputAdmin = strings.ReplaceAll(inputAdmin, "\r", "")
+		if isNumeric(inputAdmin) {
+			enteredAdmin = inputAdmin
 		} else {
 			log.Println(color.HiRedString("Please input your Discord User ID..."))
-			goto input_admin_id
+			goto EnterAdmin
 		}
 
 		//TODO: Base channel setup? Would be kind of annoying and may limit options
@@ -397,11 +397,11 @@ func createConfig() {
 	// Separate from Defaultconfiguration because there's some elements we want to strip for settings creation
 	defaultConfig := configuration{
 		Credentials: configurationCredentials{
-			Token:    INPUT_TOKEN,
-			Email:    INPUT_EMAIL,
-			Password: INPUT_PASSWORD,
+			Token:    enteredToken,
+			Email:    enteredEmail,
+			Password: enteredPassword,
 		},
-		Admins:          []string{INPUT_ADMIN},
+		Admins:          []string{enteredAdmin},
 		CommandPrefix:   SETTING_DEFAULT_CommandPrefix,
 		AllowSkipping:   SETTING_DEFAULT_AllowSkipping,
 		ScanOwnMessages: SETTING_DEFAULT_ScanOwnMessages,
@@ -415,8 +415,8 @@ func createConfig() {
 	}
 
 	baseChannel := configurationChannel{
-		ChannelID:   INPUT_BASE_CHANNEL_ID,
-		Destination: INPUT_BASE_CHANNEL_DEST,
+		ChannelID:   enteredBaseChannel,
+		Destination: enteredBaseDestination,
 
 		Enabled:       &SETTING_DEFAULT_CHANNEL_Enabled,
 		AllowCommands: &SETTING_DEFAULT_CHANNEL_AllowCommands,
