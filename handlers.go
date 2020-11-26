@@ -99,11 +99,12 @@ func handleMessage(m *discordgo.Message, edited bool) {
 	}
 
 	// Process Files
+	downloadCount := 0
 	files := getFileLinks(m)
 	for _, file := range files {
 		log.Println(color.CyanString("> FILE: " + file.Link))
 
-		startDownload(
+		status := startDownload(
 			file.Link,
 			file.Filename,
 			channelConfig.Destination,
@@ -114,6 +115,9 @@ func handleMessage(m *discordgo.Message, edited bool) {
 			file.Time,
 			false,
 		)
+		if status.Status == downloadSuccess {
+			downloadCount++
+		}
 	}
 
 	// Save All Links to File
@@ -137,6 +141,29 @@ func handleMessage(m *discordgo.Message, edited bool) {
 			if _, err = f.WriteString(addedContent); err != nil {
 				log.Println(color.RedString("[SaveAllLinksToFile] Failed to append file:\t%s", err))
 				return
+			}
+		}
+	}
+
+	if downloadCount > 0 {
+		// Filter Duplicate Images
+		if config.FilterDuplicateImages {
+			encodedStore, err := imgStore.GobEncode()
+			if err != nil {
+				log.Println(color.HiRedString("Failed to encode imgStore:\t%s"))
+			} else {
+				f, err := os.OpenFile(imgStorePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+				if err != nil {
+					log.Println(color.HiRedString("Failed to open imgStore file:\t%s"))
+				}
+				_, err = f.Write(encodedStore)
+				if err != nil {
+					log.Println(color.HiRedString("Failed to update imgStore file:\t%s"))
+				}
+				err = f.Close()
+				if err != nil {
+					log.Println(color.HiRedString("Failed to close imgStore file:\t%s"))
+				}
 			}
 		}
 	}

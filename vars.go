@@ -14,6 +14,7 @@ const (
 
 	configPath   = "settings.json"
 	databasePath = "database"
+	imgStorePath = databasePath + "/imgStore"
 
 	imgurClientID = "08af502a9e70d65"
 )

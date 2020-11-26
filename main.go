@@ -19,15 +19,17 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"github.com/rivo/duplo"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 )
 
 var (
-	bot  *discordgo.Session
-	user *discordgo.User
-	myDB *db.DB
-	loop chan os.Signal
+	bot      *discordgo.Session
+	user     *discordgo.User
+	myDB     *db.DB
+	imgStore *duplo.Store
+	loop     chan os.Signal
 
 	googleDriveService *drive.Service
 
@@ -94,6 +96,23 @@ func main() {
 	}
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
+
+	// Image Store
+	if config.FilterDuplicateImages {
+		if _, err := os.Stat(imgStorePath); err != nil {
+			imgStore = duplo.New()
+		} else {
+			storeFile, err := ioutil.ReadFile(imgStorePath)
+			if err != nil {
+				log.Println(color.HiRedString("Error opening imgStore file:\t%s", err))
+			} else {
+				err = imgStore.GobDecode(storeFile)
+				if err != nil {
+					log.Println(color.HiRedString("Error decoding imgStore file:\t%s", err))
+				}
+			}
+		}
+	}
 
 	// Twitter API
 	if config.Credentials.TwitterAccessToken != "" &&

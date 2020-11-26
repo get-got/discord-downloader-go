@@ -59,14 +59,16 @@ func defaultConfiguration() configuration {
 			Password: placeholderPassword,
 		},
 		// Setup
-		Admins:               []string{},
-		DebugOutput:          cdDebugOutput,
-		CommandPrefix:        cdCommandPrefix,
-		AllowSkipping:        cdAllowSkipping,
-		ScanOwnMessages:      cdScanOwnMessages,
-		DownloadRetryMax:     3,
-		DownloadTimeout:      60,
-		GithubUpdateChecking: cdGithubUpdateChecking,
+		Admins:                         []string{},
+		DebugOutput:                    cdDebugOutput,
+		CommandPrefix:                  cdCommandPrefix,
+		AllowSkipping:                  cdAllowSkipping,
+		ScanOwnMessages:                cdScanOwnMessages,
+		FilterDuplicateImages:          false,
+		FilterDuplicateImagesThreshold: 100,
+		DownloadRetryMax:               3,
+		DownloadTimeout:                60,
+		GithubUpdateChecking:           cdGithubUpdateChecking,
 		// Appearance
 		PresenceEnabled:    cdPresenceEnabled,
 		PresenceStatus:     cdPresenceStatus,
@@ -80,15 +82,17 @@ type configuration struct {
 	// Required
 	Credentials configurationCredentials `json:"credentials"` // required
 	// Setup
-	Admins               []string                    `json:"admins"`                     // optional
-	AdminChannels        []configurationAdminChannel `json:"adminChannels"`              // optional
-	DebugOutput          bool                        `json:"debugOutput"`                // optional, defaults
-	CommandPrefix        string                      `json:"commandPrefix"`              // optional, defaults
-	AllowSkipping        bool                        `json:"allowSkipping"`              // optional, defaults
-	ScanOwnMessages      bool                        `json:"scanOwnMessages"`            // optional, defaults
-	DownloadRetryMax     int                         `json:"downloadRetryMax,omitempty"` // optional, defaults
-	DownloadTimeout      int                         `json:"downloadTimeout,omitempty"`  // optional, defaults
-	GithubUpdateChecking bool                        `json:"githubUpdateChecking"`       // optional, defaults
+	Admins                         []string                    `json:"admins"`                                   // optional
+	AdminChannels                  []configurationAdminChannel `json:"adminChannels"`                            // optional
+	DebugOutput                    bool                        `json:"debugOutput"`                              // optional, defaults
+	CommandPrefix                  string                      `json:"commandPrefix"`                            // optional, defaults
+	AllowSkipping                  bool                        `json:"allowSkipping"`                            // optional, defaults
+	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
+	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
+	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
+	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
+	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
+	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults
 	// Appearance
 	PresenceEnabled          bool               `json:"presenceEnabled"`                    // optional, defaults
 	PresenceStatus           string             `json:"presenceStatus"`                     // optional, defaults

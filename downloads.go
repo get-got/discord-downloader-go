@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"image"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -10,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +20,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"github.com/rivo/duplo"
 	"mvdan.cc/xurls/v2"
 )
 
@@ -39,15 +43,16 @@ const (
 	downloadSkippedUnpermittedDomain    downloadStatus = 2
 	downloadSkippedUnpermittedType      downloadStatus = 3
 	downloadSkippedUnpermittedExtension downloadStatus = 4
+	downloadSkippedDetectedDuplicate    downloadStatus = 5
 
-	downloadFailed                    downloadStatus = 5
-	downloadFailedCreatingFolder      downloadStatus = 6
-	downloadFailedRequesting          downloadStatus = 7
-	downloadFailedDownloadingResponse downloadStatus = 8
-	downloadFailedReadResponse        downloadStatus = 9
-	downloadFailedCreatingSubfolder   downloadStatus = 10
-	downloadFailedWritingFile         downloadStatus = 11
-	downloadFailedWritingDatabase     downloadStatus = 12
+	downloadFailed                    downloadStatus = 6
+	downloadFailedCreatingFolder      downloadStatus = 7
+	downloadFailedRequesting          downloadStatus = 8
+	downloadFailedDownloadingResponse downloadStatus = 9
+	downloadFailedReadResponse        downloadStatus = 10
+	downloadFailedCreatingSubfolder   downloadStatus = 11
+	downloadFailedWritingFile         downloadStatus = 12
+	downloadFailedWritingDatabase     downloadStatus = 13
 )
 
 type downloadStatusStruct struct {
@@ -81,6 +86,8 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Download Skipped - Unpermitted File Type"
 	case downloadSkippedUnpermittedExtension:
 		return "Download Skipped - Unpermitted File Extension"
+	case downloadSkippedDetectedDuplicate:
+		return "Download Skipped - Detected Duplicate"
 	//
 	case downloadFailed:
 		return "Download Failed"
@@ -526,6 +533,28 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
 			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
 			return mDownloadStatus(downloadSkippedUnpermittedExtension)
+		}
+
+		// Duplicate Image Filter
+		if config.FilterDuplicateImages && contentTypeFound == "image" {
+			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
+			if err != nil {
+				log.Println(color.HiRedString("Error converting buffer to image for hashing:\t%s", err))
+			} else {
+				hash, _ := duplo.CreateHash(img)
+				matches := imgStore.Query(hash)
+				sort.Sort(matches)
+				for _, match := range matches {
+					/*if config.DebugOutput {
+						log.Println(color.YellowString("Similarity Score: %f", match.Score))
+					}*/
+					if match.Score < config.FilterDuplicateImagesThreshold {
+						log.Println(logPrefixFileSkip, color.GreenString("Duplicate detected (Score of %f) found at %s", match.Score, inputURL))
+						return mDownloadStatus(downloadSkippedDetectedDuplicate)
+					}
+				}
+				imgStore.Add(img, hash)
+			}
 		}
 
 		// Subfolder division

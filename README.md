@@ -171,6 +171,8 @@ When initially launching the bot it will create a default settings file if you d
     "debugOutput": true,
     "commandPrefix": "downloader_",
     "allowSkipping": true,
+    "filterDuplicates": true,
+    "filterDuplicatesThreshold": 75,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "githubUpdateChecking": true,
@@ -279,6 +281,13 @@ All JSON settings follow camelCase format.
 * _`[DEFAULTS]`_ scanOwnMessages `[bool]`
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
+* _`[DEFAULTS]`_ filterDuplicateImages `[bool]`
+    * _Default:_ `false`
+    * **Experimental** feature to filter out images that are too similar to other cached images.
+    * _Caching of image data is stored via a database file; it will not read all pre-existing images. Cache filesize may get large, and could possibly make bot slower as more accumulate._
+* _`[DEFAULTS]`_ filterDuplicateImagesThreshold `[float64]`
+    * _Default:_ `100.0`
+    * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`
 * _`[DEFAULTS]`_ downloadTimeout `[int]`
