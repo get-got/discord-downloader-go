@@ -52,7 +52,7 @@ var (
 	SETTING_DEFAULT_InflateCount       int64              = 0
 )
 
-func DefaultConfiguration() Configuration {
+func DefaultConfiguration() configuration {
 	return configuration{
 		// Required
 		Credentials: configurationCredentials{
