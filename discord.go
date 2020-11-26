@@ -18,7 +18,7 @@ func presenceKeyReplacement(input string) string {
 		timeNow := time.Now()
 		keys := [][]string{
 			{"{{dgVersion}}", discordgo.VERSION},
-			{"{{ddgVersion}}", PROJECT_VERSION},
+			{"{{ddgVersion}}", projectVersion},
 			{"{{apiVersion}}", discordgo.APIVersion},
 			{"{{countNoCommas}}", fmt.Sprint(countInt)},
 			{"{{count}}", formatNumber(countInt)},
@@ -64,39 +64,39 @@ func updateDiscordPresence() {
 		timeLong := timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")
 
 		// Defaults
-		status_presence := fmt.Sprintf("%s - %s files", timeShort, countShort)
-		status_details := timeLong
-		status_state := fmt.Sprintf("%s files total", count)
+		status := fmt.Sprintf("%s - %s files", timeShort, countShort)
+		statusDetails := timeLong
+		statusState := fmt.Sprintf("%s files total", count)
 
 		// Overwrite Presence
 		if config.PresenceOverwrite != nil {
-			status_presence = *config.PresenceOverwrite
-			if status_presence != "" {
-				status_presence = presenceKeyReplacement(status_presence)
+			status = *config.PresenceOverwrite
+			if status != "" {
+				status = presenceKeyReplacement(status)
 			}
 		}
 		// Overwrite Details
 		if config.PresenceOverwriteDetails != nil {
-			status_details = *config.PresenceOverwriteDetails
-			if status_details != "" {
-				status_details = presenceKeyReplacement(status_details)
+			statusDetails = *config.PresenceOverwriteDetails
+			if statusDetails != "" {
+				statusDetails = presenceKeyReplacement(statusDetails)
 			}
 		}
 		// Overwrite State
 		if config.PresenceOverwriteState != nil {
-			status_state = *config.PresenceOverwriteState
-			if status_state != "" {
-				status_state = presenceKeyReplacement(status_state)
+			statusState = *config.PresenceOverwriteState
+			if statusState != "" {
+				statusState = presenceKeyReplacement(statusState)
 			}
 		}
 
 		// Update
 		bot.UpdateStatusComplex(discordgo.UpdateStatusData{
 			Game: &discordgo.Game{
-				Name:    status_presence,
+				Name:    status,
 				Type:    config.PresenceType,
-				Details: status_details, // Only visible if real user
-				State:   status_state,   // Only visible if real user
+				Details: statusDetails, // Only visible if real user
+				State:   statusState,   // Only visible if real user
 			},
 			Status: config.PresenceStatus,
 		})
@@ -174,8 +174,8 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 		Description: description,
 		Color:       getEmbedColor(channelID),
 		Footer: &discordgo.MessageEmbedFooter{
-			IconURL: PROJECT_ICON,
-			Text:    fmt.Sprintf("%s v%s — discordgo v%s", PROJECT_NAME, PROJECT_VERSION, discordgo.VERSION),
+			IconURL: projectIcon,
+			Text:    fmt.Sprintf("%s v%s — discordgo v%s", projectName, projectVersion, discordgo.VERSION),
 		},
 	}
 }

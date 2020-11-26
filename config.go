@@ -15,9 +15,9 @@ import (
 // `json:",omitempty"` is for settings not to be included into initially written settings file
 
 var (
-	PLACEHOLDER_TOKEN    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
-	PLACEHOLDER_EMAIL    string = "REPLACE_WITH_YOUR_EMAIL_OR_DELETE_LINE"
-	PLACEHOLDER_PASSWORD string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
+	PlaceholderToken    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
+	PlaceholderEmail    string = "REPLACE_WITH_YOUR_EMAIL_OR_DELETE_LINE"
+	PlaceholderPassword string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
 )
 
 type configurationCredentials struct {
@@ -34,44 +34,45 @@ type configurationCredentials struct {
 	GoogleDriveCredentialsJSON string `json:"googleDriveCredentialsJSON,omitempty"` // optional
 }
 
+// cd = Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
-	SETTING_DEFAULT_DebugOutput          bool   = false
-	SETTING_DEFAULT_CommandPrefix        string = "ddg "
-	SETTING_DEFAULT_AllowSkipping        bool   = true
-	SETTING_DEFAULT_ScanOwnMessages      bool   = false
-	SETTING_DEFAULT_GithubUpdateChecking bool   = true
+	cdDebugOutput          bool   = false
+	cdCommandPrefix        string = "ddg "
+	cdAllowSkipping        bool   = true
+	cdScanOwnMessages      bool   = false
+	cdGithubUpdateChecking bool   = true
 	// Appearance
-	SETTING_DEFAULT_PresenceEnabled bool               = true
-	SETTING_DEFAULT_PresenceStatus  string             = string(discordgo.StatusIdle)
-	SETTING_DEFAULT_PresenceType    discordgo.GameType = discordgo.GameTypeGame
-	SETTING_DEFAULT_InflateCount    int64              = 0
+	cdPresenceEnabled bool               = true
+	cdPresenceStatus  string             = string(discordgo.StatusIdle)
+	cdPresenceType    discordgo.GameType = discordgo.GameTypeGame
+	cdInflateCount    int64              = 0
 )
 
 func DefaultConfiguration() configuration {
 	return configuration{
 		// Required
 		Credentials: configurationCredentials{
-			Token:    PLACEHOLDER_TOKEN,
-			Email:    PLACEHOLDER_EMAIL,
-			Password: PLACEHOLDER_PASSWORD,
+			Token:    PlaceholderToken,
+			Email:    PlaceholderEmail,
+			Password: PlaceholderPassword,
 		},
 		// Setup
 		Admins:               []string{},
-		DebugOutput:          SETTING_DEFAULT_DebugOutput,
-		CommandPrefix:        SETTING_DEFAULT_CommandPrefix,
-		AllowSkipping:        SETTING_DEFAULT_AllowSkipping,
-		ScanOwnMessages:      SETTING_DEFAULT_ScanOwnMessages,
+		DebugOutput:          cdDebugOutput,
+		CommandPrefix:        cdCommandPrefix,
+		AllowSkipping:        cdAllowSkipping,
+		ScanOwnMessages:      cdScanOwnMessages,
 		DownloadRetryMax:     3,
 		DownloadTimeout:      60,
-		GithubUpdateChecking: SETTING_DEFAULT_GithubUpdateChecking,
+		GithubUpdateChecking: cdGithubUpdateChecking,
 		// Appearance
-		PresenceEnabled:    SETTING_DEFAULT_PresenceEnabled,
-		PresenceStatus:     SETTING_DEFAULT_PresenceStatus,
-		PresenceType:       SETTING_DEFAULT_PresenceType,
+		PresenceEnabled:    cdPresenceEnabled,
+		PresenceStatus:     cdPresenceStatus,
+		PresenceType:       cdPresenceType,
 		FilenameDateFormat: "2006-01-02_15-04-05 ",
-		InflateCount:       &SETTING_DEFAULT_InflateCount,
+		InflateCount:       &cdInflateCount,
 	}
 }
 
@@ -108,29 +109,30 @@ type configuration struct {
 	 */
 }
 
+// ccd = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
-	SETTING_DEFAULT_CHANNEL_Enabled       bool = true
-	SETTING_DEFAULT_CHANNEL_AllowCommands bool = true
-	SETTING_DEFAULT_CHANNEL_ErrorMessages bool = true
-	SETTING_DEFAULT_CHANNEL_ScanEdits     bool = true
+	ccdEnabled       bool = true
+	ccdAllowCommands bool = true
+	ccdErrorMessages bool = true
+	ccdScanEdits     bool = true
 	// Appearance
-	SETTING_DEFAULT_CHANNEL_UpdatePresence           bool     = true
-	SETTING_DEFAULT_CHANNEL_ReactWhenDownloaded      bool     = true
-	SETTING_DEFAULT_CHANNEL_ReactWhenDownloadedEmoji string   = ""
-	SETTING_DEFAULT_CHANNEL_BlacklistReactEmojis     []string = []string{}
+	ccdUpdatePresence           bool     = true
+	ccdReactWhenDownloaded      bool     = true
+	ccdReactWhenDownloadedEmoji string   = ""
+	ccdBlacklistReactEmojis     []string = []string{}
 	// Rules for Access
-	SETTING_DEFAULT_CHANNEL_UsersAllWhitelisted bool = true
+	ccdUsersAllWhitelisted bool = true
 	// Rules for Saving
-	SETTING_DEFAULT_CHANNEL_DivideFoldersByType    bool = true
-	SETTING_DEFAULT_CHANNEL_SaveImages             bool = true
-	SETTING_DEFAULT_CHANNEL_SaveVideos             bool = true
-	SETTING_DEFAULT_CHANNEL_SaveAudioFiles         bool = false
-	SETTING_DEFAULT_CHANNEL_SaveTextFiles          bool = false
-	SETTING_DEFAULT_CHANNEL_SaveOtherFiles         bool = false
-	SETTING_DEFAULT_CHANNEL_SavePossibleDuplicates bool = true
-	SETTING_DEFAULT_CHANNEL_ExtensionBlacklist          = []string{
+	ccdDivideFoldersByType    bool = true
+	ccdSaveImages             bool = true
+	ccdSaveVideos             bool = true
+	ccdSaveAudioFiles         bool = false
+	ccdSaveTextFiles          bool = false
+	ccdSaveOtherFiles         bool = false
+	ccdSavePossibleDuplicates bool = true
+	ccdExtensionBlacklist          = []string{
 		".htm",
 		".html",
 		".php",
@@ -209,7 +211,7 @@ var (
 
 func loadConfig() {
 	// Load settings
-	file, err := os.Open(LOC_CONFIG_FILE)
+	file, err := os.Open(configPath)
 	defer file.Close()
 	if err != nil {
 		log.Println(color.HiRedString("Failed to open settings file...\t%s", err))
@@ -243,11 +245,11 @@ func loadConfig() {
 		}
 
 		// Credentials Check
-		if (config.Credentials.Token == "" || config.Credentials.Token == PLACEHOLDER_TOKEN) &&
-			(config.Credentials.Email == "" || config.Credentials.Email == PLACEHOLDER_EMAIL) &&
-			(config.Credentials.Password == "" || config.Credentials.Password == PLACEHOLDER_PASSWORD) {
+		if (config.Credentials.Token == "" || config.Credentials.Token == PlaceholderToken) &&
+			(config.Credentials.Email == "" || config.Credentials.Email == PlaceholderEmail) &&
+			(config.Credentials.Password == "" || config.Credentials.Password == PlaceholderPassword) {
 			log.Println(color.HiRedString("No valid discord login found. Token, Email, and Password are all invalid..."))
-			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", LOC_CONFIG_FILE))
+			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
 			log.Println(logPrefixHelper, color.MagentaString("If your credentials are already properly saved, please ensure you're following proper JSON format syntax."))
 			log.Println(logPrefixHelper, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			properExit()
@@ -259,67 +261,67 @@ func loadConfig() {
 func channelDefault(channel *configurationChannel) {
 	// Setup
 	if channel.Enabled == nil {
-		channel.Enabled = &SETTING_DEFAULT_CHANNEL_Enabled
+		channel.Enabled = &ccdEnabled
 	}
 	if channel.AllowCommands == nil {
-		channel.AllowCommands = &SETTING_DEFAULT_CHANNEL_AllowCommands
+		channel.AllowCommands = &ccdAllowCommands
 	}
 	if channel.ErrorMessages == nil {
-		channel.ErrorMessages = &SETTING_DEFAULT_CHANNEL_ErrorMessages
+		channel.ErrorMessages = &ccdErrorMessages
 	}
 	if channel.ScanEdits == nil {
-		channel.ScanEdits = &SETTING_DEFAULT_CHANNEL_ScanEdits
+		channel.ScanEdits = &ccdScanEdits
 	}
 	// Appearance
 	if channel.UpdatePresence == nil {
-		channel.UpdatePresence = &SETTING_DEFAULT_CHANNEL_UpdatePresence
+		channel.UpdatePresence = &ccdUpdatePresence
 	}
 	if channel.ReactWhenDownloaded == nil {
-		channel.ReactWhenDownloaded = &SETTING_DEFAULT_CHANNEL_ReactWhenDownloaded
+		channel.ReactWhenDownloaded = &ccdReactWhenDownloaded
 	}
 	if channel.ReactWhenDownloadedEmoji == nil {
-		channel.ReactWhenDownloadedEmoji = &SETTING_DEFAULT_CHANNEL_ReactWhenDownloadedEmoji
+		channel.ReactWhenDownloadedEmoji = &ccdReactWhenDownloadedEmoji
 	}
 	if channel.BlacklistReactEmojis == nil {
-		channel.BlacklistReactEmojis = &SETTING_DEFAULT_CHANNEL_BlacklistReactEmojis
+		channel.BlacklistReactEmojis = &ccdBlacklistReactEmojis
 	}
 	// Rules for Access
 	if channel.UsersAllWhitelisted == nil {
-		channel.UsersAllWhitelisted = &SETTING_DEFAULT_CHANNEL_UsersAllWhitelisted
+		channel.UsersAllWhitelisted = &ccdUsersAllWhitelisted
 	}
 	// Rules for Saving
 	if channel.DivideFoldersByType == nil {
-		channel.DivideFoldersByType = &SETTING_DEFAULT_CHANNEL_DivideFoldersByType
+		channel.DivideFoldersByType = &ccdDivideFoldersByType
 	}
 	if channel.SaveImages == nil {
-		channel.SaveImages = &SETTING_DEFAULT_CHANNEL_SaveImages
+		channel.SaveImages = &ccdSaveImages
 	}
 	if channel.SaveVideos == nil {
-		channel.SaveVideos = &SETTING_DEFAULT_CHANNEL_SaveVideos
+		channel.SaveVideos = &ccdSaveVideos
 	}
 	if channel.SaveAudioFiles == nil {
-		channel.SaveAudioFiles = &SETTING_DEFAULT_CHANNEL_SaveAudioFiles
+		channel.SaveAudioFiles = &ccdSaveAudioFiles
 	}
 	if channel.SaveTextFiles == nil {
-		channel.SaveTextFiles = &SETTING_DEFAULT_CHANNEL_SaveTextFiles
+		channel.SaveTextFiles = &ccdSaveTextFiles
 	}
 	if channel.SaveOtherFiles == nil {
-		channel.SaveOtherFiles = &SETTING_DEFAULT_CHANNEL_SaveOtherFiles
+		channel.SaveOtherFiles = &ccdSaveOtherFiles
 	}
 	if channel.SavePossibleDuplicates == nil {
-		channel.SavePossibleDuplicates = &SETTING_DEFAULT_CHANNEL_SavePossibleDuplicates
+		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
 	}
 	if channel.ExtensionBlacklist == nil {
-		channel.ExtensionBlacklist = &SETTING_DEFAULT_CHANNEL_ExtensionBlacklist
+		channel.ExtensionBlacklist = &ccdExtensionBlacklist
 	}
 }
 
 func createConfig() {
 	log.Println(color.YellowString("Creating new settings file..."))
 
-	enteredToken := PLACEHOLDER_TOKEN
-	enteredEmail := PLACEHOLDER_EMAIL
-	enteredPassword := PLACEHOLDER_PASSWORD
+	enteredToken := PlaceholderToken
+	enteredEmail := PlaceholderEmail
+	enteredPassword := PlaceholderPassword
 
 	enteredAdmin := "REPLACE_WITH_YOUR_DISCORD_USER_ID"
 
@@ -402,33 +404,33 @@ func createConfig() {
 			Password: enteredPassword,
 		},
 		Admins:          []string{enteredAdmin},
-		CommandPrefix:   SETTING_DEFAULT_CommandPrefix,
-		AllowSkipping:   SETTING_DEFAULT_AllowSkipping,
-		ScanOwnMessages: SETTING_DEFAULT_ScanOwnMessages,
+		CommandPrefix:   cdCommandPrefix,
+		AllowSkipping:   cdAllowSkipping,
+		ScanOwnMessages: cdScanOwnMessages,
 
-		PresenceEnabled: SETTING_DEFAULT_PresenceEnabled,
-		PresenceStatus:  SETTING_DEFAULT_PresenceStatus,
-		PresenceType:    SETTING_DEFAULT_PresenceType,
+		PresenceEnabled: cdPresenceEnabled,
+		PresenceStatus:  cdPresenceStatus,
+		PresenceType:    cdPresenceType,
 
-		GithubUpdateChecking: SETTING_DEFAULT_GithubUpdateChecking,
-		DebugOutput:          SETTING_DEFAULT_DebugOutput,
+		GithubUpdateChecking: cdGithubUpdateChecking,
+		DebugOutput:          cdDebugOutput,
 	}
 
 	baseChannel := configurationChannel{
 		ChannelID:   enteredBaseChannel,
 		Destination: enteredBaseDestination,
 
-		Enabled:       &SETTING_DEFAULT_CHANNEL_Enabled,
-		AllowCommands: &SETTING_DEFAULT_CHANNEL_AllowCommands,
-		ErrorMessages: &SETTING_DEFAULT_CHANNEL_ErrorMessages,
-		ScanEdits:     &SETTING_DEFAULT_CHANNEL_ScanEdits,
+		Enabled:       &ccdEnabled,
+		AllowCommands: &ccdAllowCommands,
+		ErrorMessages: &ccdErrorMessages,
+		ScanEdits:     &ccdScanEdits,
 
-		UpdatePresence:      &SETTING_DEFAULT_CHANNEL_UpdatePresence,
-		ReactWhenDownloaded: &SETTING_DEFAULT_CHANNEL_ReactWhenDownloaded,
+		UpdatePresence:      &ccdUpdatePresence,
+		ReactWhenDownloaded: &ccdReactWhenDownloaded,
 
-		DivideFoldersByType: &SETTING_DEFAULT_CHANNEL_DivideFoldersByType,
-		SaveImages:          &SETTING_DEFAULT_CHANNEL_SaveImages,
-		SaveVideos:          &SETTING_DEFAULT_CHANNEL_SaveVideos,
+		DivideFoldersByType: &ccdDivideFoldersByType,
+		SaveImages:          &ccdSaveImages,
+		SaveVideos:          &ccdSaveVideos,
 	}
 	defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
 
@@ -444,12 +446,12 @@ func createConfig() {
 	if err != nil {
 		log.Println(color.HiRedString("Failed to format new settings...\t%s", err))
 	} else {
-		err := ioutil.WriteFile(LOC_CONFIG_FILE, defaultJSON, 0644)
+		err := ioutil.WriteFile(configPath, defaultJSON, 0644)
 		if err != nil {
 			log.Println(color.HiRedString("Failed to save new settings file...\t%s", err))
 		} else {
 			log.Println(color.HiYellowString("Created new settings file..."))
-			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", LOC_CONFIG_FILE))
+			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
 			log.Println(logPrefixHelper, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			log.Println(logPrefixHelper, color.MagentaString("See README on GitHub for help and more info..."))
 		}

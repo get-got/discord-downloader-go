@@ -29,7 +29,7 @@ var (
 	myDB *db.DB
 	loop chan os.Signal
 
-	DriveService *drive.Service
+	googleDriveService *drive.Service
 
 	startTime        time.Time
 	timeLastUpdated  time.Time
@@ -43,7 +43,7 @@ func init() {
 
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
 	log.SetOutput(color.Output)
-	log.Println(color.HiCyanString("Welcome to %s v%s!", PROJECT_NAME, PROJECT_VERSION))
+	log.Println(color.HiCyanString("Welcome to %s v%s!", projectName, projectVersion))
 	log.Println(color.CyanString("> discord-go v%s, Discord API v%s", discordgo.VERSION, discordgo.APIVersion))
 }
 
@@ -51,21 +51,21 @@ func main() {
 	var err error
 
 	// Config
-	log.Println(color.YellowString("Loading settings from \"%s\"...", LOC_CONFIG_FILE))
+	log.Println(color.YellowString("Loading settings from \"%s\"...", configPath))
 	loadConfig()
 	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s)", getBoundChannelsCount()))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
-			log.Println(color.HiCyanString("Update available on %s\n", PROJECT_RELEASE_URL))
+			log.Println(color.HiCyanString("Update available on %s\n", projectReleaseURL))
 			time.Sleep(5 * time.Second)
 		}
 	}
 
 	// Database
 	log.Println(color.YellowString("Opening database..."))
-	myDB, err = db.OpenDB(LOC_DATABASE_DIR)
+	myDB, err = db.OpenDB(databasePath)
 	if err != nil {
 		log.Println(color.HiRedString("Unable to open database: %s", err))
 		return
@@ -75,9 +75,8 @@ func main() {
 		if err := myDB.Create("Downloads"); err != nil {
 			log.Println(color.HiRedString("Error while trying to create database: %s", err))
 			return
-		} else {
-			log.Println(color.HiYellowString("Created new database..."))
 		}
+		log.Println(color.HiYellowString("Created new database..."))
 		log.Println(color.YellowString("Indexing database, please wait..."))
 		if err := myDB.Use("Downloads").Index([]string{"URL"}); err != nil {
 			log.Println(color.HiRedString("Unable to create database index for URL: %s", err))
@@ -134,7 +133,7 @@ func main() {
 				log.Println(color.HiRedString("Error parsing Google Credentials JSON:\t%s", err))
 			} else {
 				client := googleConfig.Client(ctx)
-				DriveService, err = drive.New(client)
+				googleDriveService, err = drive.New(client)
 				if err != nil {
 					log.Println(color.HiRedString("Error setting up Google Drive Client:\t%s", err))
 				} else {
@@ -152,11 +151,11 @@ func main() {
 	}
 
 	// Bot Login
-	if config.Credentials.Token != "" && config.Credentials.Token != PLACEHOLDER_TOKEN {
+	if config.Credentials.Token != "" && config.Credentials.Token != PlaceholderToken {
 		log.Println(color.GreenString("Connecting to Discord via Token..."))
 		bot, err = discordgo.New("Bot " + config.Credentials.Token)
-	} else if (config.Credentials.Email != "" && config.Credentials.Email != PLACEHOLDER_EMAIL) &&
-		(config.Credentials.Password != "" && config.Credentials.Password != PLACEHOLDER_PASSWORD) {
+	} else if (config.Credentials.Email != "" && config.Credentials.Email != PlaceholderEmail) &&
+		(config.Credentials.Password != "" && config.Credentials.Password != PlaceholderPassword) {
 		log.Println(color.GreenString("Connecting to Discord via Login..."))
 		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
 	} else {
@@ -201,14 +200,14 @@ func main() {
 	router.On("ping", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:ping]")
 		if isCommandableChannel(ctx.Msg) {
-			before_pong := time.Now()
+			beforePong := time.Now()
 			pong, err := ctx.Reply("Pong!")
 			if err != nil {
 				log.Println(logPrefixHere, color.HiRedString("Error sending pong message:\t%s", err))
 			} else {
-				after_pong := time.Now()
+				afterPong := time.Now()
 				latency := bot.HeartbeatLatency().Milliseconds()
-				roundtrip := after_pong.Sub(before_pong).Milliseconds()
+				roundtrip := afterPong.Sub(beforePong).Milliseconds()
 				mention := ctx.Msg.Author.Mention()
 				content := fmt.Sprintf("**Latency:** ``%dms`` — **Roundtrip:** ``%dms``",
 					latency,
@@ -257,7 +256,7 @@ func main() {
 					text += "\n\n"
 				}
 			}
-			_, err := replyEmbed(ctx.Msg, "Command — Help", fmt.Sprintf("Use commands as ``\"%s<command> <arguments?>\"``\n```%s```\n%s", config.CommandPrefix, text, PROJECT_URL))
+			_, err := replyEmbed(ctx.Msg, "Command — Help", fmt.Sprintf("Use commands as ``\"%s<command> <arguments?>\"``\n```%s```\n%s", config.CommandPrefix, text, projectRepoURL))
 			// Failed to send
 			if err != nil {
 				log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
@@ -329,7 +328,7 @@ func main() {
 					// Cancel Local
 					if historyCommandActive[channel] == "downloading" && strings.ToLower(strings.TrimSpace(args)) == "cancel" {
 						historyCommandActive[channel] = "cancel"
-						_, err := replyEmbed(ctx.Msg, "Command — History", CMDRESP_HISTORY_CANCELLED)
+						_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
 						if err != nil {
 							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 						}
@@ -344,7 +343,7 @@ func main() {
 						}
 					}
 				} else {
-					_, err := replyEmbed(ctx.Msg, "Command — History", CMDERR_LACKING_LOCAL_ADMIN_PERMS)
+					_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingLocalAdminPerms)
 					if err != nil {
 						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 					}
@@ -362,7 +361,7 @@ func main() {
 							channelValue = strings.TrimSpace(channelValue)
 							if historyCommandActive[channelValue] == "downloading" {
 								historyCommandActive[channelValue] = "cancel"
-								_, err := replyEmbed(ctx.Msg, "Command — History", CMDRESP_HISTORY_CANCELLED)
+								_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
 								if err != nil {
 									log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 								}
@@ -381,7 +380,7 @@ func main() {
 									log.Println(logPrefixHere, color.CyanString("Tried using history command but history is already running for %s...", channelValue))
 								}
 							} else {
-								replyEmbed(ctx.Msg, "Command — History", CMDERR_CHANNEL_NOT_REGISTERED)
+								replyEmbed(ctx.Msg, "Command — History", cmderrChannelNotRegistered)
 								log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channelValue))
 							}
 						}
@@ -394,7 +393,7 @@ func main() {
 					log.Println(logPrefixHere, color.CyanString("%s tried to cache history but input no channels", getUserIdentifier(*ctx.Msg.Author)))
 				}
 			} else {
-				_, err := replyEmbed(ctx.Msg, "Command — History", CMDERR_LACKING_BOT_ADMIN_PERMS)
+				_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms)
 				if err != nil {
 					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 				}
@@ -416,7 +415,7 @@ func main() {
 				log.Println(logPrefixHere, color.HiCyanString("%s requested exit, goodbye...", getUserIdentifier(*ctx.Msg.Author)))
 				loop <- syscall.SIGINT
 			} else {
-				_, err := replyEmbed(ctx.Msg, "Command — Exit", CMDERR_LACKING_BOT_ADMIN_PERMS)
+				_, err := replyEmbed(ctx.Msg, "Command — Exit", cmderrLackingBotAdminPerms)
 				if err != nil {
 					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 				}
@@ -449,11 +448,11 @@ func main() {
 	if config.DebugOutput {
 		log.Println(logPrefixDebug, color.YellowString("Starting background loops..."))
 	}
-	ticker_5m := time.NewTicker(5 * time.Minute)
+	ticker5m := time.NewTicker(5 * time.Minute)
 	go func() {
 		for {
 			select {
-			case <-ticker_5m.C:
+			case <-ticker5m.C:
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
 				updateDiscordPresence()
 			}
@@ -466,7 +465,7 @@ func main() {
 	}
 
 	// Output Done
-	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", PROJECT_LABEL, len(bot.State.Guilds)))
+	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
 
 	// Infinite loop until interrupted
 	log.Println(color.RedString("Ctrl+C to exit..."))

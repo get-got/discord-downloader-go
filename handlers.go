@@ -12,7 +12,7 @@ import (
 	"mvdan.cc/xurls/v2"
 )
 
-type FileItem struct {
+type fileItem struct {
 	Link     string
 	Filename string
 	Time     time.Time
@@ -226,7 +226,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 								fileTime,
 								true,
 							)
-							if download.Status == DownloadSuccess {
+							if download.Status == downloadSuccess {
 								i++
 							}
 						}
@@ -247,7 +247,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 									fileTime,
 									true,
 								)
-								if download.Status == DownloadSuccess {
+								if download.Status == downloadSuccess {
 									i++
 								}
 							}

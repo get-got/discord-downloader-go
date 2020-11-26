@@ -36,7 +36,7 @@ func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string,
 		return nil, errors.New("Invalid Twitter API Keys Set")
 	}
 
-	matches := RegexpUrlTwitterStatus.FindStringSubmatch(inputURL)
+	matches := regexUrlTwitterStatus.FindStringSubmatch(inputURL)
 	statusId, err := strconv.ParseInt(matches[4], 10, 64)
 	if err != nil {
 		return nil, err
@@ -261,18 +261,18 @@ func getFacebookVideoUrls(url string) (map[string]string, error) {
 		return nil, err
 	}
 
-	foundHD := string(RegexpFacebookVideoHD.Find(bodyContent))
+	foundHD := string(regexFacebookVideoHD.Find(bodyContent))
 	if len(foundHD) > 0 {
-		foundHD_clean := foundHD[8 : len(foundHD)-1]
-		foundHD_clean = html.UnescapeString(foundHD_clean)
-		return map[string]string{foundHD_clean: ""}, nil
+		foundHD = foundHD[8 : len(foundHD)-1]
+		foundHD = html.UnescapeString(foundHD)
+		return map[string]string{foundHD: ""}, nil
 	}
 
-	foundSD := string(RegexpFacebookVideoSD.Find(bodyContent))
+	foundSD := string(regexFacebookVideoSD.Find(bodyContent))
 	if len(foundSD) > 0 {
-		foundSD_clean := foundSD[8 : len(foundSD)-1]
-		foundSD_clean = html.UnescapeString(foundSD_clean)
-		return map[string]string{foundSD_clean: ""}, nil
+		foundSD = foundSD[8 : len(foundSD)-1]
+		foundSD = html.UnescapeString(foundSD)
+		return map[string]string{foundSD: ""}, nil
 	}
 
 	return nil, errors.New("Unable to find source url for Facebook video")
@@ -285,7 +285,7 @@ func getImgurSingleUrls(url string) (map[string]string, error) {
 	return map[string]string{url: ""}, nil
 }
 
-type ImgurAlbumObject struct {
+type imgurAlbumObject struct {
 	Data []struct {
 		Link string
 	}
@@ -296,8 +296,8 @@ func getImgurAlbumUrls(url string) (map[string]string, error) {
 	afterLastSlash := strings.LastIndex(url, "/")
 	albumId := url[afterLastSlash+1:]
 	headers := make(map[string]string)
-	headers["Authorization"] = "Client-ID " + IMGUR_CLIENT_ID
-	imgurAlbumObject := new(ImgurAlbumObject)
+	headers["Authorization"] = "Client-ID " + imgurClientID
+	imgurAlbumObject := new(imgurAlbumObject)
 	getJSONwithHeaders("https://api.imgur.com/3/album/"+albumId+"/images", imgurAlbumObject, headers)
 	links := make(map[string]string)
 	for _, v := range imgurAlbumObject.Data {
@@ -310,7 +310,7 @@ func getImgurAlbumUrls(url string) (map[string]string, error) {
 	return links, nil
 }
 
-type StreamableObject struct {
+type streamableObject struct {
 	Status int    `json:"status"`
 	Title  string `json:"title"`
 	Files  struct {
@@ -331,13 +331,13 @@ type StreamableObject struct {
 }
 
 func getStreamableUrls(url string) (map[string]string, error) {
-	matches := RegexpUrlStreamable.FindStringSubmatch(url)
+	matches := regexUrlStreamable.FindStringSubmatch(url)
 	shortcode := matches[3]
 	if shortcode == "" {
 		return nil, errors.New("Unable to get shortcode from URL")
 	}
 	reqUrl := fmt.Sprintf("https://api.streamable.com/videos/%s", shortcode)
-	streamable := new(StreamableObject)
+	streamable := new(streamableObject)
 	getJSON(reqUrl, streamable)
 	if streamable.Status != 2 || streamable.Files.Mp4.URL == "" {
 		return nil, errors.New("Streamable object has no download candidate")
@@ -351,7 +351,7 @@ func getStreamableUrls(url string) (map[string]string, error) {
 	return links, nil
 }
 
-type GfycatObject struct {
+type gfycatObject struct {
 	GfyItem struct {
 		Mp4URL string `json:"mp4Url"`
 	} `json:"gfyItem"`
@@ -361,19 +361,18 @@ func getGfycatUrls(url string) (map[string]string, error) {
 	parts := strings.Split(url, "/")
 	if len(parts) < 3 {
 		return nil, errors.New("Unable to parse Gfycat URL")
-	} else {
-		gfycatId := parts[len(parts)-1]
-		gfycatObject := new(GfycatObject)
-		getJSON("https://api.gfycat.com/v1/gfycats/"+gfycatId, gfycatObject)
-		gfycatUrl := gfycatObject.GfyItem.Mp4URL
-		if url == "" {
-			return nil, errors.New("Failed to read response from Gfycat")
-		}
-		return map[string]string{gfycatUrl: ""}, nil
 	}
+	gfycatId := parts[len(parts)-1]
+	gfycatObject := new(gfycatObject)
+	getJSON("https://api.gfycat.com/v1/gfycats/"+gfycatId, gfycatObject)
+	gfycatUrl := gfycatObject.GfyItem.Mp4URL
+	if url == "" {
+		return nil, errors.New("Failed to read response from Gfycat")
+	}
+	return map[string]string{gfycatUrl: ""}, nil
 }
 
-type FlickrPhotoSizeObject struct {
+type flickrPhotoSizeObject struct {
 	Label  string `json:"label"`
 	Width  int    `json:"width,int,string"`
 	Height int    `json:"height,int,string"`
@@ -382,12 +381,12 @@ type FlickrPhotoSizeObject struct {
 	Media  string `json:"media"`
 }
 
-type FlickrPhotoObject struct {
+type flickrPhotoObject struct {
 	Sizes struct {
 		Canblog     int                     `json:"canblog"`
 		Canprint    int                     `json:"canprint"`
 		Candownload int                     `json:"candownload"`
-		Size        []FlickrPhotoSizeObject `json:"size"`
+		Size        []flickrPhotoSizeObject `json:"size"`
 	} `json:"sizes"`
 	Stat string `json:"stat"`
 }
@@ -395,9 +394,9 @@ type FlickrPhotoObject struct {
 func getFlickrUrlFromPhotoId(photoId string) string {
 	reqUrl := fmt.Sprintf("https://www.flickr.com/services/rest/?format=json&nojsoncallback=1&method=%s&api_key=%s&photo_id=%s",
 		"flickr.photos.getSizes", config.Credentials.FlickrApiKey, photoId)
-	flickrPhoto := new(FlickrPhotoObject)
+	flickrPhoto := new(flickrPhotoObject)
 	getJSON(reqUrl, flickrPhoto)
-	var bestSize FlickrPhotoSizeObject
+	var bestSize flickrPhotoSizeObject
 	for _, size := range flickrPhoto.Sizes.Size {
 		if bestSize.Label == "" {
 			bestSize = size
@@ -414,7 +413,7 @@ func getFlickrPhotoUrls(url string) (map[string]string, error) {
 	if config.Credentials.FlickrApiKey == "" {
 		return nil, errors.New("Invalid Flickr API Key Set")
 	}
-	matches := RegexpUrlFlickrPhoto.FindStringSubmatch(url)
+	matches := regexUrlFlickrPhoto.FindStringSubmatch(url)
 	photoId := matches[5]
 	if photoId == "" {
 		return nil, errors.New("Unable to get Photo ID from URL")
@@ -422,7 +421,7 @@ func getFlickrPhotoUrls(url string) (map[string]string, error) {
 	return map[string]string{getFlickrUrlFromPhotoId(photoId): ""}, nil
 }
 
-type FlickrAlbumObject struct {
+type flickrAlbumObject struct {
 	Photoset struct {
 		ID        string `json:"id"`
 		Primary   string `json:"primary"`
@@ -453,7 +452,7 @@ func getFlickrAlbumUrls(url string) (map[string]string, error) {
 	if config.Credentials.FlickrApiKey == "" {
 		return nil, errors.New("Invalid Flickr API Key Set")
 	}
-	matches := RegexpUrlFlickrAlbum.FindStringSubmatch(url)
+	matches := regexUrlFlickrAlbum.FindStringSubmatch(url)
 	if len(matches) < 10 || matches[9] == "" {
 		return nil, errors.New("Unable to find Flickr Album ID in URL")
 	}
@@ -463,7 +462,7 @@ func getFlickrAlbumUrls(url string) (map[string]string, error) {
 	}
 	reqUrl := fmt.Sprintf("https://www.flickr.com/services/rest/?format=json&nojsoncallback=1&method=%s&api_key=%s&photoset_id=%s&per_page=500",
 		"flickr.photosets.getPhotos", config.Credentials.FlickrApiKey, albumId)
-	flickrAlbum := new(FlickrAlbumObject)
+	flickrAlbum := new(flickrAlbumObject)
 	getJSON(reqUrl, flickrAlbum)
 	links := make(map[string]string)
 	for _, photo := range flickrAlbum.Photoset.Photo {
@@ -477,7 +476,7 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 	if err != nil {
 		return nil, errors.New("Error getting long URL from shortened Flickr Album URL: " + err.Error())
 	}
-	if RegexpUrlFlickrAlbum.MatchString(result.Request.URL.String()) {
+	if regexUrlFlickrAlbum.MatchString(result.Request.URL.String()) {
 		return getFlickrAlbumUrls(result.Request.URL.String())
 	}
 	return nil, errors.New("Encountered invalid URL while trying to get long URL from short Flickr Album URL")
@@ -493,11 +492,11 @@ func getGoogleDriveUrls(url string) (map[string]string, error) {
 }
 
 func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
-	matches := RegexpUrlGoogleDriveFolder.FindStringSubmatch(url)
+	matches := regexUrlGoogleDriveFolder.FindStringSubmatch(url)
 	if len(matches) < 4 || matches[3] == "" {
 		return nil, errors.New("unable to find google drive folder ID in link")
 	}
-	if DriveService.BasePath == "" {
+	if googleDriveService.BasePath == "" {
 		return nil, errors.New("please set up google credentials")
 	}
 	googleDriveFolderID := matches[3]
@@ -506,7 +505,7 @@ func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
 
 	driveQuery := fmt.Sprintf("\"%s\" in parents", googleDriveFolderID)
 	driveFields := "nextPageToken, files(id)"
-	result, err := DriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
+	result, err := googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
 	if err != nil {
 		log.Println("driveQuery:", driveQuery)
 		log.Println("driveFields:", driveFields)
@@ -522,7 +521,7 @@ func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
 		if result.NextPageToken == "" {
 			break
 		}
-		result, err = DriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).PageToken(result.NextPageToken).Do()
+		result, err = googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).PageToken(result.NextPageToken).Do()
 		if err != nil {
 			return nil, err
 		}
@@ -552,7 +551,7 @@ func getTistoryWithCDNUrls(urlI string) (map[string]string, error) {
 	parameters, _ := url.ParseQuery(urlI)
 	if val, ok := parameters["fname"]; ok {
 		if len(val) > 0 {
-			if RegexpUrlTistoryLegacy.MatchString(val[0]) {
+			if regexUrlTistoryLegacy.MatchString(val[0]) {
 				return getLegacyTistoryUrls(val[0])
 			}
 		}
@@ -604,8 +603,8 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 	doc.Find(".article img, #content img, div[role=main] img, .section_blogview img").Each(func(i int, s *goquery.Selection) {
 		foundUrl, exists := s.Attr("src")
 		if exists {
-			isTistoryCdnUrl := RegexpUrlTistoryLegacyWithCDN.MatchString(foundUrl)
-			isTistoryUrl := RegexpUrlTistoryLegacy.MatchString(foundUrl)
+			isTistoryCdnUrl := regexUrlTistoryLegacyWithCDN.MatchString(foundUrl)
+			isTistoryUrl := regexUrlTistoryLegacy.MatchString(foundUrl)
 			if isTistoryCdnUrl == true {
 				finalTistoryUrls, _ := getTistoryWithCDNUrls(foundUrl)
 				if len(finalTistoryUrls) > 0 {

@@ -24,13 +24,13 @@ func isLatestGithubRelease() bool {
 	prefixHere := color.HiMagentaString("[Github Update Check]")
 
 	githubReleaseApiObject := new(githubReleaseApiObject)
-	err := getJSON(PROJECT_RELEASE_API_URL, githubReleaseApiObject)
+	err := getJSON(projectReleaseApiURL, githubReleaseApiObject)
 	if err != nil {
 		log.Println(prefixHere, color.RedString("Error fetching current Release JSON: %s", err))
 		return true
 	}
 
-	thisVersion, err := version.NewVersion(PROJECT_VERSION)
+	thisVersion, err := version.NewVersion(projectVersion)
 	if err != nil {
 		log.Println(prefixHere, color.RedString("Error parsing current version: %s", err))
 		return true
@@ -109,17 +109,17 @@ func formatNumber(n int64) string {
 
 func formatNumberShort(x int64) string {
 	if x > 1000 {
-		x_number_format := formatNumber(x)
-		x_array := strings.Split(x_number_format, ",")
-		x_parts := [4]string{"k", "m", "b", "t"}
-		x_count_parts := len(x_array) - 1
-		var x_display string
-		if x_array[1][:1] != "0" {
-			x_display = fmt.Sprintf("%s.%s%s", x_array[0], x_array[1][:1], x_parts[x_count_parts-1])
+		formattedNumber := formatNumber(x)
+		splitSlice := strings.Split(formattedNumber, ",")
+		suffixes := [4]string{"k", "m", "b", "t"}
+		partCount := len(splitSlice) - 1
+		var output string
+		if splitSlice[1][:1] != "0" {
+			output = fmt.Sprintf("%s.%s%s", splitSlice[0], splitSlice[1][:1], suffixes[partCount-1])
 		} else {
-			x_display = fmt.Sprintf("%s%s", x_array[0], x_parts[x_count_parts-1])
+			output = fmt.Sprintf("%s%s", splitSlice[0], suffixes[partCount-1])
 		}
-		return x_display
+		return output
 	}
 	return fmt.Sprint(x)
 }
