@@ -15,9 +15,9 @@ import (
 // `json:",omitempty"` is for settings not to be included into initially written settings file
 
 var (
-	PlaceholderToken    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
-	PlaceholderEmail    string = "REPLACE_WITH_YOUR_EMAIL_OR_DELETE_LINE"
-	PlaceholderPassword string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
+	placeholderToken    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
+	placeholderEmail    string = "REPLACE_WITH_YOUR_EMAIL_OR_DELETE_LINE"
+	placeholderPassword string = "REPLACE_WITH_YOUR_PASSWORD_OR_DELETE_LINE"
 )
 
 type configurationCredentials struct {
@@ -50,13 +50,13 @@ var (
 	cdInflateCount    int64              = 0
 )
 
-func DefaultConfiguration() configuration {
+func defaultConfiguration() configuration {
 	return configuration{
 		// Required
 		Credentials: configurationCredentials{
-			Token:    PlaceholderToken,
-			Email:    PlaceholderEmail,
-			Password: PlaceholderPassword,
+			Token:    placeholderToken,
+			Email:    placeholderEmail,
+			Password: placeholderPassword,
 		},
 		// Setup
 		Admins:               []string{},
@@ -206,7 +206,7 @@ type configurationAdminChannel struct {
 }
 
 var (
-	config = DefaultConfiguration()
+	config = defaultConfiguration()
 )
 
 func loadConfig() {
@@ -245,9 +245,9 @@ func loadConfig() {
 		}
 
 		// Credentials Check
-		if (config.Credentials.Token == "" || config.Credentials.Token == PlaceholderToken) &&
-			(config.Credentials.Email == "" || config.Credentials.Email == PlaceholderEmail) &&
-			(config.Credentials.Password == "" || config.Credentials.Password == PlaceholderPassword) {
+		if (config.Credentials.Token == "" || config.Credentials.Token == placeholderToken) &&
+			(config.Credentials.Email == "" || config.Credentials.Email == placeholderEmail) &&
+			(config.Credentials.Password == "" || config.Credentials.Password == placeholderPassword) {
 			log.Println(color.HiRedString("No valid discord login found. Token, Email, and Password are all invalid..."))
 			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
 			log.Println(logPrefixHelper, color.MagentaString("If your credentials are already properly saved, please ensure you're following proper JSON format syntax."))
@@ -319,9 +319,9 @@ func channelDefault(channel *configurationChannel) {
 func createConfig() {
 	log.Println(color.YellowString("Creating new settings file..."))
 
-	enteredToken := PlaceholderToken
-	enteredEmail := PlaceholderEmail
-	enteredPassword := PlaceholderPassword
+	enteredToken := placeholderToken
+	enteredEmail := placeholderEmail
+	enteredPassword := placeholderPassword
 
 	enteredAdmin := "REPLACE_WITH_YOUR_DISCORD_USER_ID"
 

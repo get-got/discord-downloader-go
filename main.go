@@ -151,11 +151,11 @@ func main() {
 	}
 
 	// Bot Login
-	if config.Credentials.Token != "" && config.Credentials.Token != PlaceholderToken {
+	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		log.Println(color.GreenString("Connecting to Discord via Token..."))
 		bot, err = discordgo.New("Bot " + config.Credentials.Token)
-	} else if (config.Credentials.Email != "" && config.Credentials.Email != PlaceholderEmail) &&
-		(config.Credentials.Password != "" && config.Credentials.Password != PlaceholderPassword) {
+	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
+		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
 		log.Println(color.GreenString("Connecting to Discord via Login..."))
 		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
 	} else {

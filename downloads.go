@@ -678,12 +678,14 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			} else {
 				reaction = *channelConfig.ReactWhenDownloadedEmoji
 			}
-			bot.MessageReactionAdd(channelID, messageID, reaction)
+			err = bot.MessageReactionAdd(channelID, messageID, reaction)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
+			}
 			// React duration
 			if config.DebugOutput {
 				log.Println(logPrefixDebug, color.YellowString("#%d - %s to react with \"%s\".", thisDownloadID, durafmt.ParseShort(time.Since(finishTime)).String(), reaction))
 			}
-			finishTime = time.Now()
 		}
 
 		timeLastUpdated = time.Now()
