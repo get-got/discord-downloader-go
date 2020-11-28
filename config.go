@@ -116,9 +116,6 @@ type configuration struct {
 // ccd = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
-	// Main
-	ccdDestinationNestServers  bool = false
-	ccdDestinationNestChannels bool = false
 	// Setup
 	ccdEnabled       bool = true
 	ccdAllowCommands bool = true
@@ -132,6 +129,8 @@ var (
 	// Rules for Access
 	ccdUsersAllWhitelisted bool = true
 	// Rules for Saving
+	ccdDivideFoldersByServer  bool = false
+	ccdDivideFoldersByChannel bool = false
 	ccdDivideFoldersByType    bool = true
 	ccdSaveImages             bool = true
 	ccdSaveVideos             bool = true
@@ -155,11 +154,9 @@ var (
 
 type configurationChannel struct {
 	// Main
-	ChannelID               string    `json:"channel"`                           // required
-	ChannelIDs              *[]string `json:"channels,omitempty"`                // alternative to ChannelID
-	Destination             string    `json:"destination"`                       // required
-	DestinationNestServers  *bool     `json:"destinationNestServers,omitempty"`  // optional, defaults
-	DestinationNestChannels *bool     `json:"destinationNestChannels,omitempty"` // optional, defaults
+	ChannelID   string    `json:"channel"`            // required
+	ChannelIDs  *[]string `json:"channels,omitempty"` // alternative to ChannelID
+	Destination string    `json:"destination"`        // required
 	// Setup
 	Enabled       *bool `json:"enabled,omitempty"`       // optional, defaults
 	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
@@ -179,6 +176,8 @@ type configurationChannel struct {
 	UserWhitelist       *[]string `json:"userWhitelist,omitempty"`       // optional, only relevant if above is false
 	UserBlacklist       *[]string `json:"userBlacklist,omitempty"`       // optional
 	// Rules for Saving
+	DivideFoldersByServer  *bool     `json:"divideFoldersByServer,omitempty"`  // optional, defaults
+	DivideFoldersByChannel *bool     `json:"divideFoldersByChannel,omitempty"` // optional, defaults
 	DivideFoldersByType    *bool     `json:"divideFoldersByType,omitempty"`    // optional, defaults
 	SaveImages             *bool     `json:"saveImages,omitempty"`             // optional, defaults
 	SaveVideos             *bool     `json:"saveVideos,omitempty"`             // optional, defaults
@@ -268,13 +267,6 @@ func loadConfig() {
 
 // These have to use the default variables since literal values and consts can't be set to the pointers
 func channelDefault(channel *configurationChannel) {
-	// Main
-	if channel.DestinationNestServers == nil {
-		channel.DestinationNestServers = &ccdDestinationNestServers
-	}
-	if channel.DestinationNestChannels == nil {
-		channel.DestinationNestChannels = &ccdDestinationNestChannels
-	}
 	// Setup
 	if channel.Enabled == nil {
 		channel.Enabled = &ccdEnabled
@@ -306,6 +298,12 @@ func channelDefault(channel *configurationChannel) {
 		channel.UsersAllWhitelisted = &ccdUsersAllWhitelisted
 	}
 	// Rules for Saving
+	if channel.DivideFoldersByServer == nil {
+		channel.DivideFoldersByServer = &ccdDivideFoldersByServer
+	}
+	if channel.DivideFoldersByChannel == nil {
+		channel.DivideFoldersByChannel = &ccdDivideFoldersByChannel
+	}
 	if channel.DivideFoldersByType == nil {
 		channel.DivideFoldersByType = &ccdDivideFoldersByType
 	}

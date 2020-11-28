@@ -581,7 +581,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		subfolder := ""
 
 		// Subfolder Division - Server Nesting
-		if *channelConfig.DestinationNestServers {
+		if *channelConfig.DivideFoldersByServer {
 			subfolderSuffix := ""
 			if sourceGuildName != "" && sourceGuildName != "Unavailable" {
 				subfolderSuffix = sourceGuildName
@@ -602,7 +602,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		}
 
 		// Subfolder Division - Channel Nesting
-		if *channelConfig.DestinationNestChannels {
+		if *channelConfig.DivideFoldersByChannel {
 			subfolderSuffix := ""
 			if sourceChannelName != "" {
 				subfolderSuffix = sourceChannelName
