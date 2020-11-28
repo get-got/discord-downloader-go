@@ -529,14 +529,14 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Check extension
-		extension := filepath.Ext(filename)
+		extension := strings.ToLower(filepath.Ext(filename))
 		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
 			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
 			return mDownloadStatus(downloadSkippedUnpermittedExtension)
 		}
 
 		// Duplicate Image Filter
-		if config.FilterDuplicateImages && contentTypeFound == "image" {
+		if config.FilterDuplicateImages && contentTypeFound == "image" && extension != ".gif" && extension != ".webp" {
 			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
 			if err != nil {
 				log.Println(color.HiRedString("Error converting buffer to image for hashing:\t%s", err))
