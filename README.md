@@ -363,6 +363,12 @@ All JSON settings follow camelCase format.
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     * **destination** `[string]`
         * Folder path for saving files, can be full path or local subfolder.
+    * _`[DEFAULTS]`_ destinationNestServers `[string]`
+        * _Default:_ `false`
+        * Nests downloads within subfolders named by server.
+    * _`[DEFAULTS]`_ destinationNestChannels `[string]`
+        * _Default:_ `false`
+        * Nests downloads within subfolders named by channel.
     * _`[DEFAULTS]`_ enabled `[bool]`
         * _Default:_ `true`
         * Toggles bot functionality for channel.

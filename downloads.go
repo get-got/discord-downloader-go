@@ -432,8 +432,8 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		channelConfig := getChannelConfig(channelID)
 
 		// Clean/fix path
-		if !strings.HasSuffix(path, "/") {
-			path = path + "/"
+		if !strings.HasSuffix(path, string(os.PathSeparator)) {
+			path = path + string(os.PathSeparator)
 		}
 
 		// Create folder
@@ -557,34 +557,100 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			}
 		}
 
-		// Subfolder division
+		// Names
+		sourceChannelName := channelID
+		sourceGuildName := "Unavailable"
+		sourceChannel, err := bot.State.Channel(channelID)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", channelID, err))
+		}
+		if sourceChannel != nil && sourceChannel.Name != "" {
+			sourceChannelName = sourceChannel.Name
+			if sourceChannel.GuildID != "" {
+				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+				if sourceGuild != nil && sourceGuild.Name != "" {
+					sourceGuildName = "\"" + sourceGuild.Name + "\""
+				}
+			} else {
+				sourceGuildName = "Group Message" //?
+			}
+		} else {
+			sourceGuildName = "Direct Message"
+		}
+
 		subfolder := ""
+
+		// Subfolder Division - Server Nesting
+		if *channelConfig.DestinationNestServers {
+			subfolderSuffix := ""
+			if sourceGuildName != "" && sourceGuildName != "Unavailable" {
+				subfolderSuffix = sourceGuildName
+				for _, key := range pathBlacklist {
+					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+				}
+			}
+			if subfolderSuffix != "" {
+				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
+				subfolder = subfolder + subfolderSuffix
+				// Create folder.
+				err := os.MkdirAll(path+subfolder, 755)
+				if err != nil {
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating subfolder \"%s\": %s", path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				}
+			}
+		}
+
+		// Subfolder Division - Channel Nesting
+		if *channelConfig.DestinationNestChannels {
+			subfolderSuffix := ""
+			if sourceChannelName != "" {
+				subfolderSuffix = sourceChannelName
+				for _, key := range pathBlacklist {
+					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+				}
+			}
+			if subfolderSuffix != "" {
+				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
+				subfolder = subfolder + subfolderSuffix
+				// Create folder.
+				err := os.MkdirAll(path+subfolder, 755)
+				if err != nil {
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating subfolder \"%s\": %s", path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				}
+			}
+		}
+
+		// Subfolder Division - Content Type
 		if *channelConfig.DivideFoldersByType {
+			subfolderSuffix := ""
 			switch contentTypeFound {
 			case "image":
-				subfolder = "images/"
+				subfolderSuffix = "images" + string(os.PathSeparator)
 			case "video":
-				subfolder = "videos/"
+				subfolderSuffix = "videos" + string(os.PathSeparator)
 			case "audio":
-				subfolder = "audio/"
+				subfolderSuffix = "audio" + string(os.PathSeparator)
 			case "text":
-				subfolder = "text/"
+				subfolderSuffix = "text" + string(os.PathSeparator)
 			case "application":
 				if stringInSlice(extension, []string{".mov"}) {
 					contentTypeFound = "video"
-					subfolder = "videos/"
+					subfolderSuffix = "videos" + string(os.PathSeparator)
 				} else if stringInSlice(extension, []string{".psd"}) ||
 					stringInSlice(extension, []string{".nef"}) ||
 					stringInSlice(extension, []string{".dng"}) ||
 					stringInSlice(extension, []string{".tif"}) ||
 					stringInSlice(extension, []string{".tiff"}) {
 					contentTypeFound = "image"
-					subfolder = "images/"
+					subfolderSuffix = "images" + string(os.PathSeparator)
 				} else {
-					subfolder = "applications/"
+					subfolderSuffix = "applications" + string(os.PathSeparator)
 				}
 			}
-			if subfolder != "" {
+			if subfolderSuffix != "" {
+				subfolder = subfolder + subfolderSuffix
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 755)
 				if err != nil {
@@ -602,7 +668,6 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			}
 		}
 		newFilename := time.Now().Format(filenameDateFormat) + filename
-		//completePath := path + string(os.PathSeparator) + subfolder + newFilename
 		completePath := path + subfolder + newFilename
 
 		// Check if exists
@@ -646,25 +711,6 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		writeTime := time.Now()
 
 		// Output
-		sourceChannelName := channelID
-		sourceGuildName := "N/A"
-		sourceChannel, err := bot.State.Channel(channelID)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", channelID, err))
-		}
-		if sourceChannel != nil && sourceChannel.Name != "" {
-			sourceChannelName = sourceChannel.Name
-			if sourceChannel.GuildID != "" {
-				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-				if sourceGuild != nil && sourceGuild.Name != "" {
-					sourceGuildName = "\"" + sourceGuild.Name + "\""
-				}
-			} else {
-				sourceGuildName = "Group Message" //?
-			}
-		} else {
-			sourceGuildName = "Direct Message"
-		}
 		log.Println(color.HiGreenString("SAVED FILE (%s) sent in %s#%s to \"%s\"", contentTypeFound, sourceGuildName, sourceChannelName, completePath))
 
 		// Store in db

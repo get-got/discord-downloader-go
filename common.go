@@ -16,6 +16,10 @@ import (
 	"github.com/hashicorp/go-version"
 )
 
+var (
+	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
+)
+
 type githubReleaseApiObject struct {
 	TagName string `json:"tag_name"`
 }

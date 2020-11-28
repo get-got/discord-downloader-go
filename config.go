@@ -65,7 +65,7 @@ func defaultConfiguration() configuration {
 		AllowSkipping:                  cdAllowSkipping,
 		ScanOwnMessages:                cdScanOwnMessages,
 		FilterDuplicateImages:          false,
-		FilterDuplicateImagesThreshold: 100,
+		FilterDuplicateImagesThreshold: 25,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
@@ -116,6 +116,9 @@ type configuration struct {
 // ccd = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
+	// Main
+	ccdDestinationNestServers  bool = false
+	ccdDestinationNestChannels bool = false
 	// Setup
 	ccdEnabled       bool = true
 	ccdAllowCommands bool = true
@@ -151,10 +154,12 @@ var (
 )
 
 type configurationChannel struct {
-	// Required
-	ChannelID   string    `json:"channel"`            // required
-	ChannelIDs  *[]string `json:"channels,omitempty"` // alternative to ChannelID
-	Destination string    `json:"destination"`        // required
+	// Main
+	ChannelID               string    `json:"channel"`                           // required
+	ChannelIDs              *[]string `json:"channels,omitempty"`                // alternative to ChannelID
+	Destination             string    `json:"destination"`                       // required
+	DestinationNestServers  *bool     `json:"destinationNestServers,omitempty"`  // optional, defaults
+	DestinationNestChannels *bool     `json:"destinationNestChannels,omitempty"` // optional, defaults
 	// Setup
 	Enabled       *bool `json:"enabled,omitempty"`       // optional, defaults
 	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
@@ -263,6 +268,13 @@ func loadConfig() {
 
 // These have to use the default variables since literal values and consts can't be set to the pointers
 func channelDefault(channel *configurationChannel) {
+	// Main
+	if channel.DestinationNestServers == nil {
+		channel.DestinationNestServers = &ccdDestinationNestServers
+	}
+	if channel.DestinationNestChannels == nil {
+		channel.DestinationNestChannels = &ccdDestinationNestChannels
+	}
 	// Setup
 	if channel.Enabled == nil {
 		channel.Enabled = &ccdEnabled
