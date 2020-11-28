@@ -408,6 +408,9 @@ All JSON settings follow camelCase format.
     * _`[DEFAULTS]`_ divideFoldersByChannel `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by channel of origin _(e.g. "my-channel", "my-other-channel")_
+    * _`[DEFAULTS]`_ divideFoldersByUser `[bool]`
+        * _Default:_ `false`
+        * Separate files into subfolders by user who sent _(e.g. "Me#1234", "My Friend#0000")_
     * _`[DEFAULTS]`_ divideFoldersByType `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_

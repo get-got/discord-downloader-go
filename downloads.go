@@ -382,12 +382,12 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 	return fileItems
 }
 
-func startDownload(inputURL string, filename string, path string, messageID string, channelID string, guildID string, userID string, fileTime time.Time, historyCmd bool) downloadStatusStruct {
+func startDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	logPrefixErrorHere := color.HiRedString("[startDownload]")
 
 	for i := 0; i < config.DownloadRetryMax; i++ {
-		status = tryDownload(inputURL, filename, path, messageID, channelID, guildID, userID, fileTime, historyCmd)
+		status = tryDownload(inputURL, filename, path, message, fileTime, historyCmd)
 		if status.Status < downloadFailed { // Success or Skip
 			break
 		} else {
@@ -397,8 +397,8 @@ func startDownload(inputURL string, filename string, path string, messageID stri
 
 	if status.Status >= downloadFailed { // Any kind of failure
 		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s", inputURL))
-		if isChannelRegistered(channelID) {
-			channelConfig := getChannelConfig(channelID)
+		if isChannelRegistered(message.ChannelID) {
+			channelConfig := getChannelConfig(message.ChannelID)
 			if !historyCmd && *channelConfig.ErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -406,13 +406,13 @@ func startDownload(inputURL string, filename string, path string, messageID stri
 				if status.Error != nil {
 					content = content + fmt.Sprintf("\n```ERROR: %s```", status.Error)
 				}
-				_, err := bot.ChannelMessageSendComplex(channelID,
+				_, err := bot.ChannelMessageSendComplex(message.ChannelID,
 					&discordgo.MessageSend{
-						Content: fmt.Sprintf("<@!%s>", userID),
-						Embed:   buildEmbed(channelID, "Download Failure", content),
+						Content: fmt.Sprintf("<@!%s>", message.Author.ID),
+						Embed:   buildEmbed(message.ChannelID, "Download Failure", content),
 					})
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", channelID, err))
+					log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", message.ChannelID, err))
 				}
 			}
 		}
@@ -421,15 +421,15 @@ func startDownload(inputURL string, filename string, path string, messageID stri
 	return status
 }
 
-func tryDownload(inputURL string, filename string, path string, messageID string, channelID string, guildID string, userID string, fileTime time.Time, historyCmd bool) downloadStatusStruct {
+func tryDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool) downloadStatusStruct {
 	cachedDownloadID++
 	thisDownloadID := cachedDownloadID
 
 	startTime := time.Now()
 
 	logPrefixErrorHere := color.HiRedString("[tryDownload]")
-	if isChannelRegistered(channelID) {
-		channelConfig := getChannelConfig(channelID)
+	if isChannelRegistered(message.ChannelID) {
+		channelConfig := getChannelConfig(message.ChannelID)
 
 		// Clean/fix path
 		if !strings.HasSuffix(path, string(os.PathSeparator)) {
@@ -558,11 +558,11 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		}
 
 		// Names
-		sourceChannelName := channelID
+		sourceChannelName := message.ChannelID
 		sourceGuildName := "Unavailable"
-		sourceChannel, err := bot.State.Channel(channelID)
+		sourceChannel, err := bot.State.Channel(message.ChannelID)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", channelID, err))
+			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", message.ChannelID, err))
 		}
 		if sourceChannel != nil && sourceChannel.Name != "" {
 			sourceChannelName = sourceChannel.Name
@@ -595,7 +595,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 755)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating subfolder \"%s\": %s", path, err))
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", path, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
@@ -616,7 +616,28 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 755)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating subfolder \"%s\": %s", path, err))
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating channel subfolder \"%s\": %s", path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				}
+			}
+		}
+
+		// Subfolder Division - User Nesting
+		if *channelConfig.DivideFoldersByUser {
+			subfolderSuffix := message.Author.ID
+			if message.Author.Username != "" {
+				subfolderSuffix = message.Author.Username + "#" + message.Author.Discriminator
+				for _, key := range pathBlacklist {
+					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+				}
+			}
+			if subfolderSuffix != "" {
+				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
+				subfolder = subfolder + subfolderSuffix
+				// Create folder.
+				err := os.MkdirAll(path+subfolder, 755)
+				if err != nil {
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating user subfolder \"%s\": %s", path, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
@@ -654,7 +675,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 755)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating subfolder \"%s\": %s", path, err))
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating type subfolder \"%s\": %s", path, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
@@ -719,8 +740,8 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			Time:        time.Now(),
 			Destination: completePath,
 			Filename:    filename,
-			ChannelID:   channelID,
-			UserID:      userID,
+			ChannelID:   message.ChannelID,
+			UserID:      message.Author.ID,
 		})
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.HiRedString("Error writing to database: %s", err))
@@ -738,9 +759,9 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
 				if sourceChannel.GuildID != "" {
-					guild, err := bot.State.Guild(guildID)
+					guild, err := bot.State.Guild(message.GuildID)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", guildID, err))
+						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", message.GuildID, err))
 					} else {
 						emojis := guild.Emojis
 						if len(emojis) > 1 {
@@ -763,7 +784,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 			} else {
 				reaction = *channelConfig.ReactWhenDownloadedEmoji
 			}
-			err = bot.MessageReactionAdd(channelID, messageID, reaction)
+			err = bot.MessageReactionAdd(message.ChannelID, message.ID, reaction)
 			if err != nil {
 				log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
 			}
