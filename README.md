@@ -404,10 +404,10 @@ All JSON settings follow camelCase format.
         * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the array.**
     * _`[DEFAULTS]`_ divideFoldersByServer `[bool]`
         * _Default:_ `false`
-        * Nests downloads within subfolders named by server.
+        * Separate files into subfolders by server of origin _(e.g. "My Server", "My Friends Server")_
     * _`[DEFAULTS]`_ divideFoldersByChannel `[bool]`
         * _Default:_ `false`
-        * Nests downloads within subfolders named by channel.
+        * Separate files into subfolders by channel of origin _(e.g. "my-channel", "my-other-channel")_
     * _`[DEFAULTS]`_ divideFoldersByType `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
