@@ -553,7 +553,7 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 						return mDownloadStatus(downloadSkippedDetectedDuplicate)
 					}
 				}
-				imgStore.Add(img, hash)
+				imgStore.Add(cachedDownloadID, hash)
 			}
 		}
 
@@ -654,12 +654,18 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		}
 		if sourceChannel != nil && sourceChannel.Name != "" {
 			sourceChannelName = sourceChannel.Name
-			sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-			if sourceGuild != nil && sourceGuild.Name != "" {
-				sourceGuildName = sourceGuild.Name
+			if sourceChannel.GuildID != "" {
+				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+				if sourceGuild != nil && sourceGuild.Name != "" {
+					sourceGuildName = "\"" + sourceGuild.Name + "\""
+				}
+			} else {
+				sourceGuildName = "Group Message" //?
 			}
+		} else {
+			sourceGuildName = "Direct Message"
 		}
-		log.Println(color.HiGreenString("SAVED FILE (%s) sent in \"%s\"#%s to \"%s\"", contentTypeFound, sourceGuildName, sourceChannelName, completePath))
+		log.Println(color.HiGreenString("SAVED FILE (%s) sent in %s#%s to \"%s\"", contentTypeFound, sourceGuildName, sourceChannelName, completePath))
 
 		// Store in db
 		err = dbInsertDownload(&download{
@@ -685,24 +691,28 @@ func tryDownload(inputURL string, filename string, path string, messageID string
 		if !historyCmd && *channelConfig.ReactWhenDownloaded {
 			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
-				guild, err := bot.State.Guild(guildID)
-				if err != nil {
-					log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", guildID, err))
-				} else {
-					emojis := guild.Emojis
-					if len(emojis) > 1 {
-						for {
-							rand.Seed(time.Now().UnixNano())
-							chosenEmoji := emojis[rand.Intn(len(emojis))]
-							formattedEmoji := chosenEmoji.APIName()
-							if !chosenEmoji.Animated && !stringInSlice(formattedEmoji, *channelConfig.BlacklistReactEmojis) {
-								reaction = formattedEmoji
-								break
-							}
-						}
+				if sourceChannel.GuildID != "" {
+					guild, err := bot.State.Guild(guildID)
+					if err != nil {
+						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", guildID, err))
 					} else {
-						reaction = "✅"
+						emojis := guild.Emojis
+						if len(emojis) > 1 {
+							for {
+								rand.Seed(time.Now().UnixNano())
+								chosenEmoji := emojis[rand.Intn(len(emojis))]
+								formattedEmoji := chosenEmoji.APIName()
+								if !chosenEmoji.Animated && !stringInSlice(formattedEmoji, *channelConfig.BlacklistReactEmojis) {
+									reaction = formattedEmoji
+									break
+								}
+							}
+						} else {
+							reaction = "✅"
+						}
 					}
+				} else {
+					reaction = "✅"
 				}
 			} else {
 				reaction = *channelConfig.ReactWhenDownloadedEmoji

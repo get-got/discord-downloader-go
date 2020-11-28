@@ -99,16 +99,15 @@ func main() {
 
 	// Image Store
 	if config.FilterDuplicateImages {
-		if _, err := os.Stat(imgStorePath); err != nil {
-			imgStore = duplo.New()
-		} else {
+		imgStore = duplo.New()
+		if _, err := os.Stat(imgStorePath); err == nil {
 			storeFile, err := ioutil.ReadFile(imgStorePath)
 			if err != nil {
 				log.Println(color.HiRedString("Error opening imgStore file:\t%s", err))
 			} else {
 				err = imgStore.GobDecode(storeFile)
 				if err != nil {
-					log.Println(color.HiRedString("Error decoding imgStore file:\t%s", err))
+					log.Println(color.HiRedString("Error decoding imgStore:\t%s", err))
 				}
 			}
 		}
