@@ -6,7 +6,7 @@ import (
 
 //TODO: I'm trash at regex syntax so the facebook expressions are very crude
 const (
-	regexpFilename                = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{2,4}$$`
+	regexpFilename                = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{2,5}$$`
 	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
 	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)$`
 	regexpUrlInstagram            = `^http(s?):\/\/(www\.)?instagram\.com\/p\/[^/]+\/(\?[^/]+)?$`
