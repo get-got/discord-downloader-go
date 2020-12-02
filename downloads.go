@@ -506,7 +506,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Fix content type
-		if stringInSlice(extension, []string{".mov"}) {
+		if stringInSlice(extension, []string{".mov"}) ||
+			stringInSlice(extension, []string{".mp4"}) ||
+			stringInSlice(extension, []string{".webm"}) {
 			contentTypeFound = "video"
 		} else if stringInSlice(extension, []string{".psd"}) ||
 			stringInSlice(extension, []string{".nef"}) ||
