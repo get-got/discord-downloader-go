@@ -309,44 +309,15 @@ All JSON settings follow camelCase format.
 * _`[OPTIONAL]`_ presenceOverwrite `[string]`
     * _Unused by Default_
     * Replace counter status with custom string.
-    * Embedded Placeholders:
-        * `{{dgVersion}}`: discord-go version
-        * `{{ddgVersion}}`: Project version
-        * `{{apiVersion}}`: Discord API version
-        * `{{countNoCommas}}`: Raw total count of downloads (without comma formatting)
-        * `{{count}}`: Raw total count of downloads
-        * `{{countShort}}`: Shortened total count of downloads
-        * `{{numGuilds}}`: Number of guilds bot is a member of
-        * `{{numChannels}}`: Number of bound channels
-        * `{{numAdminChannels}}`: Number of admin channels
-        * `{{numAdmins}}`: Number of designated admins
-        * `{{timeSavedShort}}`: Last save time formatted as `3:04pm`
-        * `{{timeSavedShortTZ}}`: Last save time formatted as `3:04pm MST`
-        * `{{timeSavedMid}}`: Last save time formatted as `3:04pm MST 1/2/2006`
-        * `{{timeSavedLong}}`: Last save time formatted as `3:04:05pm MST - January 1, 2006`
-        * `{{timeSavedShort24}}`: Last save time formatted as `15:04`
-        * `{{timeSavedShortTZ24}}`: Last save time formatted as `15:04 MST`
-        * `{{timeSavedMid24}}`: Last save time formatted as `15:04 MST 2/1/2006`
-        * `{{timeSavedLong24}}`: Last save time formatted as `15:04:05 MST - 1 January, 2006`
-        * `{{timeNowShort}}`: Current time formatted as `3:04pm`
-        * `{{timeNowShortTZ}}`: Current time formatted as `3:04pm MST`
-        * `{{timeNowMid}}`: Current time formatted as `3:04pm MST 1/2/2006`
-        * `{{timeNowLong}}`: Current time formatted as `3:04:05pm MST - January 1, 2006`
-        * `{{timeNowShort24}}`: Current time formatted as `15:04`
-        * `{{timeNowShortTZ24}}`: Current time formatted as `15:04 MST`
-        * `{{timeNowMid24}}`: Current time formatted as `15:04 MST 2/1/2006`
-        * `{{timeNowLong24}}`: Current time formatted as `15:04:05 MST - 1 January, 2006`
-        * `{{uptime}}`: Shortened duration of bot uptime
+    * [_See Presence Placeholders for customization..._](#presence-placeholders)
 * _`[OPTIONAL]`_ presenceOverwriteDetails `[string]`
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
-    * Embedded Placeholders:
-        * _See `presenceOverwrite` above..._
+    * [_See Presence Placeholders for customization..._](#presence-placeholders)
 * _`[OPTIONAL]`_ presenceOverwriteState `[string]`
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
-    * Embedded Placeholders:
-        * _See `presenceOverwrite` above..._
+    * [_See Presence Placeholders for customization..._](#presence-placeholders)
 * _`[DEFAULTS]`_ filenameDateFormat `[string]`
     * _Default:_ `"2006-01-02_15-04-05 "`
     * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
@@ -433,6 +404,36 @@ All JSON settings follow camelCase format.
         * Ignores files from specified domains. Ensure you use proper formatting.
     * _`[OPTIONAL]`_ saveAllLinksToFile `[string]`
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
+
+### Presence Placeholders
+_For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`_
+    * `{{dgVersion}}`: discord-go version
+    * `{{ddgVersion}}`: Project version
+    * `{{apiVersion}}`: Discord API version
+    * `{{countNoCommas}}`: Raw total count of downloads (without comma formatting)
+    * `{{count}}`: Raw total count of downloads
+    * `{{countShort}}`: Shortened total count of downloads
+    * `{{numGuilds}}`: Number of guilds bot is a member of
+    * `{{numChannels}}`: Number of bound channels
+    * `{{numAdminChannels}}`: Number of admin channels
+    * `{{numAdmins}}`: Number of designated admins
+    * `{{timeSavedShort}}`: Last save time formatted as `3:04pm`
+    * `{{timeSavedShortTZ}}`: Last save time formatted as `3:04pm MST`
+    * `{{timeSavedMid}}`: Last save time formatted as `3:04pm MST 1/2/2006`
+    * `{{timeSavedLong}}`: Last save time formatted as `3:04:05pm MST - January 1, 2006`
+    * `{{timeSavedShort24}}`: Last save time formatted as `15:04`
+    * `{{timeSavedShortTZ24}}`: Last save time formatted as `15:04 MST`
+    * `{{timeSavedMid24}}`: Last save time formatted as `15:04 MST 2/1/2006`
+    * `{{timeSavedLong24}}`: Last save time formatted as `15:04:05 MST - 1 January, 2006`
+    * `{{timeNowShort}}`: Current time formatted as `3:04pm`
+    * `{{timeNowShortTZ}}`: Current time formatted as `3:04pm MST`
+    * `{{timeNowMid}}`: Current time formatted as `3:04pm MST 1/2/2006`
+    * `{{timeNowLong}}`: Current time formatted as `3:04:05pm MST - January 1, 2006`
+    * `{{timeNowShort24}}`: Current time formatted as `15:04`
+    * `{{timeNowShortTZ24}}`: Current time formatted as `15:04 MST`
+    * `{{timeNowMid24}}`: Current time formatted as `15:04 MST 2/1/2006`
+    * `{{timeNowLong24}}`: Current time formatted as `15:04:05 MST - 1 January, 2006`
+    * `{{uptime}}`: Shortened duration of bot uptime
 
 ## Info for Developers
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
