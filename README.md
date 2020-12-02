@@ -1,5 +1,5 @@
 <h1 align="center">
-    Discord Downloader 💾
+    Discord Downloader
 </h1>
 <p align="center">
     <a href="https://github.com/get-got/discord-downloader-go/releases" alt="All Releases">
@@ -43,21 +43,22 @@ Obviously, download the bot program (or compile yourself with Go) and put it in 
 
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file). Ensure you follow proper JSON syntax to avoid any unexpected errors.
 
-### For Credentials...
+### Credentials...
 * If using a **Bot User,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
 * If using a **Real User (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
 * If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
 
-### Bot Permissions in Channels/Servers
+### Bot Permissions in Discord...
 * In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
 * In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
 * In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
 
-#### How to Find Discord ID's
+#### How to Find Discord IDs...
 * **Discord Developer Mode:** Enable `Developer Mode` in Discord settings under `Appearance`.
 * **Finding Channel ID:** _Enable Discord Developer Mode (see above),_ right click on the channel and `Copy ID`.
 * **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
 * **Finding Emoji ID:** _Enable Discord Developer Mode (see above),_ right click on the emoji and `Copy ID`.
+* **Finding DM/PM ID:** Inspect Element on the DM icon for the desired user. Look for `href="/channels/@me/CHANNEL_ID_HERE"`. Using this ID in place of a normal channel ID should work perfectly fine.
 
 ## Features
 * ***Supported File Downloading:***
@@ -109,7 +110,6 @@ You will need the Channel ID (see bottom of [Setup](#Setup)) if attempting to ca
 ## Settings / Configuration Guide
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
 
-### Basic Settings Example
 The following example is for a Bot Application _(using a token)_, bound to 1 channel.
 
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
@@ -244,7 +244,7 @@ When initially launching the bot it will create a default settings file if you d
 
 All JSON settings follow camelCase format.
 
-### List of Settings
+## List of Settings
 * **credentials** `[key/value object]`
     * **token** `[string]`
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
