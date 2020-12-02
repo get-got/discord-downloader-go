@@ -309,18 +309,18 @@ All JSON settings follow camelCase format.
 * _`[OPTIONAL]`_ presenceOverwrite `[string]`
     * _Unused by Default_
     * Replace counter status with custom string.
-    * [_See Presence Placeholders for customization..._](#presence-placeholders)
+    * [see Presence Placeholders for customization...](#presence-placeholders)
 * _`[OPTIONAL]`_ presenceOverwriteDetails `[string]`
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
-    * [_See Presence Placeholders for customization..._](#presence-placeholders)
+    * [see Presence Placeholders for customization...](#presence-placeholders)
 * _`[OPTIONAL]`_ presenceOverwriteState `[string]`
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
-    * [_See Presence Placeholders for customization..._](#presence-placeholders)
+    * [see Presence Placeholders for customization...](#presence-placeholders)
 * _`[DEFAULTS]`_ filenameDateFormat `[string]`
     * _Default:_ `"2006-01-02_15-04-05 "`
-    * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
+    * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
 * _`[OPTIONAL]`_ embedColor `[string]`
     * _Unused by Default_
     * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
@@ -358,7 +358,7 @@ All JSON settings follow camelCase format.
     * _`[OPTIONAL]`_ overwriteFilenameDateFormat `[string]`
         * _Unused by Default_
         * Overwrites the global setting `filenameDateFormat` _(see above)_
-        * See [this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
+        * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
     * _`[OPTIONAL]`_ overwriteAllowSkipping `[bool]`
         * _Unused by Default_
         * Allow scanning for keywords to skip content downloading.
