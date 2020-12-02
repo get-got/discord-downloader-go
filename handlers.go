@@ -173,7 +173,9 @@ var (
 func handleHistory(commandingMessage *discordgo.Message, commandingChannelID string, subjectChannelID string) int {
 	historyCommandActive[subjectChannelID] = "downloading"
 
-	i := 0
+	var i int64 = 0
+	var d int64 = 0
+	var batch int = 0
 
 	if isChannelRegistered(subjectChannelID) {
 		channelConfig := getChannelConfig(subjectChannelID)
@@ -191,12 +193,14 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 	MessageRequestingLoop:
 		for true {
 			if lastBeforeTime != (time.Time{}) {
-				log.Println(color.CyanString("[handleHistory] Requesting 100 more messages, %d cataloged, (before %s)",
-					i, lastBeforeTime))
+				batch++
+				log.Println(color.CyanString("[handleHistory] Requesting 100 more messages, %d downloaded, (before %s)",
+					d, lastBeforeTime))
 				// Status update
 				if message != nil {
-					content := fmt.Sprintf("``%s:`` %d files cataloged\n_Requesting more messages, please wait..._",
-						durafmt.ParseShort(time.Since(historyStartTime)).String(), i)
+					content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n_(%d) Requesting more messages, please wait..._",
+						durafmt.ParseShort(time.Since(historyStartTime)).String(),
+						formatNumber(d), formatNumber(i), batch)
 					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 						ID:      message.ID,
 						Channel: message.ChannelID,
@@ -212,6 +216,11 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 					}
 				} else {
 					log.Println(color.HiRedString("[handleHistory] Tried to edit status message but it doesn't exist."))
+				}
+				// Update presence
+				timeLastUpdated = time.Now()
+				if *channelConfig.UpdatePresence {
+					updateDiscordPresence()
 				}
 			}
 			messages, err := bot.ChannelMessages(subjectChannelID, 100, lastBefore, "", "")
@@ -248,7 +257,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 								true,
 							)
 							if download.Status == downloadSuccess {
-								i++
+								d++
 							}
 						}
 					}
@@ -266,11 +275,12 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 									true,
 								)
 								if download.Status == downloadSuccess {
-									i++
+									d++
 								}
 							}
 						}
 					}
+					i++
 				}
 			} else {
 				// Error requesting messages
@@ -286,16 +296,16 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 
 		// Final status update
 		if message != nil {
-			contentFinal := fmt.Sprintf("``%s:`` **%s total files saved!**\n\nFinished cataloging history for ``%s``\n\n_Duration was %s_",
+			contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n_Duration was %s_",
 				durafmt.ParseShort(time.Since(historyStartTime)).String(),
-				formatNumber(int64(i)),
-				commandingMessage.ChannelID,
+				formatNumber(int64(d)), formatNumber(int64(i)),
+				commandingMessage.ChannelID, batch,
 				durafmt.Parse(time.Since(historyStartTime)).String(),
 			)
 			message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 				ID:      message.ID,
 				Channel: message.ChannelID,
-				Embed:   buildEmbed(message.ID, "Command — History", contentFinal),
+				Embed:   buildEmbed(message.ChannelID, "Command — History", contentFinal),
 			})
 			// Edit failure
 			if err != nil {
@@ -311,9 +321,9 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 
 		// Final log
 		log.Println(color.HiCyanString("[handleHistory] Finished cataloging history for %s (requested by %s): %d files...",
-			commandingMessage.ChannelID, getUserIdentifier(*commandingMessage.Author), i),
+			commandingMessage.ChannelID, getUserIdentifier(*commandingMessage.Author), d),
 		)
 	}
 
-	return i
+	return int(d)
 }

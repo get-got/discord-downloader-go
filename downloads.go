@@ -793,9 +793,11 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			}
 		}
 
-		timeLastUpdated = time.Now()
-		if *channelConfig.UpdatePresence {
-			updateDiscordPresence()
+		if !historyCmd {
+			timeLastUpdated = time.Now()
+			if *channelConfig.UpdatePresence {
+				updateDiscordPresence()
+			}
 		}
 
 		if config.DebugOutput {
