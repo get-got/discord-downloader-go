@@ -498,6 +498,24 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		contentTypeParts := strings.Split(contentType, "/")
 		contentTypeFound := contentTypeParts[0]
 
+		// Check extension
+		extension := strings.ToLower(filepath.Ext(filename))
+		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
+			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
+			return mDownloadStatus(downloadSkippedUnpermittedExtension)
+		}
+
+		// Fix content type
+		if stringInSlice(extension, []string{".mov"}) {
+			contentTypeFound = "video"
+		} else if stringInSlice(extension, []string{".psd"}) ||
+			stringInSlice(extension, []string{".nef"}) ||
+			stringInSlice(extension, []string{".dng"}) ||
+			stringInSlice(extension, []string{".tif"}) ||
+			stringInSlice(extension, []string{".tiff"}) {
+			contentTypeFound = "image"
+		}
+
 		// Check for valid filename, if not, replace with generic filename
 		if !regexFilename.MatchString(filename) {
 			filename = "InvalidFilename"
@@ -526,13 +544,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			(*channelConfig.SaveOtherFiles && contentTypeFound == "application")) {
 			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, inputURL))
 			return mDownloadStatus(downloadSkippedUnpermittedType)
-		}
-
-		// Check extension
-		extension := strings.ToLower(filepath.Ext(filename))
-		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
-			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
-			return mDownloadStatus(downloadSkippedUnpermittedExtension)
 		}
 
 		// Duplicate Image Filter
@@ -656,19 +667,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			case "text":
 				subfolderSuffix = "text" + string(os.PathSeparator)
 			case "application":
-				if stringInSlice(extension, []string{".mov"}) {
-					contentTypeFound = "video"
-					subfolderSuffix = "videos" + string(os.PathSeparator)
-				} else if stringInSlice(extension, []string{".psd"}) ||
-					stringInSlice(extension, []string{".nef"}) ||
-					stringInSlice(extension, []string{".dng"}) ||
-					stringInSlice(extension, []string{".tif"}) ||
-					stringInSlice(extension, []string{".tiff"}) {
-					contentTypeFound = "image"
-					subfolderSuffix = "images" + string(os.PathSeparator)
-				} else {
-					subfolderSuffix = "applications" + string(os.PathSeparator)
-				}
+				subfolderSuffix = "applications" + string(os.PathSeparator)
 			}
 			if subfolderSuffix != "" {
 				subfolder = subfolder + subfolderSuffix
