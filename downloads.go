@@ -622,8 +622,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				}
 			}
 			if subfolderSuffix != "" {
-				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
-				subfolder = subfolder + subfolderSuffix
+				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 0777)
 				if err != nil {
@@ -643,8 +642,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				}
 			}
 			if subfolderSuffix != "" {
-				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
-				subfolder = subfolder + subfolderSuffix
+				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 0777)
 				if err != nil {
@@ -659,18 +657,18 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			subfolderSuffix := ""
 			switch contentTypeFound {
 			case "image":
-				subfolderSuffix = "images" + string(os.PathSeparator)
+				subfolderSuffix = "images"
 			case "video":
-				subfolderSuffix = "videos" + string(os.PathSeparator)
+				subfolderSuffix = "videos"
 			case "audio":
-				subfolderSuffix = "audio" + string(os.PathSeparator)
+				subfolderSuffix = "audio"
 			case "text":
-				subfolderSuffix = "text" + string(os.PathSeparator)
+				subfolderSuffix = "text"
 			case "application":
-				subfolderSuffix = "applications" + string(os.PathSeparator)
+				subfolderSuffix = "applications"
 			}
 			if subfolderSuffix != "" {
-				subfolder = subfolder + subfolderSuffix
+				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 0777)
 				if err != nil {
