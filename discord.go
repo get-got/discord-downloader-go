@@ -100,6 +100,10 @@ func updateDiscordPresence() {
 			},
 			Status: config.PresenceStatus,
 		})
+	} else if config.PresenceStatus != string(discordgo.StatusOnline) {
+		bot.UpdateStatusComplex(discordgo.UpdateStatusData{
+			Status: config.PresenceStatus,
+		})
 	}
 }
 
