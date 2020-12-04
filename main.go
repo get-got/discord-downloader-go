@@ -264,7 +264,7 @@ func main() {
 		}
 	}).Cat("Utility").Alias("test").Desc("Pings the bot")
 
-	router.Default = router.On("help", func(ctx *exrouter.Context) {
+	router.On("help", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:help]")
 		if isCommandableChannel(ctx.Msg) {
 			text := ""
