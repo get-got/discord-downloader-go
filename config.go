@@ -139,7 +139,7 @@ var (
 	ccdSaveAudioFiles         bool = false
 	ccdSaveTextFiles          bool = false
 	ccdSaveOtherFiles         bool = false
-	ccdSavePossibleDuplicates bool = true
+	ccdSavePossibleDuplicates bool = false
 	ccdExtensionBlacklist          = []string{
 		".htm",
 		".html",
