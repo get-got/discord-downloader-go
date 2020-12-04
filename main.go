@@ -101,6 +101,7 @@ func main() {
 	if config.FilterDuplicateImages {
 		imgStore = duplo.New()
 		if _, err := os.Stat(imgStorePath); err == nil {
+			log.Println(color.YellowString("Opening image filter database..."))
 			storeFile, err := ioutil.ReadFile(imgStorePath)
 			if err != nil {
 				log.Println(color.HiRedString("Error opening imgStore file:\t%s", err))
