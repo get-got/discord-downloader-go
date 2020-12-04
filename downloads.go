@@ -687,7 +687,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
 			}
 		}
-		newFilename := time.Now().Format(filenameDateFormat) + filename
+		messageTime, err := message.Timestamp.Parse()
+		var newFilename string
+		if err == nil {
+			newFilename = messageTime.Format(filenameDateFormat) + filename
+		} else {
+			newFilename = time.Now().Format(filenameDateFormat) + filename
+		}
 		completePath := path + subfolder + newFilename
 
 		// Check if exists
