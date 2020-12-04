@@ -246,29 +246,13 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 						delete(historyCommandActive, message.ChannelID)
 						break MessageRequestingLoop
 					}
-					for _, iAttachment := range message.Attachments {
-						if len(dbFindDownloadByURL(iAttachment.URL)) == 0 {
-							download := startDownload(
-								iAttachment.URL,
-								iAttachment.Filename,
-								channelConfig.Destination,
-								message,
-								fileTime,
-								true,
-							)
-							if download.Status == downloadSuccess {
-								d++
-							}
-						}
-					}
-					foundUrls := xurls.Strict().FindAllString(message.Content, -1)
-					for _, iFoundUrl := range foundUrls {
-						links := getDownloadLinks(iFoundUrl, subjectChannelID)
-						for link, filename := range links {
-							if len(dbFindDownloadByURL(link)) == 0 {
+
+					if config.ScanOwnMessages || message.Author.ID != user.ID {
+						for _, iAttachment := range message.Attachments {
+							if len(dbFindDownloadByURL(iAttachment.URL)) == 0 {
 								download := startDownload(
-									link,
-									filename,
+									iAttachment.URL,
+									iAttachment.Filename,
 									channelConfig.Destination,
 									message,
 									fileTime,
@@ -279,8 +263,27 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 								}
 							}
 						}
+						foundUrls := xurls.Strict().FindAllString(message.Content, -1)
+						for _, iFoundUrl := range foundUrls {
+							links := getDownloadLinks(iFoundUrl, subjectChannelID)
+							for link, filename := range links {
+								if len(dbFindDownloadByURL(link)) == 0 {
+									download := startDownload(
+										link,
+										filename,
+										channelConfig.Destination,
+										message,
+										fileTime,
+										true,
+									)
+									if download.Status == downloadSuccess {
+										d++
+									}
+								}
+							}
+						}
+						i++
 					}
-					i++
 				}
 			} else {
 				// Error requesting messages
