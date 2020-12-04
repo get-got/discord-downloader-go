@@ -399,7 +399,7 @@ All JSON settings follow camelCase format.
     * _`[DEFAULTS]`_ saveOtherFiles `[bool]`
         * _Default:_ `false`
     * _`[DEFAULTS]`_ savePossibleDuplicates `[bool]`
-        * _Default:_ `true`
+        * _Default:_ `false`
     * _`[DEFAULTS]`_ extensionBlacklist `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
