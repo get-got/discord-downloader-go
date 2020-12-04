@@ -172,7 +172,11 @@ func main() {
 	// Bot Login
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		log.Println(color.GreenString("Connecting to Discord via Token..."))
-		bot, err = discordgo.New("Bot " + config.Credentials.Token)
+		if config.Credentials.UserBot {
+			bot, err = discordgo.New(config.Credentials.Token)
+		} else {
+			bot, err = discordgo.New("Bot " + config.Credentials.Token)
+		}
 	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
 		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
 		log.Println(color.GreenString("Connecting to Discord via Login..."))
@@ -210,6 +214,7 @@ func main() {
 		}
 	} else {
 		log.Println(color.HiRedString("Discord login failed:\t%s", err))
+		properExit()
 	}
 
 	// Command Router
