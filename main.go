@@ -361,7 +361,7 @@ func main() {
 						_, historyCommandIsSet := historyCommandActive[channel]
 						if !historyCommandIsSet || historyCommandActive[channel] == "" {
 							historyCommandActive[channel] = ""
-							handleHistory(ctx.Msg, channel, channel)
+							handleHistory(ctx.Msg, channel)
 						} else {
 							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
 						}
@@ -399,7 +399,7 @@ func main() {
 								_, historyCommandIsSet := historyCommandActive[channelValue]
 								if !historyCommandIsSet || historyCommandActive[channelValue] == "" {
 									historyCommandActive[channelValue] = ""
-									handleHistory(ctx.Msg, channel, channelValue)
+									handleHistory(ctx.Msg, channelValue)
 								} else {
 									log.Println(logPrefixHere, color.CyanString("Tried using history command but history is already running for %s...", channelValue))
 								}
@@ -468,6 +468,14 @@ func main() {
 	timeLastUpdated = time.Now()
 	updateDiscordPresence()
 
+	// Output Startup Duration
+	if config.DebugOutput {
+		log.Println(logPrefixDebug, color.YellowString("Startup finished, took %s...", uptime()))
+	}
+
+	// Output Done
+	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
+
 	// Tickers
 	if config.DebugOutput {
 		log.Println(logPrefixDebug, color.YellowString("Starting background loops..."))
@@ -483,13 +491,30 @@ func main() {
 		}
 	}()
 
-	// Output Startup Duration
-	if config.DebugOutput {
-		log.Println(logPrefixDebug, color.YellowString("Startup finished, took %s...", uptime()))
+	// Autorun History on Launch
+	var autorunHistoryChannels []configurationChannel
+	for _, item := range config.Channels {
+		if item.OverwriteAutorunHistory != nil {
+			if *item.OverwriteAutorunHistory {
+				autorunHistoryChannels = append(autorunHistoryChannels, item)
+				continue
+			}
+		}
+		if config.AutorunHistory {
+			autorunHistoryChannels = append(autorunHistoryChannels, item)
+		}
 	}
-
-	// Output Done
-	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
+	for _, item := range autorunHistoryChannels {
+		if item.ChannelID != "" {
+			historyCommandActive[item.ChannelID] = ""
+			go handleHistory(nil, item.ChannelID)
+		} else if *item.ChannelIDs != nil {
+			for _, subchannel := range *item.ChannelIDs {
+				historyCommandActive[subchannel] = ""
+				go handleHistory(nil, subchannel)
+			}
+		}
+	}
 
 	// Infinite loop until interrupted
 	log.Println(color.RedString("Ctrl+C to exit..."))

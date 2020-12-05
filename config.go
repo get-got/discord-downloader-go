@@ -67,6 +67,7 @@ func defaultConfiguration() configuration {
 		ScanOwnMessages:                cdScanOwnMessages,
 		FilterDuplicateImages:          false,
 		FilterDuplicateImagesThreshold: 0,
+		AutorunHistory:                 false,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
@@ -92,6 +93,7 @@ type configuration struct {
 	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
 	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
 	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
+	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
 	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults
@@ -162,10 +164,11 @@ type configurationChannel struct {
 	ChannelIDs  *[]string `json:"channels,omitempty"` // alternative to ChannelID
 	Destination string    `json:"destination"`        // required
 	// Setup
-	Enabled       *bool `json:"enabled,omitempty"`       // optional, defaults
-	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
-	ErrorMessages *bool `json:"errorMessages,omitempty"` // optional, defaults
-	ScanEdits     *bool `json:"scanEdits,omitempty"`     // optional, defaults
+	Enabled                 *bool `json:"enabled,omitempty"`                 // optional, defaults
+	AllowCommands           *bool `json:"allowCommands,omitempty"`           // optional, defaults
+	ErrorMessages           *bool `json:"errorMessages,omitempty"`           // optional, defaults
+	ScanEdits               *bool `json:"scanEdits,omitempty"`               // optional, defaults
+	OverwriteAutorunHistory *bool `json:"overwriteAutorunHistory,omitempty"` // optional
 	// Appearance
 	UpdatePresence           *bool     `json:"updatePresence,omitempty"`           // optional, defaults
 	ReactWhenDownloaded      *bool     `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
@@ -550,7 +553,7 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	return false
 }
 
-func getBoundChannelsCount() int {
+func getBoundChannels() []string {
 	var channels []string
 	for _, item := range config.Channels {
 		if item.ChannelID != "" {
@@ -565,5 +568,9 @@ func getBoundChannelsCount() int {
 			}
 		}
 	}
-	return len(channels)
+	return channels
+}
+
+func getBoundChannelsCount() int {
+	return len(getBoundChannels())
 }

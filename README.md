@@ -291,6 +291,8 @@ All JSON settings follow camelCase format.
 * _`[DEFAULTS]`_ filterDuplicateImagesThreshold `[float64]`
     * _Default:_ `0`
     * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
+* _`[OPTIONAL]`_ autorunHistory `[bool]`
+    * Autorun history for all registered channels in background upon launch.
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`
 * _`[DEFAULTS]`_ downloadTimeout `[int]`
@@ -352,6 +354,8 @@ All JSON settings follow camelCase format.
     * _`[DEFAULTS]`_ scanEdits `[bool]`
         * _Default:_ `true`
         * Check edits for un-downloaded media.
+    * _`[OPTIONAL]`_ overwriteAutorunHistory `[bool]`
+        * Overwrite global setting for autorunning history for all registered channels in background upon launch.
     * _`[DEFAULTS]`_ updatePresence `[bool]`
         * _Default:_ `true`
         * Update Discord Presence when download succeeds within this channel.

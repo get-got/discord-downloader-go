@@ -563,23 +563,25 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 
 		// Names
 		sourceChannelName := message.ChannelID
-		sourceGuildName := "Unavailable"
-		sourceChannel, err := bot.State.Channel(message.ChannelID)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", message.ChannelID, err))
-		}
-		if sourceChannel != nil && sourceChannel.Name != "" {
-			sourceChannelName = sourceChannel.Name
-			if sourceChannel.GuildID != "" {
-				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-				if sourceGuild != nil && sourceGuild.Name != "" {
-					sourceGuildName = "\"" + sourceGuild.Name + "\""
+		sourceGuildName := "DM"
+		if message.GuildID != "" {
+			sourceChannel, err := bot.State.Channel(message.ChannelID)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", message.ChannelID, err))
+			}
+			if sourceChannel != nil && sourceChannel.Name != "" {
+				sourceChannelName = sourceChannel.Name
+				if sourceChannel.GuildID != "" {
+					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+					if sourceGuild != nil && sourceGuild.Name != "" {
+						sourceGuildName = "\"" + sourceGuild.Name + "\""
+					}
+				} else {
+					sourceGuildName = "Group Message" //?
 				}
 			} else {
-				sourceGuildName = "Group Message" //?
+				sourceGuildName = "Direct Message"
 			}
-		} else {
-			sourceGuildName = "Direct Message"
 		}
 
 		subfolder := ""
@@ -754,7 +756,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		if !historyCmd && *channelConfig.ReactWhenDownloaded {
 			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
-				if sourceChannel.GuildID != "" {
+				if message.GuildID != "" {
 					guild, err := bot.State.Guild(message.GuildID)
 					if err != nil {
 						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", message.GuildID, err))
