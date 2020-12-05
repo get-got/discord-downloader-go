@@ -518,6 +518,7 @@ func main() {
 	}
 	if len(autorunHistoryChannels) > 0 {
 		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed"))
+		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
 
 	// Infinite loop until interrupted
