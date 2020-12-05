@@ -475,7 +475,7 @@ func main() {
 
 	// Output Done
 	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
-	log.Println(color.RedString("Ctrl+C to exit..."))
+	log.Println(color.RedString("CTRL+C to exit..."))
 
 	// Tickers
 	if config.DebugOutput {
