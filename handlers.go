@@ -195,7 +195,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				log.Println(logPrefixHistory, color.HiRedString("Failed to send command embed message (requested by %s):\t%s", commander, err))
 			}
 		}
-		log.Println(logPrefixHistory, color.CyanString("%s began saving history for %s", commander, subjectChannelID))
+		log.Println(logPrefixHistory, color.CyanString("%s/%s: Began checking history...",
+			subjectChannelID, commander))
 
 		lastBefore := ""
 		var lastBeforeTime time.Time
@@ -338,8 +339,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 
 		// Final log
-		log.Println(logPrefixHistory, color.HiCyanString("Finished saving history for %s (requested by %s): %d files",
-			subjectChannelID, commander, d),
+		log.Println(logPrefixHistory, color.HiCyanString("%s/%s: Finished history, %s files",
+			subjectChannelID, commander, formatNumber(d)),
 		)
 	}
 
