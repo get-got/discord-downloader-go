@@ -316,7 +316,6 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	}
 
 	if strings.HasPrefix(inputURL, "https://cdn.discordapp.com/emojis/") {
-		log.Println(logPrefixFileSkip, color.GreenString("Skipped %s as it is a Discord emoji", inputURL))
 		return nil
 	}
 
@@ -411,6 +410,10 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 	startTime := time.Now()
 
 	logPrefixErrorHere := color.HiRedString("[tryDownload]")
+	logPrefix := ""
+	if historyCmd {
+		logPrefix = logPrefixHistory + " "
+	}
 	if isChannelRegistered(message.ChannelID) {
 		channelConfig := getChannelConfig(message.ChannelID)
 
@@ -448,7 +451,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		defer response.Body.Close()
 
 		// Download duration
-		if config.DebugOutput {
+		if config.DebugOutput && !historyCmd {
 			log.Println(logPrefixDebug, color.YellowString("#%d - %s to download.", thisDownloadID, durafmt.ParseShort(time.Since(startTime)).String()))
 		}
 		downloadTime := time.Now()
@@ -721,13 +724,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Write duration
-		if config.DebugOutput {
+		if config.DebugOutput && !historyCmd {
 			log.Println(logPrefixDebug, color.YellowString("#%d - %s to save.", thisDownloadID, durafmt.ParseShort(time.Since(downloadTime)).String()))
 		}
 		writeTime := time.Now()
 
 		// Output
-		log.Println(color.HiGreenString("SAVED FILE (%s) sent in %s#%s to \"%s\"", contentTypeFound, sourceGuildName, sourceChannelName, completePath))
+		log.Println(logPrefix + color.HiGreenString("SAVED FILE (%s) sent in %s#%s to \"%s\"", contentTypeFound, sourceGuildName, sourceChannelName, completePath))
 
 		// Store in db
 		err = dbInsertDownload(&download{
@@ -744,7 +747,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Storage & output duration
-		if config.DebugOutput {
+		if config.DebugOutput && !historyCmd {
 			log.Println(logPrefixDebug, color.YellowString("#%d - %s to update database.", thisDownloadID, durafmt.ParseShort(time.Since(writeTime)).String()))
 		}
 		finishTime := time.Now()
@@ -796,7 +799,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			}
 		}
 
-		if config.DebugOutput {
+		if config.DebugOutput && !historyCmd {
 			log.Println(logPrefixDebug, color.YellowString("#%d - %s total.", thisDownloadID, time.Since(startTime)))
 		}
 
