@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -247,35 +246,6 @@ ParseLoop:
 	}
 
 	return links
-}
-
-func getFacebookVideoUrls(url string) (map[string]string, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	bodyContent, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	foundHD := string(regexFacebookVideoHD.Find(bodyContent))
-	if len(foundHD) > 0 {
-		foundHD = foundHD[8 : len(foundHD)-1]
-		foundHD = html.UnescapeString(foundHD)
-		return map[string]string{foundHD: ""}, nil
-	}
-
-	foundSD := string(regexFacebookVideoSD.Find(bodyContent))
-	if len(foundSD) > 0 {
-		foundSD = foundSD[8 : len(foundSD)-1]
-		foundSD = html.UnescapeString(foundSD)
-		return map[string]string{foundSD: ""}, nil
-	}
-
-	return nil, errors.New("Unable to find source url for Facebook video")
 }
 
 func getImgurSingleUrls(url string) (map[string]string, error) {

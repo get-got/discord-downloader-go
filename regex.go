@@ -4,16 +4,11 @@ import (
 	"regexp"
 )
 
-//TODO: I'm trash at regex syntax so the facebook expressions are very crude
 const (
 	regexpFilename                = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{2,5}$$`
 	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
 	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)$`
 	regexpUrlInstagram            = `^http(s?):\/\/(www\.)?instagram\.com\/p\/[^/]+\/(\?[^/]+)?$`
-	regexpUrlFacebookVideo        = `^http(s?):\/\/(www\.)?facebook\.com\/(.*?)\/videos\/(.*?)?$`
-	regexpUrlFacebookVideoWatch   = `^http(s?):\/\/(www\.)?facebook\.com\/watch\/(.*?)?$`
-	regexpFacebookVideoHD         = `(hd_src):\"(.+?)\"`
-	regexpFacebookVideoSD         = `(sd_src):\"(.+?)\"`
 	regexpUrlImgurSingle          = `^http(s?):\/\/(i\.)?imgur\.com\/[A-Za-z0-9]+(\.gifv)?$`
 	regexpUrlImgurAlbum           = `^http(s?):\/\/imgur\.com\/(a\/|gallery\/|r\/[^\/]+\/)[A-Za-z0-9]+(#[A-Za-z0-9]+)?$`
 	regexpUrlStreamable           = `^http(s?):\/\/(www\.)?streamable\.com\/([0-9a-z]+)$`
@@ -34,10 +29,6 @@ var (
 	regexUrlTwitter              *regexp.Regexp
 	regexUrlTwitterStatus        *regexp.Regexp
 	regexUrlInstagram            *regexp.Regexp
-	regexUrlFacebookVideo        *regexp.Regexp
-	regexUrlFacebookVideoWatch   *regexp.Regexp
-	regexFacebookVideoHD         *regexp.Regexp
-	regexFacebookVideoSD         *regexp.Regexp
 	regexUrlImgurSingle          *regexp.Regexp
 	regexUrlImgurAlbum           *regexp.Regexp
 	regexUrlStreamable           *regexp.Regexp
@@ -69,22 +60,6 @@ func compileRegex() error {
 		return err
 	}
 	regexUrlInstagram, err = regexp.Compile(regexpUrlInstagram)
-	if err != nil {
-		return err
-	}
-	regexUrlFacebookVideo, err = regexp.Compile(regexpUrlFacebookVideo)
-	if err != nil {
-		return err
-	}
-	regexUrlFacebookVideoWatch, err = regexp.Compile(regexpUrlFacebookVideoWatch)
-	if err != nil {
-		return err
-	}
-	regexFacebookVideoHD, err = regexp.Compile(regexpFacebookVideoHD)
-	if err != nil {
-		return err
-	}
-	regexFacebookVideoSD, err = regexp.Compile(regexpFacebookVideoSD)
 	if err != nil {
 		return err
 	}

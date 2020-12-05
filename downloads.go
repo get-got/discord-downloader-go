@@ -185,6 +185,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	/* TODO: Download Support...
 	- TikTok: Tried, once the connection is closed the cdn URL is rendered invalid
 	- Facebook Photos: Tried, it doesn't preload image data, it's loaded in after. Would have to keep connection open, find alternative way to grab, or use api.
+	- Facebook Videos: Previously supported but they split mp4 into separate audio and video streams
 	*/
 
 	if regexUrlTwitter.MatchString(inputURL) {
@@ -208,15 +209,6 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		links, err := getInstagramUrls(inputURL)
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.RedString("Instagram fetch failed for %s -- %s", inputURL, err))
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
-		}
-	}
-
-	if regexUrlFacebookVideo.MatchString(inputURL) || regexUrlFacebookVideoWatch.MatchString(inputURL) {
-		links, err := getFacebookVideoUrls(inputURL)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Facebook Video fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
