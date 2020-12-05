@@ -30,19 +30,19 @@ func presenceKeyReplacement(input string) string {
 			{"{{timeSavedShort}}", timeLastUpdated.Format("3:04pm")},
 			{"{{timeSavedShortTZ}}", timeLastUpdated.Format("3:04pm MST")},
 			{"{{timeSavedMid}}", timeLastUpdated.Format("3:04pm MST 1/2/2006")},
-			{"{{timeSavedLong}}", timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")},
+			{"{{timeSavedLong}}", timeLastUpdated.Format("3:04:05pm MST - January 2, 2006")},
 			{"{{timeSavedShort24}}", timeLastUpdated.Format("15:04")},
 			{"{{timeSavedShortTZ24}}", timeLastUpdated.Format("15:04 MST")},
 			{"{{timeSavedMid24}}", timeLastUpdated.Format("15:04 MST 2/1/2006")},
-			{"{{timeSavedLong24}}", timeLastUpdated.Format("15:04:05 MST - 1 January, 2006")},
+			{"{{timeSavedLong24}}", timeLastUpdated.Format("15:04:05 MST - 2 January, 2006")},
 			{"{{timeNowShort}}", timeNow.Format("3:04pm")},
 			{"{{timeNowShortTZ}}", timeNow.Format("3:04pm MST")},
 			{"{{timeNowMid}}", timeNow.Format("3:04pm MST 1/2/2006")},
-			{"{{timeNowLong}}", timeNow.Format("3:04:05pm MST - January 1, 2006")},
+			{"{{timeNowLong}}", timeNow.Format("3:04:05pm MST - January 2, 2006")},
 			{"{{timeNowShort24}}", timeNow.Format("15:04")},
 			{"{{timeNowShortTZ24}}", timeNow.Format("15:04 MST")},
 			{"{{timeNowMid24}}", timeNow.Format("15:04 MST 2/1/2006")},
-			{"{{timeNowLong24}}", timeNow.Format("15:04:05 MST - 1 January, 2006")},
+			{"{{timeNowLong24}}", timeNow.Format("15:04:05 MST - 2 January, 2006")},
 			{"{{uptime}}", durafmt.ParseShort(time.Since(startTime)).String()},
 		}
 		for _, key := range keys {
@@ -61,7 +61,7 @@ func updateDiscordPresence() {
 		count := formatNumber(countInt)
 		countShort := formatNumberShort(countInt)
 		timeShort := timeLastUpdated.Format("3:04pm")
-		timeLong := timeLastUpdated.Format("3:04:05pm MST - January 1, 2006")
+		timeLong := timeLastUpdated.Format("3:04:05pm MST - January 2, 2006")
 
 		// Defaults
 		status := fmt.Sprintf("%s - %s files", timeShort, countShort)

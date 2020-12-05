@@ -198,7 +198,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 					d, lastBeforeTime))
 				// Status update
 				if message != nil {
-					content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n_(%d) Requesting more messages, please wait..._",
+					content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n`(%d)` _Processing more messages, please wait..._",
 						durafmt.ParseShort(time.Since(historyStartTime)).String(),
 						formatNumber(d), formatNumber(i), batch)
 					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
@@ -247,7 +247,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 						break MessageRequestingLoop
 					}
 
-					if config.ScanOwnMessages || message.Author.ID != user.ID {
+					if message.Author.ID != user.ID || config.ScanOwnMessages {
 						for _, iAttachment := range message.Attachments {
 							if len(dbFindDownloadByURL(iAttachment.URL)) == 0 {
 								download := startDownload(

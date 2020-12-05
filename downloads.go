@@ -35,24 +35,23 @@ type download struct {
 
 type downloadStatus int
 
-//TODO: Make this not stupid
 const (
-	downloadSuccess downloadStatus = 0
+	downloadSuccess downloadStatus = iota
 
-	downloadSkippedDuplicate            downloadStatus = 1
-	downloadSkippedUnpermittedDomain    downloadStatus = 2
-	downloadSkippedUnpermittedType      downloadStatus = 3
-	downloadSkippedUnpermittedExtension downloadStatus = 4
-	downloadSkippedDetectedDuplicate    downloadStatus = 5
+	downloadSkippedDuplicate            downloadStatus = iota
+	downloadSkippedUnpermittedDomain    downloadStatus = iota
+	downloadSkippedUnpermittedType      downloadStatus = iota
+	downloadSkippedUnpermittedExtension downloadStatus = iota
+	downloadSkippedDetectedDuplicate    downloadStatus = iota
 
-	downloadFailed                    downloadStatus = 6
-	downloadFailedCreatingFolder      downloadStatus = 7
-	downloadFailedRequesting          downloadStatus = 8
-	downloadFailedDownloadingResponse downloadStatus = 9
-	downloadFailedReadResponse        downloadStatus = 10
-	downloadFailedCreatingSubfolder   downloadStatus = 11
-	downloadFailedWritingFile         downloadStatus = 12
-	downloadFailedWritingDatabase     downloadStatus = 13
+	downloadFailed                    downloadStatus = iota
+	downloadFailedCreatingFolder      downloadStatus = iota
+	downloadFailedRequesting          downloadStatus = iota
+	downloadFailedDownloadingResponse downloadStatus = iota
+	downloadFailedReadResponse        downloadStatus = iota
+	downloadFailedCreatingSubfolder   downloadStatus = iota
+	downloadFailedWritingFile         downloadStatus = iota
+	downloadFailedWritingDatabase     downloadStatus = iota
 )
 
 type downloadStatusStruct struct {
@@ -107,14 +106,6 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Download Failed - Error Writing to Database"
 	}
 	return "Unknown Error"
-}
-
-func isDiscordEmoji(link string) bool {
-	// always match discord emoji URLs, eg https://cdn.discordapp.com/emojis/340989430460317707.png
-	if strings.HasPrefix(link, "https://cdn.discordapp.com/emojis/") {
-		return true
-	}
-	return false
 }
 
 // Trim duplicate links in link list
@@ -332,7 +323,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		}
 	}
 
-	if isDiscordEmoji(inputURL) {
+	if strings.HasPrefix(inputURL, "https://cdn.discordapp.com/emojis/") {
 		log.Println(logPrefixFileSkip, color.GreenString("Skipped %s as it is a Discord emoji", inputURL))
 		return nil
 	}
@@ -687,14 +678,14 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
 			}
 		}
-		messageTime, err := message.Timestamp.Parse()
-		var newFilename string
-		if err == nil {
-			newFilename = messageTime.Format(filenameDateFormat) + filename
-		} else {
-			newFilename = time.Now().Format(filenameDateFormat) + filename
+		messageTime := time.Now()
+		if message.Timestamp != "" {
+			messageTimestamp, err := message.Timestamp.Parse()
+			if err == nil {
+				messageTime = messageTimestamp
+			}
 		}
-		completePath := path + subfolder + newFilename
+		completePath := path + subfolder + messageTime.Format(filenameDateFormat) + filename
 
 		// Check if exists
 		if _, err := os.Stat(completePath); err == nil {
@@ -780,11 +771,11 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 								}
 							}
 						} else {
-							reaction = "✅"
+							reaction = defaultReact
 						}
 					}
 				} else {
-					reaction = "✅"
+					reaction = defaultReact
 				}
 			} else {
 				reaction = *channelConfig.ReactWhenDownloadedEmoji

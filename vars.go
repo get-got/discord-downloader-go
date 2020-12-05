@@ -17,6 +17,8 @@ const (
 	imgStorePath = databasePath + "/imgStore"
 
 	imgurClientID = "08af502a9e70d65"
+
+	defaultReact = "✅"
 )
 
 /* Logging Colors:
