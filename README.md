@@ -289,7 +289,7 @@ All JSON settings follow camelCase format.
     * **Experimental** feature to filter out images that are too similar to other cached images.
     * _Caching of image data is stored via a database file; it will not read all pre-existing images._
 * _`[DEFAULTS]`_ filterDuplicateImagesThreshold `[float64]`
-    * _Default:_ `100.0`
+    * _Default:_ `0`
     * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`

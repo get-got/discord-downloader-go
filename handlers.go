@@ -302,7 +302,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 			contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n_Duration was %s_",
 				durafmt.ParseShort(time.Since(historyStartTime)).String(),
 				formatNumber(int64(d)), formatNumber(int64(i)),
-				commandingMessage.ChannelID, batch,
+				commandingChannelID, batch,
 				durafmt.Parse(time.Since(historyStartTime)).String(),
 			)
 			message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
@@ -324,7 +324,7 @@ func handleHistory(commandingMessage *discordgo.Message, commandingChannelID str
 
 		// Final log
 		log.Println(color.HiCyanString("[handleHistory] Finished cataloging history for %s (requested by %s): %d files...",
-			commandingMessage.ChannelID, getUserIdentifier(*commandingMessage.Author), d),
+			commandingChannelID, getUserIdentifier(*commandingMessage.Author), d),
 		)
 	}
 

@@ -66,7 +66,7 @@ func defaultConfiguration() configuration {
 		AllowSkipping:                  cdAllowSkipping,
 		ScanOwnMessages:                cdScanOwnMessages,
 		FilterDuplicateImages:          false,
-		FilterDuplicateImagesThreshold: 25,
+		FilterDuplicateImagesThreshold: 0,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
