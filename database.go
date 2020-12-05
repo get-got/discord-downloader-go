@@ -23,7 +23,7 @@ func trimDownloadedLinks(linkList map[string]string, channelID string) map[strin
 		}
 		if isMatched == false {
 			newList[link] = filename
-		} else {
+		} else if config.DebugOutput {
 			log.Println(logPrefixFileSkip, color.GreenString("Found URL has already been downloaded for this channel: %s", link))
 		}
 	}

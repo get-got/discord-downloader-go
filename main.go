@@ -475,6 +475,7 @@ func main() {
 
 	// Output Done
 	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
+	log.Println(color.RedString("Ctrl+C to exit..."))
 
 	// Tickers
 	if config.DebugOutput {
@@ -507,17 +508,19 @@ func main() {
 	for _, item := range autorunHistoryChannels {
 		if item.ChannelID != "" {
 			historyCommandActive[item.ChannelID] = ""
-			go handleHistory(nil, item.ChannelID)
+			handleHistory(nil, item.ChannelID)
 		} else if *item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
 				historyCommandActive[subchannel] = ""
-				go handleHistory(nil, subchannel)
+				handleHistory(nil, subchannel)
 			}
 		}
 	}
+	if len(autorunHistoryChannels) > 0 {
+		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed"))
+	}
 
 	// Infinite loop until interrupted
-	log.Println(color.RedString("Ctrl+C to exit..."))
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
 	<-loop
 

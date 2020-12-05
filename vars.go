@@ -36,10 +36,12 @@ const (
 
 // Log prefixes aren't to be used for constant messages where context is obvious.
 var (
-	logPrefixDebug       = color.HiYellowString("[DebugOutput]")
-	logPrefixDebugExtra  = color.YellowString("[DebugOutput]")
-	logPrefixHelper      = color.HiMagentaString("[Helper]")
-	logPrefixHelperExtra = color.MagentaString("[Helper]")
+	logPrefixDebug        = color.HiYellowString("[DebugOutput]")
+	logPrefixDebugExtra   = color.YellowString("[DebugOutput]")
+	logPrefixHelper       = color.HiMagentaString("[Helper]")
+	logPrefixHelperExtra  = color.MagentaString("[Helper]")
+	logPrefixHistory      = color.HiCyanString("[History]")
+	logPrefixHistoryExtra = color.CyanString("[History]")
 
 	logPrefixFileSkip = color.GreenString(">>> SKIPPING FILE:")
 )

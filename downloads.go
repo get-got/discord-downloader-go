@@ -378,7 +378,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 		}
 	}
 
-	if status.Status >= downloadFailed { // Any kind of failure
+	if status.Status >= downloadFailed && !historyCmd { // Any kind of failure
 		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s", inputURL))
 		if isChannelRegistered(message.ChannelID) {
 			channelConfig := getChannelConfig(message.ChannelID)
@@ -440,7 +440,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		request.Header.Add("Accept-Encoding", "identity")
 		response, err := client.Do(request)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while receiving response from \"%s\": %s", inputURL, err))
+			if !strings.Contains(err.Error(), "no such host") {
+				log.Println(logPrefixErrorHere, color.HiRedString("Error while receiving response from \"%s\": %s", inputURL, err))
+			}
 			return mDownloadStatus(downloadFailedDownloadingResponse, err)
 		}
 		defer response.Body.Close()
@@ -484,7 +486,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Check extension
 		extension := strings.ToLower(filepath.Ext(filename))
 		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
-			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
+			if !historyCmd {
+				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
+			}
 			return mDownloadStatus(downloadSkippedUnpermittedExtension)
 		}
 
@@ -516,7 +520,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			if err != nil {
 				log.Println(logPrefixErrorHere, color.RedString("Error while parsing url for DomainBlacklist:\t%s", err))
 			} else if stringInSlice(u.Hostname(), *channelConfig.DomainBlacklist) {
-				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", u.Hostname(), inputURL))
+				if !historyCmd {
+					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", u.Hostname(), inputURL))
+				}
 				return mDownloadStatus(downloadSkippedUnpermittedDomain)
 			}
 		}
@@ -527,7 +533,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			(*channelConfig.SaveAudioFiles && contentTypeFound == "audio") ||
 			(*channelConfig.SaveTextFiles && contentTypeFound == "text") ||
 			(*channelConfig.SaveOtherFiles && contentTypeFound == "application")) {
-			log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, inputURL))
+			if !historyCmd {
+				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, inputURL))
+			}
 			return mDownloadStatus(downloadSkippedUnpermittedType)
 		}
 
@@ -557,9 +565,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		sourceChannelName := message.ChannelID
 		sourceGuildName := "Direct Messages"
 		sourceChannel, err := bot.State.Channel(message.ChannelID)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", message.ChannelID, err))
-		}
 		if sourceChannel != nil && sourceChannel.Name != "" {
 			sourceChannelName = sourceChannel.Name
 			if sourceChannel.GuildID != "" {
@@ -691,9 +696,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 					}
 					i = i + 1
 				}
-				log.Println(color.GreenString("Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead", tmpPath, completePath))
+				if !historyCmd {
+					log.Println(color.GreenString("Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead", tmpPath, completePath))
+				}
 			} else {
-				log.Println(logPrefixFileSkip, color.GreenString("Matching filenames, possible duplicate..."))
+				if !historyCmd {
+					log.Println(logPrefixFileSkip, color.GreenString("Matching filenames, possible duplicate..."))
+				}
 				return mDownloadStatus(downloadSkippedDuplicate)
 			}
 		}
