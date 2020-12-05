@@ -555,24 +555,20 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 
 		// Names
 		sourceChannelName := message.ChannelID
-		sourceGuildName := "DM"
-		if message.GuildID != "" {
-			sourceChannel, err := bot.State.Channel(message.ChannelID)
-			if err != nil {
-				log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", message.ChannelID, err))
-			}
-			if sourceChannel != nil && sourceChannel.Name != "" {
-				sourceChannelName = sourceChannel.Name
-				if sourceChannel.GuildID != "" {
-					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-					if sourceGuild != nil && sourceGuild.Name != "" {
-						sourceGuildName = "\"" + sourceGuild.Name + "\""
-					}
-				} else {
-					sourceGuildName = "Group Message" //?
+		sourceGuildName := "Direct Messages"
+		sourceChannel, err := bot.State.Channel(message.ChannelID)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.HiRedString("Error fetching channel state for %s: %s", message.ChannelID, err))
+		}
+		if sourceChannel != nil && sourceChannel.Name != "" {
+			sourceChannelName = sourceChannel.Name
+			if sourceChannel.GuildID != "" {
+				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+				if sourceGuild != nil && sourceGuild.Name != "" {
+					sourceGuildName = "\"" + sourceGuild.Name + "\""
 				}
 			} else {
-				sourceGuildName = "Direct Message"
+				sourceGuildName = "Group Messages" //?
 			}
 		}
 
