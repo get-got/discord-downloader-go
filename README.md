@@ -330,6 +330,9 @@ All JSON settings follow camelCase format.
 * _`[OPTIONAL]`_ inflateCount `[int]`
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
+* _`[DEFAULTS]`_ numberFormatEuropean `[bool]`
+    * _Default:_ false
+    * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
 * **channels** `[array of key/value objects]`
     * _`[THIS OR BELOW]`_ **channel** `[string]`
         * Channel ID to monitor.

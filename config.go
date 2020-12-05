@@ -71,11 +71,12 @@ func defaultConfiguration() configuration {
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
 		// Appearance
-		PresenceEnabled:    cdPresenceEnabled,
-		PresenceStatus:     cdPresenceStatus,
-		PresenceType:       cdPresenceType,
-		FilenameDateFormat: "2006-01-02_15-04-05 ",
-		InflateCount:       &cdInflateCount,
+		PresenceEnabled:      cdPresenceEnabled,
+		PresenceStatus:       cdPresenceStatus,
+		PresenceType:         cdPresenceType,
+		FilenameDateFormat:   "2006-01-02_15-04-05 ",
+		InflateCount:         &cdInflateCount,
+		NumberFormatEuropean: false,
 	}
 }
 
@@ -104,6 +105,7 @@ type configuration struct {
 	FilenameDateFormat       string             `json:"filenameDateFormat,omitempty"`       // optional, defaults
 	EmbedColor               *string            `json:"embedColor,omitempty"`               // optional, defaults to role if undefined, then defaults random if no role color
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
+	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
 	// Channels
 	Channels []configurationChannel `json:"channels"` // required
 

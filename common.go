@@ -93,6 +93,11 @@ func isNumeric(s string) bool {
 }
 
 func formatNumber(n int64) string {
+	var numberSeparator byte = ','
+	if config.NumberFormatEuropean {
+		numberSeparator = '.'
+	}
+
 	in := strconv.FormatInt(n, 10)
 	out := make([]byte, len(in)+(len(in)-2+int(in[0]/'0'))/3)
 	if in[0] == '-' {
@@ -106,20 +111,29 @@ func formatNumber(n int64) string {
 		}
 		if k++; k == 3 {
 			j, k = j-1, 0
-			out[j] = ','
+			out[j] = numberSeparator
 		}
 	}
 }
 
 func formatNumberShort(x int64) string {
+	var numberSeparator string = ","
+	if config.NumberFormatEuropean {
+		numberSeparator = "."
+	}
+	var decimalSeparator string = "."
+	if config.NumberFormatEuropean {
+		decimalSeparator = ","
+	}
+
 	if x > 1000 {
 		formattedNumber := formatNumber(x)
-		splitSlice := strings.Split(formattedNumber, ",")
+		splitSlice := strings.Split(formattedNumber, numberSeparator)
 		suffixes := [4]string{"k", "m", "b", "t"}
 		partCount := len(splitSlice) - 1
 		var output string
 		if splitSlice[1][:1] != "0" {
-			output = fmt.Sprintf("%s.%s%s", splitSlice[0], splitSlice[1][:1], suffixes[partCount-1])
+			output = fmt.Sprintf("%s%s%s%s", splitSlice[0], decimalSeparator, splitSlice[1][:1], suffixes[partCount-1])
 		} else {
 			output = fmt.Sprintf("%s%s", splitSlice[0], suffixes[partCount-1])
 		}
