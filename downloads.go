@@ -443,7 +443,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		request.Header.Add("Accept-Encoding", "identity")
 		response, err := client.Do(request)
 		if err != nil {
-			if !strings.Contains(err.Error(), "no such host") {
+			if !strings.Contains(err.Error(), "no such host") && !strings.Contains(err.Error(), "connection refused") {
 				log.Println(logPrefixErrorHere, color.HiRedString("Error while receiving response from \"%s\": %s", inputURL, err))
 			}
 			return mDownloadStatus(downloadFailedDownloadingResponse, err)
