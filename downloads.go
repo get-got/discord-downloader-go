@@ -730,7 +730,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		writeTime := time.Now()
 
 		// Output
-		log.Println(logPrefix + color.HiGreenString("SAVED FILE (%s) sent in %s#%s to \"%s\"", contentTypeFound, sourceGuildName, sourceChannelName, completePath))
+		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceGuildName, sourceChannelName, completePath))
 
 		// Store in db
 		err = dbInsertDownload(&download{
