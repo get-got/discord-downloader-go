@@ -498,8 +498,8 @@ func main() {
 		if item.OverwriteAutorunHistory != nil {
 			if *item.OverwriteAutorunHistory {
 				autorunHistoryChannels = append(autorunHistoryChannels, item)
-				continue
 			}
+			continue
 		}
 		if config.AutorunHistory {
 			autorunHistoryChannels = append(autorunHistoryChannels, item)
