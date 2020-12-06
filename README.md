@@ -291,6 +291,7 @@ All JSON settings follow camelCase format.
     * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
 * _`[OPTIONAL]`_ autorunHistory `[bool]`
     * Autorun history for all registered channels in background upon launch.
+    * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`
 * _`[DEFAULTS]`_ downloadTimeout `[int]`
