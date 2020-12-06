@@ -201,7 +201,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlTwitterStatus.MatchString(inputURL) {
 		links, err := getTwitterStatusUrls(inputURL, channelID)
 		if err != nil {
-			if !strings.Contains(err.Error(), "suspended") {
+			if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
 				log.Println(logPrefixErrorHere, color.RedString("Twitter Status fetch failed for %s -- %s", inputURL, err))
 			}
 		} else if len(links) > 0 {
@@ -277,20 +277,22 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			return trimDownloadedLinks(links, channelID)
 		}
 	}
-	if regexUrlGoogleDrive.MatchString(inputURL) {
-		links, err := getGoogleDriveUrls(inputURL)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Google Drive Album URL for %s -- %s", inputURL, err))
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+	if config.Credentials.GoogleDriveCredentialsJSON != "" {
+		if regexUrlGoogleDrive.MatchString(inputURL) {
+			links, err := getGoogleDriveUrls(inputURL)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.RedString("Google Drive Album URL for %s -- %s", inputURL, err))
+			} else if len(links) > 0 {
+				return trimDownloadedLinks(links, channelID)
+			}
 		}
-	}
-	if regexUrlGoogleDriveFolder.MatchString(inputURL) {
-		links, err := getGoogleDriveFolderUrls(inputURL)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Google Drive Folder URL for %s -- %s", inputURL, err))
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+		if regexUrlGoogleDriveFolder.MatchString(inputURL) {
+			links, err := getGoogleDriveFolderUrls(inputURL)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.RedString("Google Drive Folder URL for %s -- %s", inputURL, err))
+			} else if len(links) > 0 {
+				return trimDownloadedLinks(links, channelID)
+			}
 		}
 	}
 	if regexUrlTistory.MatchString(inputURL) {

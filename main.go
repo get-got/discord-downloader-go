@@ -360,7 +360,6 @@ func main() {
 					} else { // Start Local
 						_, historyCommandIsSet := historyCommandActive[channel]
 						if !historyCommandIsSet || historyCommandActive[channel] == "" {
-							historyCommandActive[channel] = ""
 							handleHistory(ctx.Msg, channel)
 						} else {
 							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
@@ -507,11 +506,9 @@ func main() {
 	}
 	for _, item := range autorunHistoryChannels {
 		if item.ChannelID != "" {
-			historyCommandActive[item.ChannelID] = ""
 			handleHistory(nil, item.ChannelID)
 		} else if *item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
-				historyCommandActive[subchannel] = ""
 				handleHistory(nil, subchannel)
 			}
 		}
