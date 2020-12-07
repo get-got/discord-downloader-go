@@ -302,9 +302,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				}
 			} else {
 				// Error requesting messages
-				_, err = replyEmbed(message, "Command — History", fmt.Sprintf("Encountered an error requesting messages: %s", err.Error()))
-				if err != nil {
-					log.Println(logPrefixHistory, color.HiRedString("%s/%s: Failed to send error message:\t%s", subjectChannelID, commander, err))
+				if message != nil {
+					_, err = replyEmbed(message, "Command — History", fmt.Sprintf("Encountered an error requesting messages: %s", err.Error()))
+					if err != nil {
+						log.Println(logPrefixHistory, color.HiRedString("%s/%s: Failed to send error message:\t%s", subjectChannelID, commander, err))
+					}
 				}
 				log.Println(logPrefixHistory, color.HiRedString("%s/%s: Error requesting messages:\t%s", subjectChannelID, commander, err))
 				delete(historyCommandActive, subjectChannelID)
