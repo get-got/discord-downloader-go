@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -177,6 +178,9 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	var d int64 = 0
 	var batch int = 0
 
+	var beforeID string
+	var beforeTime time.Time
+
 	var err error
 	var message *discordgo.Message = nil
 	var commander string = "AUTORUN"
@@ -186,6 +190,17 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	if isChannelRegistered(subjectChannelID) {
 		channelConfig := getChannelConfig(subjectChannelID)
+
+		// Open Cache File?
+		if historyCachePath != "" {
+			filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
+			if f, err := ioutil.ReadFile(filepath); err == nil {
+				beforeID = string(f)
+				if commandingMessage != nil && config.DebugOutput {
+					log.Println(logPrefixDebug, color.YellowString("%s/%s: Found a cache file, picking up where we left off...", subjectChannelID, commander))
+				}
+			}
+		}
 
 		historyStartTime := time.Now()
 
@@ -199,18 +214,36 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		log.Println(logPrefixHistory, color.CyanString("%s/%s: Began checking history...",
 			subjectChannelID, commander))
 
-		lastBefore := ""
-		var lastBeforeTime time.Time
 	MessageRequestingLoop:
 		for true {
-			if lastBeforeTime != (time.Time{}) {
+			// Next 100
+			if beforeTime != (time.Time{}) {
 				batch++
+
+				// Write to cache file
+				if historyCachePath != "" {
+					err := os.MkdirAll(historyCachePath, 0777)
+					if err != nil {
+						log.Println(logPrefixHistory, color.HiRedString("Error while creating history cache folder \"%s\": %s", historyCachePath, err))
+					}
+
+					filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
+					f, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+					if err != nil {
+						log.Println(logPrefixHistory, color.RedString("Failed to open cache file:\t%s", err))
+					}
+					if _, err = f.WriteString(beforeID); err != nil {
+						log.Println(logPrefixHistory, color.RedString("Failed to write cache file:\t%s", err))
+					} else if commandingMessage != nil && config.DebugOutput {
+						log.Println(logPrefixDebug, color.YellowString("%s/%s: Wrote to cache file."))
+					}
+					f.Close()
+				}
+
+				// Status Update
 				if commandingMessage != nil {
 					log.Println(logPrefixHistory, color.CyanString("%s/%s: Requesting 100 more, %d downloaded, %d processed — Before %s",
-						subjectChannelID, commander, d, i, lastBeforeTime))
-				}
-				// Status update
-				if commandingMessage != nil {
+						subjectChannelID, commander, d, i, beforeTime))
 					if message != nil {
 						content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n`(%d)` _Processing more messages, please wait..._",
 							durafmt.ParseShort(time.Since(historyStartTime)).String(),
@@ -238,17 +271,21 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					updateDiscordPresence()
 				}
 			}
-			messages, err := bot.ChannelMessages(subjectChannelID, 100, lastBefore, "", "")
+			// Request More
+			messages, err := bot.ChannelMessages(subjectChannelID, 100, beforeID, "", "")
 			if err == nil {
+				// No More Messages
 				if len(messages) <= 0 {
 					delete(historyCommandActive, subjectChannelID)
 					break MessageRequestingLoop
 				}
-				lastBefore = messages[len(messages)-1].ID
-				lastBeforeTime, err = messages[len(messages)-1].Timestamp.Parse()
+				// Go Back
+				beforeID = messages[len(messages)-1].ID
+				beforeTime, err = messages[len(messages)-1].Timestamp.Parse()
 				if err != nil {
 					log.Println(logPrefixHistory, color.RedString("%s/%s: Failed to fetch message timestamp:\t%s", subjectChannelID, commander, err))
 				}
+				// Process Messages
 				for _, message := range messages {
 					fileTime := time.Now()
 					if message.Timestamp != "" {
@@ -347,6 +384,21 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		log.Println(logPrefixHistory, color.HiCyanString("%s/%s: Finished history, %s files",
 			subjectChannelID, commander, formatNumber(d)),
 		)
+
+		// Delete Cache File
+		if historyCachePath != "" {
+			filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
+			if _, err := os.Stat(filepath); err == nil {
+				err = os.Remove(filepath)
+				if err != nil {
+					log.Println(logPrefixHistory, color.HiRedString("%s/%s: Encountered error deleting cache file:\t%s",
+						subjectChannelID, commander, err))
+				} else if commandingMessage != nil && config.DebugOutput {
+					log.Println(logPrefixDebug, color.YellowString("%s/%s: Deleted cache file.", subjectChannelID, commander))
+				}
+			}
+		}
+
 	}
 
 	return int(d)

@@ -1,6 +1,10 @@
 package main
 
-import "github.com/fatih/color"
+import (
+	"os"
+
+	"github.com/fatih/color"
+)
 
 const (
 	projectName    = "discord-downloader-go"
@@ -12,9 +16,10 @@ const (
 	projectReleaseURL    = "https://github.com/get-got/discord-downloader-go/releases/latest"
 	projectReleaseApiURL = "https://api.github.com/repos/get-got/discord-downloader-go/releases/latest"
 
-	configPath   = "settings.json"
-	databasePath = "database"
-	imgStorePath = databasePath + "/imgStore"
+	configPath       = "settings.json"
+	databasePath     = "database"
+	historyCachePath = databasePath + string(os.PathSeparator) + ".history"
+	imgStorePath     = databasePath + string(os.PathSeparator) + "imgStore"
 
 	imgurClientID = "08af502a9e70d65"
 
