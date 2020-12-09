@@ -60,7 +60,9 @@ func main() {
 	// Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
-			log.Println(color.HiCyanString("Update available on %s\n", projectReleaseURL))
+			log.Println(color.HiCyanString("Update Available!", projectReleaseURL))
+			log.Println(color.CyanString("* " + projectReleaseURL))
+			log.Println(color.HiCyanString("See changelog for information..."))
 			time.Sleep(5 * time.Second)
 		}
 	}

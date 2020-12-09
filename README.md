@@ -25,9 +25,12 @@
         <b>DOWNLOAD LATEST RELEASE BUILDS</b>
     </a>
 </h2>
-
-### **This project is a fork of [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go)**
-#### For list of differences and why I made an independent project, [**see below**](#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this).
+<h3 align="center">
+    <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
+</h3>
+<h4 align="center">
+    For list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
+</h4>
 
 This is a Discord bot program to download files posted in specified Discord channels to local folders. It can fetch highest possible quality files from various sources (listed below), aside from downloading any file directly linked or attached. _See [Features](#Features) below for full list._
 
