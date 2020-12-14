@@ -222,7 +222,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 				// Write to cache file
 				if historyCachePath != "" {
-					err := os.MkdirAll(historyCachePath, 0777)
+					err := os.MkdirAll(historyCachePath, 0755)
 					if err != nil {
 						log.Println(logPrefixHistory, color.HiRedString("Error while creating history cache folder \"%s\": %s", historyCachePath, err))
 					}
