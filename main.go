@@ -196,6 +196,7 @@ func main() {
 	}
 
 	// Open Bot, Fetch User
+	bot.LogLevel = -1 // to ignore dumb wsapi error
 	err = bot.Open()
 	if err == nil {
 		user, err = bot.User("@me")
@@ -218,6 +219,7 @@ func main() {
 		log.Println(color.HiRedString("Discord login failed:\t%s", err))
 		properExit()
 	}
+	bot.LogLevel = 0 // reset
 
 	// Command Router
 	router := exrouter.New()
