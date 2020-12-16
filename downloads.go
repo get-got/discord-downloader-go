@@ -572,17 +572,24 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 
 		// Names
 		sourceChannelName := message.ChannelID
-		sourceGuildName := "Direct Messages"
+		sourceName := "UNKNOWN"
 		sourceChannel, err := bot.State.Channel(message.ChannelID)
-		if sourceChannel != nil && sourceChannel.Name != "" {
-			sourceChannelName = sourceChannel.Name
-			if sourceChannel.GuildID != "" {
-				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-				if sourceGuild != nil && sourceGuild.Name != "" {
-					sourceGuildName = "\"" + sourceGuild.Name + "\""
+		if sourceChannel != nil {
+			if sourceChannel.Name != "" {
+				sourceChannelName = sourceChannel.Name
+			}
+			switch sourceChannel.Type {
+			case discordgo.ChannelTypeGuildText:
+				if sourceChannel.GuildID != "" {
+					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+					if sourceGuild != nil && sourceGuild.Name != "" {
+						sourceName = "\"" + sourceGuild.Name + "\""
+					}
 				}
-			} else {
-				sourceGuildName = "Group Messages" //?
+			case discordgo.ChannelTypeDM:
+				sourceName = "Direct Messages"
+			case discordgo.ChannelTypeGroupDM:
+				sourceName = "Group Messages"
 			}
 		}
 
@@ -591,8 +598,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Subfolder Division - Server Nesting
 		if *channelConfig.DivideFoldersByServer {
 			subfolderSuffix := ""
-			if sourceGuildName != "" && sourceGuildName != "Unavailable" {
-				subfolderSuffix = sourceGuildName
+			if sourceName != "" && sourceName != "UNKNOWN" {
+				subfolderSuffix = sourceName
 				for _, key := range pathBlacklist {
 					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
 				}
@@ -736,7 +743,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		writeTime := time.Now()
 
 		// Output
-		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceGuildName, sourceChannelName, completePath))
+		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 
 		// Store in db
 		err = dbInsertDownload(&download{
