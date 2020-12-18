@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/AvraamMavridis/randomcolor"
 	"github.com/bwmarrin/discordgo"
+	"github.com/fatih/color"
 	"github.com/hako/durafmt"
 )
 
@@ -186,12 +188,17 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 
 // Shortcut function for quickly replying a styled embed with Title & Description
 func replyEmbed(m *discordgo.Message, title string, description string) (*discordgo.Message, error) {
-	return bot.ChannelMessageSendComplex(m.ChannelID,
-		&discordgo.MessageSend{
-			Content: m.Author.Mention(),
-			Embed:   buildEmbed(m.ChannelID, title, description),
-		},
-	)
+	if hasPerms(m.ChannelID, discordgo.PermissionSendMessages) {
+		return bot.ChannelMessageSendComplex(m.ChannelID,
+			&discordgo.MessageSend{
+				Content: m.Author.Mention(),
+				Embed:   buildEmbed(m.ChannelID, title, description),
+			},
+		)
+	} else {
+		log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
+		return nil, nil
+	}
 }
 
 // Checks if message author is a specified bot admin.
@@ -218,6 +225,15 @@ func isLocalAdmin(m *discordgo.Message) bool {
 	localManageMessages := localPerms&discordgo.PermissionManageMessages > 0
 
 	return botSelf || botAdmin || guildOwner || guildAdmin || localManageMessages
+}
+
+func hasPerms(channelID string, permission int) bool {
+	perms, err := bot.UserChannelPermissions(user.ID, channelID)
+	if err == nil {
+		return perms&permission == permission
+	}
+	log.Println(color.HiRedString("Failed to check permissions (%d) for %s:\t%s", permission, channelID, err))
+	return false
 }
 
 func getUserIdentifier(usr discordgo.User) string {

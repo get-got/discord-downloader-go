@@ -24,6 +24,13 @@ import (
 	"google.golang.org/api/drive/v3"
 )
 
+/* TODO:
+
+- Permission checks are very messy.
+	- Solution may be to wrap all editing and sending within functions that check permissions universally.
+
+*/
+
 var (
 	bot      *discordgo.Session
 	user     *discordgo.User
@@ -227,120 +234,136 @@ func main() {
 	// Commands: Utility
 	router.On("ping", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:ping]")
-		if isCommandableChannel(ctx.Msg) {
-			beforePong := time.Now()
-			pong, err := ctx.Reply("Pong!")
-			if err != nil {
-				log.Println(logPrefixHere, color.HiRedString("Error sending pong message:\t%s", err))
-			} else {
-				afterPong := time.Now()
-				latency := bot.HeartbeatLatency().Milliseconds()
-				roundtrip := afterPong.Sub(beforePong).Milliseconds()
-				mention := ctx.Msg.Author.Mention()
-				content := fmt.Sprintf("**Latency:** ``%dms`` — **Roundtrip:** ``%dms``",
-					latency,
-					roundtrip,
-				)
-				if pong != nil {
-					_, err := bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-						ID:      pong.ID,
-						Channel: pong.ChannelID,
-						Content: &mention,
-						Embed:   buildEmbed(ctx.Msg.ChannelID, "Command — Ping", content),
-					})
-					// Failed to edit pong
-					if err != nil {
-						log.Println(logPrefixHere, color.HiRedString("Failed to edit pong message, sending new one:\t%s", err))
-						_, err := replyEmbed(pong, "Command — Ping", content)
-						// Failed to send new pong
+		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+			if isCommandableChannel(ctx.Msg) {
+				beforePong := time.Now()
+				pong, err := ctx.Reply("Pong!")
+				if err != nil {
+					log.Println(logPrefixHere, color.HiRedString("Error sending pong message:\t%s", err))
+				} else {
+					afterPong := time.Now()
+					latency := bot.HeartbeatLatency().Milliseconds()
+					roundtrip := afterPong.Sub(beforePong).Milliseconds()
+					mention := ctx.Msg.Author.Mention()
+					content := fmt.Sprintf("**Latency:** ``%dms`` — **Roundtrip:** ``%dms``",
+						latency,
+						roundtrip,
+					)
+					if pong != nil {
+						_, err := bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+							ID:      pong.ID,
+							Channel: pong.ChannelID,
+							Content: &mention,
+							Embed:   buildEmbed(ctx.Msg.ChannelID, "Command — Ping", content),
+						})
+						// Failed to edit pong
 						if err != nil {
-							log.Println(logPrefixHere, color.HiRedString("Failed to send replacement pong message:\t%s", err))
+							log.Println(logPrefixHere, color.HiRedString("Failed to edit pong message, sending new one:\t%s", err))
+							_, err := replyEmbed(pong, "Command — Ping", content)
+							// Failed to send new pong
+							if err != nil {
+								log.Println(logPrefixHere, color.HiRedString("Failed to send replacement pong message:\t%s", err))
+							}
 						}
 					}
+					// Log
+					log.Println(logPrefixHere, color.HiCyanString("%s pinged bot - Latency: %dms, Roundtrip: %dms",
+						getUserIdentifier(*ctx.Msg.Author),
+						latency,
+						roundtrip),
+					)
 				}
-				// Log
-				log.Println(logPrefixHere, color.HiCyanString("%s pinged bot - Latency: %dms, Roundtrip: %dms",
-					getUserIdentifier(*ctx.Msg.Author),
-					latency,
-					roundtrip),
-				)
 			}
+		} else {
+			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 		}
 	}).Cat("Utility").Alias("test").Desc("Pings the bot")
 
 	router.On("help", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:help]")
-		if isCommandableChannel(ctx.Msg) {
-			text := ""
-			for _, cmd := range router.Routes {
-				if cmd.Category != "Admin" || isBotAdmin(ctx.Msg) {
-					text += fmt.Sprintf("• \"%s\" : %s",
-						cmd.Name,
-						cmd.Description,
-					)
-					if len(cmd.Aliases) > 0 {
-						text += fmt.Sprintf("\n— Aliases: \"%s\"", strings.Join(cmd.Aliases, "\", \""))
+		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+			if isCommandableChannel(ctx.Msg) {
+				text := ""
+				for _, cmd := range router.Routes {
+					if cmd.Category != "Admin" || isBotAdmin(ctx.Msg) {
+						text += fmt.Sprintf("• \"%s\" : %s",
+							cmd.Name,
+							cmd.Description,
+						)
+						if len(cmd.Aliases) > 0 {
+							text += fmt.Sprintf("\n— Aliases: \"%s\"", strings.Join(cmd.Aliases, "\", \""))
+						}
+						text += "\n\n"
 					}
-					text += "\n\n"
 				}
+				_, err := replyEmbed(ctx.Msg, "Command — Help", fmt.Sprintf("Use commands as ``\"%s<command> <arguments?>\"``\n```%s```\n%s", config.CommandPrefix, text, projectRepoURL))
+				// Failed to send
+				if err != nil {
+					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+				}
+				log.Println(logPrefixHere, color.HiCyanString("%s asked for help", getUserIdentifier(*ctx.Msg.Author)))
 			}
-			_, err := replyEmbed(ctx.Msg, "Command — Help", fmt.Sprintf("Use commands as ``\"%s<command> <arguments?>\"``\n```%s```\n%s", config.CommandPrefix, text, projectRepoURL))
-			// Failed to send
-			if err != nil {
-				log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
-			}
-			log.Println(logPrefixHere, color.HiCyanString("%s asked for help", getUserIdentifier(*ctx.Msg.Author)))
+		} else {
+			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 		}
 	}).Cat("Utility").Alias("commands").Desc("Outputs this help menu")
 
 	// Commands: Info
 	router.On("status", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:status]")
-		if isCommandableChannel(ctx.Msg) {
-			message := fmt.Sprintf("• **Uptime —** %s\n"+
-				"• **Started at —** %s\n"+
-				"• **Joined Servers —** %d\n"+
-				"• **Bound Channels —** %d\n"+
-				"• **Admin Channels —** %d\n"+
-				"• **Heartbeat Latency —** %dms",
-				durafmt.Parse(time.Since(startTime)).String(),
-				startTime.Format("03:04:05pm on Monday, January 2, 2006 (MST)"),
-				len(bot.State.Guilds),
-				getBoundChannelsCount(),
-				len(config.AdminChannels),
-				bot.HeartbeatLatency().Milliseconds(),
-			)
-			if isChannelRegistered(ctx.Msg.ChannelID) {
-				configJson, _ := json.MarshalIndent(getChannelConfig(ctx.Msg.ChannelID), "", "\t")
-				message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
+		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+			if isCommandableChannel(ctx.Msg) {
+				message := fmt.Sprintf("• **Uptime —** %s\n"+
+					"• **Started at —** %s\n"+
+					"• **Joined Servers —** %d\n"+
+					"• **Bound Channels —** %d\n"+
+					"• **Admin Channels —** %d\n"+
+					"• **Heartbeat Latency —** %dms",
+					durafmt.Parse(time.Since(startTime)).String(),
+					startTime.Format("03:04:05pm on Monday, January 2, 2006 (MST)"),
+					len(bot.State.Guilds),
+					getBoundChannelsCount(),
+					len(config.AdminChannels),
+					bot.HeartbeatLatency().Milliseconds(),
+				)
+				if isChannelRegistered(ctx.Msg.ChannelID) {
+					configJson, _ := json.MarshalIndent(getChannelConfig(ctx.Msg.ChannelID), "", "\t")
+					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
+				}
+				_, err := replyEmbed(ctx.Msg, "Command — Status", message)
+				// Failed to send
+				if err != nil {
+					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+				}
+				log.Println(logPrefixHere, color.HiCyanString("%s requested status report", getUserIdentifier(*ctx.Msg.Author)))
 			}
-			_, err := replyEmbed(ctx.Msg, "Command — Status", message)
-			// Failed to send
-			if err != nil {
-				log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
-			}
-			log.Println(logPrefixHere, color.HiCyanString("%s requested status report", getUserIdentifier(*ctx.Msg.Author)))
+		} else {
+			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 		}
 	}).Cat("Info").Alias("info").Desc("Displays info regarding the current status of the bot")
 
 	router.On("stats", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:stats]")
-		if isChannelRegistered(ctx.Msg.ChannelID) {
-			channelConfig := getChannelConfig(ctx.Msg.ChannelID)
-			if *channelConfig.AllowCommands {
-				content := fmt.Sprintf("• **Total Downloads —** %s\n"+
-					"• **Downloads in this Channel —** %s",
-					formatNumber(int64(dbDownloadCount())),
-					formatNumber(int64(dbDownloadCountByChannel(ctx.Msg.ChannelID))),
-				)
-				//TODO: Count in channel by users
-				_, err := replyEmbed(ctx.Msg, "Command — Stats", content)
-				// Failed to send
-				if err != nil {
-					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+			if isChannelRegistered(ctx.Msg.ChannelID) {
+				channelConfig := getChannelConfig(ctx.Msg.ChannelID)
+				if *channelConfig.AllowCommands {
+					content := fmt.Sprintf("• **Total Downloads —** %s\n"+
+						"• **Downloads in this Channel —** %s",
+						formatNumber(int64(dbDownloadCount())),
+						formatNumber(int64(dbDownloadCountByChannel(ctx.Msg.ChannelID))),
+					)
+					//TODO: Count in channel by users
+					_, err := replyEmbed(ctx.Msg, "Command — Stats", content)
+					// Failed to send
+					if err != nil {
+						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					}
+					log.Println(logPrefixHere, color.HiCyanString("%s requested stats", getUserIdentifier(*ctx.Msg.Author)))
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s requested stats", getUserIdentifier(*ctx.Msg.Author)))
 			}
+		} else {
+			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 		}
 	}).Cat("Info").Desc("Outputs statistics regarding this channel")
 
@@ -356,9 +379,13 @@ func main() {
 					// Cancel Local
 					if historyCommandActive[channel] == "downloading" && strings.ToLower(strings.TrimSpace(args)) == "cancel" {
 						historyCommandActive[channel] = "cancel"
-						_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
-						if err != nil {
-							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+						if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+							_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
+							if err != nil {
+								log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+							}
+						} else {
+							log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 						}
 						log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for %s", getUserIdentifier(*ctx.Msg.Author), channel))
 					} else { // Start Local
@@ -370,9 +397,13 @@ func main() {
 						}
 					}
 				} else {
-					_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingLocalAdminPerms)
-					if err != nil {
-						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+						_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingLocalAdminPerms)
+						if err != nil {
+							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+						}
+					} else {
+						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 					}
 					log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked local admin perms.", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
@@ -388,9 +419,13 @@ func main() {
 							channelValue = strings.TrimSpace(channelValue)
 							if historyCommandActive[channelValue] == "downloading" {
 								historyCommandActive[channelValue] = "cancel"
-								_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
-								if err != nil {
-									log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+								if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+									_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
+									if err != nil {
+										log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+									}
+								} else {
+									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 								}
 								log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for %s", getUserIdentifier(*ctx.Msg.Author), channelValue))
 							}
@@ -407,22 +442,34 @@ func main() {
 									log.Println(logPrefixHere, color.CyanString("Tried using history command but history is already running for %s...", channelValue))
 								}
 							} else {
-								replyEmbed(ctx.Msg, "Command — History", cmderrChannelNotRegistered)
+								if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+									replyEmbed(ctx.Msg, "Command — History", cmderrChannelNotRegistered)
+								} else {
+									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+								}
 								log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channelValue))
 							}
 						}
 					}
 				} else {
-					_, err := replyEmbed(ctx.Msg, "Command — History", "Please enter valid channel ID(s)...\n\n_Ex:_ ``<prefix>history <id1>,<id2>,<id3>``")
-					if err != nil {
-						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+						_, err := replyEmbed(ctx.Msg, "Command — History", "Please enter valid channel ID(s)...\n\n_Ex:_ ``<prefix>history <id1>,<id2>,<id3>``")
+						if err != nil {
+							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+						}
+					} else {
+						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 					}
 					log.Println(logPrefixHere, color.CyanString("%s tried to cache history but input no channels", getUserIdentifier(*ctx.Msg.Author)))
 				}
 			} else {
-				_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms)
-				if err != nil {
-					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms)
+					if err != nil {
+						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 				}
 				log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author), channel))
 			}
@@ -435,16 +482,24 @@ func main() {
 		logPrefixHere := color.CyanString("[dgrouter:exit]")
 		if isCommandableChannel(ctx.Msg) {
 			if isBotAdmin(ctx.Msg) {
-				_, err := replyEmbed(ctx.Msg, "Command — Exit", "Exiting...")
-				if err != nil {
-					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := replyEmbed(ctx.Msg, "Command — Exit", "Exiting...")
+					if err != nil {
+						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 				}
 				log.Println(logPrefixHere, color.HiCyanString("%s requested exit, goodbye...", getUserIdentifier(*ctx.Msg.Author)))
 				loop <- syscall.SIGINT
 			} else {
-				_, err := replyEmbed(ctx.Msg, "Command — Exit", cmderrLackingBotAdminPerms)
-				if err != nil {
-					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := replyEmbed(ctx.Msg, "Command — Exit", cmderrLackingBotAdminPerms)
+					if err != nil {
+						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 				}
 				log.Println(logPrefixHere, color.HiCyanString("%s tried to exit but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
 			}

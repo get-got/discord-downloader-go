@@ -394,13 +394,18 @@ func startDownload(inputURL string, filename string, path string, message *disco
 				if status.Error != nil {
 					content = content + fmt.Sprintf("\n```ERROR: %s```", status.Error)
 				}
-				_, err := bot.ChannelMessageSendComplex(message.ChannelID,
-					&discordgo.MessageSend{
-						Content: fmt.Sprintf("<@!%s>", message.Author.ID),
-						Embed:   buildEmbed(message.ChannelID, "Download Failure", content),
-					})
-				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", message.ChannelID, err))
+				// Failure Notice
+				if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := bot.ChannelMessageSendComplex(message.ChannelID,
+						&discordgo.MessageSend{
+							Content: fmt.Sprintf("<@!%s>", message.Author.ID),
+							Embed:   buildEmbed(message.ChannelID, "Download Failure", content),
+						})
+					if err != nil {
+						log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", message.ChannelID, err))
+					}
+				} else {
+					log.Println(logPrefixErrorHere, color.HiRedString(fmtBotSendPerm, message.ChannelID))
 				}
 			}
 		}
@@ -795,9 +800,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			} else {
 				reaction = *channelConfig.ReactWhenDownloadedEmoji
 			}
-			err = bot.MessageReactionAdd(message.ChannelID, message.ID, reaction)
-			if err != nil {
-				log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
+			if hasPerms(message.ChannelID, discordgo.PermissionAddReactions) {
+				err = bot.MessageReactionAdd(message.ChannelID, message.ID, reaction)
+				if err != nil {
+					log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
+				}
+			} else {
+				log.Println(logPrefixErrorHere, color.RedString(fmtBotSendPerm, message.ChannelID))
 			}
 			// React duration
 			if config.DebugOutput {

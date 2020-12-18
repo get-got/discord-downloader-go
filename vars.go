@@ -63,3 +63,7 @@ const (
 	cmderrChannelNotRegistered = "Specified channel is not registered in the bot settings."
 	cmderrHistoryCancelled     = "History cataloging was cancelled."
 )
+
+const (
+	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
+)

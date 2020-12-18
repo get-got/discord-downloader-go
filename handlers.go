@@ -172,6 +172,19 @@ var (
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string) int {
+	var commander string = "AUTORUN"
+	if commandingMessage != nil {
+		commander = getUserIdentifier(*commandingMessage.Author)
+	}
+
+	logPrefix := fmt.Sprintf("%s/%s: ", subjectChannelID, commander)
+
+	if !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
+		log.Println(logPrefixHistory, color.HiRedString(logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!",
+			subjectChannelID, commander))
+		return 0
+	}
+
 	historyCommandActive[subjectChannelID] = "downloading"
 
 	var i int64 = 0
@@ -183,10 +196,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	var err error
 	var message *discordgo.Message = nil
-	var commander string = "AUTORUN"
-	if commandingMessage != nil {
-		commander = getUserIdentifier(*commandingMessage.Author)
-	}
 
 	if isChannelRegistered(subjectChannelID) {
 		channelConfig := getChannelConfig(subjectChannelID)
@@ -197,7 +206,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			if f, err := ioutil.ReadFile(filepath); err == nil {
 				beforeID = string(f)
 				if commandingMessage != nil && config.DebugOutput {
-					log.Println(logPrefixDebug, color.YellowString("%s/%s: Found a cache file, picking up where we left off...", subjectChannelID, commander))
+					log.Println(logPrefixDebug, color.YellowString(logPrefix+"Found a cache file, picking up where we left off...", subjectChannelID, commander))
 				}
 			}
 		}
@@ -205,13 +214,16 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		historyStartTime := time.Now()
 
 		if commandingMessage != nil {
-			message, err = replyEmbed(commandingMessage, "Command — History", "Starting to save channel history, please wait...")
-			if err != nil {
-				log.Println(logPrefixHistory, color.HiRedString("%s/%s: Failed to send command embed message:\t%s",
-					subjectChannelID, commander, err))
+			if hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
+				message, err = replyEmbed(commandingMessage, "Command — History", "Starting to save channel history, please wait...")
+				if err != nil {
+					log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send command embed message:\t%s", err))
+				}
+			} else {
+				log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm, commandingMessage.ChannelID))
 			}
 		}
-		log.Println(logPrefixHistory, color.CyanString("%s/%s: Began checking history...",
+		log.Println(logPrefixHistory, color.CyanString(logPrefix+"Began checking history...",
 			subjectChannelID, commander))
 
 	MessageRequestingLoop:
@@ -235,34 +247,39 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if _, err = f.WriteString(beforeID); err != nil {
 						log.Println(logPrefixHistory, color.RedString("Failed to write cache file:\t%s", err))
 					} else if commandingMessage != nil && config.DebugOutput {
-						log.Println(logPrefixDebug, color.YellowString("%s/%s: Wrote to cache file."))
+						log.Println(logPrefixDebug, color.YellowString(logPrefix+"Wrote to cache file."))
 					}
 					f.Close()
 				}
 
 				// Status Update
 				if commandingMessage != nil {
-					log.Println(logPrefixHistory, color.CyanString("%s/%s: Requesting 100 more, %d downloaded, %d processed — Before %s",
+					log.Println(logPrefixHistory, color.CyanString(logPrefix+"Requesting 100 more, %d downloaded, %d processed — Before %s",
 						subjectChannelID, commander, d, i, beforeTime))
 					if message != nil {
-						content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n`(%d)` _Processing more messages, please wait..._",
-							durafmt.ParseShort(time.Since(historyStartTime)).String(),
-							formatNumber(d), formatNumber(i), batch)
-						message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-							ID:      message.ID,
-							Channel: message.ChannelID,
-							Embed:   buildEmbed(message.ChannelID, "Command — History", content),
-						})
-						// Edit failure
-						if err != nil {
-							log.Println(logPrefixHistory, color.RedString("%s/%s: Failed to edit status message, sending new one:\t%s", subjectChannelID, commander, err))
-							message, err = replyEmbed(message, "Command — History", content)
+						if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
+							content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n`(%d)` _Processing more messages, please wait..._",
+								durafmt.ParseShort(time.Since(historyStartTime)).String(),
+								formatNumber(d), formatNumber(i), batch)
+							message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+								ID:      message.ID,
+								Channel: message.ChannelID,
+								Embed:   buildEmbed(message.ChannelID, "Command — History", content),
+							})
+							// Edit failure
 							if err != nil {
-								log.Println(logPrefixHistory, color.HiRedString("%s/%s: Failed to send replacement status message:\t%s", subjectChannelID, commander, err))
+								log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", subjectChannelID, commander, err))
+								message, err = replyEmbed(message, "Command — History", content)
+								if err != nil {
+									log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", subjectChannelID, commander, err))
+								}
 							}
+						} else {
+							log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm,
+								subjectChannelID, commander, message.ChannelID))
 						}
 					} else {
-						log.Println(logPrefixHistory, color.HiRedString("%s/%s: Tried to edit status message but it doesn't exist.", subjectChannelID, commander))
+						log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Tried to edit status message but it doesn't exist.", subjectChannelID, commander))
 					}
 				}
 				// Update presence
@@ -283,7 +300,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				beforeID = messages[len(messages)-1].ID
 				beforeTime, err = messages[len(messages)-1].Timestamp.Parse()
 				if err != nil {
-					log.Println(logPrefixHistory, color.RedString("%s/%s: Failed to fetch message timestamp:\t%s", subjectChannelID, commander, err))
+					log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to fetch message timestamp:\t%s", subjectChannelID, commander, err))
 				}
 				// Process Messages
 				for _, message := range messages {
@@ -291,7 +308,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if message.Timestamp != "" {
 						fileTime, err = message.Timestamp.Parse()
 						if err != nil {
-							log.Println(logPrefixHistory, color.RedString("%s/%s: Failed to parse message timestamp:\t%s", subjectChannelID, commander, err))
+							log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to parse message timestamp:\t%s", subjectChannelID, commander, err))
 						}
 					}
 					if historyCommandActive[message.ChannelID] == "cancel" {
@@ -340,12 +357,17 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			} else {
 				// Error requesting messages
 				if message != nil {
-					_, err = replyEmbed(message, "Command — History", fmt.Sprintf("Encountered an error requesting messages: %s", err.Error()))
-					if err != nil {
-						log.Println(logPrefixHistory, color.HiRedString("%s/%s: Failed to send error message:\t%s", subjectChannelID, commander, err))
+					if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
+						_, err = replyEmbed(message, "Command — History", fmt.Sprintf("Encountered an error requesting messages: %s", err.Error()))
+						if err != nil {
+							log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send error message:\t%s", subjectChannelID, commander, err))
+						}
+					} else {
+						log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm,
+							subjectChannelID, commander, message.ChannelID))
 					}
 				}
-				log.Println(logPrefixHistory, color.HiRedString("%s/%s: Error requesting messages:\t%s", subjectChannelID, commander, err))
+				log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Error requesting messages:\t%s", subjectChannelID, commander, err))
 				delete(historyCommandActive, subjectChannelID)
 				break MessageRequestingLoop
 			}
@@ -354,34 +376,39 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		// Final status update
 		if commandingMessage != nil {
 			if message != nil {
-				contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n_Duration was %s_",
-					durafmt.ParseShort(time.Since(historyStartTime)).String(),
-					formatNumber(int64(d)), formatNumber(int64(i)),
-					subjectChannelID, batch,
-					durafmt.Parse(time.Since(historyStartTime)).String(),
-				)
-				message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-					ID:      message.ID,
-					Channel: message.ChannelID,
-					Embed:   buildEmbed(message.ChannelID, "Command — History", contentFinal),
-				})
-				// Edit failure
-				if err != nil {
-					log.Println(logPrefixHistory, color.RedString("%s/%s: Failed to edit status message, sending new one:\t%s",
-						subjectChannelID, commander, err))
-					message, err = replyEmbed(message, "Command — History", contentFinal)
+				if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
+					contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n_Duration was %s_",
+						durafmt.ParseShort(time.Since(historyStartTime)).String(),
+						formatNumber(int64(d)), formatNumber(int64(i)),
+						subjectChannelID, batch,
+						durafmt.Parse(time.Since(historyStartTime)).String(),
+					)
+					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+						ID:      message.ID,
+						Channel: message.ChannelID,
+						Embed:   buildEmbed(message.ChannelID, "Command — History", contentFinal),
+					})
+					// Edit failure
 					if err != nil {
-						log.Println(logPrefixHistory, color.HiRedString("%s/%s: Failed to send replacement status message:\t%s",
+						log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s",
 							subjectChannelID, commander, err))
+						message, err = replyEmbed(message, "Command — History", contentFinal)
+						if err != nil {
+							log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s",
+								subjectChannelID, commander, err))
+						}
 					}
+				} else {
+					log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm,
+						subjectChannelID, commander, message.ChannelID))
 				}
 			} else {
-				log.Println(logPrefixHistory, color.HiRedString("%s/%s: Tried to edit status message but it doesn't exist.", subjectChannelID, commander))
+				log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Tried to edit status message but it doesn't exist.", subjectChannelID, commander))
 			}
 		}
 
 		// Final log
-		log.Println(logPrefixHistory, color.HiCyanString("%s/%s: Finished history, %s files",
+		log.Println(logPrefixHistory, color.HiCyanString(logPrefix+"Finished history, %s files",
 			subjectChannelID, commander, formatNumber(d)),
 		)
 
@@ -391,10 +418,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			if _, err := os.Stat(filepath); err == nil {
 				err = os.Remove(filepath)
 				if err != nil {
-					log.Println(logPrefixHistory, color.HiRedString("%s/%s: Encountered error deleting cache file:\t%s",
+					log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Encountered error deleting cache file:\t%s",
 						subjectChannelID, commander, err))
 				} else if commandingMessage != nil && config.DebugOutput {
-					log.Println(logPrefixDebug, color.YellowString("%s/%s: Deleted cache file.", subjectChannelID, commander))
+					log.Println(logPrefixDebug, color.YellowString(logPrefix+"Deleted cache file.", subjectChannelID, commander))
 				}
 			}
 		}
