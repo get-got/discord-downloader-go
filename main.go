@@ -69,6 +69,8 @@ func main() {
 		}
 	}
 
+	//#region Database/Cache Initialization
+
 	// Database
 	log.Println(color.YellowString("Opening database..."))
 	myDB, err = db.OpenDB(databasePath)
@@ -116,6 +118,17 @@ func main() {
 				}
 			}
 		}
+	}
+
+	//#endregion
+
+	//#region Component Initialization
+
+	// Regex
+	err = compileRegex()
+	if err != nil {
+		log.Println(color.HiRedString("Error initializing Regex:\t%s", err))
+		return
 	}
 
 	// Twitter API
@@ -166,12 +179,9 @@ func main() {
 		}
 	}
 
-	// Regex
-	err = compileRegex()
-	if err != nil {
-		log.Println(color.HiRedString("Error initializing Regex:\t%s", err))
-		return
-	}
+	//#endregion
+
+	//#region Discord Initialization
 
 	// Bot Login
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
@@ -234,14 +244,16 @@ func main() {
 	timeLastUpdated = time.Now()
 	updateDiscordPresence()
 
-	// Output Startup Duration
+	//#endregion
+
+	// Output Done
 	if config.DebugOutput {
 		log.Println(logPrefixDebug, color.YellowString("Startup finished, took %s...", uptime()))
 	}
-
-	// Output Done
 	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
 	log.Println(color.RedString("CTRL+C to exit..."))
+
+	//#region Background Tasks
 
 	// Tickers
 	if config.DebugOutput {
@@ -284,6 +296,8 @@ func main() {
 		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed"))
 		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
+
+	//#endregion
 
 	// Infinite loop until interrupted
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)

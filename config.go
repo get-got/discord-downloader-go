@@ -12,7 +12,11 @@ import (
 	"github.com/fatih/color"
 )
 
-// `json:",omitempty"` is for settings not to be included into initially written settings file
+var (
+	config = defaultConfiguration()
+)
+
+//#region Credentials
 
 var (
 	placeholderToken    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
@@ -34,6 +38,10 @@ type configurationCredentials struct {
 	FlickrApiKey               string `json:"flickrApiKey,omitempty"`               // optional
 	GoogleDriveCredentialsJSON string `json:"googleDriveCredentialsJSON,omitempty"` // optional
 }
+
+//#endregion
+
+//#region Configuration
 
 // cd = Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
@@ -117,6 +125,10 @@ type configuration struct {
 
 	 */
 }
+
+//#endregion
+
+//#region Channels
 
 // ccd = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
@@ -207,6 +219,10 @@ type configurationChannel struct {
 	*/
 }
 
+//#endregion
+
+//#region Admin Channels
+
 type configurationAdminChannel struct {
 	// Required
 	ChannelID string `json:"channel"` // required
@@ -221,9 +237,7 @@ type configurationAdminChannel struct {
 	 */
 }
 
-var (
-	config = defaultConfiguration()
-)
+//#endregion
 
 func loadConfig() {
 	// Load settings
@@ -270,74 +284,6 @@ func loadConfig() {
 			log.Println(logPrefixHelper, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			properExit()
 		}
-	}
-}
-
-// These have to use the default variables since literal values and consts can't be set to the pointers
-func channelDefault(channel *configurationChannel) {
-	// Setup
-	if channel.Enabled == nil {
-		channel.Enabled = &ccdEnabled
-	}
-	if channel.AllowCommands == nil {
-		channel.AllowCommands = &ccdAllowCommands
-	}
-	if channel.ErrorMessages == nil {
-		channel.ErrorMessages = &ccdErrorMessages
-	}
-	if channel.ScanEdits == nil {
-		channel.ScanEdits = &ccdScanEdits
-	}
-	// Appearance
-	if channel.UpdatePresence == nil {
-		channel.UpdatePresence = &ccdUpdatePresence
-	}
-	if channel.ReactWhenDownloaded == nil {
-		channel.ReactWhenDownloaded = &ccdReactWhenDownloaded
-	}
-	if channel.ReactWhenDownloadedEmoji == nil {
-		channel.ReactWhenDownloadedEmoji = &ccdReactWhenDownloadedEmoji
-	}
-	if channel.BlacklistReactEmojis == nil {
-		channel.BlacklistReactEmojis = &ccdBlacklistReactEmojis
-	}
-	// Rules for Access
-	if channel.UsersAllWhitelisted == nil {
-		channel.UsersAllWhitelisted = &ccdUsersAllWhitelisted
-	}
-	// Rules for Saving
-	if channel.DivideFoldersByServer == nil {
-		channel.DivideFoldersByServer = &ccdDivideFoldersByServer
-	}
-	if channel.DivideFoldersByChannel == nil {
-		channel.DivideFoldersByChannel = &ccdDivideFoldersByChannel
-	}
-	if channel.DivideFoldersByUser == nil {
-		channel.DivideFoldersByUser = &ccdDivideFoldersByUser
-	}
-	if channel.DivideFoldersByType == nil {
-		channel.DivideFoldersByType = &ccdDivideFoldersByType
-	}
-	if channel.SaveImages == nil {
-		channel.SaveImages = &ccdSaveImages
-	}
-	if channel.SaveVideos == nil {
-		channel.SaveVideos = &ccdSaveVideos
-	}
-	if channel.SaveAudioFiles == nil {
-		channel.SaveAudioFiles = &ccdSaveAudioFiles
-	}
-	if channel.SaveTextFiles == nil {
-		channel.SaveTextFiles = &ccdSaveTextFiles
-	}
-	if channel.SaveOtherFiles == nil {
-		channel.SaveOtherFiles = &ccdSaveOtherFiles
-	}
-	if channel.SavePossibleDuplicates == nil {
-		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
-	}
-	if channel.ExtensionBlacklist == nil {
-		channel.ExtensionBlacklist = &ccdExtensionBlacklist
 	}
 }
 
@@ -483,6 +429,77 @@ func createConfig() {
 	}
 }
 
+func channelDefault(channel *configurationChannel) {
+	// These have to use the default variables since literal values and consts can't be set to the pointers
+
+	// Setup
+	if channel.Enabled == nil {
+		channel.Enabled = &ccdEnabled
+	}
+	if channel.AllowCommands == nil {
+		channel.AllowCommands = &ccdAllowCommands
+	}
+	if channel.ErrorMessages == nil {
+		channel.ErrorMessages = &ccdErrorMessages
+	}
+	if channel.ScanEdits == nil {
+		channel.ScanEdits = &ccdScanEdits
+	}
+	// Appearance
+	if channel.UpdatePresence == nil {
+		channel.UpdatePresence = &ccdUpdatePresence
+	}
+	if channel.ReactWhenDownloaded == nil {
+		channel.ReactWhenDownloaded = &ccdReactWhenDownloaded
+	}
+	if channel.ReactWhenDownloadedEmoji == nil {
+		channel.ReactWhenDownloadedEmoji = &ccdReactWhenDownloadedEmoji
+	}
+	if channel.BlacklistReactEmojis == nil {
+		channel.BlacklistReactEmojis = &ccdBlacklistReactEmojis
+	}
+	// Rules for Access
+	if channel.UsersAllWhitelisted == nil {
+		channel.UsersAllWhitelisted = &ccdUsersAllWhitelisted
+	}
+	// Rules for Saving
+	if channel.DivideFoldersByServer == nil {
+		channel.DivideFoldersByServer = &ccdDivideFoldersByServer
+	}
+	if channel.DivideFoldersByChannel == nil {
+		channel.DivideFoldersByChannel = &ccdDivideFoldersByChannel
+	}
+	if channel.DivideFoldersByUser == nil {
+		channel.DivideFoldersByUser = &ccdDivideFoldersByUser
+	}
+	if channel.DivideFoldersByType == nil {
+		channel.DivideFoldersByType = &ccdDivideFoldersByType
+	}
+	if channel.SaveImages == nil {
+		channel.SaveImages = &ccdSaveImages
+	}
+	if channel.SaveVideos == nil {
+		channel.SaveVideos = &ccdSaveVideos
+	}
+	if channel.SaveAudioFiles == nil {
+		channel.SaveAudioFiles = &ccdSaveAudioFiles
+	}
+	if channel.SaveTextFiles == nil {
+		channel.SaveTextFiles = &ccdSaveTextFiles
+	}
+	if channel.SaveOtherFiles == nil {
+		channel.SaveOtherFiles = &ccdSaveOtherFiles
+	}
+	if channel.SavePossibleDuplicates == nil {
+		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
+	}
+	if channel.ExtensionBlacklist == nil {
+		channel.ExtensionBlacklist = &ccdExtensionBlacklist
+	}
+}
+
+//#region Channel Checks/Returns
+
 func isChannelRegistered(ChannelID string) bool {
 	for _, item := range config.Channels {
 		// Single Channel Config
@@ -574,3 +591,5 @@ func getBoundChannels() []string {
 func getBoundChannelsCount() int {
 	return len(getBoundChannels())
 }
+
+//#endregion

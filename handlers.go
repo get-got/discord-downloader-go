@@ -28,6 +28,8 @@ var (
 	}
 )
 
+//#region Events
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	handleMessage(m.Message, false)
 }
@@ -166,6 +168,10 @@ func handleMessage(m *discordgo.Message, edited bool) {
 		}
 	}
 }
+
+//#endregion
+
+//#region History
 
 var (
 	historyCommandActive map[string]string
@@ -430,3 +436,5 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	return int(d)
 }
+
+//#endregion

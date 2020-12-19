@@ -20,39 +20,6 @@ var (
 	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
 )
 
-type githubReleaseApiObject struct {
-	TagName string `json:"tag_name"`
-}
-
-func isLatestGithubRelease() bool {
-	prefixHere := color.HiMagentaString("[Github Update Check]")
-
-	githubReleaseApiObject := new(githubReleaseApiObject)
-	err := getJSON(projectReleaseApiURL, githubReleaseApiObject)
-	if err != nil {
-		log.Println(prefixHere, color.RedString("Error fetching current Release JSON: %s", err))
-		return true
-	}
-
-	thisVersion, err := version.NewVersion(projectVersion)
-	if err != nil {
-		log.Println(prefixHere, color.RedString("Error parsing current version: %s", err))
-		return true
-	}
-
-	latestVersion, err := version.NewVersion(githubReleaseApiObject.TagName)
-	if err != nil {
-		log.Println(prefixHere, color.RedString("Error parsing latest version: %s", err))
-		return true
-	}
-
-	if latestVersion.GreaterThan(thisVersion) {
-		return false
-	}
-
-	return true
-}
-
 func uptime() time.Duration {
 	return time.Since(startTime)
 }
@@ -64,20 +31,6 @@ func properExit() {
 	os.Exit(1)
 }
 
-func filenameFromURL(inputURL string) string {
-	base := path.Base(inputURL)
-	parts := strings.Split(base, "?")
-	return parts[0]
-}
-
-func filepathExtension(filepath string) string {
-	if strings.Contains(filepath, "?") {
-		filepath = strings.Split(filepath, "?")[0]
-	}
-	filepath = path.Ext(filepath)
-	return filepath
-}
-
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if strings.ToLower(b) == strings.ToLower(a) {
@@ -87,10 +40,7 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func isNumeric(s string) bool {
-	_, err := strconv.ParseFloat(s, 64)
-	return err == nil
-}
+//#region Formatting
 
 func formatNumber(n int64) string {
 	var numberSeparator byte = ','
@@ -142,6 +92,43 @@ func formatNumberShort(x int64) string {
 	return fmt.Sprint(x)
 }
 
+//#endregion
+
+//#region Requests
+
+type githubReleaseApiObject struct {
+	TagName string `json:"tag_name"`
+}
+
+func isLatestGithubRelease() bool {
+	prefixHere := color.HiMagentaString("[Github Update Check]")
+
+	githubReleaseApiObject := new(githubReleaseApiObject)
+	err := getJSON(projectReleaseApiURL, githubReleaseApiObject)
+	if err != nil {
+		log.Println(prefixHere, color.RedString("Error fetching current Release JSON: %s", err))
+		return true
+	}
+
+	thisVersion, err := version.NewVersion(projectVersion)
+	if err != nil {
+		log.Println(prefixHere, color.RedString("Error parsing current version: %s", err))
+		return true
+	}
+
+	latestVersion, err := version.NewVersion(githubReleaseApiObject.TagName)
+	if err != nil {
+		log.Println(prefixHere, color.RedString("Error parsing latest version: %s", err))
+		return true
+	}
+
+	if latestVersion.GreaterThan(thisVersion) {
+		return false
+	}
+
+	return true
+}
+
 func getJSON(url string, target interface{}) error {
 	r, err := http.Get(url)
 	if err != nil {
@@ -168,3 +155,28 @@ func getJSONwithHeaders(url string, target interface{}, headers map[string]strin
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
+
+//#endregion
+
+//#region Parsing
+
+func filenameFromURL(inputURL string) string {
+	base := path.Base(inputURL)
+	parts := strings.Split(base, "?")
+	return parts[0]
+}
+
+func filepathExtension(filepath string) string {
+	if strings.Contains(filepath, "?") {
+		filepath = strings.Split(filepath, "?")[0]
+	}
+	filepath = path.Ext(filepath)
+	return filepath
+}
+
+func isNumeric(s string) bool {
+	_, err := strconv.ParseFloat(s, 64)
+	return err == nil
+}
+
+//#endregion

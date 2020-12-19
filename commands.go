@@ -17,7 +17,8 @@ import (
 func commandHandler() {
 	router := exrouter.New()
 
-	// Commands: Utility
+	//#region Utility Commands
+
 	router.On("ping", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:ping]")
 		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
@@ -94,7 +95,10 @@ func commandHandler() {
 		}
 	}).Cat("Utility").Alias("commands").Desc("Outputs this help menu")
 
-	// Commands: Info
+	//#endregion
+
+	//#region Info Commands
+
 	router.On("status", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:status]")
 		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
@@ -153,7 +157,10 @@ func commandHandler() {
 		}
 	}).Cat("Info").Desc("Outputs statistics regarding this channel")
 
-	// Commands: Admin
+	//#endregion
+
+	//#region Admin Commands
+
 	router.On("history", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:history]")
 		channel := ctx.Msg.ChannelID
@@ -292,11 +299,7 @@ func commandHandler() {
 		}
 	}).Alias("reload", "kill").Cat("Admin").Desc("Kills the bot")
 
-	//TODO: add_channel command
-	//TODO: edit_channel command
-	//TODO: delete_channel command
-	//NOTE: The problem with these is opeaning, modifying, then saving the JSON without adding unwanted junk.
-	// Also the hoops the user will have to jump through to edit these via commands.
+	//#endregion
 
 	// Handler for Command Router
 	bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {

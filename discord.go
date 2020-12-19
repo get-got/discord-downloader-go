@@ -13,6 +13,8 @@ import (
 	"github.com/hako/durafmt"
 )
 
+//#region Presence
+
 func presenceKeyReplacement(input string) string {
 	//TODO: Case-insensitive key replacement.
 	if strings.Contains(input, "{{") && strings.Contains(input, "}}") {
@@ -109,6 +111,10 @@ func updateDiscordPresence() {
 	}
 }
 
+//#endregion
+
+//#region Embeds
+
 func getEmbedColor(channelID string) int {
 	var color *string
 	// Assign Defined Color
@@ -201,6 +207,10 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 	}
 }
 
+//#endregion
+
+//#region Permissions
+
 // Checks if message author is a specified bot admin.
 func isBotAdmin(m *discordgo.Message) bool {
 	return m.Author.ID == user.ID || stringInSlice(m.Author.ID, config.Admins)
@@ -236,6 +246,10 @@ func hasPerms(channelID string, permission int) bool {
 	return false
 }
 
+//#endregion
+
+//#region Labeling
+
 func getUserIdentifier(usr discordgo.User) string {
 	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
@@ -257,6 +271,8 @@ func getChannelName(channelID string) string {
 	}
 	return sourceChannelName
 }
+
+//#endregion
 
 // For command case-insensitivity
 func messageToLower(message *discordgo.Message) *discordgo.Message {

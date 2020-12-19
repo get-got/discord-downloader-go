@@ -800,13 +800,14 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			} else {
 				reaction = *channelConfig.ReactWhenDownloadedEmoji
 			}
+			// Add Reaction
 			if hasPerms(message.ChannelID, discordgo.PermissionAddReactions) {
 				err = bot.MessageReactionAdd(message.ChannelID, message.ID, reaction)
 				if err != nil {
 					log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
 				}
 			} else {
-				log.Println(logPrefixErrorHere, color.RedString(fmtBotSendPerm, message.ChannelID))
+				log.Println(logPrefixErrorHere, color.RedString("Bot does not have permission to add reactions in %s", message.ChannelID))
 			}
 			// React duration
 			if config.DebugOutput {

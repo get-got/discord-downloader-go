@@ -22,6 +22,8 @@ var (
 	twitterClient *anaconda.TwitterApi
 )
 
+//#region Twitter
+
 func getTwitterUrls(inputURL string) (map[string]string, error) {
 	parts := strings.Split(inputURL, ":")
 	if len(parts) < 2 {
@@ -74,6 +76,10 @@ func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string,
 
 	return links, nil
 }
+
+//#endregion
+
+//#region Instagram
 
 func getInstagramUrls(url string) (map[string]string, error) {
 	username, shortcode := getInstagramInfo(url)
@@ -248,6 +254,10 @@ ParseLoop:
 	return links
 }
 
+//#endregion
+
+//#region Imgur
+
 func getImgurSingleUrls(url string) (map[string]string, error) {
 	url = regexp.MustCompile(`(r\/[^\/]+\/)`).ReplaceAllString(url, "") // remove subreddit url
 	url = strings.Replace(url, "imgur.com/", "imgur.com/download/", -1)
@@ -279,6 +289,10 @@ func getImgurAlbumUrls(url string) (map[string]string, error) {
 	log.Printf("Found imgur album with %d images (url: %s)\n", len(links), url)
 	return links, nil
 }
+
+//#endregion
+
+//#region Streamable
 
 type streamableObject struct {
 	Status int    `json:"status"`
@@ -321,6 +335,10 @@ func getStreamableUrls(url string) (map[string]string, error) {
 	return links, nil
 }
 
+//#endregion
+
+//#region Gfycat
+
 type gfycatObject struct {
 	GfyItem struct {
 		Mp4URL string `json:"mp4Url"`
@@ -341,6 +359,10 @@ func getGfycatUrls(url string) (map[string]string, error) {
 	}
 	return map[string]string{gfycatUrl: ""}, nil
 }
+
+//#endregion
+
+//#region Flickr
 
 type flickrPhotoSizeObject struct {
 	Label  string `json:"label"`
@@ -452,6 +474,10 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 	return nil, errors.New("Encountered invalid URL while trying to get long URL from short Flickr Album URL")
 }
 
+//#endregion
+
+//#region Google Drive
+
 func getGoogleDriveUrls(url string) (map[string]string, error) {
 	parts := strings.Split(url, "/")
 	if len(parts) != 7 {
@@ -501,6 +527,10 @@ func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
 	}
 	return links, nil
 }
+
+//#endregion
+
+//#region Tistory
 
 // getTistoryUrls downloads tistory URLs
 // http://t1.daumcdn.net/cfile/tistory/[…] => http://t1.daumcdn.net/cfile/tistory/[…]
@@ -600,3 +630,5 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 	}
 	return links, nil
 }
+
+//#endregion

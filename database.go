@@ -72,6 +72,8 @@ func dbFindDownloadByURL(inputURL string) []*download {
 	return downloadedImages
 }
 
+//#region Statistics
+
 func dbDownloadCount() int {
 	i := 0
 	myDB.Use("Downloads").ForEachDoc(func(id int, docContent []byte) (willMoveOn bool) {
@@ -106,3 +108,5 @@ func dbDownloadCountByUser(userID string) int {
 	}
 	return len(downloadedImages)
 }
+
+//#endregion
