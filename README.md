@@ -46,7 +46,9 @@ While this project works for user logins, I do not reccomend it as you risk acco
 ## Getting Started (Basic Setup)
 Obviously, download the bot program (or compile yourself with Go) and put it in a folder of your choice.
 
-You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file). [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp) [Feeling lazy or having issues? Try this JSON Formatter/Validator.](https://jsonformatter.curiousconcept.com/)
+You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
+- [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
+- [Feeling lazy or having issues? Try this JSON Formatter/Validator.](https://jsonformatter.curiousconcept.com/)
 
 ### Credentials...
 * If using a **Bot User,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
