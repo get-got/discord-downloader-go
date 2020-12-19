@@ -46,12 +46,12 @@ While this project works for user logins, I do not reccomend it as you risk acco
 ## Getting Started (Basic Setup)
 Obviously, download the bot program (or compile yourself with Go) and put it in a folder of your choice.
 
-You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file). Ensure you follow proper JSON syntax to avoid any unexpected errors.
+You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file). [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp) [Feeling lazy or having issues? Try this JSON Formatter/Validator.](https://jsonformatter.curiousconcept.com/)
 
 ### Credentials...
 * If using a **Bot User,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
 * If using a **Real User (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
-* If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
+* If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`. **You must also set `userBot` within the `credentials` section of the settings.json to `true`.**
 
 ### Bot Permissions in Discord...
 * In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
