@@ -36,6 +36,13 @@ This is a Discord bot program to download files posted in specified Discord chan
 
 [**Need help? Have suggestions? Join the Discord server!**](https://discord.com/invite/6Z6FJZVaDV)
 
+### Table of Contents
+* [Getting Started (Basic Setup)](#getting-started-basic-setup)
+* [Features](#features)
+* [History Cataloging Guide](#history-cataloging-guide)
+* [Settings / Configuration Guide](#settings--configuration-guide)
+* [List of Settings](#list-of-settings)
+
 ## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
