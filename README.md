@@ -36,8 +36,10 @@ This is a Discord bot program to download files posted in specified Discord chan
 
 [**Need help? Have suggestions? Join the Discord server!**](https://discord.com/invite/6Z6FJZVaDV)
 
-## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots)
+## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
+
+While this project works for user logins, I do not reccomend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
@@ -419,33 +421,35 @@ All JSON settings follow camelCase format.
 
 ### Presence Placeholders
 _For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`_
-* `{{dgVersion}}`: discord-go version
-* `{{ddgVersion}}`: Project version
-* `{{apiVersion}}`: Discord API version
-* `{{countNoCommas}}`: Raw total count of downloads (without comma formatting)
-* `{{count}}`: Raw total count of downloads
-* `{{countShort}}`: Shortened total count of downloads
-* `{{numGuilds}}`: Number of guilds bot is a member of
-* `{{numChannels}}`: Number of bound channels
-* `{{numAdminChannels}}`: Number of admin channels
-* `{{numAdmins}}`: Number of designated admins
-* `{{timeSavedShort}}`: Last save time formatted as `3:04pm`
-* `{{timeSavedShortTZ}}`: Last save time formatted as `3:04pm MST`
-* `{{timeSavedMid}}`: Last save time formatted as `3:04pm MST 1/2/2006`
-* `{{timeSavedLong}}`: Last save time formatted as `3:04:05pm MST - January 2, 2006`
-* `{{timeSavedShort24}}`: Last save time formatted as `15:04`
-* `{{timeSavedShortTZ24}}`: Last save time formatted as `15:04 MST`
-* `{{timeSavedMid24}}`: Last save time formatted as `15:04 MST 2/1/2006`
-* `{{timeSavedLong24}}`: Last save time formatted as `15:04:05 MST - 2 January, 2006`
-* `{{timeNowShort}}`: Current time formatted as `3:04pm`
-* `{{timeNowShortTZ}}`: Current time formatted as `3:04pm MST`
-* `{{timeNowMid}}`: Current time formatted as `3:04pm MST 1/2/2006`
-* `{{timeNowLong}}`: Current time formatted as `3:04:05pm MST - January 2, 2006`
-* `{{timeNowShort24}}`: Current time formatted as `15:04`
-* `{{timeNowShortTZ24}}`: Current time formatted as `15:04 MST`
-* `{{timeNowMid24}}`: Current time formatted as `15:04 MST 2/1/2006`
-* `{{timeNowLong24}}`: Current time formatted as `15:04:05 MST - 2 January, 2006`
-* `{{uptime}}`: Shortened duration of bot uptime
+Key | Description
+--- | ---
+`{{dgVersion}}`             | discord-go version
+`{{ddgVersion}}`            | Project version
+`{{apiVersion}}`            | Discord API version
+`{{countNoCommas}}`         | Raw total count of downloads (without comma formatting)
+`{{count}}`                 | Raw total count of downloads
+`{{countShort}}`            | Shortened total count of downloads
+`{{numGuilds}}`             | Number of guilds bot is a member of
+`{{numChannels}}`           | Number of bound channels
+`{{numAdminChannels}}`      | Number of admin channels
+`{{numAdmins}}`             | Number of designated admins
+`{{timeSavedShort}}`        | Last save time formatted as `3:04pm`
+`{{timeSavedShortTZ}}`      | Last save time formatted as `3:04pm MST`
+`{{timeSavedMid}}`          | Last save time formatted as `3:04pm MST 1/2/2006`
+`{{timeSavedLong}}`         | Last save time formatted as `3:04:05pm MST - January 2, 2006`
+`{{timeSavedShort24}}`      | Last save time formatted as `15:04`
+`{{timeSavedShortTZ24}}`    | Last save time formatted as `15:04 MST`
+`{{timeSavedMid24}}`        | Last save time formatted as `15:04 MST 2/1/2006`
+`{{timeSavedLong24}}`       | Last save time formatted as `15:04:05 MST - 2 January, 2006`
+`{{timeNowShort}}`          | Current time formatted as `3:04pm`
+`{{timeNowShortTZ}}`        | Current time formatted as `3:04pm MST`
+`{{timeNowMid}}`            | Current time formatted as `3:04pm MST 1/2/2006`
+`{{timeNowLong}}`           | Current time formatted as `3:04:05pm MST - January 2, 2006`
+`{{timeNowShort24}}`        | Current time formatted as `15:04`
+`{{timeNowShortTZ24}}`      | Current time formatted as `15:04 MST`
+`{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
+`{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
+`{{uptime}}`                | Shortened duration of bot uptime
 
 ## Info for Developers
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
