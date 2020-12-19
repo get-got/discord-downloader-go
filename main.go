@@ -14,6 +14,7 @@ import (
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
+	"github.com/fsnotify/fsnotify"
 	"github.com/rivo/duplo"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
@@ -38,6 +39,8 @@ var (
 	startTime        time.Time
 	timeLastUpdated  time.Time
 	cachedDownloadID int
+
+	configReloadLastTime time.Time
 )
 
 func init() {
@@ -297,6 +300,46 @@ func main() {
 		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed"))
 		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
+
+	// Settings Watcher
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatal(err)
+		log.Println(color.HiRedString("[Watchers] Error creating NewWatcher:\t%s", err))
+	}
+	defer watcher.Close()
+
+	err = watcher.Add(configPath)
+	if err != nil {
+		log.Println(color.HiRedString("[Watchers] Error adding watcher for settings:\t%s", err))
+	}
+
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				if event.Op&fsnotify.Write == fsnotify.Write {
+					// It double-fires the event without time check, might depend on OS but this works anyways
+					if time.Now().Sub(configReloadLastTime).Milliseconds() > 1 {
+						log.Println(color.YellowString("Settings file has been changed! Reloading settings from \"%s\"...", configPath))
+						loadConfig()
+						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s)", getBoundChannelsCount()))
+
+						updateDiscordPresence()
+					}
+					configReloadLastTime = time.Now()
+				}
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.Println(color.HiRedString("[Watchers] Error:\t%s", err))
+			}
+		}
+	}()
 
 	//#endregion
 
