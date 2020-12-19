@@ -304,16 +304,13 @@ func main() {
 	// Settings Watcher
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
 		log.Println(color.HiRedString("[Watchers] Error creating NewWatcher:\t%s", err))
 	}
 	defer watcher.Close()
-
 	err = watcher.Add(configPath)
 	if err != nil {
 		log.Println(color.HiRedString("[Watchers] Error adding watcher for settings:\t%s", err))
 	}
-
 	go func() {
 		for {
 			select {
@@ -324,7 +321,7 @@ func main() {
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					// It double-fires the event without time check, might depend on OS but this works anyways
 					if time.Now().Sub(configReloadLastTime).Milliseconds() > 1 {
-						log.Println(color.YellowString("Settings file has been changed! Reloading settings from \"%s\"...", configPath))
+						log.Println(color.YellowString("Detected changes in \"%s\", reloading settings...", configPath))
 						loadConfig()
 						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s)", getBoundChannelsCount()))
 
