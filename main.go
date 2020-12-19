@@ -207,31 +207,32 @@ func main() {
 		}
 	}
 
-	// Open Bot, Fetch User
+	// Connect Bot
 	bot.LogLevel = -1 // to ignore dumb wsapi error
 	err = bot.Open()
-	if err == nil {
-		user, err = bot.User("@me")
-		if err != nil {
-			log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
-		} else {
-			log.Println(color.HiGreenString("Discord logged into %s", getUserIdentifier(*user)))
-			if user.Bot {
-				log.Println(logPrefixHelper, color.MagentaString("This is a Bot User..."))
-				log.Println(logPrefixHelper, color.MagentaString("- Status presence details are limited."))
-				log.Println(logPrefixHelper, color.MagentaString("- Server access is restricted to servers you have permission to add the bot to."))
-			} else {
-				log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)..."))
-				log.Println(logPrefixHelper, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
-				log.Println(logPrefixHelper, color.MagentaString("- See GitHub page for link to Discord's official statement."))
-				log.Println(logPrefixHelper, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
-			}
-		}
-	} else {
+	if err != nil {
 		log.Println(color.HiRedString("Discord login failed:\t%s", err))
 		properExit()
 	}
 	bot.LogLevel = 0 // reset
+
+	// Fetch Bot's User Info
+	user, err = bot.User("@me")
+	if err != nil {
+		log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
+	} else {
+		log.Println(color.HiGreenString("Discord logged into %s", getUserIdentifier(*user)))
+		if user.Bot {
+			log.Println(logPrefixHelper, color.MagentaString("This is a Bot User"))
+			log.Println(logPrefixHelper, color.MagentaString("- Status presence details are limited."))
+			log.Println(logPrefixHelper, color.MagentaString("- Server access is restricted to servers you have permission to add the bot to."))
+		} else {
+			log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)"))
+			log.Println(logPrefixHelper, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
+			log.Println(logPrefixHelper, color.MagentaString("- See GitHub page for link to Discord's official statement."))
+			log.Println(logPrefixHelper, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
+		}
+	}
 
 	// Commands
 	commandHandler()
