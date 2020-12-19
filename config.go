@@ -241,20 +241,20 @@ type configurationAdminChannel struct {
 
 func loadConfig() {
 	// Load settings
-	file, err := os.Open(configPath)
-	defer file.Close()
+	configContent, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		log.Println(color.HiRedString("Failed to open settings file...\t%s", err))
 		createConfig()
 		properExit()
 	} else {
-		decoder := json.NewDecoder(file)
-		err := decoder.Decode(&config)
+		newConfig := defaultConfiguration()
+		err = json.Unmarshal(configContent, &newConfig)
 		if err != nil {
-			log.Println(color.HiRedString("Settings failed to decode...\t%s", err))
+			log.Println(color.HiRedString("Failed to parse settings file...\t%s", err))
 			log.Println(logPrefixHelper, color.MagentaString("Please ensure you're following proper JSON format syntax."))
-			properExit()
+			return
 		}
+		config = newConfig
 
 		// Channel Config Defaults
 		// this is dumb but don't see a better way to initialize defaults
