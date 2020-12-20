@@ -178,6 +178,7 @@ var (
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string) int {
+	// Identifier
 	var commander string = "AUTORUN"
 	if commandingMessage != nil {
 		commander = getUserIdentifier(*commandingMessage.Author)
@@ -185,12 +186,14 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	logPrefix := fmt.Sprintf("%s/%s: ", subjectChannelID, commander)
 
+	// Check Read History perms
 	if !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
 		log.Println(logPrefixHistory, color.HiRedString(logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!",
 			subjectChannelID, commander))
 		return 0
 	}
 
+	// Mark active
 	historyCommandActive[subjectChannelID] = "downloading"
 
 	var i int64 = 0
@@ -219,6 +222,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 		historyStartTime := time.Now()
 
+		// Initial Status Message
 		if commandingMessage != nil {
 			if hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
 				message, err = replyEmbed(commandingMessage, "Command — History", "Starting to save channel history, please wait...")
@@ -272,7 +276,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 								Channel: message.ChannelID,
 								Embed:   buildEmbed(message.ChannelID, "Command — History", content),
 							})
-							// Edit failure
+							// Edit failure, so send replacement status
 							if err != nil {
 								log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", subjectChannelID, commander, err))
 								message, err = replyEmbed(message, "Command — History", content)
@@ -294,6 +298,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					updateDiscordPresence()
 				}
 			}
+
 			// Request More
 			messages, err := bot.ChannelMessages(subjectChannelID, 100, beforeID, "", "")
 			if err == nil {
@@ -317,11 +322,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to parse message timestamp:\t%s", subjectChannelID, commander, err))
 						}
 					}
+					// Ordered to Cancel
 					if historyCommandActive[message.ChannelID] == "cancel" {
 						delete(historyCommandActive, message.ChannelID)
 						break MessageRequestingLoop
 					}
 
+					// Process
 					if message.Author.ID != user.ID || config.ScanOwnMessages {
 						for _, iAttachment := range message.Attachments {
 							if len(dbFindDownloadByURL(iAttachment.URL)) == 0 {
