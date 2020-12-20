@@ -321,6 +321,7 @@ func main() {
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					// It double-fires the event without time check, might depend on OS but this works anyways
 					if time.Now().Sub(configReloadLastTime).Milliseconds() > 1 {
+						time.Sleep(1 * time.Second)
 						log.Println(color.YellowString("Detected changes in \"%s\", reloading settings...", configPath))
 						loadConfig()
 						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s)", getBoundChannelsCount()))
