@@ -265,7 +265,7 @@ func getUserIdentifier(usr discordgo.User) string {
 }
 
 func getGuildName(guildID string) string {
-	sourceGuildName := "Server Name Unknown"
+	sourceGuildName := "UNKNOWN"
 	sourceGuild, _ := bot.State.Guild(guildID)
 	if sourceGuild != nil && sourceGuild.Name != "" {
 		sourceGuildName = sourceGuild.Name
@@ -274,12 +274,30 @@ func getGuildName(guildID string) string {
 }
 
 func getChannelName(channelID string) string {
-	sourceChannelName := "Channel Name Unknown"
+	sourceChannelName := "unknown"
 	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil && sourceChannel.Name != "" {
-		sourceChannelName = sourceChannel.Name
+	if sourceChannel != nil {
+		if sourceChannel.Name != "" {
+			sourceChannelName = sourceChannel.Name
+		} else {
+			switch sourceChannel.Type {
+			case discordgo.ChannelTypeDM:
+				sourceChannelName = "dm"
+			case discordgo.ChannelTypeGroupDM:
+				sourceChannelName = "group-dm"
+			}
+		}
 	}
 	return sourceChannelName
+}
+
+func getSourceName(guildID string, channelID string) string {
+	guildName := getGuildName(guildID)
+	channelName := getChannelName(channelID)
+	if channelName == "dm" || channelName == "group-dm" {
+		return channelName
+	}
+	return fmt.Sprintf("\"%s\"#%s", guildName, channelName)
 }
 
 //#endregion

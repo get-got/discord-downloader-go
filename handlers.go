@@ -60,7 +60,7 @@ func handleMessage(m *discordgo.Message, edited bool) {
 	if config.DebugOutput {
 		sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
 	} else {
-		sendLabel = fmt.Sprintf("%s in \"%s\"#%s", getUserIdentifier(*m.Author), getGuildName(m.GuildID), getChannelName(m.ChannelID))
+		sendLabel = fmt.Sprintf("%s in %s", getUserIdentifier(*m.Author), getSourceName(m.GuildID, m.ChannelID))
 	}
 	content := m.Content
 	if len(m.Attachments) > 0 {
