@@ -238,11 +238,21 @@ func isLocalAdmin(m *discordgo.Message) bool {
 }
 
 func hasPerms(channelID string, permission int) bool {
-	perms, err := bot.UserChannelPermissions(user.ID, channelID)
-	if err == nil {
-		return perms&permission == permission
+	sourceChannel, err := bot.State.Channel(channelID)
+	if sourceChannel != nil && err == nil {
+		switch sourceChannel.Type {
+		case discordgo.ChannelTypeDM:
+			return true
+		case discordgo.ChannelTypeGroupDM:
+			return true
+		case discordgo.ChannelTypeGuildText:
+			perms, err := bot.UserChannelPermissions(user.ID, channelID)
+			if err == nil {
+				return perms&permission == permission
+			}
+			log.Println(color.HiRedString("Failed to check permissions (%d) for %s:\t%s", permission, channelID, err))
+		}
 	}
-	log.Println(color.HiRedString("Failed to check permissions (%d) for %s:\t%s", permission, channelID, err))
 	return false
 }
 
