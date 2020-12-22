@@ -188,8 +188,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	// Check Read History perms
 	if !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
-		log.Println(logPrefixHistory, color.HiRedString(logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!",
-			subjectChannelID, commander))
+		log.Println(logPrefixHistory, color.HiRedString(logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!"))
 		return 0
 	}
 

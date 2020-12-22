@@ -4,6 +4,8 @@ import (
 	"regexp"
 )
 
+//TODO: Reddit short url ... https://redd.it/post_code
+
 const (
 	regexpFilename                = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{2,5}$$`
 	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
@@ -22,6 +24,7 @@ const (
 	regexpUrlTistoryLegacy        = `^http(s?):\/\/[a-z0-9]+\.uf\.tistory\.com\/(image|original)\/[A-Z0-9]+$`
 	regexpUrlTistoryLegacyWithCDN = `^http(s)?:\/\/[0-9a-z]+.daumcdn.net\/[a-z]+\/[a-zA-Z0-9\.]+\/\?scode=mtistory&fname=http(s?)%3A%2F%2F[a-z0-9]+\.uf\.tistory\.com%2F(image|original)%2F[A-Z0-9]+$`
 	regexpUrlPossibleTistorySite  = `^http(s)?:\/\/[0-9a-zA-Z\.-]+\/(m\/)?(photo\/)?[0-9]+$`
+	regexpUrlRedditPost           = `^http(s?):\/\/(www\.)?reddit\.com\/r\/([0-9a-zA-Z'_]+)?\/comments\/([0-9a-zA-Z'_]+)\/?([0-9a-zA-Z'_]+)?(.*)?$`
 )
 
 var (
@@ -42,6 +45,7 @@ var (
 	regexUrlTistoryLegacy        *regexp.Regexp
 	regexUrlTistoryLegacyWithCDN *regexp.Regexp
 	regexUrlPossibleTistorySite  *regexp.Regexp
+	regexUrlRedditPost           *regexp.Regexp
 )
 
 func compileRegex() error {
@@ -112,6 +116,10 @@ func compileRegex() error {
 		return err
 	}
 	regexUrlPossibleTistorySite, err = regexp.Compile(regexpUrlPossibleTistorySite)
+	if err != nil {
+		return err
+	}
+	regexUrlRedditPost, err = regexp.Compile(regexpUrlRedditPost)
 	if err != nil {
 		return err
 	}

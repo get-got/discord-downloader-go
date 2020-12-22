@@ -277,6 +277,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			return trimDownloadedLinks(links, channelID)
 		}
 	}
+
 	if config.Credentials.GoogleDriveCredentialsJSON != "" {
 		if regexUrlGoogleDrive.MatchString(inputURL) {
 			links, err := getGoogleDriveUrls(inputURL)
@@ -295,6 +296,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			}
 		}
 	}
+
 	if regexUrlTistory.MatchString(inputURL) {
 		links, err := getTistoryUrls(inputURL)
 		if err != nil {
@@ -311,6 +313,16 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			return trimDownloadedLinks(links, channelID)
 		}
 	}
+
+	if regexUrlRedditPost.MatchString(inputURL) {
+		links, err := getRedditPostUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Reddit Post URL failed for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
+
 	// The original project has this as an option,
 	if regexUrlPossibleTistorySite.MatchString(inputURL) {
 		links, err := getPossibleTistorySiteUrls(inputURL)

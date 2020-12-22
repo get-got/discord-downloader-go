@@ -566,7 +566,7 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 		return nil, err
 	}
 	request.Header.Add("Accept-Encoding", "identity")
-	request.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+	request.Header.Add("User-Agent", sneakyUserAgent)
 	respHead, err := client.Do(request)
 	if err != nil {
 		return nil, err
@@ -587,7 +587,7 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 		return nil, err
 	}
 	request.Header.Add("Accept-Encoding", "identity")
-	request.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36")
+	request.Header.Add("User-Agent", sneakyUserAgent)
 	resp, err := client.Do(request)
 	if err != nil {
 		return nil, err
@@ -629,6 +629,38 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 		log.Printf("[%s] Found tistory album with %d images (url: %s)\n", time.Now().Format(time.Stamp), len(links), url)
 	}
 	return links, nil
+}
+
+//#endregion
+
+//#region Reddit
+
+// This is very crude but works for now
+type redditThreadObject []struct {
+	Kind string `json:"kind"`
+	Data struct {
+		Children interface{} `json:"children"`
+	} `json:"data"`
+}
+
+func getRedditPostUrls(link string) (map[string]string, error) {
+	redditThread := new(redditThreadObject)
+	headers := make(map[string]string)
+	headers["Accept-Encoding"] = "identity"
+	headers["User-Agent"] = sneakyUserAgent
+	err := getJSONwithHeaders(link+".json", redditThread, headers)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to parse json from reddit post:\t%s", err))
+	}
+
+	redditPost := (*redditThread)[0].Data.Children.([]interface{})[0].(map[string]interface{})
+	redditPostData := redditPost["data"].(map[string]interface{})
+	if redditPostData["url_overridden_by_dest"] != nil {
+		redditLink := redditPostData["url_overridden_by_dest"].(string)
+		filename := fmt.Sprintf("Reddit-%s_%s %s", redditPostData["subreddit"].(string), redditPostData["id"].(string), filenameFromURL(redditLink))
+		return map[string]string{redditLink: filename}, nil
+	}
+	return nil, nil
 }
 
 //#endregion
