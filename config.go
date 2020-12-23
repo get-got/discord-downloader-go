@@ -247,12 +247,19 @@ func loadConfig() {
 		createConfig()
 		properExit()
 	} else {
+		fixed := string(configContent)
+		fixed = strings.ReplaceAll(fixed, "\\", "\\\\")
+		for strings.Contains(fixed, "\\\\\\") {
+			fixed = strings.ReplaceAll(fixed, "\\\\\\", "\\\\")
+		}
+		configContent = []byte(fixed)
+		// Parse
 		newConfig := defaultConfiguration()
 		err = json.Unmarshal(configContent, &newConfig)
 		if err != nil {
 			log.Println(color.HiRedString("Failed to parse settings file...\t%s", err))
 			log.Println(logPrefixHelper, color.MagentaString("Please ensure you're following proper JSON format syntax."))
-			return
+			properExit()
 		}
 		config = newConfig
 
