@@ -10,6 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
+	"gopkg.in/ini.v1"
 )
 
 var (
@@ -26,10 +27,10 @@ var (
 
 type configurationCredentials struct {
 	// Login
-	Token    string `json:"token"`    // required for bot token (this or login)
-	Email    string `json:"email"`    // required for login (this or token)
-	Password string `json:"password"` // required for login (this or token)
-	UserBot  bool   `json:"userBot"`  // required
+	Token    string `json:"token,omitempty"`    // required for bot token (this or login)
+	Email    string `json:"email,omitempty"`    // required for login (this or token)
+	Password string `json:"password,omitempty"` // required for login (this or token)
+	UserBot  bool   `json:"userBot,omitempty"`  // required
 	// APIs
 	TwitterAccessToken         string `json:"twitterAccessToken,omitempty"`         // optional
 	TwitterAccessTokenSecret   string `json:"twitterAccessTokenSecret,omitempty"`   // optional
@@ -248,10 +249,13 @@ func loadConfig() {
 		properExit()
 	} else {
 		fixed := string(configContent)
+		// Fix backslashes
 		fixed = strings.ReplaceAll(fixed, "\\", "\\\\")
 		for strings.Contains(fixed, "\\\\\\") {
 			fixed = strings.ReplaceAll(fixed, "\\\\\\", "\\\\")
 		}
+		//TODO: Not even sure if this is realistic to do but would be nice to have line comma & trailing comma fixing
+		// Re-convert
 		configContent = []byte(fixed)
 		// Parse
 		newConfig := defaultConfiguration()
@@ -306,74 +310,6 @@ func createConfig() {
 	enteredBaseChannel := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
 	enteredBaseDestination := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
 
-	//TODO: Improve, this is very crude, I just wanted *something* for this.
-	log.Print(color.HiCyanString("Would you like to enter settings info now? [Y/N]: "))
-	reader := bufio.NewReader(os.Stdin)
-	inputCredsYN, _ := reader.ReadString('\n')
-	inputCredsYN = strings.ReplaceAll(inputCredsYN, "\n", "")
-	inputCredsYN = strings.ReplaceAll(inputCredsYN, "\r", "")
-	if strings.Contains(strings.ToLower(inputCredsYN), "y") {
-	EnterCreds:
-		log.Print(color.HiCyanString("Token or Login? [\"token\"/\"login\"]: "))
-		inputCreds, _ := reader.ReadString('\n')
-		inputCreds = strings.ReplaceAll(inputCreds, "\n", "")
-		inputCreds = strings.ReplaceAll(inputCreds, "\r", "")
-		if strings.Contains(strings.ToLower(inputCreds), "token") {
-		EnterToken:
-			log.Print(color.HiCyanString("Enter token: "))
-			inputToken, _ := reader.ReadString('\n')
-			inputToken = strings.ReplaceAll(inputToken, "\n", "")
-			inputToken = strings.ReplaceAll(inputToken, "\r", "")
-			if inputToken != "" {
-				enteredToken = inputToken
-			} else {
-				log.Println(color.HiRedString("Please input token..."))
-				goto EnterToken
-			}
-		} else if strings.Contains(strings.ToLower(inputCreds), "login") {
-		EnterEmail:
-			log.Print(color.HiCyanString("Enter email: "))
-			inputEmail, _ := reader.ReadString('\n')
-			inputEmail = strings.ReplaceAll(inputEmail, "\n", "")
-			inputEmail = strings.ReplaceAll(inputEmail, "\r", "")
-			if strings.Contains(inputEmail, "@") {
-				enteredEmail = inputEmail
-			EnterPassword:
-				log.Print(color.HiCyanString("Enter password: "))
-				inputPassword, _ := reader.ReadString('\n')
-				inputPassword = strings.ReplaceAll(inputPassword, "\n", "")
-				inputPassword = strings.ReplaceAll(inputPassword, "\r", "")
-				if inputPassword != "" {
-					enteredPassword = inputPassword
-				} else {
-					log.Println(color.HiRedString("Please input password..."))
-					goto EnterPassword
-				}
-			} else {
-				log.Println(color.HiRedString("Please input email..."))
-				goto EnterEmail
-			}
-		} else {
-			log.Println(color.HiRedString("Please input \"token\" or \"login\"..."))
-			goto EnterCreds
-		}
-
-	EnterAdmin:
-		log.Print(color.HiCyanString("Input your Discord User ID: "))
-		inputAdmin, _ := reader.ReadString('\n')
-		inputAdmin = strings.ReplaceAll(inputAdmin, "\n", "")
-		inputAdmin = strings.ReplaceAll(inputAdmin, "\r", "")
-		if isNumeric(inputAdmin) {
-			enteredAdmin = inputAdmin
-		} else {
-			log.Println(color.HiRedString("Please input your Discord User ID..."))
-			goto EnterAdmin
-		}
-
-		//TODO: Base channel setup? Would be kind of annoying and may limit options
-		//TODO: Admin channel setup?
-	}
-
 	// Separate from Defaultconfiguration because there's some elements we want to strip for settings creation
 	defaultConfig := configuration{
 		Credentials: configurationCredentials{
@@ -394,28 +330,179 @@ func createConfig() {
 		DebugOutput:          cdDebugOutput,
 	}
 
-	baseChannel := configurationChannel{
-		ChannelID:   enteredBaseChannel,
-		Destination: enteredBaseDestination,
+	// Import old config
+	if _, err := os.Stat("config.ini"); err == nil {
+		log.Println(color.HiGreenString("Detected old config.ini, importing..."))
+		cfg, err := ini.Load("config.ini")
+		if err != nil {
+			log.Println(color.HiRedString("Unable to read your old config file:\t%s", err))
+			cfg = ini.Empty()
+		} else {
+			// Import old ini
 
-		Enabled:       &ccdEnabled,
-		AllowCommands: &ccdAllowCommands,
-		ErrorMessages: &ccdErrorMessages,
-		ScanEdits:     &ccdScanEdits,
+			// Auth
+			if cfg.Section("auth").HasKey("token") {
+				defaultConfig.Credentials.Token = cfg.Section("auth").Key("token").String()
+			} else {
+				defaultConfig.Credentials.Token = ""
+			}
+			if cfg.Section("auth").HasKey("email") {
+				defaultConfig.Credentials.Email = cfg.Section("auth").Key("email").String()
+			} else {
+				defaultConfig.Credentials.Email = ""
+			}
+			if cfg.Section("auth").HasKey("password") {
+				defaultConfig.Credentials.Password = cfg.Section("auth").Key("password").String()
+			} else {
+				defaultConfig.Credentials.Password = ""
+			}
+			if cfg.Section("google").HasKey("client credentials json") {
+				defaultConfig.Credentials.GoogleDriveCredentialsJSON = cfg.Section("google").Key("client credentials json").String()
+			}
+			if cfg.Section("flickr").HasKey("api key") {
+				defaultConfig.Credentials.FlickrApiKey = cfg.Section("flickr").Key("api key").String()
+			}
+			if cfg.Section("twitter").HasKey("consumer key") {
+				defaultConfig.Credentials.TwitterConsumerKey = cfg.Section("twitter").Key("consumer key").String()
+			}
+			if cfg.Section("twitter").HasKey("consumer secret") {
+				defaultConfig.Credentials.TwitterConsumerSecret = cfg.Section("twitter").Key("consumer secret").String()
+			}
+			if cfg.Section("twitter").HasKey("access token") {
+				defaultConfig.Credentials.TwitterAccessToken = cfg.Section("twitter").Key("access token").String()
+			}
+			if cfg.Section("twitter").HasKey("access secret") {
+				defaultConfig.Credentials.TwitterAccessTokenSecret = cfg.Section("twitter").Key("access secret").String()
+			}
 
-		UpdatePresence:      &ccdUpdatePresence,
-		ReactWhenDownloaded: &ccdReactWhenDownloaded,
+			// General
+			if cfg.Section("general").HasKey("max download retries") {
+				defaultConfig.DownloadRetryMax = cfg.Section("general").Key("max download retries").MustInt()
+			}
+			if cfg.Section("general").HasKey("download timeout") {
+				defaultConfig.DownloadRetryMax = cfg.Section("general").Key("download timeout").MustInt()
+			}
 
-		DivideFoldersByType: &ccdDivideFoldersByType,
-		SaveImages:          &ccdSaveImages,
-		SaveVideos:          &ccdSaveVideos,
+			// Status
+			if cfg.Section("status").HasKey("status enabled") {
+				defaultConfig.PresenceEnabled = cfg.Section("status").Key("status enabled").MustBool()
+			}
+			if cfg.Section("status").HasKey("status type") {
+				defaultConfig.PresenceStatus = cfg.Section("status").Key("status type").String()
+			}
+			if cfg.Section("status").HasKey("status label") {
+				defaultConfig.PresenceType = discordgo.GameType(cfg.Section("status").Key("status label").MustInt())
+			}
+
+			// Channels
+			InteractiveChannelWhitelist := cfg.Section("interactive channels").KeysHash()
+			for key, _ := range InteractiveChannelWhitelist {
+				newChannel := configurationAdminChannel{
+					ChannelID: key,
+				}
+				defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, newChannel)
+			}
+			ChannelWhitelist := cfg.Section("channels").KeysHash()
+			for key, value := range ChannelWhitelist {
+				newChannel := configurationChannel{
+					ChannelID:   key,
+					Destination: value,
+				}
+				defaultConfig.Channels = append(defaultConfig.Channels, newChannel)
+			}
+		}
+	} else {
+		baseChannel := configurationChannel{
+			ChannelID:   enteredBaseChannel,
+			Destination: enteredBaseDestination,
+
+			Enabled:       &ccdEnabled,
+			AllowCommands: &ccdAllowCommands,
+			ErrorMessages: &ccdErrorMessages,
+			ScanEdits:     &ccdScanEdits,
+
+			UpdatePresence:      &ccdUpdatePresence,
+			ReactWhenDownloaded: &ccdReactWhenDownloaded,
+
+			DivideFoldersByType: &ccdDivideFoldersByType,
+			SaveImages:          &ccdSaveImages,
+			SaveVideos:          &ccdSaveVideos,
+		}
+		defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
+
+		baseAdminChannel := configurationAdminChannel{
+			ChannelID: "REPLACE_WITH_DISCORD_CHANNEL_ID_FOR_ADMIN_COMMANDS",
+		}
+		defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
+
+		//TODO: Improve, this is very crude, I just wanted *something* for this.
+		log.Print(color.HiCyanString("Would you like to enter settings info now? [Y/N]: "))
+		reader := bufio.NewReader(os.Stdin)
+		inputCredsYN, _ := reader.ReadString('\n')
+		inputCredsYN = strings.ReplaceAll(inputCredsYN, "\n", "")
+		inputCredsYN = strings.ReplaceAll(inputCredsYN, "\r", "")
+		if strings.Contains(strings.ToLower(inputCredsYN), "y") {
+		EnterCreds:
+			log.Print(color.HiCyanString("Token or Login? [\"token\"/\"login\"]: "))
+			inputCreds, _ := reader.ReadString('\n')
+			inputCreds = strings.ReplaceAll(inputCreds, "\n", "")
+			inputCreds = strings.ReplaceAll(inputCreds, "\r", "")
+			if strings.Contains(strings.ToLower(inputCreds), "token") {
+			EnterToken:
+				log.Print(color.HiCyanString("Enter token: "))
+				inputToken, _ := reader.ReadString('\n')
+				inputToken = strings.ReplaceAll(inputToken, "\n", "")
+				inputToken = strings.ReplaceAll(inputToken, "\r", "")
+				if inputToken != "" {
+					enteredToken = inputToken
+				} else {
+					log.Println(color.HiRedString("Please input token..."))
+					goto EnterToken
+				}
+			} else if strings.Contains(strings.ToLower(inputCreds), "login") {
+			EnterEmail:
+				log.Print(color.HiCyanString("Enter email: "))
+				inputEmail, _ := reader.ReadString('\n')
+				inputEmail = strings.ReplaceAll(inputEmail, "\n", "")
+				inputEmail = strings.ReplaceAll(inputEmail, "\r", "")
+				if strings.Contains(inputEmail, "@") {
+					enteredEmail = inputEmail
+				EnterPassword:
+					log.Print(color.HiCyanString("Enter password: "))
+					inputPassword, _ := reader.ReadString('\n')
+					inputPassword = strings.ReplaceAll(inputPassword, "\n", "")
+					inputPassword = strings.ReplaceAll(inputPassword, "\r", "")
+					if inputPassword != "" {
+						enteredPassword = inputPassword
+					} else {
+						log.Println(color.HiRedString("Please input password..."))
+						goto EnterPassword
+					}
+				} else {
+					log.Println(color.HiRedString("Please input email..."))
+					goto EnterEmail
+				}
+			} else {
+				log.Println(color.HiRedString("Please input \"token\" or \"login\"..."))
+				goto EnterCreds
+			}
+
+		EnterAdmin:
+			log.Print(color.HiCyanString("Input your Discord User ID: "))
+			inputAdmin, _ := reader.ReadString('\n')
+			inputAdmin = strings.ReplaceAll(inputAdmin, "\n", "")
+			inputAdmin = strings.ReplaceAll(inputAdmin, "\r", "")
+			if isNumeric(inputAdmin) {
+				enteredAdmin = inputAdmin
+			} else {
+				log.Println(color.HiRedString("Please input your Discord User ID..."))
+				goto EnterAdmin
+			}
+
+			//TODO: Base channel setup? Would be kind of annoying and may limit options
+			//TODO: Admin channel setup?
+		}
 	}
-	defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
-
-	baseAdminChannel := configurationAdminChannel{
-		ChannelID: "REPLACE_WITH_DISCORD_CHANNEL_ID_FOR_ADMIN_COMMANDS",
-	}
-	defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
 
 	log.Println(logPrefixHelper, color.MagentaString("The default settings will be missing some options to avoid clutter."))
 	log.Println(logPrefixHelper, color.HiMagentaString("There are MANY MORE SETTINGS! If you would like to maximize customization, see the GitHub README for all available settings."))

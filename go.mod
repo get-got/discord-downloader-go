@@ -24,5 +24,6 @@ require (
 	golang.org/x/net v0.0.0-20201016165138-7b1cca2348c0
 	golang.org/x/oauth2 v0.0.0-20201109201403-9fd604954f58
 	google.golang.org/api v0.35.0
+	gopkg.in/ini.v1 v1.62.0
 	mvdan.cc/xurls/v2 v2.2.0
 )
