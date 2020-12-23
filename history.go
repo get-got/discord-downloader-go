@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	historyCommandActive map[string]string
+	historyStatus map[string]string
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string) int {
@@ -33,7 +33,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	// Mark active
-	historyCommandActive[subjectChannelID] = "downloading"
+	historyStatus[subjectChannelID] = "downloading"
 
 	var i int64 = 0
 	var d int64 = 0
@@ -143,7 +143,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			if err == nil {
 				// No More Messages
 				if len(messages) <= 0 {
-					delete(historyCommandActive, subjectChannelID)
+					delete(historyStatus, subjectChannelID)
 					break MessageRequestingLoop
 				}
 				// Go Back
@@ -162,8 +162,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						}
 					}
 					// Ordered to Cancel
-					if historyCommandActive[message.ChannelID] == "cancel" {
-						delete(historyCommandActive, message.ChannelID)
+					if historyStatus[message.ChannelID] == "cancel" {
+						delete(historyStatus, message.ChannelID)
 						break MessageRequestingLoop
 					}
 
@@ -220,7 +220,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 				}
 				log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Error requesting messages:\t%s", subjectChannelID, commander, err))
-				delete(historyCommandActive, subjectChannelID)
+				delete(historyStatus, subjectChannelID)
 				break MessageRequestingLoop
 			}
 		}

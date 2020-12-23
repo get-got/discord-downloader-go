@@ -25,6 +25,8 @@ import (
 - Permission checks are very messy.
 	- Solution may be to wrap all editing and sending within functions that check permissions universally.
 
+- Consolidate history command variations
+
 */
 
 var (
@@ -46,7 +48,7 @@ var (
 func init() {
 	loop = make(chan os.Signal, 1)
 	startTime = time.Now()
-	historyCommandActive = make(map[string]string)
+	historyStatus = make(map[string]string)
 
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
 	log.SetOutput(color.Output)
@@ -238,7 +240,7 @@ func main() {
 	}
 
 	// Commands
-	commandHandler()
+	handleCommands()
 
 	// Event Handlers
 	bot.AddHandler(messageCreate)

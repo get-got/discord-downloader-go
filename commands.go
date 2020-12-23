@@ -14,7 +14,7 @@ import (
 	"github.com/hako/durafmt"
 )
 
-func commandHandler() {
+func handleCommands() {
 	router := exrouter.New()
 
 	//#region Utility Commands
@@ -170,8 +170,8 @@ func commandHandler() {
 			if *channelConfig.AllowCommands {
 				if isLocalAdmin(ctx.Msg) {
 					// Cancel Local
-					if historyCommandActive[channel] == "downloading" && strings.ToLower(strings.TrimSpace(args)) == "cancel" {
-						historyCommandActive[channel] = "cancel"
+					if historyStatus[channel] == "downloading" && strings.ToLower(strings.TrimSpace(args)) == "cancel" {
+						historyStatus[channel] = "cancel"
 						if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 							_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
 							if err != nil {
@@ -182,8 +182,8 @@ func commandHandler() {
 						}
 						log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for %s", getUserIdentifier(*ctx.Msg.Author), channel))
 					} else { // Start Local
-						_, historyCommandIsSet := historyCommandActive[channel]
-						if !historyCommandIsSet || historyCommandActive[channel] == "" {
+						_, historyCommandIsSet := historyStatus[channel]
+						if !historyCommandIsSet || historyStatus[channel] == "" {
 							handleHistory(ctx.Msg, channel)
 						} else {
 							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
@@ -210,8 +210,8 @@ func commandHandler() {
 						channels = strings.Split(ctx.Args.After(2), ",")
 						for _, channelValue := range channels {
 							channelValue = strings.TrimSpace(channelValue)
-							if historyCommandActive[channelValue] == "downloading" {
-								historyCommandActive[channelValue] = "cancel"
+							if historyStatus[channelValue] == "downloading" {
+								historyStatus[channelValue] = "cancel"
 								if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 									_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
 									if err != nil {
@@ -227,9 +227,9 @@ func commandHandler() {
 						for _, channelValue := range channels {
 							channelValue = strings.TrimSpace(channelValue)
 							if isChannelRegistered(channelValue) {
-								_, historyCommandIsSet := historyCommandActive[channelValue]
-								if !historyCommandIsSet || historyCommandActive[channelValue] == "" {
-									historyCommandActive[channelValue] = ""
+								_, historyCommandIsSet := historyStatus[channelValue]
+								if !historyCommandIsSet || historyStatus[channelValue] == "" {
+									historyStatus[channelValue] = ""
 									handleHistory(ctx.Msg, channelValue)
 								} else {
 									log.Println(logPrefixHere, color.CyanString("Tried using history command but history is already running for %s...", channelValue))
