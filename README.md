@@ -8,10 +8,10 @@
     <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" />
     </a>
-    <a href="https://hub.docker.com/repository/docker/getgot/discord-downloader-go" alt="Docker Build">
+    <a href="https://hub.docker.com/r/getgot/discord-downloader-go" alt="Docker Build">
         <img src="https://img.shields.io/docker/cloud/build/getgot/discord-downloader-go" />
     </a>
-    <a href="https://hub.docker.com/repository/docker/getgot/discord-downloader-go/builds" alt="Docker Image Size">
+    <a href="https://hub.docker.com/r/getgot/discord-downloader-go/builds" alt="Docker Image Size">
         <img src="https://shields.io/docker/image-size/getgot/discord-downloader-go?sort=semver" />
     </a>
     <br>
@@ -60,7 +60,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 Depending on your purpose for this program, there are various ways you can run it.
 - Run the executable [file for your platform included in releases.](https://github.com/get-got/discord-downloader-go/releases/latest)
 - Run the executable file in a process manager like **pm2**. _(Google it)_
-- [Use automated image builds for Docker.](https://hub.docker.com/repository/docker/getgot/discord-downloader-go) _(Google it)_
+- [Use automated image builds for Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._ This requires mounting your settings file to the Docker container, as well as any destinations for saving.
 - Install Golang and compile the source code yourself. _(Google it)_
   
 ## Getting Started (Basic Setup)
