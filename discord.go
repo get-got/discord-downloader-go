@@ -16,7 +16,7 @@ import (
 //#region Presence
 
 func presenceKeyReplacement(input string) string {
-	//TODO: Case-insensitive key replacement.
+	//TODO: Case-insensitive key replacement. -- If no streamlined way to do it, convert to lower to find substring location but replace normally
 	if strings.Contains(input, "{{") && strings.Contains(input, "}}") {
 		countInt := int64(dbDownloadCount()) + *config.InflateCount
 		timeNow := time.Now()
