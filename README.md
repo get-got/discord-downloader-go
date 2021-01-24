@@ -56,9 +56,14 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
+## Running
+Depending on your purpose for this program, there are various ways you can run it.
+- Run the executable [file for your platform included in releases.](https://github.com/get-got/discord-downloader-go/releases/latest)
+- Install Golang and compile the source code yourself. _(Google it)_
+- Run executable in a process manager like **pm2**. _(Google it)_
+- [Use automated image builds for Docker. _(Google it)_](https://hub.docker.com/repository/docker/getgot/discord-downloader-go)
+  
 ## Getting Started (Basic Setup)
-Obviously, download the bot program (or compile yourself with Go) and put it in a folder of your choice.
-
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
 - [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
 - [Feeling lazy or having issues? Try this JSON Formatter/Validator.](https://jsonformatter.curiousconcept.com/)
