@@ -106,8 +106,8 @@ You can either create a `settings.json` following the examples & variables liste
     * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
 
 ### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
-* ~~_Go 1.15 rather than 1.13_~~ I updated Sekl's project to match this.
-* ~~_discordgo 0.22.0 rather than 0.16.1_~~ I updated Sekl's project to match this.
+* ~~_Go 1.15 rather than 1.13_~~ ***I updated Sekl's project to match this.***
+* ~~_discordgo 0.22.0 rather than 0.16.1_~~ ***I updated Sekl's project to match this.***
 * _Implements dgrouter for commands_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
 * Channel-specific control of downloaded filetypes / content types (considers things like .mov as videos as well, rather than ignore them), Optional dividing of content types into separate folders.
@@ -116,7 +116,7 @@ You can either create a `settings.json` following the examples & variables liste
 * Extensive bot status/presence customization.
 * Consistent Log Formatting, Color-Coded Logging
 * Somewhat different organization than original project; initially created from scratch then components ported over.
-* ~~Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. The issue was due to some people having xurls v2 installed while the projects go.mod required v1.1; changing go.mod to require v2 specifically seems to be the correct fix.~~ I updated Sekl's project to match this.
+* ~~Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. The issue was due to some people having xurls v2 installed while the projects go.mod required v1.1; changing go.mod to require v2 specifically seems to be the correct fix.~~ ***I updated Sekl's project to match this.***
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
