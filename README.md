@@ -10,7 +10,7 @@
     </a>
     <br>
     <a href="https://hub.docker.com/repository/docker/getgot/discord-downloader-go" alt="Docker Build">
-        <img src="https://shields.io/docker/build/getgot/discord-downloader-go" />
+        <img src="https://img.shields.io/docker/cloud/build/getgot/discord-downloader-go" />
     </a>
     <a href="https://hub.docker.com/repository/docker/getgot/discord-downloader-go/builds" alt="Docker Image Size">
         <img src="https://shields.io/docker/image-size/getgot/discord-downloader-go?sort=semver" />
