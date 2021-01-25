@@ -45,6 +45,7 @@ const (
 	downloadSkippedDetectedDuplicate    downloadStatus = iota
 
 	downloadFailed                    downloadStatus = iota
+	downloadFailedInvalidSource       downloadStatus = iota
 	downloadFailedCreatingFolder      downloadStatus = iota
 	downloadFailedRequesting          downloadStatus = iota
 	downloadFailedDownloadingResponse downloadStatus = iota
@@ -90,6 +91,8 @@ func getDownloadStatusString(status downloadStatus) string {
 	//
 	case downloadFailed:
 		return "Download Failed"
+	case downloadFailedInvalidSource:
+		return "Download Failed - Invalid Source"
 	case downloadFailedCreatingFolder:
 		return "Download Failed - Error Creating Folder"
 	case downloadFailedRequesting:
@@ -440,13 +443,21 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 	if isChannelRegistered(message.ChannelID) {
 		channelConfig := getChannelConfig(message.ChannelID)
 
+		var err error
+
+		// Source validation
+		_, err = url.ParseRequestURI(inputURL)
+		if err != nil {
+			return mDownloadStatus(downloadFailedInvalidSource, err)
+		}
+
 		// Clean/fix path
 		if !strings.HasSuffix(path, string(os.PathSeparator)) {
 			path = path + string(os.PathSeparator)
 		}
 
 		// Create folder
-		err := os.MkdirAll(path, 0755)
+		err = os.MkdirAll(path, 0755)
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.HiRedString("Error while creating destination folder \"%s\": %s", path, err))
 			return mDownloadStatus(downloadFailedCreatingFolder, err)
