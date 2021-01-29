@@ -20,15 +20,6 @@ import (
 	"google.golang.org/api/drive/v3"
 )
 
-/* TODO:
-
-- Permission checks are very messy.
-	- Solution may be to wrap all editing and sending within functions that check permissions universally.
-
-- Consolidate history command variations
-
-*/
-
 var (
 	bot      *discordgo.Session
 	user     *discordgo.User
@@ -187,62 +178,10 @@ func main() {
 	//#endregion
 
 	//#region Discord Initialization
-
-	// Bot Login
-	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
-		log.Println(color.GreenString("Connecting to Discord via Token..."))
-		if config.Credentials.UserBot {
-			bot, err = discordgo.New(config.Credentials.Token)
-		} else {
-			bot, err = discordgo.New("Bot " + config.Credentials.Token)
-		}
-	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
-		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
-		log.Println(color.GreenString("Connecting to Discord via Login..."))
-		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
-	} else {
-		log.Println(color.HiRedString("No valid credentials for Discord..."))
-		properExit()
-	}
-	if err != nil {
-		// Newer discordgo throws this error for some reason with Email/Password login
-		if err.Error() != "Unable to fetch discord authentication token. <nil>" {
-			log.Println(color.HiRedString("Error logging into Discord: %s", err))
-			properExit()
-		}
-	}
-
-	// Connect Bot
-	bot.LogLevel = -1 // to ignore dumb wsapi error
-	err = bot.Open()
-	if err != nil {
-		log.Println(color.HiRedString("Discord login failed:\t%s", err))
-		properExit()
-	}
-	bot.LogLevel = 0 // reset
-
-	// Fetch Bot's User Info
-	user, err = bot.User("@me")
-	if err != nil {
-		log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
-	} else {
-		log.Println(color.HiGreenString("Discord logged into %s", getUserIdentifier(*user)))
-		if user.Bot {
-			log.Println(logPrefixHelper, color.MagentaString("This is a Bot User"))
-			log.Println(logPrefixHelper, color.MagentaString("- Status presence details are limited."))
-			log.Println(logPrefixHelper, color.MagentaString("- Server access is restricted to servers you have permission to add the bot to."))
-		} else {
-			log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)"))
-			log.Println(logPrefixHelper, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
-			log.Println(logPrefixHelper, color.MagentaString("- See GitHub page for link to Discord's official statement."))
-			log.Println(logPrefixHelper, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
-		}
-	}
-
-	// Commands
-	handleCommands()
+	botLogin()
 
 	// Event Handlers
+	handleCommands()
 	bot.AddHandler(messageCreate)
 	bot.AddHandler(messageUpdate)
 
@@ -266,12 +205,24 @@ func main() {
 		log.Println(logPrefixDebug, color.YellowString("Starting background loops..."))
 	}
 	ticker5m := time.NewTicker(5 * time.Minute)
+	ticker15s := time.NewTicker(15 * time.Second)
 	go func() {
 		for {
 			select {
 			case <-ticker5m.C:
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
 				updateDiscordPresence()
+			case <-ticker15s.C:
+				if time.Since(bot.LastHeartbeatAck).Seconds() > 180 {
+					log.Println(color.HiRedString("Discord seems to have lost connection, reconnecting..."))
+					log.Println(color.YellowString("Closing connections..."))
+					bot.Client.CloseIdleConnections()
+					bot.CloseWithCode(1001)
+					log.Println(color.RedString("Connections closed!"))
+					log.Println(color.GreenString("Logging in..."))
+					botLogin()
+					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
+				}
 			}
 		}
 	}()
@@ -354,4 +305,59 @@ func main() {
 	myDB.Close()
 
 	log.Println(color.HiRedString("Exiting..."))
+}
+
+func botLogin() {
+	var err error
+
+	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
+		log.Println(color.GreenString("Connecting to Discord via Token..."))
+		if config.Credentials.UserBot {
+			bot, err = discordgo.New(config.Credentials.Token)
+		} else {
+			bot, err = discordgo.New("Bot " + config.Credentials.Token)
+		}
+	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
+		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
+		log.Println(color.GreenString("Connecting to Discord via Login..."))
+		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
+	} else {
+		log.Println(color.HiRedString("No valid credentials for Discord..."))
+		properExit()
+	}
+	if err != nil {
+		// Newer discordgo throws this error for some reason with Email/Password login
+		if err.Error() != "Unable to fetch discord authentication token. <nil>" {
+			log.Println(color.HiRedString("Error logging into Discord: %s", err))
+			properExit()
+		}
+	}
+
+	// Connect Bot
+	bot.LogLevel = -1 // to ignore dumb wsapi error
+	err = bot.Open()
+	if err != nil {
+		log.Println(color.HiRedString("Discord login failed:\t%s", err))
+		properExit()
+	}
+	bot.LogLevel = 0 // reset
+	bot.ShouldReconnectOnError = true
+
+	// Fetch Bot's User Info
+	user, err = bot.User("@me")
+	if err != nil {
+		log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
+	} else {
+		log.Println(color.HiGreenString("Discord logged into %s", getUserIdentifier(*user)))
+		if user.Bot {
+			log.Println(logPrefixHelper, color.MagentaString("This is a Bot User"))
+			log.Println(logPrefixHelper, color.MagentaString("- Status presence details are limited."))
+			log.Println(logPrefixHelper, color.MagentaString("- Server access is restricted to servers you have permission to add the bot to."))
+		} else {
+			log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)"))
+			log.Println(logPrefixHelper, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
+			log.Println(logPrefixHelper, color.MagentaString("- See GitHub page for link to Discord's official statement."))
+			log.Println(logPrefixHelper, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
+		}
+	}
 }
