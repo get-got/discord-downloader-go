@@ -153,6 +153,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to fetch message timestamp:\t%s", subjectChannelID, commander, err))
 				}
 				// Process Messages
+				bot.ChannelTyping(commandingMessage.ChannelID)
 				for _, message := range messages {
 					fileTime := time.Now()
 					if message.Timestamp != "" {
