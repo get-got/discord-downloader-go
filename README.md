@@ -136,7 +136,9 @@ You will need the Channel ID (see bottom of [Setup](#Setup)) if attempting to ca
 ## Guide: Settings / Configuration
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
 
-When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand. All JSON settings follow camelCase format.
+When initially launching the bot it will create a default settings file if you do not create your own `settings.json` manually. All JSON settings follow camelCase format.
+
+**If you have a ``config.ini`` from _Seklfreak's discord-image-downloader-go_, it will import settings if it's in the same folder as the program.**
 
 ### Settings Examples
 The following example is for a Bot Application _(using a token)_, bound to 1 channel.
