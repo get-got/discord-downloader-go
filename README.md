@@ -55,10 +55,12 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 ## Running
 Depending on your purpose for this program, there are various ways you can run it.
-- Run the executable [file for your platform included in releases.](https://github.com/get-got/discord-downloader-go/releases/latest)
-- Run the executable file in a process manager like **pm2**. _(Google it)_
-- [Use automated image builds for Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._ This requires mounting your settings file to the Docker container, as well as any destinations for saving.
-- Install Golang and compile the source code yourself. _(Google it)_
+- [Run the executable file for your platform included in releases. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
+- [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
+    - Mount your settings.json to ``/root/settings.json``
+    - Mount a folder named "database" to ``/root/database``
+    - Mount your save folders or the parent of your save folders within ``/root/`` _(i.e. ``X:\My Folder`` to ``/root/My Folder``)_
+- Install Golang and compile/run the source code yourself. _(Google it)_
   
 ## Getting Started (Basic Setup)
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
