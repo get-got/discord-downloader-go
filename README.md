@@ -55,7 +55,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 ## Running
 Depending on your purpose for this program, there are various ways you can run it.
-- [Run the executable file for your platform included in releases. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
+- [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
   - Mount your settings.json to ``/root/settings.json``
   - Mount a folder named "database" to ``/root/database``
