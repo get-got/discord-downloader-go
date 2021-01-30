@@ -40,11 +40,12 @@ This is a Discord bot program to download files posted in specified Discord chan
 [**Need help? Have suggestions? Join the Discord server!**](https://discord.com/invite/6Z6FJZVaDV)
 
 ### Table of Contents
-* [Getting Started (Basic Setup)](#getting-started-basic-setup)
-* [Features](#features)
-* [History Cataloging Guide](#history-cataloging-guide)
-* [Settings / Configuration Guide](#settings--configuration-guide)
-* [List of Settings](#list-of-settings)
+* [**Getting Running**](#getting-running)
+* [**Getting Started**](#getting-started)
+* [**Features**](#features)
+* [**Guide: History Cataloging**](#guide-history-cataloging)
+* [**Guide: Settings / Configuration**](#guide-settings--configuration)
+* [**List of Settings**](#list-of-settings)
 
 ## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
@@ -53,7 +54,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
-## Running
+## Getting Running
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
@@ -63,7 +64,7 @@ Depending on your purpose for this program, there are various ways you can run i
     - _i.e. ``X:\My Folder`` to ``/root/My Folder``_
 - Install Golang and compile/run the source code yourself. _(Google it)_
   
-## Getting Started (Basic Setup)
+## Getting Started
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
 - [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
 - [Feeling lazy or having issues? Try this JSON Formatter/Validator.](https://jsonformatter.curiousconcept.com/)
@@ -91,6 +92,7 @@ You can either create a `settings.json` following the examples & variables liste
     * Direct Links to Files
     * Twitter _(requires API key, see config section)_
     * Instagram
+    * Reddit
     * Imgur _(Single Posts & Albums)_
     * Flickr _(requires API key, see config section)_
     * Google Drive _(requires API Credentials, see config section)_
@@ -111,6 +113,7 @@ You can either create a `settings.json` following the examples & variables liste
 * _Implements dgrouter for commands_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
 * Channel-specific control of downloaded filetypes / content types (considers things like .mov as videos as well, rather than ignore them), Optional dividing of content types into separate folders.
+* **Download Support for Reddit**
 * (Optional) Reactions upon download success.
 * (Optional) Discord messages upon encountered errors.
 * Extensive bot status/presence customization.
@@ -120,17 +123,17 @@ You can either create a `settings.json` following the examples & variables liste
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
-## History Cataloging Guide
+## Guide: History Cataloging
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
 
 You will need the Channel ID (see bottom of [Setup](#Setup)) if attempting to catalog history from a specific channel or group of channels, within an admin channel.
 
-* `<prefix>history` to catalog the current channel the command is sent in (must be registered in `channels` in settings).
-* `<prefix>history cancel` to stop cataloging the current channel the command is sent in (must be registered in `channels` in settings).
-* `<prefix>history <Channel ID(s)>` to catalog specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
-* `<prefix>history cancel <Channel ID(s)>` to stop cataloging specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
+* `ddg history` to catalog the current channel the command is sent in (must be registered in `channels` in settings).
+* `ddg history cancel` to stop cataloging the current channel the command is sent in (must be registered in `channels` in settings).
+* `ddg history <Channel ID(s)>` to catalog specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
+* `ddg history cancel <Channel ID(s)>` to stop cataloging specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
 
-## Settings / Configuration Guide
+## Guide: Settings / Configuration
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` beforehand. All JSON settings follow camelCase format.
