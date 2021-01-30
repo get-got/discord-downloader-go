@@ -92,6 +92,13 @@ func formatNumberShort(x int64) string {
 	return fmt.Sprint(x)
 }
 
+func boolS(val bool) string {
+	if val {
+		return "ON"
+	}
+	return "OFF"
+}
+
 //#endregion
 
 //#region Requests

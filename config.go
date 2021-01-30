@@ -332,7 +332,7 @@ func createConfig() {
 
 	// Import old config
 	if _, err := os.Stat("config.ini"); err == nil {
-		log.Println(color.HiGreenString("Detected old config.ini, importing..."))
+		log.Println(color.HiGreenString("Detected config.ini from Seklfreak's discord-image-downloader-go, importing..."))
 		cfg, err := ini.Load("config.ini")
 		if err != nil {
 			log.Println(color.HiRedString("Unable to read your old config file:\t%s", err))
@@ -343,55 +343,69 @@ func createConfig() {
 			// Auth
 			if cfg.Section("auth").HasKey("token") {
 				defaultConfig.Credentials.Token = cfg.Section("auth").Key("token").String()
+				log.Println(color.GreenString("IMPORTED token:\t\t\t%s", defaultConfig.Credentials.Token))
 			} else {
 				defaultConfig.Credentials.Token = ""
 			}
 			if cfg.Section("auth").HasKey("email") {
 				defaultConfig.Credentials.Email = cfg.Section("auth").Key("email").String()
+				log.Println(color.GreenString("IMPORTED email:\t\t\t%s", defaultConfig.Credentials.Email))
 			} else {
 				defaultConfig.Credentials.Email = ""
 			}
 			if cfg.Section("auth").HasKey("password") {
 				defaultConfig.Credentials.Password = cfg.Section("auth").Key("password").String()
+				log.Println(color.GreenString("IMPORTED password:\t\t\t%s", defaultConfig.Credentials.Password))
 			} else {
 				defaultConfig.Credentials.Password = ""
 			}
 			if cfg.Section("google").HasKey("client credentials json") {
 				defaultConfig.Credentials.GoogleDriveCredentialsJSON = cfg.Section("google").Key("client credentials json").String()
+				log.Println(color.GreenString("IMPORTED Google Drive Credentials:\t\t\t%s", defaultConfig.Credentials.GoogleDriveCredentialsJSON))
 			}
 			if cfg.Section("flickr").HasKey("api key") {
 				defaultConfig.Credentials.FlickrApiKey = cfg.Section("flickr").Key("api key").String()
+				log.Println(color.GreenString("IMPORTED Flickr API Key:\t\t\t%s", defaultConfig.Credentials.FlickrApiKey))
 			}
 			if cfg.Section("twitter").HasKey("consumer key") {
 				defaultConfig.Credentials.TwitterConsumerKey = cfg.Section("twitter").Key("consumer key").String()
+				log.Println(color.GreenString("IMPORTED Twitter Consumer Key:\t\t\t%s", defaultConfig.Credentials.TwitterConsumerKey))
 			}
 			if cfg.Section("twitter").HasKey("consumer secret") {
 				defaultConfig.Credentials.TwitterConsumerSecret = cfg.Section("twitter").Key("consumer secret").String()
+				log.Println(color.GreenString("IMPORTED Twitter Consumer Secret:\t\t\t%s", defaultConfig.Credentials.TwitterConsumerSecret))
 			}
 			if cfg.Section("twitter").HasKey("access token") {
 				defaultConfig.Credentials.TwitterAccessToken = cfg.Section("twitter").Key("access token").String()
+				log.Println(color.GreenString("IMPORTED Twitter Access Token:\t\t\t%s", defaultConfig.Credentials.TwitterAccessToken))
 			}
 			if cfg.Section("twitter").HasKey("access secret") {
 				defaultConfig.Credentials.TwitterAccessTokenSecret = cfg.Section("twitter").Key("access secret").String()
+				log.Println(color.GreenString("IMPORTED Twitter Access Token Secret:\t\t\t%s", defaultConfig.Credentials.TwitterAccessTokenSecret))
 			}
 
 			// General
 			if cfg.Section("general").HasKey("max download retries") {
 				defaultConfig.DownloadRetryMax = cfg.Section("general").Key("max download retries").MustInt()
+				log.Println(color.GreenString("IMPORTED Max Download Retries:\t%d", defaultConfig.DownloadRetryMax))
 			}
 			if cfg.Section("general").HasKey("download timeout") {
-				defaultConfig.DownloadRetryMax = cfg.Section("general").Key("download timeout").MustInt()
+				defaultConfig.DownloadTimeout = cfg.Section("general").Key("download timeout").MustInt()
+				log.Println(color.GreenString("IMPORTED Download Timeout:\t\t%d", defaultConfig.DownloadRetryMax))
 			}
 
 			// Status
 			if cfg.Section("status").HasKey("status enabled") {
 				defaultConfig.PresenceEnabled = cfg.Section("status").Key("status enabled").MustBool()
+				log.Println(color.GreenString("IMPORTED Presence Enabled:\t\t%s", boolS(defaultConfig.PresenceEnabled)))
 			}
 			if cfg.Section("status").HasKey("status type") {
 				defaultConfig.PresenceStatus = cfg.Section("status").Key("status type").String()
+				log.Println(color.GreenString("IMPORTED Presence Status:\t\t%s", defaultConfig.PresenceStatus))
 			}
 			if cfg.Section("status").HasKey("status label") {
 				defaultConfig.PresenceType = discordgo.GameType(cfg.Section("status").Key("status label").MustInt())
+				log.Println(color.GreenString("IMPORTED Presence Type:\t\t%d", defaultConfig.PresenceType))
 			}
 
 			// Channels
@@ -400,6 +414,7 @@ func createConfig() {
 				newChannel := configurationAdminChannel{
 					ChannelID: key,
 				}
+				log.Println(color.GreenString("IMPORTED Admin Channel:\t\t%s", key))
 				defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, newChannel)
 			}
 			ChannelWhitelist := cfg.Section("channels").KeysHash()
@@ -408,9 +423,11 @@ func createConfig() {
 					ChannelID:   key,
 					Destination: value,
 				}
+				log.Println(color.GreenString("IMPORTED Channel:\t\t\t%s to \"%s\"", key, value))
 				defaultConfig.Channels = append(defaultConfig.Channels, newChannel)
 			}
 		}
+		log.Println(color.HiGreenString("Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
 	} else {
 		baseChannel := configurationChannel{
 			ChannelID:   enteredBaseChannel,
