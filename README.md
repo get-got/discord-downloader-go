@@ -39,7 +39,7 @@ This is a Discord bot program to download files posted in specified Discord chan
 
 [**Need help? Have suggestions? Join the Discord server!**](https://discord.com/invite/6Z6FJZVaDV)
 
-### Table of Contents
+### Sections
 * [**Getting Running**](#getting-running)
 * [**Getting Started**](#getting-started)
 * [**Features**](#features)
