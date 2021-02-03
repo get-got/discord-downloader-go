@@ -144,6 +144,7 @@ var (
 	ccdReactWhenDownloaded      bool     = true
 	ccdReactWhenDownloadedEmoji string   = ""
 	ccdBlacklistReactEmojis     []string = []string{}
+	ccdTypeWhileProcessing      bool     = true
 	// Rules for Access
 	ccdUsersAllWhitelisted bool = true
 	// Rules for Saving
@@ -187,6 +188,7 @@ type configurationChannel struct {
 	ReactWhenDownloaded      *bool     `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
 	ReactWhenDownloadedEmoji *string   `json:"reactWhenDownloadedEmoji,omitempty"` // optional, defaults
 	BlacklistReactEmojis     *[]string `json:"blacklistReactEmojis,omitempty"`     // optional
+	TypeWhileProcessing      *bool     `json:"typeWhileProcessing,omitempty"`      // optional, defaults
 	// Overwrite Global Settings
 	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
 	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
@@ -568,6 +570,9 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.BlacklistReactEmojis == nil {
 		channel.BlacklistReactEmojis = &ccdBlacklistReactEmojis
+	}
+	if channel.TypeWhileProcessing == nil {
+		channel.TypeWhileProcessing = &ccdTypeWhileProcessing
 	}
 	// Rules for Access
 	if channel.UsersAllWhitelisted == nil {
