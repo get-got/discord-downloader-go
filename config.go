@@ -118,7 +118,8 @@ type configuration struct {
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
 	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
 	// Channels
-	Channels []configurationChannel `json:"channels"` // required
+	AllChannels *configurationChannel  `json:"allChannels,omitempty"` // optional, defaults
+	Channels    []configurationChannel `json:"channels"`              // required
 
 	/* IDEAS / TODO:
 
@@ -273,6 +274,9 @@ func loadConfig() {
 		// this is dumb but don't see a better way to initialize defaults
 		for i := 0; i < len(config.Channels); i++ {
 			channelDefault(&config.Channels[i])
+		}
+		if config.AllChannels != nil {
+			channelDefault(config.AllChannels)
 		}
 
 		// Debug Output
@@ -631,6 +635,9 @@ func isChannelRegistered(ChannelID string) bool {
 			}
 		}
 	}
+	if config.AllChannels != nil {
+		return true
+	}
 	return false
 }
 
@@ -648,6 +655,9 @@ func getChannelConfig(ChannelID string) configurationChannel {
 				}
 			}
 		}
+	}
+	if config.AllChannels != nil {
+		return *config.AllChannels
 	}
 	return configurationChannel{}
 }
