@@ -118,8 +118,9 @@ type configuration struct {
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
 	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
 	// Channels
-	AllChannels *configurationChannel  `json:"allChannels,omitempty"` // optional, defaults
-	Channels    []configurationChannel `json:"channels"`              // required
+	AllChannels          *configurationChannel  `json:"allChannels,omitempty"`          // optional, defaults
+	AllChannelsBlacklist *[]string              `json:"allChannelsBlacklist,omitempty"` // optional
+	Channels             []configurationChannel `json:"channels"`                       // required
 
 	/* IDEAS / TODO:
 
@@ -636,6 +637,11 @@ func isChannelRegistered(ChannelID string) bool {
 		}
 	}
 	if config.AllChannels != nil {
+		if config.AllChannelsBlacklist != nil {
+			if stringInSlice(ChannelID, *config.AllChannelsBlacklist) {
+				return false
+			}
+		}
 		return true
 	}
 	return false

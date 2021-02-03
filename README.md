@@ -363,8 +363,11 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
 * **allChannels** `[key/value objects]`
-    * **Follow ``channels`` below for variables, except channel ID(s) are not necessary.
+    * **Follow `channels` below for variables, except channel ID(s) are not necessary.
     * If a pre-existing config for the channel is not found, it will download from any and every channel it has access to, following these settings.
+* allChannelsBlacklist `[array of strings]`
+    * _Unused by Default_
+    * Blacklists channels (by ID) from `allChannels`.
 * **channels** `[array of key/value objects]`
     * _`[THIS OR BELOW]`_ **channel** `[string]`
         * Channel ID to monitor.
