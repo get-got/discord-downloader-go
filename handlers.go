@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -114,54 +113,6 @@ func handleMessage(m *discordgo.Message, edited bool) {
 		)
 		if status.Status == downloadSuccess {
 			downloadCount++
-		}
-	}
-
-	// Save All Links to File
-	if channelConfig.SaveAllLinksToFile != nil {
-		filepath := *channelConfig.SaveAllLinksToFile
-		if filepath != "" {
-			f, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-			if err != nil {
-				log.Println(color.RedString("[SaveAllLinksToFile] Failed to open file:\t%s", err))
-				f.Close()
-				return
-			}
-			defer f.Close()
-
-			var addedContent string
-			rawLinks := getRawLinks(m)
-			for _, rawLink := range rawLinks {
-				addedContent = addedContent + "\n" + rawLink.Link
-			}
-
-			if _, err = f.WriteString(addedContent); err != nil {
-				log.Println(color.RedString("[SaveAllLinksToFile] Failed to append file:\t%s", err))
-				return
-			}
-		}
-	}
-
-	if downloadCount > 0 {
-		// Filter Duplicate Images
-		if config.FilterDuplicateImages {
-			encodedStore, err := imgStore.GobEncode()
-			if err != nil {
-				log.Println(color.HiRedString("Failed to encode imgStore:\t%s"))
-			} else {
-				f, err := os.OpenFile(imgStorePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-				if err != nil {
-					log.Println(color.HiRedString("Failed to open imgStore file:\t%s"))
-				}
-				_, err = f.Write(encodedStore)
-				if err != nil {
-					log.Println(color.HiRedString("Failed to update imgStore file:\t%s"))
-				}
-				err = f.Close()
-				if err != nil {
-					log.Println(color.HiRedString("Failed to close imgStore file:\t%s"))
-				}
-			}
 		}
 	}
 }
