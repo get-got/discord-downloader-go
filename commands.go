@@ -163,9 +163,8 @@ func handleCommands() {
 
 	router.On("history", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:history]")
-		channel := ctx.Msg.ChannelID
 		args := ctx.Args.After(1)
-		if strings.ToLower(args) == "all" {
+		if strings.ToLower(args) == "all" && isBotAdmin(ctx.Msg) && isAdminChannelRegistered(ctx.Msg.ChannelID) {
 			log.Println(logPrefixHistory, color.CyanString("Beginning history for all available channels..."))
 			for _, channel := range getAllChannels() {
 				_, historyCommandIsSet := historyStatus[channel]
@@ -175,7 +174,8 @@ func handleCommands() {
 					log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
 			}
-		} else if isChannelRegistered(channel) { // Local
+		} else if isChannelRegistered(ctx.Msg.ChannelID) { // Local
+			channel := ctx.Msg.ChannelID
 			channelConfig := getChannelConfig(channel)
 			if *channelConfig.AllowCommands {
 				if isLocalAdmin(ctx.Msg) {
@@ -211,7 +211,7 @@ func handleCommands() {
 					log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked local admin perms.", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
 			}
-		} else if isAdminChannelRegistered(channel) { // Designated
+		} else if isAdminChannelRegistered(ctx.Msg.ChannelID) { // Designated
 			if isBotAdmin(ctx.Msg) {
 				channels := strings.Split(args, ",")
 				if len(channels) > 0 {
@@ -228,7 +228,7 @@ func handleCommands() {
 										log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 									}
 								} else {
-									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 								}
 								log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for %s", getUserIdentifier(*ctx.Msg.Author), channelValue))
 							}
@@ -248,7 +248,7 @@ func handleCommands() {
 								if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 									replyEmbed(ctx.Msg, "Command — History", cmderrChannelNotRegistered)
 								} else {
-									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 								}
 								log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channelValue))
 							}
@@ -261,7 +261,7 @@ func handleCommands() {
 							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 						}
 					} else {
-						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 					}
 					log.Println(logPrefixHere, color.CyanString("%s tried to cache history but input no channels", getUserIdentifier(*ctx.Msg.Author)))
 				}
@@ -272,12 +272,12 @@ func handleCommands() {
 						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
 					}
 				} else {
-					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 				}
-				log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author), channel))
+				log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author), ctx.Msg.ChannelID))
 			}
 		} else {
-			log.Println(logPrefixHere, color.CyanString("%s tried to catalog history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channel))
+			log.Println(logPrefixHere, color.CyanString("%s tried to catalog history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), ctx.Msg.ChannelID))
 		}
 	}).Alias("catalog", "cache").Cat("Admin").Desc("Catalogs history for this channel")
 
