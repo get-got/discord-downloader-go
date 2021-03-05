@@ -46,6 +46,10 @@ func handleMessage(m *discordgo.Message, edited bool) {
 	if m.Author.ID == user.ID && !config.ScanOwnMessages {
 		return
 	}
+	// Ignore bots if told to do so
+	if m.Author.Bot && *channelConfig.IgnoreBots {
+		return
+	}
 	// Ignore if told so by config
 	if !*channelConfig.Enabled || (edited && !*channelConfig.ScanEdits) {
 		return

@@ -387,6 +387,9 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[DEFAULTS]`_ scanEdits `[bool]`
         * _Default:_ `true`
         * Check edits for un-downloaded media.
+    * _`[DEFAULTS]`_ ignoreBots `[bool]`
+        * _Default:_ `false`
+        * Ignores messages from Bot users.
     * _`[OPTIONAL]`_ overwriteAutorunHistory `[bool]`
         * Overwrite global setting for autorunning history for all registered channels in background upon launch.
     * _`[DEFAULTS]`_ updatePresence `[bool]`

@@ -141,6 +141,7 @@ var (
 	ccdAllowCommands bool = true
 	ccdErrorMessages bool = true
 	ccdScanEdits     bool = true
+	ccdIgnoreBots    bool = false
 	// Appearance
 	ccdUpdatePresence           bool     = true
 	ccdReactWhenDownloaded      bool     = true
@@ -184,6 +185,7 @@ type configurationChannel struct {
 	AllowCommands           *bool `json:"allowCommands,omitempty"`           // optional, defaults
 	ErrorMessages           *bool `json:"errorMessages,omitempty"`           // optional, defaults
 	ScanEdits               *bool `json:"scanEdits,omitempty"`               // optional, defaults
+	IgnoreBots              *bool `json:"ignoreBots,omitempty"`              // optional, defaults
 	OverwriteAutorunHistory *bool `json:"overwriteAutorunHistory,omitempty"` // optional
 	// Appearance
 	UpdatePresence           *bool     `json:"updatePresence,omitempty"`           // optional, defaults
@@ -444,6 +446,7 @@ func createConfig() {
 			AllowCommands: &ccdAllowCommands,
 			ErrorMessages: &ccdErrorMessages,
 			ScanEdits:     &ccdScanEdits,
+			IgnoreBots:    &ccdIgnoreBots,
 
 			UpdatePresence:      &ccdUpdatePresence,
 			ReactWhenDownloaded: &ccdReactWhenDownloaded,
@@ -562,6 +565,9 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.ScanEdits == nil {
 		channel.ScanEdits = &ccdScanEdits
+	}
+	if channel.IgnoreBots == nil {
+		channel.IgnoreBots = &ccdIgnoreBots
 	}
 	// Appearance
 	if channel.UpdatePresence == nil {
