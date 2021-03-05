@@ -37,7 +37,7 @@
 
 This is a Discord bot program to download files posted in specified Discord channels to local folders. It can fetch highest possible quality files from various sources (listed below), aside from downloading any file directly linked or attached. _See [Features](#Features) below for full list._
 
-[**Need help? Have suggestions? Join the Discord server!**](https://discord.com/invite/6Z6FJZVaDV)
+### [**Need help? Have suggestions? Join the Discord server!**](https://discord.com/invite/6Z6FJZVaDV)
 
 ### Sections
 * [**Getting Running**](#getting-running)
