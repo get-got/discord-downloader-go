@@ -13,6 +13,30 @@ import (
 	"github.com/hako/durafmt"
 )
 
+func getAllChannels() []string {
+	var channels []string
+	if config.AllChannels != nil {
+		for _, guild := range bot.State.Guilds {
+			for _, channel := range guild.Channels {
+				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+					channels = append(channels, channel.ID)
+				}
+			}
+		}
+	} else {
+		for _, channel := range config.Channels {
+			if channel.ChannelIDs != nil {
+				for _, subchannel := range *channel.ChannelIDs {
+					channels = append(channels, subchannel)
+				}
+			} else {
+				channels = append(channels, channel.ChannelID)
+			}
+		}
+	}
+	return channels
+}
+
 //#region Presence
 
 func presenceKeyReplacement(input string) string {

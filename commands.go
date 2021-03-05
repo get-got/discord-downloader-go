@@ -165,7 +165,17 @@ func handleCommands() {
 		logPrefixHere := color.CyanString("[dgrouter:history]")
 		channel := ctx.Msg.ChannelID
 		args := ctx.Args.After(1)
-		if isChannelRegistered(channel) { // Local
+		if strings.ToLower(args) == "all" {
+			log.Println(logPrefixHistory, color.CyanString("Beginning history for all available channels..."))
+			for _, channel := range getAllChannels() {
+				_, historyCommandIsSet := historyStatus[channel]
+				if !historyCommandIsSet || historyStatus[channel] == "" {
+					handleHistory(ctx.Msg, channel)
+				} else {
+					log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
+				}
+			}
+		} else if isChannelRegistered(channel) { // Local
 			channelConfig := getChannelConfig(channel)
 			if *channelConfig.AllowCommands {
 				if isLocalAdmin(ctx.Msg) {
