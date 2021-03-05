@@ -130,6 +130,7 @@ You will need the Channel ID (see bottom of [Setup](#Setup)) if attempting to ca
 
 * `ddg history` to catalog the current channel the command is sent in (must be registered in `channels` in settings).
 * `ddg history cancel` to stop cataloging the current channel the command is sent in (must be registered in `channels` in settings).
+* `ddg history all` to catalog specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
 * `ddg history <Channel ID(s)>` to catalog specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
 * `ddg history cancel <Channel ID(s)>` to stop cataloging specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
 
