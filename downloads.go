@@ -440,8 +440,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 	if historyCmd {
 		logPrefix = logPrefixHistory + " "
 	}
-	if isChannelRegistered(message.ChannelID) {
-		channelConfig := getChannelConfig(message.ChannelID)
+	if isCommandableChannel(message) {
+		var channelConfig configurationChannel
+		if isChannelRegistered(message.ChannelID) {
+			channelConfig = getChannelConfig(message.ChannelID)
+		} else {
+			channelDefault(&channelConfig)
+		}
 
 		var err error
 
@@ -622,70 +627,71 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		subfolder := ""
+		if message.Author != nil {
+			// Subfolder Division - Server Nesting
+			if *channelConfig.DivideFoldersByServer {
+				subfolderSuffix := ""
+				if sourceName != "" && sourceName != "UNKNOWN" {
+					subfolderSuffix = sourceName
+					for _, key := range pathBlacklist {
+						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+					}
+				}
+				if subfolderSuffix != "" {
+					subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
+					subfolder = subfolder + subfolderSuffix
+					// Create folder.
+					err := os.MkdirAll(path+subfolder, 0755)
+					if err != nil {
+						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", path, err))
+						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					}
+				}
+			}
 
-		// Subfolder Division - Server Nesting
-		if *channelConfig.DivideFoldersByServer {
-			subfolderSuffix := ""
-			if sourceName != "" && sourceName != "UNKNOWN" {
-				subfolderSuffix = sourceName
-				for _, key := range pathBlacklist {
-					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+			// Subfolder Division - Channel Nesting
+			if *channelConfig.DivideFoldersByChannel {
+				subfolderSuffix := ""
+				if sourceChannelName != "" {
+					subfolderSuffix = sourceChannelName
+					for _, key := range pathBlacklist {
+						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+					}
+				}
+				if subfolderSuffix != "" {
+					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
+					// Create folder.
+					err := os.MkdirAll(path+subfolder, 0755)
+					if err != nil {
+						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating channel subfolder \"%s\": %s", path, err))
+						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					}
 				}
 			}
-			if subfolderSuffix != "" {
-				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
-				subfolder = subfolder + subfolderSuffix
-				// Create folder.
-				err := os.MkdirAll(path+subfolder, 0755)
-				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", path, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
-				}
-			}
-		}
 
-		// Subfolder Division - Channel Nesting
-		if *channelConfig.DivideFoldersByChannel {
-			subfolderSuffix := ""
-			if sourceChannelName != "" {
-				subfolderSuffix = sourceChannelName
-				for _, key := range pathBlacklist {
-					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+			// Subfolder Division - User Nesting
+			if *channelConfig.DivideFoldersByUser {
+				subfolderSuffix := message.Author.ID
+				if message.Author.Username != "" {
+					subfolderSuffix = message.Author.Username + "#" + message.Author.Discriminator
+					for _, key := range pathBlacklist {
+						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+					}
 				}
-			}
-			if subfolderSuffix != "" {
-				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
-				// Create folder.
-				err := os.MkdirAll(path+subfolder, 0755)
-				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating channel subfolder \"%s\": %s", path, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
-				}
-			}
-		}
-
-		// Subfolder Division - User Nesting
-		if *channelConfig.DivideFoldersByUser {
-			subfolderSuffix := message.Author.ID
-			if message.Author.Username != "" {
-				subfolderSuffix = message.Author.Username + "#" + message.Author.Discriminator
-				for _, key := range pathBlacklist {
-					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
-				}
-			}
-			if subfolderSuffix != "" {
-				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
-				// Create folder.
-				err := os.MkdirAll(path+subfolder, 0755)
-				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating user subfolder \"%s\": %s", path, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				if subfolderSuffix != "" {
+					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
+					// Create folder.
+					err := os.MkdirAll(path+subfolder, 0755)
+					if err != nil {
+						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating user subfolder \"%s\": %s", path, err))
+						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					}
 				}
 			}
 		}
 
 		// Subfolder Division - Content Type
-		if *channelConfig.DivideFoldersByType {
+		if *channelConfig.DivideFoldersByType && message.Author != nil {
 			subfolderSuffix := ""
 			switch contentTypeFound {
 			case "image":
@@ -773,6 +779,10 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Output
 		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 
+		userID := user.ID
+		if message.Author != nil {
+			userID = message.Author.ID
+		}
 		// Store in db
 		err = dbInsertDownload(&download{
 			URL:         inputURL,
@@ -780,7 +790,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			Destination: completePath,
 			Filename:    filename,
 			ChannelID:   message.ChannelID,
-			UserID:      message.Author.ID,
+			UserID:      userID,
 		})
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.HiRedString("Error writing to database: %s", err))
@@ -794,7 +804,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		finishTime := time.Now()
 
 		// React
-		if !historyCmd && *channelConfig.ReactWhenDownloaded {
+		if !historyCmd && *channelConfig.ReactWhenDownloaded && message.Author != nil {
 			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
 				if message.GuildID != "" {

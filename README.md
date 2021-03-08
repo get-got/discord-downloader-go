@@ -108,6 +108,7 @@ You can either create a `settings.json` following the examples & variables liste
     * Ping _(<prefix>ping - Alias: test)_
     * Status: Get an output of the current status of the bot _(<prefix>status - Alias: info)_
     * Stats: Have the bot dump stats _(<prefix>stats)_
+    * **[Must be Bot Admin]** Emojis: Saves all server emojis (within an "emojis" subfolder). _(<prefix>emojis)_
     * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
     * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
 

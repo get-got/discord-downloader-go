@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"syscall"
 	"time"
@@ -308,6 +309,61 @@ func handleCommands() {
 			}
 		}
 	}).Alias("reload", "kill").Cat("Admin").Desc("Kills the bot")
+
+	router.On("emojis", func(ctx *exrouter.Context) {
+		logPrefixHere := color.CyanString("[dgrouter:emojis]")
+		if isCommandableChannel(ctx.Msg) {
+			if isBotAdmin(ctx.Msg) {
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					args := ctx.Args.After(1)
+
+					// bootleg
+					guildID := ctx.Msg.GuildID
+					if args != "" {
+						guildID = args
+					}
+
+					destination := "emojis" + string(os.PathSeparator) + guildID + string(os.PathSeparator)
+					if isChannelRegistered(ctx.Msg.ChannelID) {
+						channelConfig := getChannelConfig(ctx.Msg.ChannelID)
+						destination = channelConfig.Destination + string(os.PathSeparator) + "emojis" + string(os.PathSeparator)
+					}
+
+					i := 0
+
+					emojis, err := bot.GuildEmojis(guildID)
+					if err == nil {
+						for _, emoji := range emojis {
+							var message discordgo.Message
+							message.ChannelID = ctx.Msg.ChannelID
+							tryDownload(
+								"https://cdn.discordapp.com/emojis/"+emoji.ID,
+								emoji.Name,
+								destination,
+								&message,
+								time.Now(),
+								false)
+
+							i++
+						}
+						_, err = replyEmbed(ctx.Msg, "Command — Emojis", fmt.Sprintf("`%d` emojis downloaded to `%s`", i, destination))
+					} else {
+						log.Println(err)
+					}
+				}
+			} else {
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := replyEmbed(ctx.Msg, "Command — Emojis", cmderrLackingBotAdminPerms)
+					if err != nil {
+						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				}
+				log.Println(logPrefixHere, color.HiCyanString("%s tried to download emojis but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
+			}
+		}
+	}).Cat("Admin").Desc("Saves all server emojis to download destination")
 
 	//#endregion
 
