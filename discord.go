@@ -211,7 +211,7 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 		Color:       getEmbedColor(channelID),
 		Footer: &discordgo.MessageEmbedFooter{
 			IconURL: projectIcon,
-			Text:    fmt.Sprintf("%s v%s — discordgo v%s", projectName, projectVersion, discordgo.VERSION),
+			Text:    fmt.Sprintf("%s v%s", projectName, projectVersion),
 		},
 	}
 }

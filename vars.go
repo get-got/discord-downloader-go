@@ -8,7 +8,7 @@ import (
 
 const (
 	projectName    = "discord-downloader-go"
-	projectLabel   = "Discord Download Bot"
+	projectLabel   = "Discord Downloader"
 	projectVersion = "1.4.2-a"
 	projectIcon    = "https://discordguide.github.io/assets/Gopher.png"
 
@@ -42,10 +42,10 @@ const (
 
 // Log prefixes aren't to be used for constant messages where context is obvious.
 var (
-	logPrefixDebug        = color.HiYellowString("[DebugOutput]")
-	logPrefixDebugExtra   = color.YellowString("[DebugOutput]")
-	logPrefixHelper       = color.HiMagentaString("[Helper]")
-	logPrefixHelperExtra  = color.MagentaString("[Helper]")
+	logPrefixDebug        = color.HiYellowString("[Debug]")
+	logPrefixDebugExtra   = color.YellowString("[Debug]")
+	logPrefixHelper       = color.HiMagentaString("[Help]")
+	logPrefixHelperExtra  = color.MagentaString("[Help]")
 	logPrefixHistory      = color.HiCyanString("[History]")
 	logPrefixHistoryExtra = color.CyanString("[History]")
 
@@ -57,10 +57,10 @@ var (
 const (
 	cmderrLackingLocalAdminPerms = "You do not have permission to use this command.\n" +
 		"\nTo use this command you must:" +
-		"\n• Be a specified bot administrator (in settings)" +
-		"\n• Be Server Owner" +
+		"\n• Be set as a bot administrator (in the settings)" +
+		"\n• Own this Discord Server" +
 		"\n• Have Server Administrator Permissions"
-	cmderrLackingBotAdminPerms = "You do not have permission to use this command. You must be a specified bot administrator."
+	cmderrLackingBotAdminPerms = "You do not have permission to use this command. Your User ID must be set as a bot administrator in the settings file."
 	cmderrChannelNotRegistered = "Specified channel is not registered in the bot settings."
 	cmderrHistoryCancelled     = "History cataloging was cancelled."
 )
