@@ -547,7 +547,14 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			contentTypeFound = "image"
 		}
 
-		// Check for valid filename, if not, replace with generic filename
+		// Filename extension fix
+		if filepath.Ext(filename) == "" {
+			possibleExtension, _ := mime.ExtensionsByType(contentType)
+			if len(possibleExtension) > 0 {
+				filename += possibleExtension[0]
+			}
+		}
+		// Filename validation
 		if !regexFilename.MatchString(filename) {
 			filename = "InvalidFilename"
 			possibleExtension, _ := mime.ExtensionsByType(contentType)
