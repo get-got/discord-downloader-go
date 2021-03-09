@@ -634,16 +634,16 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		subfolder := ""
-		if message.Author != nil {
-			// Subfolder Division - Server Nesting
-			if *channelConfig.DivideFoldersByServer {
-				subfolderSuffix := ""
-				if sourceName != "" && sourceName != "UNKNOWN" {
-					subfolderSuffix = sourceName
-					for _, key := range pathBlacklist {
-						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
-					}
+		// Subfolder Division - Server Nesting
+		if *channelConfig.DivideFoldersByServer || message.Author == nil {
+			subfolderSuffix := ""
+			if sourceName != "" && sourceName != "UNKNOWN" {
+				subfolderSuffix = sourceName
+				for _, key := range pathBlacklist {
+					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
 				}
+			}
+			if message.Author != nil {
 				if subfolderSuffix != "" {
 					subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
 					subfolder = subfolder + subfolderSuffix
