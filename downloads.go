@@ -634,28 +634,29 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		subfolder := ""
-		if message.Author != nil {
-			// Subfolder Division - Server Nesting
-			if *channelConfig.DivideFoldersByServer {
-				subfolderSuffix := ""
-				if sourceName != "" && sourceName != "UNKNOWN" {
-					subfolderSuffix = sourceName
-					for _, key := range pathBlacklist {
-						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
-					}
-				}
-				if subfolderSuffix != "" {
-					subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
-					subfolder = subfolder + subfolderSuffix
-					// Create folder.
-					err := os.MkdirAll(path+subfolder, 0755)
-					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", path, err))
-						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
-					}
+
+		// Subfolder Division - Server Nesting
+		if *channelConfig.DivideFoldersByServer || message.Author == nil {
+			subfolderSuffix := ""
+			if sourceName != "" && sourceName != "UNKNOWN" {
+				subfolderSuffix = sourceName
+				for _, key := range pathBlacklist {
+					subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
 				}
 			}
+			if subfolderSuffix != "" {
+				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
+				subfolder = subfolder + subfolderSuffix
+				// Create folder.
+				err := os.MkdirAll(path+subfolder, 0755)
+				if err != nil {
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				}
+			}
+		}
 
+		if message.Author != nil {
 			// Subfolder Division - Channel Nesting
 			if *channelConfig.DivideFoldersByChannel {
 				subfolderSuffix := ""
