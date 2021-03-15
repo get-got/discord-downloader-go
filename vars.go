@@ -44,8 +44,8 @@ const (
 var (
 	logPrefixDebug        = color.HiYellowString("[Debug]")
 	logPrefixDebugExtra   = color.YellowString("[Debug]")
-	logPrefixHelper       = color.HiMagentaString("[Help]")
-	logPrefixHelperExtra  = color.MagentaString("[Help]")
+	logPrefixHelper       = color.HiMagentaString("[Info]")
+	logPrefixHelperExtra  = color.MagentaString("[Info]")
 	logPrefixHistory      = color.HiCyanString("[History]")
 	logPrefixHistoryExtra = color.CyanString("[History]")
 
