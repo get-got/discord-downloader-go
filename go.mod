@@ -19,6 +19,7 @@ require (
 	github.com/garyburd/go-oauth v0.0.0-20180319155456-bca2e7f09a17 // indirect
 	github.com/hako/durafmt v0.0.0-20200710122514-c0fb7b4da026
 	github.com/hashicorp/go-version v1.2.1
+	github.com/kennygrant/sanitize v1.2.4
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/rivo/duplo v0.0.0-20180323201418-c4ec823d58cd
 	golang.org/x/net v0.0.0-20201016165138-7b1cca2348c0

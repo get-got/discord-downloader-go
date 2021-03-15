@@ -13,6 +13,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"github.com/kennygrant/sanitize"
 )
 
 func handleCommands() {
@@ -317,38 +318,54 @@ func handleCommands() {
 				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 					args := ctx.Args.After(1)
 
-					// bootleg
-					guildID := ctx.Msg.GuildID
+					// Determine which guild(s)
+					guilds := []string{ctx.Msg.GuildID}
 					if args != "" {
-						guildID = args
-					}
-
-					destination := "emojis" + string(os.PathSeparator) + guildID + string(os.PathSeparator)
-					if isChannelRegistered(ctx.Msg.ChannelID) {
-						channelConfig := getChannelConfig(ctx.Msg.ChannelID)
-						destination = channelConfig.Destination + string(os.PathSeparator) + "emojis" + string(os.PathSeparator)
-					}
-
-					i := 0
-
-					emojis, err := bot.GuildEmojis(guildID)
-					if err == nil {
-						for _, emoji := range emojis {
-							var message discordgo.Message
-							message.ChannelID = ctx.Msg.ChannelID
-							tryDownload(
-								"https://cdn.discordapp.com/emojis/"+emoji.ID,
-								emoji.Name,
-								destination,
-								&message,
-								time.Now(),
-								false)
-
-							i++
+						_guilds := strings.Split(args, ",")
+						if len(_guilds) > 0 {
+							for _, guild := range _guilds {
+								guild = strings.TrimSpace(guild)
+								guilds = append(guilds, guild)
+							}
 						}
-						_, err = replyEmbed(ctx.Msg, "Command — Emojis", fmt.Sprintf("`%d` emojis downloaded to `%s`", i, destination))
-					} else {
-						log.Println(err)
+					}
+
+					for _, guild := range guilds {
+						i := 0
+
+						guildName := guild
+						guildNameO := guild
+						guildInfo, err := bot.Guild(guild)
+						if err == nil {
+							guildName = sanitize.Name(guildInfo.Name)
+							guildNameO = guildInfo.Name
+						}
+
+						destination := "emojis" + string(os.PathSeparator) + guildName + string(os.PathSeparator)
+
+						emojis, err := bot.GuildEmojis(guild)
+						if err == nil {
+							for _, emoji := range emojis {
+								var message discordgo.Message
+								message.ChannelID = ctx.Msg.ChannelID
+								tryDownload(
+									"https://cdn.discordapp.com/emojis/"+emoji.ID,
+									emoji.Name,
+									destination,
+									&message,
+									time.Now(),
+									false)
+
+								i++
+							}
+							_, err = replyEmbed(ctx.Msg, "Command — Emojis",
+								fmt.Sprintf("`%d` emojis downloaded!\n• Destination: `%s`\n• Server: `%s`",
+									i, destination, guildNameO,
+								),
+							)
+						} else {
+							log.Println(err)
+						}
 					}
 				}
 			} else {
