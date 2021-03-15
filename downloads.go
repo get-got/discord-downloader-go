@@ -326,6 +326,15 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		}
 	}
 
+	if regexUrlMastodonPost.MatchString(inputURL) {
+		links, err := getMastodonPostUrls(inputURL)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.RedString("Mastodon Post URL failed for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, channelID)
+		}
+	}
+
 	// The original project has this as an option,
 	if regexUrlPossibleTistorySite.MatchString(inputURL) {
 		links, err := getPossibleTistorySiteUrls(inputURL)

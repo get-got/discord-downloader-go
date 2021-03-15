@@ -100,6 +100,7 @@ You can either create a `settings.json` following the examples & variables liste
     * Imgur _(Single Posts & Albums)_
     * Flickr _(requires API key, see config section)_
     * Google Drive _(requires API Credentials, see config section)_
+    * Mastodon
     * Tistory
     * Streamable
     * Gfycat
@@ -118,7 +119,7 @@ You can either create a `settings.json` following the examples & variables liste
 * _Implements dgrouter for commands_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
 * Channel-specific control of downloaded filetypes / content types (considers things like .mov as videos as well, rather than ignore them), Optional dividing of content types into separate folders.
-* **Download Support for Reddit**
+* **Download Support for Reddit & Mastodon!**
 * (Optional) Reactions upon download success.
 * (Optional) Discord messages upon encountered errors.
 * Extensive bot status/presence customization.

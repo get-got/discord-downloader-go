@@ -25,6 +25,7 @@ const (
 	regexpUrlTistoryLegacyWithCDN = `^http(s)?:\/\/[0-9a-z]+.daumcdn.net\/[a-z]+\/[a-zA-Z0-9\.]+\/\?scode=mtistory&fname=http(s?)%3A%2F%2F[a-z0-9]+\.uf\.tistory\.com%2F(image|original)%2F[A-Z0-9]+$`
 	regexpUrlPossibleTistorySite  = `^http(s)?:\/\/[0-9a-zA-Z\.-]+\/(m\/)?(photo\/)?[0-9]+$`
 	regexpUrlRedditPost           = `^http(s?):\/\/(www\.)?reddit\.com\/r\/([0-9a-zA-Z'_]+)?\/comments\/([0-9a-zA-Z'_]+)\/?([0-9a-zA-Z'_]+)?(.*)?$`
+	regexpUrlMastodonPost         = `^http(s)?:\/\/[0-9a-zA-Z\.-]+\/@([0-9a-zA-Z'_]+)?\/([0-9]+)?$`
 )
 
 var (
@@ -46,6 +47,7 @@ var (
 	regexUrlTistoryLegacyWithCDN *regexp.Regexp
 	regexUrlPossibleTistorySite  *regexp.Regexp
 	regexUrlRedditPost           *regexp.Regexp
+	regexUrlMastodonPost         *regexp.Regexp
 )
 
 func compileRegex() error {
@@ -120,6 +122,10 @@ func compileRegex() error {
 		return err
 	}
 	regexUrlRedditPost, err = regexp.Compile(regexpUrlRedditPost)
+	if err != nil {
+		return err
+	}
+	regexUrlMastodonPost, err = regexp.Compile(regexpUrlMastodonPost)
 	if err != nil {
 		return err
 	}
