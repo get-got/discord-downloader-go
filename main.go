@@ -75,26 +75,26 @@ func main() {
 		return
 	}
 	if myDB.Use("Downloads") == nil {
-		log.Println(color.YellowString("Creating database, please wait..."))
+		log.Println(logPrefixSetup, color.YellowString("Creating database, please wait..."))
 		if err := myDB.Create("Downloads"); err != nil {
-			log.Println(color.HiRedString("Error while trying to create database: %s", err))
+			log.Println(logPrefixSetup, color.HiRedString("Error while trying to create database: %s", err))
 			return
 		}
-		log.Println(color.HiYellowString("Created new database..."))
-		log.Println(color.YellowString("Indexing database, please wait..."))
+		log.Println(logPrefixSetup, color.HiYellowString("Created new database..."))
+		log.Println(logPrefixSetup, color.YellowString("Indexing database, please wait..."))
 		if err := myDB.Use("Downloads").Index([]string{"URL"}); err != nil {
-			log.Println(color.HiRedString("Unable to create database index for URL: %s", err))
+			log.Println(logPrefixSetup, color.HiRedString("Unable to create database index for URL: %s", err))
 			return
 		}
 		if err := myDB.Use("Downloads").Index([]string{"ChannelID"}); err != nil {
-			log.Println(color.HiRedString("Unable to create database index for ChannelID: %s", err))
+			log.Println(logPrefixSetup, color.HiRedString("Unable to create database index for ChannelID: %s", err))
 			return
 		}
 		if err := myDB.Use("Downloads").Index([]string{"UserID"}); err != nil {
-			log.Println(color.HiRedString("Unable to create database index for UserID: %s", err))
+			log.Println(logPrefixSetup, color.HiRedString("Unable to create database index for UserID: %s", err))
 			return
 		}
-		log.Println(color.HiYellowString("Created database indexes..."))
+		log.Println(logPrefixSetup, color.HiYellowString("Created database indexes..."))
 	}
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
@@ -201,9 +201,6 @@ func main() {
 	//#region Background Tasks
 
 	// Tickers
-	if config.DebugOutput {
-		log.Println(logPrefixDebug, color.YellowString("Starting background loops..."))
-	}
 	ticker5m := time.NewTicker(5 * time.Minute)
 	ticker15s := time.NewTicker(15 * time.Second)
 	go func() {
@@ -304,7 +301,7 @@ func main() {
 	log.Println(color.YellowString("Closing database..."))
 	myDB.Close()
 
-	log.Println(color.HiRedString("Exiting..."))
+	log.Println(color.HiRedString("Exiting... "))
 }
 
 func botLogin() {

@@ -308,7 +308,7 @@ func loadConfig() {
 }
 
 func createConfig() {
-	log.Println(color.YellowString("Creating new settings file..."))
+	log.Println(logPrefixSetup, color.YellowString("Creating new settings file..."))
 
 	enteredToken := placeholderToken
 	enteredEmail := placeholderEmail
@@ -341,10 +341,10 @@ func createConfig() {
 
 	// Import old config
 	if _, err := os.Stat("config.ini"); err == nil {
-		log.Println(color.HiGreenString("Detected config.ini from Seklfreak's discord-image-downloader-go, importing..."))
+		log.Println(logPrefixSetup, color.HiGreenString("Detected config.ini from Seklfreak's discord-image-downloader-go, importing..."))
 		cfg, err := ini.Load("config.ini")
 		if err != nil {
-			log.Println(color.HiRedString("Unable to read your old config file:\t%s", err))
+			log.Println(logPrefixSetup, color.HiRedString("Unable to read your old config file:\t%s", err))
 			cfg = ini.Empty()
 		} else {
 			// Import old ini
@@ -436,7 +436,7 @@ func createConfig() {
 				defaultConfig.Channels = append(defaultConfig.Channels, newChannel)
 			}
 		}
-		log.Println(color.HiGreenString("Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
+		log.Println(logPrefixSetup, color.HiGreenString("Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
 	} else {
 		baseChannel := configurationChannel{
 			ChannelID:   enteredBaseChannel,
@@ -536,14 +536,14 @@ func createConfig() {
 
 	defaultJSON, err := json.MarshalIndent(defaultConfig, "", "\t")
 	if err != nil {
-		log.Println(color.HiRedString("Failed to format new settings...\t%s", err))
+		log.Println(logPrefixSetup, color.HiRedString("Failed to format new settings...\t%s", err))
 	} else {
 		err := ioutil.WriteFile(configPath, defaultJSON, 0644)
 		if err != nil {
-			log.Println(color.HiRedString("Failed to save new settings file...\t%s", err))
+			log.Println(logPrefixSetup, color.HiRedString("Failed to save new settings file...\t%s", err))
 		} else {
-			log.Println(color.HiYellowString("Created new settings file..."))
-			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
+			log.Println(logPrefixSetup, color.HiYellowString("Created new settings file..."))
+			log.Println(logPrefixSetup, color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
 			log.Println(logPrefixHelper, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			log.Println(logPrefixHelper, color.MagentaString("See README on GitHub for help and more info..."))
 		}

@@ -27,27 +27,12 @@ const (
 	defaultReact = "✅"
 )
 
-/* Logging Colors:
-- HiCyan:		Main Init, Command Use, Handled Event Action
-- Cyan:			Main Additional Info, Command Additional Info, Handled Event Additional Info
-- HiGreen:		Discord Login Success, Save Success,
-- Green:		Discord Login Background, Save Additional Info,
-- HiYellow:		Debug, Settings,
-- Yellow:		Debug Additional Info, Settings Additional Info,
-- HiMagenta:	API Connection Success, Helper
-- Magenta:		API Connection Additional Info, Helper Additional Info
-- HiRed:		Errors, Exit,
-- Red:			Error Additional Info, Exit Additional Info,
-*/
-
 // Log prefixes aren't to be used for constant messages where context is obvious.
 var (
-	logPrefixDebug        = color.HiYellowString("[Debug]")
-	logPrefixDebugExtra   = color.YellowString("[Debug]")
-	logPrefixHelper       = color.HiMagentaString("[Info]")
-	logPrefixHelperExtra  = color.MagentaString("[Info]")
-	logPrefixHistory      = color.HiCyanString("[History]")
-	logPrefixHistoryExtra = color.CyanString("[History]")
+	logPrefixSetup   = color.HiGreenString("[Setup]")
+	logPrefixDebug   = color.HiYellowString("[Debug]")
+	logPrefixHelper  = color.HiMagentaString("[Info]")
+	logPrefixHistory = color.HiCyanString("[History]")
 
 	logPrefixFileSkip = color.GreenString(">>> SKIPPING FILE:")
 )
