@@ -326,7 +326,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		}
 	}
 
-	if regexUrlMastodonPost.MatchString(inputURL) {
+	if regexUrlMastodonPost1.MatchString(inputURL) || regexUrlMastodonPost2.MatchString(inputURL) {
 		links, err := getMastodonPostUrls(inputURL)
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.RedString("Mastodon Post URL failed for %s -- %s", inputURL, err))
