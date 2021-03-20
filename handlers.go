@@ -27,16 +27,16 @@ var (
 //#region Events
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	handleMessage(m.Message, false)
+	handleMessage(m.Message, false, false)
 }
 
 func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	if m.EditedTimestamp != discordgo.Timestamp("") {
-		handleMessage(m.Message, true)
+		handleMessage(m.Message, true, false)
 	}
 }
 
-func handleMessage(m *discordgo.Message, edited bool) {
+func handleMessage(m *discordgo.Message, edited bool, history bool) {
 	if !isChannelRegistered(m.ChannelID) {
 		return
 	}
@@ -113,7 +113,7 @@ func handleMessage(m *discordgo.Message, edited bool) {
 			channelConfig.Destination,
 			m,
 			file.Time,
-			false,
+			history,
 		)
 		if status.Status == downloadSuccess {
 			downloadCount++

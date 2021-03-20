@@ -10,7 +10,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
-	"mvdan.cc/xurls/v2"
 )
 
 var (
@@ -155,13 +154,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					bot.ChannelTyping(commandingMessage.ChannelID)
 				}
 				for _, message := range messages {
-					fileTime := time.Now()
-					if message.Timestamp != "" {
-						fileTime, err = message.Timestamp.Parse()
-						if err != nil {
-							log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to parse message timestamp:\t%s", err))
-						}
-					}
 					// Ordered to Cancel
 					if historyStatus[message.ChannelID] == "cancel" {
 						delete(historyStatus, message.ChannelID)
@@ -169,43 +161,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 
 					// Process
-					if message.Author.ID != user.ID || config.ScanOwnMessages {
-						for _, iAttachment := range message.Attachments {
-							if len(dbFindDownloadByURL(iAttachment.URL)) == 0 {
-								download := startDownload(
-									iAttachment.URL,
-									iAttachment.Filename,
-									channelConfig.Destination,
-									message,
-									fileTime,
-									true,
-								)
-								if download.Status == downloadSuccess {
-									d++
-								}
-							}
-						}
-						foundUrls := xurls.Strict().FindAllString(message.Content, -1)
-						for _, iFoundUrl := range foundUrls {
-							links := getDownloadLinks(iFoundUrl, subjectChannelID)
-							for link, filename := range links {
-								if len(dbFindDownloadByURL(link)) == 0 {
-									download := startDownload(
-										link,
-										filename,
-										channelConfig.Destination,
-										message,
-										fileTime,
-										true,
-									)
-									if download.Status == downloadSuccess {
-										d++
-									}
-								}
-							}
-						}
-						i++
-					}
+					handleMessage(message, false, true)
+					i++
 				}
 			} else {
 				// Error requesting messages
