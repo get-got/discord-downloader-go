@@ -449,7 +449,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 	if historyCmd {
 		logPrefix = logPrefixHistory + " "
 	}
-	if isCommandableChannel(message) {
+	if isCommandableChannel(message) || historyCmd {
 		var channelConfig configurationChannel
 		if isChannelRegistered(message.ChannelID) {
 			channelConfig = getChannelConfig(message.ChannelID)
