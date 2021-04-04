@@ -147,7 +147,7 @@ var (
 	ccdReactWhenDownloaded      bool     = true
 	ccdReactWhenDownloadedEmoji string   = ""
 	ccdBlacklistReactEmojis     []string = []string{}
-	ccdTypeWhileProcessing      bool     = true
+	ccdTypeWhileProcessing      bool     = false
 	// Rules for Access
 	ccdUsersAllWhitelisted bool = true
 	// Rules for Saving

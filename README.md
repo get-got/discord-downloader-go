@@ -412,7 +412,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Unused by Default_
         * Block specific emojis from being used for reacts. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
     * _`[DEFAULTS]`_ typeWhileProcessing `[bool]`
-        * _Default:_ `true`
+        * _Default:_ `false`
         * Shows _"<name> is typing..."_ while processing things that aren't processed instantly, like history cataloging.
     * _`[OPTIONAL]`_ overwriteFilenameDateFormat `[string]`
         * _Unused by Default_

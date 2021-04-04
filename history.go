@@ -150,7 +150,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to fetch message timestamp:\t%s", err))
 				}
 				// Process Messages
-				if *channelConfig.TypeWhileProcessing {
+				if *channelConfig.TypeWhileProcessing && hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
 					bot.ChannelTyping(commandingMessage.ChannelID)
 				}
 				for _, message := range messages {
