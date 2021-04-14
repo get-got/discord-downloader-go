@@ -76,12 +76,13 @@ func defaultConfiguration() configuration {
 		AllowSkipping:                  cdAllowSkipping,
 		ScanOwnMessages:                cdScanOwnMessages,
 		CheckPermissions:               cdCheckPermissions,
-		FilterDuplicateImages:          false,
-		FilterDuplicateImagesThreshold: 0,
 		AutorunHistory:                 false,
+		AsynchronousHistory:            false,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
+		FilterDuplicateImages:          false,
+		FilterDuplicateImagesThreshold: 0,
 		// Appearance
 		PresenceEnabled:      cdPresenceEnabled,
 		PresenceStatus:       cdPresenceStatus,
@@ -103,12 +104,13 @@ type configuration struct {
 	AllowSkipping                  bool                        `json:"allowSkipping"`                            // optional, defaults
 	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
 	CheckPermissions               bool                        `json:"checkPermissions,omitempty"`               // optional, defaults
-	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
-	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults
+	AsynchronousHistory            bool                        `json:"asyncHistory,omitempty"`                   // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
 	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults
+	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
+	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	// Appearance
 	PresenceEnabled          bool               `json:"presenceEnabled"`                    // optional, defaults
 	PresenceStatus           string             `json:"presenceStatus"`                     // optional, defaults

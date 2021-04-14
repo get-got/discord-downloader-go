@@ -320,16 +320,12 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ checkPermissions `[bool]`
     * _Default:_ `true`
     * Checks Discord permissions before attempting requests/actions.
-* _`[DEFAULTS]`_ filterDuplicateImages `[bool]`
-    * _Default:_ `false`
-    * **Experimental** feature to filter out images that are too similar to other cached images.
-    * _Caching of image data is stored via a database file; it will not read all pre-existing images._
-* _`[DEFAULTS]`_ filterDuplicateImagesThreshold `[float64]`
-    * _Default:_ `0`
-    * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
 * _`[OPTIONAL]`_ autorunHistory `[bool]`
     * Autorun history for all registered channels in background upon launch.
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
+* _`[OPTIONAL]`_ asyncHistory `[bool]`
+    * _Default:_ `false`
+    * Runs history commands simultaneously rather than one after the other. **NOTE:** May result in Discord API Rate Limiting, difficulty troubleshooting, exploding CPUs, melted RAM.
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`
 * _`[DEFAULTS]`_ downloadTimeout `[int]`
@@ -337,6 +333,13 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ githubUpdateChecking `[bool]`
     * _Default:_ `true`
     * Check for updates from this repo.
+* _`[DEFAULTS]`_ filterDuplicateImages `[bool]`
+    * _Default:_ `false`
+    * **Experimental** feature to filter out images that are too similar to other cached images.
+    * _Caching of image data is stored via a database file; it will not read all pre-existing images._
+* _`[DEFAULTS]`_ filterDuplicateImagesThreshold `[float64]`
+    * _Default:_ `0`
+    * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
 * _`[DEFAULTS]`_ presenceEnabled `[bool]`
     * _Default:_ `true`
 * _`[DEFAULTS]`_ presenceStatus `[string]`

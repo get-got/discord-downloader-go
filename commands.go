@@ -171,7 +171,11 @@ func handleCommands() {
 			for _, channel := range getAllChannels() {
 				_, historyCommandIsSet := historyStatus[channel]
 				if !historyCommandIsSet || historyStatus[channel] == "" {
-					handleHistory(ctx.Msg, channel)
+					if config.AsynchronousHistory {
+						go handleHistory(ctx.Msg, channel)
+					} else {
+						handleHistory(ctx.Msg, channel)
+					}
 				} else {
 					log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
@@ -196,7 +200,11 @@ func handleCommands() {
 					} else { // Start Local
 						_, historyCommandIsSet := historyStatus[channel]
 						if !historyCommandIsSet || historyStatus[channel] == "" {
-							handleHistory(ctx.Msg, channel)
+							if config.AsynchronousHistory {
+								go handleHistory(ctx.Msg, channel)
+							} else {
+								handleHistory(ctx.Msg, channel)
+							}
 						} else {
 							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
 						}
@@ -242,7 +250,11 @@ func handleCommands() {
 								_, historyCommandIsSet := historyStatus[channelValue]
 								if !historyCommandIsSet || historyStatus[channelValue] == "" {
 									historyStatus[channelValue] = ""
-									handleHistory(ctx.Msg, channelValue)
+									if config.AsynchronousHistory {
+										go handleHistory(ctx.Msg, channelValue)
+									} else {
+										handleHistory(ctx.Msg, channelValue)
+									}
 								} else {
 									log.Println(logPrefixHere, color.CyanString("Tried using history command but history is already running for %s...", channelValue))
 								}

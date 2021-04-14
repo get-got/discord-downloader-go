@@ -239,10 +239,18 @@ func main() {
 	}
 	for _, item := range autorunHistoryChannels {
 		if item.ChannelID != "" {
-			handleHistory(nil, item.ChannelID)
+			if config.AsynchronousHistory {
+				go handleHistory(nil, item.ChannelID)
+			} else {
+				handleHistory(nil, item.ChannelID)
+			}
 		} else if *item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
-				handleHistory(nil, subchannel)
+				if config.AsynchronousHistory {
+					go handleHistory(nil, subchannel)
+				} else {
+					handleHistory(nil, subchannel)
+				}
 			}
 		}
 	}
