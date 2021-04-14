@@ -36,23 +36,23 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	}
 }
 
-func handleMessage(m *discordgo.Message, edited bool, history bool) {
+func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 	if !isChannelRegistered(m.ChannelID) {
-		return
+		return -1
 	}
 	channelConfig := getChannelConfig(m.ChannelID)
 
 	// Ignore own messages unless told not to
 	if m.Author.ID == user.ID && !config.ScanOwnMessages {
-		return
+		return -1
 	}
 	// Ignore bots if told to do so
 	if m.Author.Bot && *channelConfig.IgnoreBots {
-		return
+		return -1
 	}
 	// Ignore if told so by config
 	if !*channelConfig.Enabled || (edited && !*channelConfig.ScanEdits) {
-		return
+		return -1
 	}
 
 	// Log
@@ -76,14 +76,14 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) {
 	if !*channelConfig.UsersAllWhitelisted && channelConfig.UserWhitelist != nil {
 		if !stringInSlice(m.Author.ID, *channelConfig.UserWhitelist) {
 			log.Println(color.HiYellowString("Message handling skipped due to user not being whitelisted."))
-			return
+			return -1
 		}
 	}
 	// User Blacklisting
 	if channelConfig.UserBlacklist != nil {
 		if stringInSlice(m.Author.ID, *channelConfig.UserBlacklist) {
 			log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
-			return
+			return -1
 		}
 	}
 
@@ -96,13 +96,13 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) {
 		for _, cmd := range skipCommands {
 			if m.Content == cmd {
 				log.Println(color.HiYellowString("Message handling skipped due to use of skip command."))
-				return
+				return -1
 			}
 		}
 	}
 
 	// Process Files
-	downloadCount := 0
+	var downloadCount int64
 	files := getFileLinks(m)
 	for _, file := range files {
 		log.Println(color.CyanString("> FILE: " + file.Link))
@@ -119,6 +119,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) {
 			downloadCount++
 		}
 	}
+	return downloadCount
 }
 
 //#endregion

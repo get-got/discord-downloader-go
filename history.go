@@ -161,7 +161,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 
 					// Process
-					handleMessage(message, false, true)
+					d += handleMessage(message, false, true)
 					i++
 				}
 			} else {
