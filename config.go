@@ -419,7 +419,7 @@ func createConfig() {
 
 			// Channels
 			InteractiveChannelWhitelist := cfg.Section("interactive channels").KeysHash()
-			for key, _ := range InteractiveChannelWhitelist {
+			for key := range InteractiveChannelWhitelist {
 				newChannel := configurationAdminChannel{
 					ChannelID: key,
 				}

@@ -71,7 +71,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm, commandingMessage.ChannelID))
 			}
 		}
-		log.Println(logPrefixHistory, color.CyanString(logPrefix+"Began checking history..."))
+		log.Println(logPrefixHistory, color.CyanString(logPrefix+"Began checking history for %s...", subjectChannelID))
 
 	MessageRequestingLoop:
 		for true {
@@ -94,7 +94,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if _, err = f.WriteString(beforeID); err != nil {
 						log.Println(logPrefixHistory, color.RedString("Failed to write cache file:\t%s", err))
 					} else if commandingMessage != nil && config.DebugOutput {
-						log.Println(logPrefixDebug, color.YellowString(logPrefix+"Wrote to cache file."))
+						log.Println(logPrefixDebug, logPrefixHistory, color.YellowString(logPrefix+"Wrote to cache file."))
 					}
 					f.Close()
 				}
@@ -224,7 +224,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				if err != nil {
 					log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Encountered error deleting cache file:\t%s", err))
 				} else if commandingMessage != nil && config.DebugOutput {
-					log.Println(logPrefixDebug, color.YellowString(logPrefix+"Deleted cache file."))
+					log.Println(logPrefixDebug, logPrefixHistory, color.YellowString(logPrefix+"Deleted cache file."))
 				}
 			}
 		}
