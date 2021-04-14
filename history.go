@@ -161,7 +161,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 
 					// Process
-					d += handleMessage(message, false, true)
+					downloadCount := handleMessage(message, false, true)
+					if downloadCount > 0 {
+						d += downloadCount
+					}
 					i++
 				}
 			} else {
