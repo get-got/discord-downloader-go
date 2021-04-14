@@ -262,6 +262,10 @@ func isLocalAdmin(m *discordgo.Message) bool {
 }
 
 func hasPerms(channelID string, permission int) bool {
+	if !config.CheckPermissions {
+		return true
+	}
+
 	sourceChannel, err := bot.State.Channel(channelID)
 	if sourceChannel != nil && err == nil {
 		switch sourceChannel.Type {

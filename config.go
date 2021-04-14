@@ -52,6 +52,7 @@ var (
 	cdCommandPrefix        string = "ddg "
 	cdAllowSkipping        bool   = true
 	cdScanOwnMessages      bool   = false
+	cdCheckPermissions     bool   = true
 	cdGithubUpdateChecking bool   = true
 	// Appearance
 	cdPresenceEnabled bool               = true
@@ -74,6 +75,7 @@ func defaultConfiguration() configuration {
 		CommandPrefix:                  cdCommandPrefix,
 		AllowSkipping:                  cdAllowSkipping,
 		ScanOwnMessages:                cdScanOwnMessages,
+		CheckPermissions:               cdCheckPermissions,
 		FilterDuplicateImages:          false,
 		FilterDuplicateImagesThreshold: 0,
 		AutorunHistory:                 false,
@@ -100,6 +102,7 @@ type configuration struct {
 	CommandPrefix                  string                      `json:"commandPrefix"`                            // optional, defaults
 	AllowSkipping                  bool                        `json:"allowSkipping"`                            // optional, defaults
 	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
+	CheckPermissions               bool                        `json:"checkPermissions,omitempty"`               // optional, defaults
 	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
 	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults

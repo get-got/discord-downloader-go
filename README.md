@@ -317,6 +317,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ scanOwnMessages `[bool]`
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
+* _`[DEFAULTS]`_ checkPermissions `[bool]`
+    * _Default:_ `true`
+    * Checks Discord permissions before attempting requests/actions.
 * _`[DEFAULTS]`_ filterDuplicateImages `[bool]`
     * _Default:_ `false`
     * **Experimental** feature to filter out images that are too similar to other cached images.
