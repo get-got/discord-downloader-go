@@ -206,8 +206,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     "debugOutput": true,
     "commandPrefix": "downloader_",
     "allowSkipping": true,
-    "filterDuplicates": true,
-    "filterDuplicatesThreshold": 75,
+    "filterDuplicateImages": true,
+    "filterDuplicateImagesThreshold": 75,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "githubUpdateChecking": true,
@@ -325,7 +325,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
 * _`[OPTIONAL]`_ asyncHistory `[bool]`
     * _Default:_ `false`
-    * Runs history commands simultaneously rather than one after the other. **NOTE:** May result in Discord API Rate Limiting, difficulty troubleshooting, exploding CPUs, melted RAM.
+    * Runs history commands simultaneously rather than one after the other.
+      * **NOTE:** May result in Discord API Rate Limiting, difficulty troubleshooting, exploding CPUs, melted RAM.
 * _`[DEFAULTS]`_ downloadRetryMax `[int]`
     * _Default:_ `3`
 * _`[DEFAULTS]`_ downloadTimeout `[int]`
