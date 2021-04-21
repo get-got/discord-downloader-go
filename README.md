@@ -463,6 +463,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Default:_ `false`
     * _`[DEFAULTS]`_ savePossibleDuplicates `[bool]`
         * _Default:_ `false`
+        * Save file even if exact filename already exists or exact URL is already recorded in database.
     * _`[DEFAULTS]`_ extensionBlacklist `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.

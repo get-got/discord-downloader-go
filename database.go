@@ -12,16 +12,19 @@ import (
 
 // Trim files already downloaded and stored in database
 func trimDownloadedLinks(linkList map[string]string, channelID string) map[string]string {
+	channelConfig := getChannelConfig(channelID)
+
 	newList := make(map[string]string, 0)
 	for link, filename := range linkList {
-		downloadedImages := dbFindDownloadByURL(link)
-		isMatched := false
-		for _, downloadedImage := range downloadedImages {
-			if downloadedImage.ChannelID == channelID {
-				isMatched = true
+		downloadedFiles := dbFindDownloadByURL(link)
+		alreadyDownloaded := false
+		for _, downloadedFile := range downloadedFiles {
+			if downloadedFile.ChannelID == channelID {
+				alreadyDownloaded = true
 			}
 		}
-		if isMatched == false {
+
+		if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
 			newList[link] = filename
 		} else if config.DebugOutput {
 			log.Println(logPrefixFileSkip, color.GreenString("Found URL has already been downloaded for this channel: %s", link))
