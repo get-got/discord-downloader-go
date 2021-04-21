@@ -71,7 +71,7 @@ func handleCommands() {
 	router.On("help", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:help]")
 		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-			if isCommandableChannel(ctx.Msg) {
+			if isGlobalCommandAllowed(ctx.Msg) {
 				text := ""
 				for _, cmd := range router.Routes {
 					if cmd.Category != "Admin" || isBotAdmin(ctx.Msg) {
@@ -132,7 +132,7 @@ func handleCommands() {
 		} else {
 			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 		}
-	}).Cat("Info").Alias("info").Desc("Displays info regarding the current status of the bot")
+	}).Cat("Info").Desc("Displays info regarding the current status of the bot")
 
 	router.On("stats", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:stats]")
@@ -158,6 +158,31 @@ func handleCommands() {
 			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 		}
 	}).Cat("Info").Desc("Outputs statistics regarding this channel")
+
+	router.On("info", func(ctx *exrouter.Context) {
+		logPrefixHere := color.CyanString("[dgrouter:info]")
+		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+			if isGlobalCommandAllowed(ctx.Msg) {
+				content := fmt.Sprintf("Here is some useful info...\n\n"+
+					"• **Your User ID —** `%s`\n"+
+					"• **Bots User ID —** `%s`\n"+
+					"• **This Channel ID —** `%s`\n"+
+					"• **This Server ID —** `%s`"+
+					"\n\nRemember to remove any spaces when copying to settings.",
+					ctx.Msg.Author.ID, user.ID, ctx.Msg.ChannelID, ctx.Msg.GuildID)
+				_, err := replyEmbed(ctx.Msg, "Command — Info", content)
+				// Failed to send
+				if err != nil {
+					log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+				}
+				log.Println(logPrefixHere, color.HiCyanString("%s requested info", getUserIdentifier(*ctx.Msg.Author)))
+			} else {
+				log.Println(logPrefixHere, color.HiRedString("%s tried using the info command but commands are disabled here", getUserIdentifier(*ctx.Msg.Author)))
+			}
+		} else {
+			log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+		}
+	}).Cat("Info").Desc("Displays info regarding Discord IDs")
 
 	//#endregion
 
@@ -325,7 +350,7 @@ func handleCommands() {
 
 	router.On("emojis", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:emojis]")
-		if isCommandableChannel(ctx.Msg) {
+		if isGlobalCommandAllowed(ctx.Msg) {
 			if isBotAdmin(ctx.Msg) {
 				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 					args := ctx.Args.After(1)

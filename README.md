@@ -105,11 +105,12 @@ You can either create a `settings.json` following the examples & variables liste
     * Streamable
     * Gfycat
 * ***Commands:***
-    * Help _(<prefix>help - Alias: commands)_
+    * _[GLOBAL]_ Help _(<prefix>help - Alias: commands)_
     * Ping _(<prefix>ping - Alias: test)_
     * Status: Get an output of the current status of the bot _(<prefix>status - Alias: info)_
     * Stats: Have the bot dump stats _(<prefix>stats)_
-    * **[Must be Bot Admin]** Emojis: Saves all server emojis (within an "emojis" subfolder). _(<prefix>emojis)_
+    * _[GLOBAL]_ Info: Send Discord ID information.
+    * _[GLOBAL_ - **Must be Bot Admin]** Emojis: Saves all server emojis (within an "emojis" subfolder). _(<prefix>emojis)_
     * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
     * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
 
@@ -320,6 +321,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ checkPermissions `[bool]`
     * _Default:_ `true`
     * Checks Discord permissions before attempting requests/actions.
+* _`[DEFAULTS]`_ allowGlobalCommands `[bool]`
+    * _Default:_ `true`
+    * Allow certain commands to be used even if not registered in `channels` or `adminChannels`.
 * _`[OPTIONAL]`_ autorunHistory `[bool]`
     * Autorun history for all registered channels in background upon launch.
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._

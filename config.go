@@ -53,6 +53,7 @@ var (
 	cdAllowSkipping        bool   = true
 	cdScanOwnMessages      bool   = false
 	cdCheckPermissions     bool   = true
+	cdAllowGlobalCommands  bool   = true
 	cdGithubUpdateChecking bool   = true
 	// Appearance
 	cdPresenceEnabled bool               = true
@@ -76,6 +77,7 @@ func defaultConfiguration() configuration {
 		AllowSkipping:                  cdAllowSkipping,
 		ScanOwnMessages:                cdScanOwnMessages,
 		CheckPermissions:               cdCheckPermissions,
+		AllowGlobalCommands:            cdAllowGlobalCommands,
 		AutorunHistory:                 false,
 		AsynchronousHistory:            false,
 		DownloadRetryMax:               3,
@@ -104,6 +106,7 @@ type configuration struct {
 	AllowSkipping                  bool                        `json:"allowSkipping"`                            // optional, defaults
 	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
 	CheckPermissions               bool                        `json:"checkPermissions,omitempty"`               // optional, defaults
+	AllowGlobalCommands            bool                        `json:"allowGlobalCommmands,omitempty"`           // optional, defaults
 	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults
 	AsynchronousHistory            bool                        `json:"asyncHistory,omitempty"`                   // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
@@ -709,6 +712,13 @@ func isCommandableChannel(m *discordgo.Message) bool {
 		if *channelConfig.AllowCommands || isBotAdmin(m) {
 			return true
 		}
+	}
+	return false
+}
+
+func isGlobalCommandAllowed(m *discordgo.Message) bool {
+	if config.AllowGlobalCommands || isCommandableChannel(m) {
+		return true
 	}
 	return false
 }
