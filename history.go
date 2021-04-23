@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -16,7 +17,7 @@ var (
 	historyStatus map[string]string
 )
 
-func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string) int {
+func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
 	// Identifier
 	var commander string = "AUTORUN"
 	if commandingMessage != nil {
@@ -39,7 +40,15 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	var batch int = 0
 
 	var beforeID string
+	if before != "" {
+		beforeID = before
+	}
 	var beforeTime time.Time
+
+	var sinceID string
+	if since != "" {
+		sinceID = since
+	}
 
 	var err error
 	var message *discordgo.Message = nil
@@ -105,9 +114,19 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						d, i, beforeTime))
 					if message != nil {
 						if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
-							content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n`(%d)` _Processing more messages, please wait..._",
+							extraContent := ""
+							if since != "" {
+								extraContent += fmt.Sprintf("**Since:** `%s`\n", discordSnowflakeToTimestamp(since, "2006-01-02"))
+							}
+							if before != "" {
+								extraContent += fmt.Sprintf("**Before:** `%s`", discordSnowflakeToTimestamp(before, "2006-01-02"))
+							}
+							if extraContent != "" {
+								extraContent += "\n\n"
+							}
+							content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n%s`(%d)` _Processing more messages, please wait..._",
 								durafmt.ParseShort(time.Since(historyStartTime)).String(),
-								formatNumber(d), formatNumber(i), batch)
+								formatNumber(d), formatNumber(i), extraContent, batch)
 							message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 								ID:      message.ID,
 								Channel: message.ChannelID,
@@ -136,7 +155,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 
 			// Request More
-			messages, err := bot.ChannelMessages(subjectChannelID, 100, beforeID, "", "")
+			messages, err := bot.ChannelMessages(subjectChannelID, 100, beforeID, sinceID, "")
 			if err == nil {
 				// No More Messages
 				if len(messages) <= 0 {
@@ -149,6 +168,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				if err != nil {
 					log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to fetch message timestamp:\t%s", err))
 				}
+				sinceID = ""
 				// Process Messages
 				if *channelConfig.TypeWhileProcessing && hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
 					bot.ChannelTyping(commandingMessage.ChannelID)
@@ -158,6 +178,21 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if historyStatus[message.ChannelID] == "cancel" {
 						delete(historyStatus, message.ChannelID)
 						break MessageRequestingLoop
+					}
+
+					// Check Before/Since
+					message_int64, _ := strconv.ParseInt(message.ID, 10, 64)
+					if before != "" {
+						before_int64, _ := strconv.ParseInt(before, 10, 64)
+						if message_int64 > before_int64 {
+							continue
+						}
+					}
+					if since != "" {
+						since_int64, _ := strconv.ParseInt(since, 10, 64)
+						if message_int64 < since_int64 {
+							continue
+						}
 					}
 
 					// Process
@@ -189,10 +224,21 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		if commandingMessage != nil {
 			if message != nil {
 				if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
-					contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n_Duration was %s_",
+					extraContent := ""
+					if since != "" {
+						extraContent += fmt.Sprintf("**Since:** `%s`\n", discordSnowflakeToTimestamp(since, "2006-01-02"))
+					}
+					if before != "" {
+						extraContent += fmt.Sprintf("**Before:** `%s`", discordSnowflakeToTimestamp(before, "2006-01-02"))
+					}
+					if extraContent != "" {
+						extraContent += "\n\n"
+					}
+					contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n%s_Duration was %s_",
 						durafmt.ParseShort(time.Since(historyStartTime)).String(),
 						formatNumber(int64(d)), formatNumber(int64(i)),
 						subjectChannelID, batch,
+						extraContent,
 						durafmt.Parse(time.Since(historyStartTime)).String(),
 					)
 					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{

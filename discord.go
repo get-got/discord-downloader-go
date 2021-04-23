@@ -13,6 +13,32 @@ import (
 	"github.com/hako/durafmt"
 )
 
+const (
+	DISCORD_EPOCH = 1420070400000
+)
+
+//TODO: Clean these two
+
+func discordTimestampToSnowflake(format string, timestamp string) string {
+	t, err := time.Parse(format, timestamp)
+	if err == nil {
+		return fmt.Sprint(((t.Local().UnixNano() / int64(time.Millisecond)) - DISCORD_EPOCH) << 22)
+	}
+	log.Println(color.HiRedString("Failed to convert timestamp to discord snowflake... Format: '%s', Timestamp: '%s' - Error:\t%s",
+		format, timestamp, err),
+	)
+	return ""
+}
+
+func discordSnowflakeToTimestamp(snowflake string, format string) string {
+	i, err := strconv.ParseInt(snowflake, 10, 64)
+	if err != nil {
+		return ""
+	}
+	t := time.Unix(0, ((i>>22)+DISCORD_EPOCH)*1000000)
+	return t.Format(format)
+}
+
 func getAllChannels() []string {
 	var channels []string
 	if config.AllChannels != nil {

@@ -190,28 +190,68 @@ func handleCommands() {
 
 	router.On("history", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:history]")
-		args := ctx.Args.After(1)
-		if strings.ToLower(args) == "all" && isBotAdmin(ctx.Msg) && isAdminChannelRegistered(ctx.Msg.ChannelID) {
-			log.Println(logPrefixHistory, color.CyanString("Beginning history for all available channels..."))
-			for _, channel := range getAllChannels() {
-				_, historyCommandIsSet := historyStatus[channel]
-				if !historyCommandIsSet || historyStatus[channel] == "" {
-					if config.AsynchronousHistory {
-						go handleHistory(ctx.Msg, channel)
-					} else {
-						handleHistory(ctx.Msg, channel)
+
+		// Vars
+		var channels []string
+		var before string
+		var beforeID string
+		var since string
+		var sinceID string
+		var stop bool
+
+		// Keys
+		beforeKey := "--before="
+		sinceKey := "--since="
+
+		// Parse Args
+		for k, v := range ctx.Args {
+			if k == 0 {
+				continue
+			}
+			if strings.Contains(strings.ToLower(v), beforeKey) {
+				before = strings.ReplaceAll(strings.ToLower(v), beforeKey, "")
+				beforeID = discordTimestampToSnowflake("2006-01-02", before)
+				log.Println("TEST: beforeID =", beforeID)
+			} else if strings.Contains(strings.ToLower(v), sinceKey) {
+				since = strings.ReplaceAll(strings.ToLower(v), sinceKey, "")
+				sinceID = discordTimestampToSnowflake("2006-01-02", since)
+				log.Println("TEST: sinceID =", sinceID)
+			} else if strings.Contains(strings.ToLower(v), "cancel") || strings.Contains(strings.ToLower(v), "stop") {
+				stop = true
+			} else {
+				targets := strings.Split(ctx.Args.Get(k), ",")
+				for _, target := range targets {
+					if isNumeric(target) {
+						channels = append(channels, target)
+					} else if strings.Contains(strings.ToLower(target), "all") {
+						channels = getAllChannels()
 					}
-				} else {
-					log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
 			}
-		} else if isChannelRegistered(ctx.Msg.ChannelID) { // Local
-			channel := ctx.Msg.ChannelID
-			channelConfig := getChannelConfig(channel)
-			if *channelConfig.AllowCommands {
-				if isLocalAdmin(ctx.Msg) {
-					// Cancel Local
-					if historyStatus[channel] == "downloading" && strings.ToLower(strings.TrimSpace(args)) == "cancel" {
+		}
+		if len(channels) == 0 {
+			channels = append(channels, ctx.Msg.ChannelID)
+		}
+
+		// Foreach Channel
+		for _, channel := range channels {
+			// Registered check
+			if isCommandableChannel(ctx.Msg) {
+				// Permission check
+				if isBotAdmin(ctx.Msg) || isLocalAdmin(ctx.Msg) {
+					// Run
+					if !stop {
+						_, historyCommandIsSet := historyStatus[channel]
+						if !historyCommandIsSet || historyStatus[channel] == "" {
+							if config.AsynchronousHistory {
+								go handleHistory(ctx.Msg, channel, beforeID, sinceID)
+							} else {
+								handleHistory(ctx.Msg, channel, beforeID, sinceID)
+							}
+						} else { // ALREADY RUNNING
+							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
+						}
+					} else if historyStatus[channel] == "downloading" {
 						historyStatus[channel] = "cancel"
 						if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 							_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
@@ -221,20 +261,9 @@ func handleCommands() {
 						} else {
 							log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 						}
-						log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for %s", getUserIdentifier(*ctx.Msg.Author), channel))
-					} else { // Start Local
-						_, historyCommandIsSet := historyStatus[channel]
-						if !historyCommandIsSet || historyStatus[channel] == "" {
-							if config.AsynchronousHistory {
-								go handleHistory(ctx.Msg, channel)
-							} else {
-								handleHistory(ctx.Msg, channel)
-							}
-						} else {
-							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
-						}
+						log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for \"%s\"", getUserIdentifier(*ctx.Msg.Author), channel))
 					}
-				} else {
+				} else { // DOES NOT HAVE PERMISSION
 					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 						_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingLocalAdminPerms)
 						if err != nil {
@@ -243,80 +272,11 @@ func handleCommands() {
 					} else {
 						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 					}
-					log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked local admin perms.", getUserIdentifier(*ctx.Msg.Author), channel))
+					log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked proper permission.", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
+			} else { // CHANNEL NOT REGISTERED
+				log.Println(logPrefixHere, color.CyanString("%s tried to catalog history for \"%s\" but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channel))
 			}
-		} else if isAdminChannelRegistered(ctx.Msg.ChannelID) { // Designated
-			if isBotAdmin(ctx.Msg) {
-				channels := strings.Split(args, ",")
-				if len(channels) > 0 {
-					// Cancel Designated
-					if strings.ToLower(strings.TrimSpace(ctx.Args.Get(1))) == "cancel" {
-						channels = strings.Split(ctx.Args.After(2), ",")
-						for _, channelValue := range channels {
-							channelValue = strings.TrimSpace(channelValue)
-							if historyStatus[channelValue] == "downloading" {
-								historyStatus[channelValue] = "cancel"
-								if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-									_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
-									if err != nil {
-										log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
-									}
-								} else {
-									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
-								}
-								log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for %s", getUserIdentifier(*ctx.Msg.Author), channelValue))
-							}
-						}
-					} else { // Start Designated
-						for _, channelValue := range channels {
-							channelValue = strings.TrimSpace(channelValue)
-							if isChannelRegistered(channelValue) {
-								_, historyCommandIsSet := historyStatus[channelValue]
-								if !historyCommandIsSet || historyStatus[channelValue] == "" {
-									historyStatus[channelValue] = ""
-									if config.AsynchronousHistory {
-										go handleHistory(ctx.Msg, channelValue)
-									} else {
-										handleHistory(ctx.Msg, channelValue)
-									}
-								} else {
-									log.Println(logPrefixHere, color.CyanString("Tried using history command but history is already running for %s...", channelValue))
-								}
-							} else {
-								if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-									replyEmbed(ctx.Msg, "Command — History", cmderrChannelNotRegistered)
-								} else {
-									log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
-								}
-								log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channelValue))
-							}
-						}
-					}
-				} else {
-					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-						_, err := replyEmbed(ctx.Msg, "Command — History", "Please enter valid channel ID(s)...\n\n_Ex:_ ``<prefix>history <id1>,<id2>,<id3>``")
-						if err != nil {
-							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
-						}
-					} else {
-						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
-					}
-					log.Println(logPrefixHere, color.CyanString("%s tried to cache history but input no channels", getUserIdentifier(*ctx.Msg.Author)))
-				}
-			} else {
-				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms)
-					if err != nil {
-						log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
-					}
-				} else {
-					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
-				}
-				log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author), ctx.Msg.ChannelID))
-			}
-		} else {
-			log.Println(logPrefixHere, color.CyanString("%s tried to catalog history for %s but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), ctx.Msg.ChannelID))
 		}
 	}).Alias("catalog", "cache").Cat("Admin").Desc("Catalogs history for this channel")
 
