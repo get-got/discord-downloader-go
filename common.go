@@ -186,4 +186,9 @@ func isNumeric(s string) bool {
 	return err == nil
 }
 
+func isDate(s string) bool {
+	_, err := time.Parse("2006-01-02", s)
+	return err == nil
+}
+
 //#endregion

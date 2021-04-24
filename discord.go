@@ -36,7 +36,7 @@ func discordSnowflakeToTimestamp(snowflake string, format string) string {
 		return ""
 	}
 	t := time.Unix(0, ((i>>22)+DISCORD_EPOCH)*1000000)
-	return t.Format(format)
+	return t.Local().Format(format)
 }
 
 func getAllChannels() []string {

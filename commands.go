@@ -223,12 +223,18 @@ func handleCommands() {
 			}
 			if strings.Contains(strings.ToLower(v), beforeKey) {
 				before = strings.ReplaceAll(strings.ToLower(v), beforeKey, "")
-				beforeID = discordTimestampToSnowflake("2006-01-02", before)
-				log.Println("TEST: beforeID =", beforeID)
+				if isDate(since) {
+					beforeID = discordTimestampToSnowflake("2006-01-02", before)
+				} else if isNumeric(before) {
+					beforeID = before
+				}
 			} else if strings.Contains(strings.ToLower(v), sinceKey) {
 				since = strings.ReplaceAll(strings.ToLower(v), sinceKey, "")
-				sinceID = discordTimestampToSnowflake("2006-01-02", since)
-				log.Println("TEST: sinceID =", sinceID)
+				if isDate(since) {
+					sinceID = discordTimestampToSnowflake("2006-01-02", since)
+				} else if isNumeric(since) {
+					sinceID = since
+				}
 			} else if strings.Contains(strings.ToLower(v), "cancel") || strings.Contains(strings.ToLower(v), "stop") {
 				stop = true
 			} else {
