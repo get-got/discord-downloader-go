@@ -16,6 +16,19 @@ import (
 	"github.com/kennygrant/sanitize"
 )
 
+// Multiple use messages to save space and make cleaner.
+//TODO: Implement this for more?
+const (
+	cmderrLackingLocalAdminPerms = "You do not have permission to use this command.\n" +
+		"\nTo use this command you must:" +
+		"\n• Be set as a bot administrator (in the settings)" +
+		"\n• Own this Discord Server" +
+		"\n• Have Server Administrator Permissions"
+	cmderrLackingBotAdminPerms = "You do not have permission to use this command. Your User ID must be set as a bot administrator in the settings file."
+	cmderrChannelNotRegistered = "Specified channel is not registered in the bot settings."
+	cmderrHistoryCancelled     = "History cataloging was cancelled."
+)
+
 func handleCommands() {
 	router := exrouter.New()
 
