@@ -1,5 +1,5 @@
 <h1 align="center">
-    Discord Downloader _Go_
+    Discord Downloader <i>Go</i>
 </h1>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Travis Build">
@@ -28,6 +28,7 @@
         <b>DOWNLOAD LATEST RELEASE</b>
     </a>
 </h2>
+
 This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization, and can process all old messages within channels. _See [Features](#Features) below for full list._
 
 <h3 align="center">
@@ -36,7 +37,7 @@ This is a program that connects to a Discord Bot or User to locally download fil
 <h4 align="center">
     For list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
 </h4>
-<hr/>
+<br/>
 <h3 align="center">
     <a href="https://discord.com/invite/6Z6FJZVaDV">
         <b>Need help? Have suggestions? Join the Discord server!</b>
