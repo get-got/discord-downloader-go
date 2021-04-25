@@ -203,7 +203,6 @@ func handleCommands() {
 
 	router.On("history", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:history]")
-
 		// Vars
 		var channels []string
 		var before string
@@ -211,11 +210,9 @@ func handleCommands() {
 		var since string
 		var sinceID string
 		var stop bool
-
 		// Keys
 		beforeKey := "--before="
 		sinceKey := "--since="
-
 		// Parse Args
 		for k, v := range ctx.Args {
 			if k == 0 {
@@ -248,10 +245,9 @@ func handleCommands() {
 				}
 			}
 		}
-		if len(channels) == 0 {
+		if len(channels) == 0 { // Local
 			channels = append(channels, ctx.Msg.ChannelID)
 		}
-
 		// Foreach Channel
 		for _, channel := range channels {
 			// Registered check
