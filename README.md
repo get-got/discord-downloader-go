@@ -89,7 +89,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
 ## Getting Started
-_Confused? Try looking at [](#getting-started-step-by-step)._
+_Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)._
 
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
@@ -104,7 +104,7 @@ You can either create a `settings.json` following the examples & variables liste
 - [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
 - [Having issues? Try this JSON Validator to ensure it's correctly formatted.](https://jsonformatter.curiousconcept.com/)
 
-#### Getting Started Step-by-Step
+### Getting Started Step-by-Step
 1. Download & put executable within it's own folder.
 2. Configure Main Settings (or run once to have settings generated). [_(SEE BELOW)_](#list-of-settings)
 3. Enter your login credentials in the `"credentials"` section. [_(SEE BELOW)_](#list-of-settings)
@@ -113,7 +113,7 @@ You can either create a `settings.json` following the examples & variables liste
 6. Put your desired Discord Channel IDs into the `"channels"` section. [_(SEE BELOW)_](#list-of-settings)
 - I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
 
-### Bot Login Credentials
+### Bot Login Credentials...
 * If using a **Bot Application,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
 * If using a **User Account (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
 * If using a **User Account (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`. **You must also set `userBot` within the `credentials` section of the settings.json to `true`.**
@@ -153,9 +153,9 @@ If no channel IDs are specified, it will try and use the channel ID for the chan
 
 Argument / Flag         | Details
 ---                     | ---
-**channel ID(s)**       | One or more channel IDs to download from, separated by commas if multiple.
-`all`                   | Download history for all available registered channels.
-`cancel` or `stop`      | Stop downloading history for a channel.
+**channel ID(s)**       | One or more channel IDs, separated by commas if multiple.
+`all`                   | Use all available registered channels.
+`cancel` or `stop`      | Stop downloading history for specified channel(s).
 `--since=YYYY-MM-DD`    | Will process messages sent after this date.
 `--since=message_id`    | Will process messages sent after this message.
 `--before=YYYY-MM-DD`   | Will process messages sent before this date.
@@ -230,10 +230,10 @@ This setup exempts many options so they will use default values _(see below)_. I
 {
     "credentials": {
         "token": "YOUR_TOKEN",
-        "twitterAccessToken": "",
-        "twitterAccessTokenSecret": "",
-        "twitterConsumerKey": "",
-        "twitterConsumerSecret": ""
+        "twitterAccessToken": "aaa",
+        "twitterAccessTokenSecret": "bbb",
+        "twitterConsumerKey": "ccc",
+        "twitterConsumerSecret": "ddd"
     },
     "admins": [ "YOUR_DISCORD_USER_ID", "YOUR_FRIENDS_DISCORD_USER_ID" ],
     "adminChannels": [
@@ -289,16 +289,82 @@ This setup exempts many options so they will use default values _(see below)_. I
             "destination": "media2",
             "usersAllWhitelisted": false,
             "userWhitelist": [ "MY_USER_ID" ],
+`Example - Pretty Much Every Setting settings.json:`
+```javascript
+{
+    "credentials": {
+        "token": "YOUR_TOKEN",
+        "userBot": true,
+        "twitterAccessToken": "aaa",
+        "twitterAccessTokenSecret": "bbb",
+        "twitterConsumerKey": "ccc",
+        "twitterConsumerSecret": "ddd",
+        "flickrApiKey": "eee",
+        "googleDriveCredentialsJSON": "googleDriveCreds.json"
+    },
+    "admins": [ "YOUR_DISCORD_USER_ID", "YOUR_FRIENDS_DISCORD_USER_ID" ],
+    "adminChannels": [
+        {
+            "channel": "CHANNEL_IN_MY_SERVER"
+        },
+        {
+            "channel": "CHANNEL_IN_FRIENDS_SERVER"
+        }
+    ],
+    "debugOutput": true,
+    "commandPrefix": "d_",
+    "allowSkipping": true,
+    "scanOwnMessages": true,
+    "checkPermissions": false,
+    "allowGlobalCommands": false,
+    "autorunHistory": true,
+    "asyncHistory": true,
+    "downloadRetryMax": 5,
+    "downloadTimeout": 120,
+    "githubUpdateChecking": false,
+    "filterDuplicateImages": true,
+    "filterDuplicateImagesThreshold": 50,
+    "presenceEnabled": true,
+    "presenceStatus": "idle",
+    "presenceType": 3,
+    "presenceOverwrite": "{{count}} things",
+    "presenceOverwriteDetails": "these are my details",
+    "presenceOverwriteState": "this is my state",
+    "filenameDateFormat": "2006.01.02_15.04.05_",
+    "embedColor": "#FF0000",
+    "inflateCount": 69,
+    "numberFormatEuropean": true,
+    "allChannels": {
+        "destination": "X:/Discord Downloads/Unregistered",
+        "userBlacklist": [ "USER_ID_FOR_PERSON_I_DONT_LIKE" ],
+        "divideFoldersByType": false,
+        "saveImages": true,
+        "saveVideos": true,
+        "saveAudioFiles": true,
+        "saveTextFiles": true,
+        "saveOtherFiles": true,
+        "savePossibleDuplicates": true,
+        "extensionBlacklist": [
+            ".htm",
+            ".html",
+            ".php"
+        ]
+    },
+    "allChannelsBlacklist": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
+    "channels": [
+        {
+            "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
+            "destination": "X:/Discord Downloads/Media",
+            "overwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
             "saveTextFiles": false,
-            "saveOtherFiles": false,
-            "domainBlacklist": [ "cdn.discordapp.com" ]
+            "saveOtherFiles": false
         },
         {
             "channel": "THIS_CHANNEL_IS_STEALTHY",
-            "destination": "stealthy files",
+            "destination": "X:/Discord Downloads/XXX",
             "allowCommands": false,
             "errorMessages": false,
             "updatePresence": false,
@@ -306,10 +372,11 @@ This setup exempts many options so they will use default values _(see below)_. I
         },
         {
             "channels": [ "CHANNEL_1", "CHANNEL_2", "CHANNEL_3", "CHANNEL_4", "CHANNEL_5" ],
-            "destination": "lots of stuff",
+            "destination": "X:/Discord Downloads/Public Discord Memes",
             "allowCommands": false,
             "errorMessages": false,
-            "updatePresence": false
+            "updatePresence": false,
+            "reactWhenDownloaded": false
         }
     ]
 }
