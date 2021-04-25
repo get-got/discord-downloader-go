@@ -89,6 +89,8 @@ While this project works for user logins, I do not reccomend it as you risk acco
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
 ## Getting Started
+_Confused? Try looking at [](#getting-started-step-by-step)._
+
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
@@ -101,6 +103,15 @@ Depending on your purpose for this program, there are various ways you can run i
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
 - [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
 - [Having issues? Try this JSON Validator to ensure it's correctly formatted.](https://jsonformatter.curiousconcept.com/)
+
+#### Getting Started Step-by-Step
+1. Download & put executable within it's own folder.
+2. Configure Main Settings (or run once to have settings generated). [_(SEE BELOW)_](#list-of-settings)
+3. Enter your login credentials in the `"credentials"` section. [_(SEE BELOW)_](#list-of-settings)
+4. Put your Discord User ID as in the `"admins"` array of the settings. [_(SEE BELOW)_](#list-of-settings)
+5. Put a Discord Channel ID for a private channel you have access to into the `"adminChannels"`. [_(SEE BELOW)_](#list-of-settings)
+6. Put your desired Discord Channel IDs into the `"channels"` section. [_(SEE BELOW)_](#list-of-settings)
+- I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
 
 ### Bot Login Credentials
 * If using a **Bot Application,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
@@ -407,7 +418,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
 * **"allChannels"** `[key/value objects]`
-    * **Follow `channels` below for variables, except channel ID(s) are not necessary.
+    * **Follow `channels` below for variables, except channel ID(s) are not necessary.**
     * If a pre-existing config for the channel is not found, it will download from any and every channel it has access to, following these settings.
 * "allChannelsBlacklist" `[array of strings]`
     * _Unused by Default_
