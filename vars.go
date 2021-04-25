@@ -19,8 +19,9 @@ const (
 
 	configPath       = "settings.json"
 	databasePath     = "database"
-	historyCachePath = databasePath + string(os.PathSeparator) + ".history"
-	imgStorePath     = databasePath + string(os.PathSeparator) + "imgStore"
+	cachePath        = "cache"
+	historyCachePath = cachePath + string(os.PathSeparator) + "history"
+	imgStorePath     = cachePath + string(os.PathSeparator) + "imgStore"
 
 	defaultReact = "✅"
 )
