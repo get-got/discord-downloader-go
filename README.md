@@ -53,19 +53,21 @@ This is a program that connects to a Discord Bot or User to locally download fil
 </h3>
 
 ## Features
-### Supported File Downloading
-    * Discord File Attachments
-    * Direct Links to Files
-    * Twitter _(requires API key, see config section)_
-    * Instagram
-    * Reddit
-    * Imgur _(Single Posts & Albums)_
-    * Flickr _(requires API key, see config section)_
-    * Google Drive _(requires API Credentials, see config section)_
-    * Mastodon
-    * Tistory
-    * Streamable
-    * Gfycat
+
+### Supported Download Sources
+* Discord File Attachments
+* Direct Links to Files
+* Twitter _(requires API key, see config section)_
+* Instagram
+* Reddit
+* Imgur _(Single Posts & Albums)_
+* Flickr _(requires API key, see config section)_
+* Google Drive _(requires API Credentials, see config section)_
+* Mastodon
+* Tistory
+* Streamable
+* Gfycat
+  
 ### Commands
 Commands are used as `ddg <command> <?arguments?>` _(unless you've changed the prefix)_
 Command     | Arguments? | Description
@@ -175,6 +177,7 @@ When initially launching the bot it will create a default settings file if you d
 The following example is for a Bot Application _(using a token)_, bound to 1 channel.
 
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
+
 `Example - Barebones settings.json:`
 ```javascript
 {
