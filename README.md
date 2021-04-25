@@ -244,36 +244,21 @@ This setup exempts many options so they will use default values _(see below)_. I
     "debugOutput": true,
     "commandPrefix": "downloader_",
     "allowSkipping": true,
-    "filterDuplicateImages": true,
-    "filterDuplicateImagesThreshold": 75,
+    "allowGlobalCommands": true,
+    "asyncHistory": true,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "githubUpdateChecking": true,
+    "filterDuplicateImages": true,
+    "filterDuplicateImagesThreshold": 75,
+    "presenceEnabled": true,
     "presenceStatus": "dnd",
     "presenceType": 3,
     "presenceOverwrite": "{{count}} files",
-    "filenameDateFormat": "2006.01.02-15.04.05_",
-    "embedColor": "#29BEB0",
-    "inflateCount": 123456,
+    "filenameDateFormat": "2006.01.02-15.04.05 ",
+    "embedColor": "#EE22CC",
+    "inflateCount": 12345,
     "channels": [
-        {
-            "channel": "THIS_CHANNEL_DOWNLOADS_EVERYTHING",
-            "destination": "EVERYTHING",
-            "overwriteEmbedColor": "#FF0000",
-            "userBlacklist": [ "USER_ID_FOR_PERSON_I_DONT_LIKE" ],
-            "divideFoldersByType": false,
-            "saveImages": true,
-            "saveVideos": true,
-            "saveAudioFiles": true,
-            "saveTextFiles": true,
-            "saveOtherFiles": true,
-            "savePossibleDuplicates": true,
-            "extensionBlacklist": [
-                ".htm",
-                ".html",
-                ".php"
-            ]
-        },
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
             "destination": "media",
@@ -285,10 +270,25 @@ This setup exempts many options so they will use default values _(see below)_. I
             "saveOtherFiles": false
         },
         {
-            "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA_FROM_ME_EXCEPT_DISCORD_FILES",
-            "destination": "media2",
-            "usersAllWhitelisted": false,
-            "userWhitelist": [ "MY_USER_ID" ],
+            "channel": "THIS_CHANNEL_IS_STEALTHY",
+            "destination": "stealthy",
+            "allowCommands": false,
+            "errorMessages": false,
+            "updatePresence": false,
+            "reactWhenDownloaded": false
+        },
+        {
+            "channels": [ "CHANNEL_1", "CHANNEL_2", "CHANNEL_3", "CHANNEL_4", "CHANNEL_5" ],
+            "destination": "stuff",
+            "allowCommands": false,
+            "errorMessages": false,
+            "updatePresence": false,
+            "reactWhenDownloaded": false
+        }
+    ]
+}
+```
+
 `Example - Pretty Much Every Setting settings.json:`
 ```javascript
 {
@@ -336,19 +336,30 @@ This setup exempts many options so they will use default values _(see below)_. I
     "numberFormatEuropean": true,
     "allChannels": {
         "destination": "X:/Discord Downloads/Unregistered",
-        "userBlacklist": [ "USER_ID_FOR_PERSON_I_DONT_LIKE" ],
+        "allowCommands": false,
+        "errorMessages": false,
+        "scanEdits": true,
+        "ignoreBots": true,
+        "overwriteAutorunHistory": false,
+        "updatePresence": false,
+        "reactWhenDownloaded": false,
+        "typeWhileProcessing": false,
+        "divideFoldersByServer": true,
+        "divideFoldersByChannel": true,
+        "divideFoldersByUser": false,
         "divideFoldersByType": false,
         "saveImages": true,
         "saveVideos": true,
         "saveAudioFiles": true,
-        "saveTextFiles": true,
+        "saveTextFiles": false,
         "saveOtherFiles": true,
         "savePossibleDuplicates": true,
         "extensionBlacklist": [
             ".htm",
             ".html",
             ".php"
-        ]
+        ],
+        "saveAllLinksToFile": "X:/Discord Downloads/Unregistered/Log.txt"
     },
     "allChannelsBlacklist": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
     "channels": [
