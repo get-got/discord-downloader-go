@@ -630,21 +630,21 @@ Key | Description
 ### Credits & Dependencies
 * [github.com/Seklfreak/discord-image-downloader-go - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
 
-#### Essential Dependencies
+#### Core Dependencies
 * [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo)
 * [github.com/Necroforger/dgrouter](https://github.com/Necroforger/dgrouter)
+* [github.com/HouzuoGuo/tiedot/db](https://github.com/HouzuoGuo/tiedot)
+* [github.com/fatih/color](https://github.com/fatih/color)
 
-#### Utility Dependencies
+#### Other Dependencies
 * [github.com/AvraamMavridis/randomcolor](https://github.com/AvraamMavridis/randomcolor)
 * [github.com/ChimeraCoder/anaconda](https://github.com/ChimeraCoder/anaconda)
 * [github.com/ChimeraCoder/tokenbucket](https://github.com/ChimeraCoder/tokenbucket)
-* [github.com/HouzuoGuo/tiedot](https://github.com/HouzuoGuo/tiedot)
 * [github.com/Jeffail/gabs](https://github.com/Jeffail/gabs)
 * [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
 * [github.com/azr/backoff](https://github.com/azr/backoff)
 * [github.com/dustin/go-jsonpointer](https://github.com/dustin/go-jsonpointer)
 * [github.com/dustin/gojson](https://github.com/dustin/gojson)
-* [github.com/fatih/color](https://github.com/fatih/color)
 * [github.com/fsnotify/fsnotify](https://github.com/fsnotify/fsnotify)
 * [github.com/garyburd/go-oauth](https://github.com/garyburd/go-oauth)
 * [github.com/hako/durafmt](https://github.com/hako/durafmt)
