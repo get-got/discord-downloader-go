@@ -1,5 +1,5 @@
 <h1 align="center">
-    Discord Downloader
+    Discord Downloader _Go_
 </h1>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Travis Build">
@@ -25,18 +25,18 @@
 </p>
 <h2 align="center">
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
-        <b>DOWNLOAD LATEST RELEASE BUILDS</b>
+        <b>DOWNLOAD LATEST RELEASE</b>
     </a>
 </h2>
+This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization, and can process all old messages within channels. _See [Features](#Features) below for full list._
+
 <h3 align="center">
     <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
 </h3>
 <h4 align="center">
     For list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
 </h4>
-
-This is a Discord bot program to download files posted in specified Discord channels to local folders. It can fetch highest possible quality files from various sources (listed below), aside from downloading any file directly linked or attached. _See [Features](#Features) below for full list._
-
+<hr/>
 <h3 align="center">
     <a href="https://discord.com/invite/6Z6FJZVaDV">
         <b>Need help? Have suggestions? Join the Discord server!</b>
@@ -44,21 +44,45 @@ This is a Discord bot program to download files posted in specified Discord chan
 </h3>
 
 ### Sections
-* [**Getting Running**](#getting-running)
+* [**List of Features**](#features)
+* [**Running the Bot**](#running-the-bot)
 * [**Getting Started**](#getting-started)
-* [**Features**](#features)
-* [**Guide: Saving History _(Cataloging Old Messages)_**](#guide-saving-history-cataloging-old-messages)
+* [**Guide: Saving History _(Old Messages)_**](#guide-saving-history-cataloging-old-messages)
 * [**Guide: Settings / Configuration**](#guide-settings--configuration)
 * [**List of Settings**](#list-of-settings)
 
-## **WARNING:** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
+## Features
+* ***Supported File Downloading:***
+    * Discord File Attachments
+    * Direct Links to Files
+    * Twitter _(requires API key, see config section)_
+    * Instagram
+    * Reddit
+    * Imgur _(Single Posts & Albums)_
+    * Flickr _(requires API key, see config section)_
+    * Google Drive _(requires API Credentials, see config section)_
+    * Mastodon
+    * Tistory
+    * Streamable
+    * Gfycat
+* ***Commands:***
+    * _[GLOBAL]_ Help _(<prefix>help - Alias: commands)_
+    * Ping _(<prefix>ping - Alias: test)_
+    * Status: Get an output of the current status of the bot _(<prefix>status - Alias: info)_
+    * Stats: Have the bot dump stats _(<prefix>stats)_
+    * _[GLOBAL]_ Info: Send Discord ID information.
+    * _[GLOBAL_ - **Must be Bot Admin]** Emojis: Saves all server emojis (within an "emojis" subfolder). _(<prefix>emojis)_
+    * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
+    * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
+
+## **WARNING!!!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
 While this project works for user logins, I do not reccomend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
-## Getting Running
+## Running the Bot
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
@@ -89,30 +113,6 @@ You can either create a `settings.json` following the examples & variables liste
 * **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
 * **Finding Emoji ID:** _Enable Discord Developer Mode (see above),_ right click on the emoji and `Copy ID`.
 * **Finding DM/PM ID:** Inspect Element on the DM icon for the desired user. Look for `href="/channels/@me/CHANNEL_ID_HERE"`. Using this ID in place of a normal channel ID should work perfectly fine.
-
-## Features
-* ***Supported File Downloading:***
-    * Discord File Attachments
-    * Direct Links to Files
-    * Twitter _(requires API key, see config section)_
-    * Instagram
-    * Reddit
-    * Imgur _(Single Posts & Albums)_
-    * Flickr _(requires API key, see config section)_
-    * Google Drive _(requires API Credentials, see config section)_
-    * Mastodon
-    * Tistory
-    * Streamable
-    * Gfycat
-* ***Commands:***
-    * _[GLOBAL]_ Help _(<prefix>help - Alias: commands)_
-    * Ping _(<prefix>ping - Alias: test)_
-    * Status: Get an output of the current status of the bot _(<prefix>status - Alias: info)_
-    * Stats: Have the bot dump stats _(<prefix>stats)_
-    * _[GLOBAL]_ Info: Send Discord ID information.
-    * _[GLOBAL_ - **Must be Bot Admin]** Emojis: Saves all server emojis (within an "emojis" subfolder). _(<prefix>emojis)_
-    * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
-    * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
 
 ### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
 * ~~_Go 1.15 rather than 1.13_~~ ***I updated Sekl's project to match this.***
