@@ -29,7 +29,7 @@
     </a>
 </h2>
 
-This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization, and can process all old messages within channels. _See [Features](#Features) below for full list._
+This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels in real-time as well as old messages. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization. _See [Features](#Features) below for full list!_
 
 <h3 align="center">
     <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
@@ -40,11 +40,11 @@ This is a program that connects to a Discord Bot or User to locally download fil
 
 ### Sections
 * [**List of Features**](#features)
-* [**Running the Bot**](#running-the-bot)
 * [**Getting Started**](#getting-started)
 * [**Guide: Downloading History _(Old Messages)_**](#guide-downloading-history-old-messages)
 * [**Guide: Settings / Configuration**](#guide-settings--configuration)
 * [**List of Settings**](#list-of-settings)
+* [**Development, Credits, Dependencies**](#development)
   
 <h3 align="center">
     <a href="https://discord.com/invite/6Z6FJZVaDV">
@@ -53,7 +53,7 @@ This is a program that connects to a Discord Bot or User to locally download fil
 </h3>
 
 ## Features
-* ***Supported File Downloading:***
+### Supported File Downloading
     * Discord File Attachments
     * Direct Links to Files
     * Twitter _(requires API key, see config section)_
@@ -66,24 +66,27 @@ This is a program that connects to a Discord Bot or User to locally download fil
     * Tistory
     * Streamable
     * Gfycat
-* ***Commands:***
-    * _[GLOBAL]_ Help _(<prefix>help - Alias: commands)_
-    * Ping _(<prefix>ping - Alias: test)_
-    * Status: Get an output of the current status of the bot _(<prefix>status - Alias: info)_
-    * Stats: Have the bot dump stats _(<prefix>stats)_
-    * _[GLOBAL]_ Info: Send Discord ID information.
-    * _[GLOBAL_ - **Must be Bot Admin]** Emojis: Saves all server emojis (within an "emojis" subfolder). _(<prefix>emojis)_
-    * **[Must be Bot or Server Admin]** History: Process all old messages in channel _(<prefix>history - Aliases: catalog, cache)_
-    * **[Must be Bot Admin]** Exit (nice for process managers like pm2 for instant reload) _(<prefix>exit - Aliases: reload, kill)_
+### Commands
+Commands are used as `ddg <command> <?arguments?>` _(unless you've changed the prefix)_
+Command     | Arguments? | Description
+---         | ---   | ---
+`help`, `commands`  | No    | Lists all commands.
+`ping`, `test`      | No    | Pings the bot.
+`info`      | No    | Displays relevant Discord info.
+`status`    | No    | Shows the status of the bot.
+`stats`     | No    | Shows channel stats.
+`history`   | [**SEE HISTORY SECTION**](#guide-downloading-history-old-messages) | **(BOT AND SERVER ADMINS ONLY)** Processes history for old messages in channel.
+`exit`, `kill`, `reload`    | No    | **(BOT ADMINS ONLY)** Exits the bot _(or restarts if using a keep-alive process manager)_.
+`emojis`    | Optionally specify server IDs to download emojis from; separate by commas | **(BOT ADMINS ONLY)** Saves all emojis for channel.
 
-## **WARNING!!!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
+## **WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
 While this project works for user logins, I do not reccomend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
-## Running the Bot
+## Getting Started
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
@@ -92,23 +95,23 @@ Depending on your purpose for this program, there are various ways you can run i
   - Mount your save folders or the parent of your save folders within ``/root/``
     - _i.e. ``X:\My Folder`` to ``/root/My Folder``_
 - Install Golang and compile/run the source code yourself. _(Google it)_
-  
-## Getting Started
+
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
 - [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
-- [Feeling lazy or having issues? Try this JSON Formatter/Validator.](https://jsonformatter.curiousconcept.com/)
+- [Having issues? Try this JSON Validator to ensure it's correctly formatted.](https://jsonformatter.curiousconcept.com/)
 
-### Credentials...
-* If using a **Bot User,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
-* If using a **Real User (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
-* If using a **Real User (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`. **You must also set `userBot` within the `credentials` section of the settings.json to `true`.**
+### Bot Login Credentials
+* If using a **Bot Application,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
+* If using a **User Account (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
+* If using a **User Account (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`. **You must also set `userBot` within the `credentials` section of the settings.json to `true`.**
 
 ### Bot Permissions in Discord...
 * In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
 * In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
 * In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
 
-#### How to Find Discord IDs...
+### How to Find Discord IDs...
+* ***Use the info command!***
 * **Discord Developer Mode:** Enable `Developer Mode` in Discord settings under `Appearance`.
 * **Finding Channel ID:** _Enable Discord Developer Mode (see above),_ right click on the channel and `Copy ID`.
 * **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
@@ -129,16 +132,37 @@ You can either create a `settings.json` following the examples & variables liste
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
-## Guide: Saving History (Cataloging Old Messages)
+## Guide: Downloading History (Old Messages)
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
 
-You will need the Channel ID (see bottom of [Setup](#Setup)) if attempting to catalog history from a specific channel or group of channels, within an admin channel.
+### Command Arguments
+If no channel IDs are specified, it will try and use the channel ID for the channel you're using the command in.
 
-* `ddg history` to catalog the current channel the command is sent in (must be registered in `channels` in settings).
-* `ddg history cancel` to stop cataloging the current channel the command is sent in (must be registered in `channels` in settings).
-* `ddg history all` to catalog specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
-* `ddg history <Channel ID(s)>` to catalog specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
-* `ddg history cancel <Channel ID(s)>` to stop cataloging specified channels from within a designated Admin Channel (must be registered in `adminChannels` in settings). You can do multiple channels per command if desired, separated by commas.
+Argument / Flag         | Details
+---                     | ---
+**channel ID(s)**       | One or more channel IDs to download from, separated by commas if multiple.
+`all`                   | Download history for all available registered channels.
+`cancel` or `stop`      | Stop downloading history for a channel.
+`--since=YYYY-MM-DD`    | Will process messages sent after this date.
+`--since=message_id`    | Will process messages sent after this message.
+`--before=YYYY-MM-DD`   | Will process messages sent before this date.
+`--before=message_id`   | Will process messages sent before this message.
+
+***Order of arguments does not matter.***
+
+#### Examples
+* `ddg history`
+* `ddg history cancel`
+* `ddg history all`
+* `ddg history stop all`
+* `ddg history 000111000111000`
+* `ddg history 000111000111000, 000222000222000`
+* `ddg history 000111000111000,000222000222000,000333000333000`
+* `ddg history 000111000111000, 000333000333000 cancel`
+* `ddg history 000111000111000 --before=000555000555000`
+* `ddg history 000111000111000 --since=2020-01-02`
+* `ddg history 000111000111000 --since=2020-10-12 --before=2021-05-06`
+* `ddg history 000111000111000 --since=000555000555000 --before=2021-05-06`
 
 ## Guide: Settings / Configuration
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
@@ -511,14 +535,14 @@ Key | Description
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
 * Versioning is `[MAJOR].[MINOR].[PATCH]`
 
-## Credits & Dependencies
-* [Seklfreak's _discord-image-downloader-go_ - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
+### Credits & Dependencies
+* [github.com/Seklfreak/discord-image-downloader-go - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
 
-### Essential Dependencies
+#### Essential Dependencies
 * [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo)
 * [github.com/Necroforger/dgrouter](https://github.com/Necroforger/dgrouter)
 
-### Utility Dependencies
+#### Utility Dependencies
 * [github.com/AvraamMavridis/randomcolor](https://github.com/AvraamMavridis/randomcolor)
 * [github.com/ChimeraCoder/anaconda](https://github.com/ChimeraCoder/anaconda)
 * [github.com/ChimeraCoder/tokenbucket](https://github.com/ChimeraCoder/tokenbucket)
