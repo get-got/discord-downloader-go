@@ -37,20 +37,20 @@ This is a program that connects to a Discord Bot or User to locally download fil
 <h4 align="center">
     For list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
 </h4>
-<br/>
-<h3 align="center">
-    <a href="https://discord.com/invite/6Z6FJZVaDV">
-        <b>Need help? Have suggestions? Join the Discord server!</b>
-    </a>
-</h3>
 
 ### Sections
 * [**List of Features**](#features)
 * [**Running the Bot**](#running-the-bot)
 * [**Getting Started**](#getting-started)
-* [**Guide: Saving History _(Old Messages)_**](#guide-saving-history-cataloging-old-messages)
+* [**Guide: Downloading History _(Old Messages)_**](#guide-downloading-history-old-messages)
 * [**Guide: Settings / Configuration**](#guide-settings--configuration)
 * [**List of Settings**](#list-of-settings)
+  
+<h3 align="center">
+    <a href="https://discord.com/invite/6Z6FJZVaDV">
+        <b>Need help? Have suggestions? Join the Discord server!</b>
+    </a>
+</h3>
 
 ## Features
 * ***Supported File Downloading:***
@@ -116,18 +116,16 @@ You can either create a `settings.json` following the examples & variables liste
 * **Finding DM/PM ID:** Inspect Element on the DM icon for the desired user. Look for `href="/channels/@me/CHANNEL_ID_HERE"`. Using this ID in place of a normal channel ID should work perfectly fine.
 
 ### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
-* ~~_Go 1.15 rather than 1.13_~~ ***I updated Sekl's project to match this.***
-* ~~_discordgo 0.22.0 rather than 0.16.1_~~ ***I updated Sekl's project to match this.***
-* _Implements dgrouter for commands_
+* _Better command formatting & support_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
 * Channel-specific control of downloaded filetypes / content types (considers things like .mov as videos as well, rather than ignore them), Optional dividing of content types into separate folders.
-* **Download Support for Reddit & Mastodon!**
+* **Download Support for Reddit & Mastodon.**
 * (Optional) Reactions upon download success.
 * (Optional) Discord messages upon encountered errors.
 * Extensive bot status/presence customization.
 * Consistent Log Formatting, Color-Coded Logging
 * Somewhat different organization than original project; initially created from scratch then components ported over.
-* ~~Fixed Compatability Issue with `xurls` that required people to edit the project, regarding `xurls.Strict.FindAllString`. The issue was due to some people having xurls v2 installed while the projects go.mod required v1.1; changing go.mod to require v2 specifically seems to be the correct fix.~~ ***I updated Sekl's project to match this.***
+* _Various fixes, improvements, and dependency updates that I also contributed to Seklfreak's original project._
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
@@ -280,201 +278,201 @@ This setup exempts many options so they will use default values _(see below)_. I
 ```
 
 ## List of Settings
-* **credentials** `[key/value object]`
-    * **token** `[string]`
+* **"credentials"** `[key/value object]`
+    * **"token"** `[string]`
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
-    * **email** `[string]`
+    * **"email"** `[string]`
         * _Required for User Login without 2FA, don't include if using Bot Login._
-    * **password** `[string]`
+    * **"password"** `[string]`
         * _Required for User Login without 2FA, don't include if using Bot Login._
-    * _`[DEFAULTS]`_ **userBot** `[bool]`
+    * _`[DEFAULTS]`_ **"userBot"** `[bool]`
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
-    * _`[OPTIONAL]`_ twitterAccessToken `[string]`
+    * _`[OPTIONAL]`_ "twitterAccessToken" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ twitterAccessTokenSecret `[string]`
+    * _`[OPTIONAL]`_ "twitterAccessTokenSecret" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ twitterConsumerKey `[string]`
+    * _`[OPTIONAL]`_ "twitterConsumerKey" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ twitterConsumerSecret `[string]`
+    * _`[OPTIONAL]`_ "twitterConsumerSecret" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ flickrApiKey `[string]`
+    * _`[OPTIONAL]`_ "flickrApiKey" `[string]`
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
-    * _`[OPTIONAL]`_ googleDriveCredentialsJSON `[string]`
+    * _`[OPTIONAL]`_ "googleDriveCredentialsJSON" `[string]`
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
-* _`[OPTIONAL]`_ admins `[array of strings]`
+* _`[OPTIONAL]`_ "admins" `[array of strings]`
     * Array of User ID strings for users allowed to use admin commands
-* _`[OPTIONAL]`_ adminChannels `[array of key/value objects]`
+* _`[OPTIONAL]`_ "adminChannels" `[array of key/value objects]`
     * **channel** `[string]`
-* _`[DEFAULTS]`_ debugOutput `[bool]`
+* _`[DEFAULTS]`_ "debugOutput" `[bool]`
     * _Default:_ `false`
     * Output debugging information.
-* _`[DEFAULTS]`_ commandPrefix `[string]`
+* _`[DEFAULTS]`_ "commandPrefix" `[string]`
     * _Default:_ `"ddg "`
-* _`[DEFAULTS]`_ allowSkipping `[bool]`
+* _`[DEFAULTS]`_ "allowSkipping" `[bool]`
     * _Default:_ `true`
     * Allow scanning for keywords to skip content downloading.
     * `"skip", "ignore", "don't save", "no save"`
-* _`[DEFAULTS]`_ scanOwnMessages `[bool]`
+* _`[DEFAULTS]`_ "scanOwnMessages" `[bool]`
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
-* _`[DEFAULTS]`_ checkPermissions `[bool]`
+* _`[DEFAULTS]`_ "checkPermissions" `[bool]`
     * _Default:_ `true`
     * Checks Discord permissions before attempting requests/actions.
-* _`[DEFAULTS]`_ allowGlobalCommands `[bool]`
+* _`[DEFAULTS]`_ "allowGlobalCommands" `[bool]`
     * _Default:_ `true`
     * Allow certain commands to be used even if not registered in `channels` or `adminChannels`.
-* _`[OPTIONAL]`_ autorunHistory `[bool]`
+* _`[OPTIONAL]`_ "autorunHistory" `[bool]`
     * Autorun history for all registered channels in background upon launch.
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
-* _`[OPTIONAL]`_ asyncHistory `[bool]`
+* _`[OPTIONAL]`_ "asyncHistory" `[bool]`
     * _Default:_ `false`
     * Runs history commands simultaneously rather than one after the other.
       * **NOTE:** May result in Discord API Rate Limiting, difficulty troubleshooting, exploding CPUs, melted RAM.
-* _`[DEFAULTS]`_ downloadRetryMax `[int]`
+* _`[DEFAULTS]`_ "downloadRetryMax" `[int]`
     * _Default:_ `3`
-* _`[DEFAULTS]`_ downloadTimeout `[int]`
+* _`[DEFAULTS]`_ "downloadTimeout" `[int]`
     * _Default:_ `60`
-* _`[DEFAULTS]`_ githubUpdateChecking `[bool]`
+* _`[DEFAULTS]`_ "githubUpdateChecking" `[bool]`
     * _Default:_ `true`
     * Check for updates from this repo.
-* _`[DEFAULTS]`_ filterDuplicateImages `[bool]`
+* _`[DEFAULTS]`_ "filterDuplicateImages" `[bool]`
     * _Default:_ `false`
     * **Experimental** feature to filter out images that are too similar to other cached images.
     * _Caching of image data is stored via a database file; it will not read all pre-existing images._
-* _`[DEFAULTS]`_ filterDuplicateImagesThreshold `[float64]`
+* _`[DEFAULTS]`_ "filterDuplicateImagesThreshold" `[float64]`
     * _Default:_ `0`
     * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
-* _`[DEFAULTS]`_ presenceEnabled `[bool]`
+* _`[DEFAULTS]`_ "presenceEnabled" `[bool]`
     * _Default:_ `true`
-* _`[DEFAULTS]`_ presenceStatus `[string]`
+* _`[DEFAULTS]`_ "presenceStatus" `[string]`
     * _Default:_ `"idle"`
     * Presence status type.
     * `"online"`, `"idle"`, `"dnd"`, `"invisible"`, `"offline"`
-* _`[DEFAULTS]`_ presenceType `[int]`
+* _`[DEFAULTS]`_ "presenceType" `[int]`
     * _Default:_ `0`
     * Presence label type. _("Playing \<activity\>", "Listening to \<activity\>", etc)_
     * `Game = 0, Streaming = 1, Listening = 2, Watching = 3, Custom = 4`
         * If Bot User, Streaming & Custom won't work properly.
-* _`[OPTIONAL]`_ presenceOverwrite `[string]`
+* _`[OPTIONAL]`_ "presenceOverwrite" `[string]`
     * _Unused by Default_
     * Replace counter status with custom string.
     * [see Presence Placeholders for customization...](#presence-placeholders)
-* _`[OPTIONAL]`_ presenceOverwriteDetails `[string]`
+* _`[OPTIONAL]`_ "presenceOverwriteDetails" `[string]`
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
     * [see Presence Placeholders for customization...](#presence-placeholders)
-* _`[OPTIONAL]`_ presenceOverwriteState `[string]`
+* _`[OPTIONAL]`_ "presenceOverwriteState" `[string]`
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
     * [see Presence Placeholders for customization...](#presence-placeholders)
-* _`[DEFAULTS]`_ filenameDateFormat `[string]`
+* _`[DEFAULTS]`_ "filenameDateFormat" `[string]`
     * _Default:_ `"2006-01-02_15-04-05 "`
     * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-* _`[OPTIONAL]`_ embedColor `[string]`
+* _`[OPTIONAL]`_ "embedColor" `[string]`
     * _Unused by Default_
     * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
-* _`[OPTIONAL]`_ inflateCount `[int]`
+* _`[OPTIONAL]`_ "inflateCount" `[int]`
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
-* _`[DEFAULTS]`_ numberFormatEuropean `[bool]`
+* _`[DEFAULTS]`_ "numberFormatEuropean" `[bool]`
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
-* **allChannels** `[key/value objects]`
+* **"allChannels"** `[key/value objects]`
     * **Follow `channels` below for variables, except channel ID(s) are not necessary.
     * If a pre-existing config for the channel is not found, it will download from any and every channel it has access to, following these settings.
-* allChannelsBlacklist `[array of strings]`
+* "allChannelsBlacklist" `[array of strings]`
     * _Unused by Default_
     * Blacklists channels (by ID) from `allChannels`.
-* **channels** `[array of key/value objects]`
-    * _`[THIS OR BELOW]`_ **channel** `[string]`
+* **"channels"** `[array of key/value objects]`
+    * _`[THIS OR BELOW]`_ **"channel"** `[string]`
         * Channel ID to monitor.
-    * _`[THIS OR ABOVE]`_ **channels** `[array of strings]`
+    * _`[THIS OR ABOVE]`_ **"channels"** `[array of strings]`
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
-    * **destination** `[string]`
+    * **"destination"** `[string]`
         * Folder path for saving files, can be full path or local subfolder.
-    * _`[DEFAULTS]`_ enabled `[bool]`
+    * _`[DEFAULTS]`_ "enabled" `[bool]`
         * _Default:_ `true`
         * Toggles bot functionality for channel.
-    * _`[DEFAULTS]`_ allowCommands `[bool]`
+    * _`[DEFAULTS]`_ "allowCommands" `[bool]`
         * _Default:_ `true`
         * Allow use of commands like ping, help, etc.
-    * _`[DEFAULTS]`_ errorMessages `[bool]`
+    * _`[DEFAULTS]`_ "errorMessages" `[bool]`
         * _Default:_ `true`
         * Send response messages when downloads fail or other download-related errors are encountered.
-    * _`[DEFAULTS]`_ scanEdits `[bool]`
+    * _`[DEFAULTS]`_ "scanEdits" `[bool]`
         * _Default:_ `true`
         * Check edits for un-downloaded media.
-    * _`[DEFAULTS]`_ ignoreBots `[bool]`
+    * _`[DEFAULTS]`_ "ignoreBots" `[bool]`
         * _Default:_ `false`
         * Ignores messages from Bot users.
     * _`[OPTIONAL]`_ overwriteAutorunHistory `[bool]`
         * Overwrite global setting for autorunning history for all registered channels in background upon launch.
-    * _`[DEFAULTS]`_ updatePresence `[bool]`
+    * _`[DEFAULTS]`_ "updatePresence" `[bool]`
         * _Default:_ `true`
         * Update Discord Presence when download succeeds within this channel.
-    * _`[DEFAULTS]`_ reactWhenDownloaded `[bool]`
+    * _`[DEFAULTS]`_ "reactWhenDownloaded" `[bool]`
         * _Default:_ `true`
         * Confirmation reaction that file(s) successfully downloaded.
-    * _`[OPTIONAL]`_ reactWhenDownloadedEmoji `[string]`
+    * _`[OPTIONAL]`_ "reactWhenDownloadedEmoji" `[string]`
         * _Unused by Default_
         * Uses specified emoji rather than random server emojis. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
-    * _`[DEFAULTS]`_ blacklistReactEmojis `[array of strings]`
+    * _`[DEFAULTS]`_ "blacklistReactEmojis" `[array of strings]`
         * _Unused by Default_
         * Block specific emojis from being used for reacts. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
-    * _`[DEFAULTS]`_ typeWhileProcessing `[bool]`
+    * _`[DEFAULTS]`_ "typeWhileProcessing" `[bool]`
         * _Default:_ `false`
         * Shows _"<name> is typing..."_ while processing things that aren't processed instantly, like history cataloging.
-    * _`[OPTIONAL]`_ overwriteFilenameDateFormat `[string]`
+    * _`[OPTIONAL]`_ "overwriteFilenameDateFormat" `[string]`
         * _Unused by Default_
         * Overwrites the global setting `filenameDateFormat` _(see above)_
         * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-    * _`[OPTIONAL]`_ overwriteAllowSkipping `[bool]`
+    * _`[OPTIONAL]`_ "overwriteAllowSkipping" `[bool]`
         * _Unused by Default_
         * Allow scanning for keywords to skip content downloading.
         * `"skip", "ignore", "don't save", "no save"`
-    * _`[OPTIONAL]`_ overwriteEmbedColor `[string]`
+    * _`[OPTIONAL]`_ "overwriteEmbedColor" `[string]`
         * _Unused by Default_
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
-    * _`[DEFAULTS]`_ usersAllWhitelisted `[bool]`
+    * _`[DEFAULTS]`_ "usersAllWhitelisted" `[bool]`
         * _Default:_ `true`
         * Allow messages from all users to be handled. Set to `false` if you wish to use `userWhitelist` to only permit specific users messages to be handled.
-    * _`[OPTIONAL]`_ userWhitelist `[array of strings]`
+    * _`[OPTIONAL]`_ "userWhitelist" `[array of strings]`
         * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot. **Only accepts User ID's in the array.**
-    * _`[OPTIONAL]`_ userBlacklist `[array of strings]`
+    * _`[OPTIONAL]`_ "userBlacklist" `[array of strings]`
         * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the array.**
-    * _`[DEFAULTS]`_ divideFoldersByServer `[bool]`
+    * _`[DEFAULTS]`_ "divideFoldersByServer" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by server of origin _(e.g. "My Server", "My Friends Server")_
-    * _`[DEFAULTS]`_ divideFoldersByChannel `[bool]`
+    * _`[DEFAULTS]`_ "divideFoldersByChannel" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by channel of origin _(e.g. "my-channel", "my-other-channel")_
-    * _`[DEFAULTS]`_ divideFoldersByUser `[bool]`
+    * _`[DEFAULTS]`_ "divideFoldersByUser" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by user who sent _(e.g. "Me#1234", "My Friend#0000")_
-    * _`[DEFAULTS]`_ divideFoldersByType `[bool]`
+    * _`[DEFAULTS]`_ "divideFoldersByType" `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
-    * _`[DEFAULTS]`_ saveImages `[bool]`
+    * _`[DEFAULTS]`_ "saveImages" `[bool]`
         * _Default:_ `true`
-    * _`[DEFAULTS]`_ saveVideos `[bool]`
+    * _`[DEFAULTS]`_ "saveVideos" `[bool]`
         * _Default:_ `true`
-    * _`[DEFAULTS]`_ saveAudioFiles `[bool]`
+    * _`[DEFAULTS]`_ "saveAudioFiles" `[bool]`
         * _Default:_ `false`
-    * _`[DEFAULTS]`_ saveTextFiles `[bool]`
+    * _`[DEFAULTS]`_ "saveTextFiles" `[bool]`
         * _Default:_ `false`
-    * _`[DEFAULTS]`_ saveOtherFiles `[bool]`
+    * _`[DEFAULTS]`_ "saveOtherFiles" `[bool]`
         * _Default:_ `false`
-    * _`[DEFAULTS]`_ savePossibleDuplicates `[bool]`
+    * _`[DEFAULTS]`_ "savePossibleDuplicates" `[bool]`
         * _Default:_ `false`
         * Save file even if exact filename already exists or exact URL is already recorded in database.
-    * _`[DEFAULTS]`_ extensionBlacklist `[array of strings]`
+    * _`[DEFAULTS]`_ "extensionBlacklist" `[array of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
-    * _`[OPTIONAL]`_ domainBlacklist `[array of strings]`
+    * _`[OPTIONAL]`_ "domainBlacklist" `[array of strings]`
         * Ignores files from specified domains. Ensure you use proper formatting.
-    * _`[OPTIONAL]`_ saveAllLinksToFile `[string]`
+    * _`[OPTIONAL]`_ "saveAllLinksToFile" `[string]`
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
 
 ### Presence Placeholders
@@ -509,8 +507,37 @@ Key | Description
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
 
-## Info for Developers
+## Development
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
 * Versioning is `[MAJOR].[MINOR].[PATCH]`
-* I try to be consistent with annotation but it's not perfect.
-* Logging generally follows certain standards and patterns with formatting and color-coding.
+
+## Credits & Dependencies
+* [Seklfreak's _discord-image-downloader-go_ - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
+
+### Essential Dependencies
+* [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo)
+* [github.com/Necroforger/dgrouter](https://github.com/Necroforger/dgrouter)
+
+### Utility Dependencies
+* [github.com/AvraamMavridis/randomcolor](https://github.com/AvraamMavridis/randomcolor)
+* [github.com/ChimeraCoder/anaconda](https://github.com/ChimeraCoder/anaconda)
+* [github.com/ChimeraCoder/tokenbucket](https://github.com/ChimeraCoder/tokenbucket)
+* [github.com/HouzuoGuo/tiedot](https://github.com/HouzuoGuo/tiedot)
+* [github.com/Jeffail/gabs](https://github.com/Jeffail/gabs)
+* [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
+* [github.com/azr/backoff](https://github.com/azr/backoff)
+* [github.com/dustin/go-jsonpointer](https://github.com/dustin/go-jsonpointer)
+* [github.com/dustin/gojson](https://github.com/dustin/gojson)
+* [github.com/fatih/color](https://github.com/fatih/color)
+* [github.com/fsnotify/fsnotify](https://github.com/fsnotify/fsnotify)
+* [github.com/garyburd/go-oauth](https://github.com/garyburd/go-oauth)
+* [github.com/hako/durafmt](https://github.com/hako/durafmt)
+* [github.com/hashicorp/go-version](https://github.com/hashicorp/go-version)
+* [github.com/kennygrant/sanitize](https://github.com/kennygrant/sanitize)
+* [github.com/nfnt/resize](https://github.com/nfnt/resize)
+* [github.com/rivo/duplo](https://github.com/rivo/duplo)
+* [golang.org/x/net](https://golang.org/x/net)
+* [golang.org/x/oauth2](https://golang.org/x/oauth2)
+* [google.golang.org/api](https://google.golang.org/api)
+* [gopkg.in/ini.v1](https://gopkg.in/ini.v1)
+* [mvdan.cc/xurls/v2](https://mvdan.cc/xurls/v2)
