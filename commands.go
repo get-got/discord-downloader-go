@@ -29,7 +29,7 @@ const (
 	cmderrHistoryCancelled     = "History cataloging was cancelled."
 )
 
-func handleCommands() {
+func handleCommands() *exrouter.Route {
 	router := exrouter.New()
 
 	//#region Utility Commands
@@ -401,4 +401,6 @@ func handleCommands() {
 		//NOTE: This setup makes it case-insensitive but message content will be lowercase, currently case sensitivity is not necessary.
 		router.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m.Message))
 	})
+
+	return router
 }

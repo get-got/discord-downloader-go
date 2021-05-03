@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -53,6 +54,21 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 	// Ignore if told so by config
 	if !*channelConfig.Enabled || (edited && !*channelConfig.ScanEdits) {
 		return -1
+	}
+
+	// If message content is empty (likely due to userbot/selfbot)
+	if m.Content == "" && len(m.Attachments) == 0 {
+		nms, err := bot.ChannelMessages(m.ChannelID, 10, "", "", "")
+		if err == nil {
+			if len(nms) > 0 {
+				for _, nm := range nms {
+					if nm.ID == m.ID {
+						m = nm
+						dgr.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
+					}
+				}
+			}
+		}
 	}
 
 	// Log

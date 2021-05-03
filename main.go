@@ -12,6 +12,7 @@ import (
 
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/HouzuoGuo/tiedot/db"
+	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
@@ -23,6 +24,7 @@ import (
 var (
 	bot      *discordgo.Session
 	user     *discordgo.User
+	dgr      *exrouter.Route
 	myDB     *db.DB
 	imgStore *duplo.Store
 	loop     chan os.Signal
@@ -181,7 +183,7 @@ func main() {
 	botLogin()
 
 	// Event Handlers
-	handleCommands()
+	dgr = handleCommands()
 	bot.AddHandler(messageCreate)
 	bot.AddHandler(messageUpdate)
 
