@@ -38,21 +38,22 @@ type downloadStatus int
 const (
 	downloadSuccess downloadStatus = iota
 
-	downloadSkippedDuplicate            downloadStatus = iota
-	downloadSkippedUnpermittedDomain    downloadStatus = iota
-	downloadSkippedUnpermittedType      downloadStatus = iota
-	downloadSkippedUnpermittedExtension downloadStatus = iota
-	downloadSkippedDetectedDuplicate    downloadStatus = iota
+	downloadSkippedDuplicate
+	downloadSkippedUnpermittedDomain
+	downloadSkippedUnpermittedType
+	downloadSkippedUnpermittedExtension
+	downloadSkippedDetectedDuplicate
 
-	downloadFailed                    downloadStatus = iota
-	downloadFailedInvalidSource       downloadStatus = iota
-	downloadFailedCreatingFolder      downloadStatus = iota
-	downloadFailedRequesting          downloadStatus = iota
-	downloadFailedDownloadingResponse downloadStatus = iota
-	downloadFailedReadResponse        downloadStatus = iota
-	downloadFailedCreatingSubfolder   downloadStatus = iota
-	downloadFailedWritingFile         downloadStatus = iota
-	downloadFailedWritingDatabase     downloadStatus = iota
+	downloadFailed
+	downloadFailedInvalidSource
+	downloadFailedInvalidPath
+	downloadFailedCreatingFolder
+	downloadFailedRequesting
+	downloadFailedDownloadingResponse
+	downloadFailedReadResponse
+	downloadFailedCreatingSubfolder
+	downloadFailedWritingFile
+	downloadFailedWritingDatabase
 )
 
 type downloadStatusStruct struct {
@@ -93,6 +94,8 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Download Failed"
 	case downloadFailedInvalidSource:
 		return "Download Failed - Invalid Source"
+	case downloadFailedInvalidPath:
+		return "Download Failed - Invalid Path"
 	case downloadFailedCreatingFolder:
 		return "Download Failed - Error Creating Folder"
 	case downloadFailedRequesting:
@@ -466,6 +469,15 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Clean/fix path
+		if path == "" || path == string(os.PathSeparator) {
+			log.Println(logPrefixErrorHere, color.HiRedString("Destination cannot be empty path..."))
+			return mDownloadStatus(downloadFailedInvalidPath, err)
+		}
+		path, err = filepath.Abs(path)
+		if err != nil {
+			log.Println(logPrefixErrorHere, color.HiRedString("Error while checking validity of path \"%s\": %s", path, err))
+			return mDownloadStatus(downloadFailedInvalidPath, err)
+		}
 		if !strings.HasSuffix(path, string(os.PathSeparator)) {
 			path = path + string(os.PathSeparator)
 		}
@@ -725,7 +737,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				// Create folder.
 				err := os.MkdirAll(path+subfolder, 0755)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating type subfolder \"%s\": %s", path, err))
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating type subfolder \"%s\": %s", path+subfolder, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
