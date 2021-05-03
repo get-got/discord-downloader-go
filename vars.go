@@ -9,7 +9,7 @@ import (
 const (
 	projectName    = "discord-downloader-go"
 	projectLabel   = "Discord Downloader"
-	projectVersion = "1.5.1"
+	projectVersion = "1.5.2-dev"
 	projectIcon    = "https://discordguide.github.io/assets/Gopher.png"
 
 	projectRepo          = "get-got/discord-downloader-go"
