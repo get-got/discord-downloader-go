@@ -22,9 +22,9 @@ require (
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/rivo/duplo v0.0.0-20180323201418-c4ec823d58cd
-	golang.org/x/net v0.0.0-20210423184538-5f58ad60dda6
-	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78
-	google.golang.org/api v0.45.0
+	golang.org/x/net v0.0.0-20210505214959-0714010a04ed
+	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
+	google.golang.org/api v0.46.0
 	gopkg.in/ini.v1 v1.62.0
 	mvdan.cc/xurls/v2 v2.2.0
 )
