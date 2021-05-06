@@ -473,11 +473,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			log.Println(logPrefixErrorHere, color.HiRedString("Destination cannot be empty path..."))
 			return mDownloadStatus(downloadFailedInvalidPath, err)
 		}
-		path, err = filepath.Abs(path)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while checking validity of path \"%s\": %s", path, err))
-			return mDownloadStatus(downloadFailedInvalidPath, err)
-		}
 		if !strings.HasSuffix(path, string(os.PathSeparator)) {
 			path = path + string(os.PathSeparator)
 		}
