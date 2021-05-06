@@ -396,8 +396,8 @@ func createConfig() {
 				defaultConfig.Credentials.TwitterAccessToken = cfg.Section("twitter").Key("access token").String()
 				log.Println(color.GreenString("IMPORTED Twitter Access Token:\t\t\t%s", defaultConfig.Credentials.TwitterAccessToken))
 			}
-			if cfg.Section("twitter").HasKey("access secret") {
-				defaultConfig.Credentials.TwitterAccessTokenSecret = cfg.Section("twitter").Key("access secret").String()
+			if cfg.Section("twitter").HasKey("access token secret") {
+				defaultConfig.Credentials.TwitterAccessTokenSecret = cfg.Section("twitter").Key("access token secret").String()
 				log.Println(color.GreenString("IMPORTED Twitter Access Token Secret:\t\t\t%s", defaultConfig.Credentials.TwitterAccessTokenSecret))
 			}
 
