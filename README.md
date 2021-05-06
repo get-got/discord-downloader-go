@@ -89,7 +89,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
 ## Getting Started
-_Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)._
+_Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)_
 
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
