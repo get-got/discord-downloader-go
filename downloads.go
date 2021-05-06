@@ -411,7 +411,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 	}
 
 	if status.Status >= downloadFailed && !historyCmd { // Any kind of failure
-		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s", inputURL))
+		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", inputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
 		if isChannelRegistered(message.ChannelID) {
 			channelConfig := getChannelConfig(message.ChannelID)
 			if !historyCmd && *channelConfig.ErrorMessages {
@@ -419,7 +419,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
 					inputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status))
 				if status.Error != nil {
-					content = content + fmt.Sprintf("\n```ERROR: %s```", status.Error)
+					content += fmt.Sprintf("\n```ERROR: %s```", status.Error)
 				}
 				// Failure Notice
 				if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
