@@ -362,6 +362,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         "saveAllLinksToFile": "X:/Discord Downloads/Unregistered/Log.txt"
     },
     "allChannelsBlacklist": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
+    "allChannelsServerBlacklist": [ "SERVER_I_DONT_LIKE", "OTHER_SERVER_I_DONT_LIKE" ],
     "channels": [
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
@@ -501,6 +502,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 * "allChannelsBlacklist" `[array of strings]`
     * _Unused by Default_
     * Blacklists channels (by ID) from `allChannels`.
+* "allChannelsServerBlacklist" `[array of strings]`
+    * _Unused by Default_
+    * Blacklists servers (by ID) from `allChannels`.
 * **"channels"** `[array of key/value objects]`
     * _`[THIS OR BELOW]`_ **"channel"** `[string]`
         * Channel ID to monitor.

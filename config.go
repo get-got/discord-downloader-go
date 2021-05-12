@@ -126,9 +126,10 @@ type configuration struct {
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
 	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
 	// Channels
-	AllChannels          *configurationChannel  `json:"allChannels,omitempty"`          // optional, defaults
-	AllChannelsBlacklist *[]string              `json:"allChannelsBlacklist,omitempty"` // optional
-	Channels             []configurationChannel `json:"channels"`                       // required
+	AllChannels                *configurationChannel  `json:"allChannels,omitempty"`                // optional, defaults
+	AllChannelsBlacklist       *[]string              `json:"allChannelsBlacklist,omitempty"`       // optional
+	AllChannelsServerBlacklist *[]string              `json:"allChannelsServerBlacklist,omitempty"` // optional
+	Channels                   []configurationChannel `json:"channels"`                             // required
 
 	/* IDEAS / TODO:
 
@@ -654,6 +655,16 @@ func isChannelRegistered(ChannelID string) bool {
 		if config.AllChannelsBlacklist != nil {
 			if stringInSlice(ChannelID, *config.AllChannelsBlacklist) {
 				return false
+			}
+		}
+		if config.AllChannelsServerBlacklist != nil {
+			guild, err := bot.State.Guild(ChannelID)
+			if err == nil {
+				if stringInSlice(guild.ID, *config.AllChannelsServerBlacklist) {
+					return false
+				}
+			} else {
+				log.Println(color.HiRedString("Error finding server info for channel:\t%s", err))
 			}
 		}
 		return true
