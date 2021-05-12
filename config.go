@@ -129,6 +129,7 @@ type configuration struct {
 	AllChannels                *configurationChannel  `json:"allChannels,omitempty"`                // optional, defaults
 	AllChannelsBlacklist       *[]string              `json:"allChannelsBlacklist,omitempty"`       // optional
 	AllChannelsServerBlacklist *[]string              `json:"allChannelsServerBlacklist,omitempty"` // optional
+	Servers                    []configurationChannel `json:"servers"`                              // required
 	Channels                   []configurationChannel `json:"channels"`                             // required
 
 	/* IDEAS / TODO:
@@ -186,8 +187,10 @@ var (
 
 type configurationChannel struct {
 	// Main
-	ChannelID   string    `json:"channel"`            // required
-	ChannelIDs  *[]string `json:"channels,omitempty"` // alternative to ChannelID
+	ChannelID   string    `json:"channel,omitempty"`  // used for config.Channels
+	ChannelIDs  *[]string `json:"channels,omitempty"` // ---> alternative to ChannelID
+	ServerID    string    `json:"server,omitempty"`   // used for config.Servers
+	ServerIDs   *[]string `json:"servers,omitempty"`  // ---> alternative to ServerID
 	Destination string    `json:"destination"`        // required
 	// Setup
 	Enabled                 *bool `json:"enabled,omitempty"`                 // optional, defaults
@@ -284,6 +287,9 @@ func loadConfig() {
 
 		// Channel Config Defaults
 		// this is dumb but don't see a better way to initialize defaults
+		for i := 0; i < len(config.Servers); i++ {
+			channelDefault(&config.Servers[i])
+		}
 		for i := 0; i < len(config.Channels); i++ {
 			channelDefault(&config.Channels[i])
 		}
@@ -651,6 +657,33 @@ func isChannelRegistered(ChannelID string) bool {
 			}
 		}
 	}
+	// Server Config
+	for _, item := range config.Servers {
+		if item.ServerID != "" {
+			guild, err := bot.State.Guild(item.ServerID)
+			if err == nil {
+				for _, channel := range guild.Channels {
+					if ChannelID == channel.ID {
+						return true
+					}
+				}
+			}
+		}
+		// Multi-Server Config
+		if item.ServerIDs != nil {
+			for _, subserver := range *item.ServerIDs {
+				guild, err := bot.State.Guild(subserver)
+				if err == nil {
+					for _, channel := range guild.Channels {
+						if ChannelID == channel.ID {
+							return true
+						}
+					}
+				}
+			}
+		}
+	}
+	// All
 	if config.AllChannels != nil {
 		if config.AllChannelsBlacklist != nil {
 			if stringInSlice(ChannelID, *config.AllChannelsBlacklist) {
@@ -683,6 +716,32 @@ func getChannelConfig(ChannelID string) configurationChannel {
 			for _, subchannel := range *item.ChannelIDs {
 				if ChannelID == subchannel {
 					return item
+				}
+			}
+		}
+	}
+	// Server Config
+	for _, item := range config.Servers {
+		if item.ServerID != "" {
+			guild, err := bot.State.Guild(item.ServerID)
+			if err == nil {
+				for _, channel := range guild.Channels {
+					if ChannelID == channel.ID {
+						return item
+					}
+				}
+			}
+		}
+		// Multi-Server Config
+		if item.ServerIDs != nil {
+			for _, subserver := range *item.ServerIDs {
+				guild, err := bot.State.Guild(subserver)
+				if err == nil {
+					for _, channel := range guild.Channels {
+						if ChannelID == channel.ID {
+							return item
+						}
+					}
 				}
 			}
 		}
@@ -741,10 +800,12 @@ func getBoundChannels() []string {
 			if !stringInSlice(item.ChannelID, channels) {
 				channels = append(channels, item.ChannelID)
 			}
-		} else if *item.ChannelIDs != nil {
+		} else if item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
-				if !stringInSlice(subchannel, channels) {
-					channels = append(channels, subchannel)
+				if subchannel != "" {
+					if !stringInSlice(subchannel, channels) {
+						channels = append(channels, subchannel)
+					}
 				}
 			}
 		}
