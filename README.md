@@ -496,16 +496,22 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ "numberFormatEuropean" `[bool]`
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
-* **"allChannels"** `[key/value objects]`
-    * **Follow `channels` below for variables, except channel ID(s) are not necessary.**
-    * If a pre-existing config for the channel is not found, it will download from any and every channel it has access to, following these settings.
-* "allChannelsBlacklist" `[array of strings]`
+* **"all"** `[key/value objects]`
+    * **Follow `channels` below for variables, except channel & server ID(s) are not used.**
+    * If a pre-existing config for the channel or server is not found, it will download from any and every channel it has access to using your specified settings.
+* "allBlacklistServers" `[array of strings]`
     * _Unused by Default_
-    * Blacklists channels (by ID) from `allChannels`.
-* "allChannelsServerBlacklist" `[array of strings]`
+    * Blacklists servers (by ID) from `all`.
+* "allBlacklistChannels" `[array of strings]`
     * _Unused by Default_
-    * Blacklists servers (by ID) from `allChannels`.
-* **"channels"** `[array of key/value objects]`
+    * Blacklists channels (by ID) from `all`.
+* _`[THIS OR CHANNELS]`_ **"servers"** `[array of key/value objects]`
+    * _`[THIS OR BELOW]`_ **"server"** `[string]`
+        * Server ID to monitor.
+    * _`[THIS OR ABOVE]`_ **"servers"** `[array of strings]`
+        * Server IDs to monitor, for if you want the same configuration for multiple servers.
+    * **ALL OTHER VARIABLES ARE SAME AS `"channels"` BELOW**
+* _`[THIS OR SERVER]`_ **"channels"** `[array of key/value objects]`
     * _`[THIS OR BELOW]`_ **"channel"** `[string]`
         * Channel ID to monitor.
     * _`[THIS OR ABOVE]`_ **"channels"** `[array of strings]`

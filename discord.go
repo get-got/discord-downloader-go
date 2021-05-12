@@ -41,7 +41,7 @@ func discordSnowflakeToTimestamp(snowflake string, format string) string {
 
 func getAllChannels() []string {
 	var channels []string
-	if config.AllChannels != nil {
+	if config.All != nil {
 		for _, guild := range bot.State.Guilds {
 			for _, channel := range guild.Channels {
 				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {

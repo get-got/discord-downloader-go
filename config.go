@@ -126,11 +126,11 @@ type configuration struct {
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
 	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
 	// Channels
-	AllChannels                *configurationChannel  `json:"allChannels,omitempty"`                // optional, defaults
-	AllChannelsBlacklist       *[]string              `json:"allChannelsBlacklist,omitempty"`       // optional
-	AllChannelsServerBlacklist *[]string              `json:"allChannelsServerBlacklist,omitempty"` // optional
-	Servers                    []configurationChannel `json:"servers"`                              // required
-	Channels                   []configurationChannel `json:"channels"`                             // required
+	All                  *configurationChannel  `json:"all,omitempty"`                  // optional, defaults
+	AllBlacklistChannels *[]string              `json:"allBlacklistChannels,omitempty"` // optional
+	AllBlacklistServers  *[]string              `json:"allBlacklistServers,omitempty"`  // optional
+	Servers              []configurationChannel `json:"servers"`                        // required
+	Channels             []configurationChannel `json:"channels"`                       // required
 
 	/* IDEAS / TODO:
 
@@ -293,8 +293,8 @@ func loadConfig() {
 		for i := 0; i < len(config.Channels); i++ {
 			channelDefault(&config.Channels[i])
 		}
-		if config.AllChannels != nil {
-			channelDefault(config.AllChannels)
+		if config.All != nil {
+			channelDefault(config.All)
 		}
 
 		// Debug Output
@@ -684,16 +684,16 @@ func isChannelRegistered(ChannelID string) bool {
 		}
 	}
 	// All
-	if config.AllChannels != nil {
-		if config.AllChannelsBlacklist != nil {
-			if stringInSlice(ChannelID, *config.AllChannelsBlacklist) {
+	if config.All != nil {
+		if config.AllBlacklistChannels != nil {
+			if stringInSlice(ChannelID, *config.AllBlacklistChannels) {
 				return false
 			}
 		}
-		if config.AllChannelsServerBlacklist != nil {
+		if config.AllBlacklistServers != nil {
 			guild, err := bot.State.Guild(ChannelID)
 			if err == nil {
-				if stringInSlice(guild.ID, *config.AllChannelsServerBlacklist) {
+				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
 					return false
 				}
 			} else {
@@ -746,8 +746,8 @@ func getChannelConfig(ChannelID string) configurationChannel {
 			}
 		}
 	}
-	if config.AllChannels != nil {
-		return *config.AllChannels
+	if config.All != nil {
+		return *config.All
 	}
 	return configurationChannel{}
 }
