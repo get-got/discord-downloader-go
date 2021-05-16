@@ -269,18 +269,30 @@ func isBotAdmin(m *discordgo.Message) bool {
 // Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
 func isLocalAdmin(m *discordgo.Message) bool {
 	if m == nil {
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to empty message"))
+		}
 		return true
 	}
 	sourceChannel, err := bot.State.Channel(m.ChannelID)
 	if err != nil || sourceChannel == nil {
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to an error or received empty channel info for message:\t%s", err))
+		}
 		return true
 	} else if sourceChannel.Name == "" || sourceChannel.GuildID == "" {
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to incomplete channel info"))
+		}
 		return true
 	}
 
 	guild, _ := bot.State.Guild(m.GuildID)
 	localPerms, err := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
 	if err != nil {
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to error when checking permissions:\t%s", err))
+		}
 		return true
 	}
 
