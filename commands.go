@@ -244,13 +244,22 @@ func handleCommands() *exrouter.Route {
 						// Test/Use if number is guild
 						guild, err := bot.State.Guild(target)
 						if err == nil {
+							if config.DebugOutput {
+								log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Specified target %s is a guild: \"%s\", adding all channels...", target, guild.Name))
+							}
 							for _, ch := range guild.Channels {
 								channels = append(channels, ch.ID)
+								if config.DebugOutput {
+									log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Added %s (#%s in \"%s\") to history queue", ch.ID, ch.Name, guild.Name))
+								}
 							}
 						} else { // Test/Use if number is channel
-							_, err := bot.State.Channel(target)
+							ch, err := bot.State.Channel(target)
 							if err == nil {
 								channels = append(channels, target)
+								if config.DebugOutput {
+									log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Added %s (#%s in %s) to history queue", ch.ID, ch.Name, ch.GuildID))
+								}
 							}
 						}
 					} else if strings.Contains(strings.ToLower(target), "all") {
