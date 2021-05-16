@@ -275,6 +275,9 @@ func handleCommands() *exrouter.Route {
 		}
 		// Foreach Channel
 		for _, channel := range channels {
+			if config.DebugOutput {
+				log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Processing %s...", channel))
+			}
 			// Registered check
 			if isCommandableChannel(ctx.Msg) {
 				// Permission check
