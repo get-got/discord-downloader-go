@@ -268,6 +268,9 @@ func isBotAdmin(m *discordgo.Message) bool {
 
 // Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
 func isLocalAdmin(m *discordgo.Message) bool {
+	if m == nil {
+		return true
+	}
 	sourceChannel, err := bot.State.Channel(m.ChannelID)
 	if err != nil || sourceChannel == nil {
 		return true
@@ -276,7 +279,10 @@ func isLocalAdmin(m *discordgo.Message) bool {
 	}
 
 	guild, _ := bot.State.Guild(m.GuildID)
-	localPerms, _ := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
+	localPerms, err := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
+	if err != nil {
+		return true
+	}
 
 	botSelf := m.Author.ID == user.ID
 	botAdmin := stringInSlice(m.Author.ID, config.Admins)
