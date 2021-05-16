@@ -55,8 +55,31 @@ func getAllChannels() []string {
 				for _, subchannel := range *channel.ChannelIDs {
 					channels = append(channels, subchannel)
 				}
-			} else {
+			} else if isNumeric(channel.ChannelID) {
 				channels = append(channels, channel.ChannelID)
+			}
+		}
+		for _, server := range config.Servers {
+			if server.ServerIDs != nil {
+				for _, subserver := range *server.ServerIDs {
+					guild, err := bot.State.Guild(subserver)
+					if err == nil {
+						for _, channel := range guild.Channels {
+							if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+								channels = append(channels, channel.ID)
+							}
+						}
+					}
+				}
+			} else if isNumeric(server.ServerID) {
+				guild, err := bot.State.Guild(server.ServerID)
+				if err == nil {
+					for _, channel := range guild.Channels {
+						if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+							channels = append(channels, channel.ID)
+						}
+					}
+				}
 			}
 		}
 	}
