@@ -650,10 +650,8 @@ func isChannelRegistered(ChannelID string) bool {
 		}
 		// Multi-Channel Config
 		if item.ChannelIDs != nil {
-			for _, subchannel := range *item.ChannelIDs {
-				if ChannelID == subchannel {
-					return true
-				}
+			if stringInSlice(ChannelID, *item.ChannelIDs) {
+				return true
 			}
 		}
 	}
@@ -791,6 +789,30 @@ func isGlobalCommandAllowed(m *discordgo.Message) bool {
 		return true
 	}
 	return false
+}
+
+func getBoundServers() []string {
+	var servers []string
+	for _, item := range config.Servers {
+		if item.ServerID != "" {
+			if !stringInSlice(item.ServerID, servers) {
+				servers = append(servers, item.ServerID)
+			}
+		} else if item.ServerIDs != nil {
+			for _, subserver := range *item.ServerIDs {
+				if subserver != "" {
+					if !stringInSlice(subserver, servers) {
+						servers = append(servers, subserver)
+					}
+				}
+			}
+		}
+	}
+	return servers
+}
+
+func getBoundServersCount() int {
+	return len(getBoundServers())
 }
 
 func getBoundChannels() []string {

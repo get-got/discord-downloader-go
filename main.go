@@ -55,7 +55,7 @@ func main() {
 	// Config
 	log.Println(color.YellowString("Loading settings from \"%s\"...", configPath))
 	loadConfig()
-	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s)", getBoundChannelsCount()))
+	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount()))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
@@ -284,7 +284,7 @@ func main() {
 						time.Sleep(1 * time.Second)
 						log.Println(color.YellowString("Detected changes in \"%s\", reloading settings...", configPath))
 						loadConfig()
-						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s)", getBoundChannelsCount()))
+						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount()))
 
 						updateDiscordPresence()
 					}
