@@ -215,9 +215,11 @@ func handleCommands() *exrouter.Route {
 		sinceKey := "--since="
 		// Parse Args
 		for k, v := range ctx.Args {
+			// Skip "history" segment
 			if k == 0 {
 				continue
 			}
+			// Actually Parse Args
 			if strings.Contains(strings.ToLower(v), beforeKey) {
 				before = strings.ReplaceAll(strings.ToLower(v), beforeKey, "")
 				if isDate(since) {
@@ -235,10 +237,22 @@ func handleCommands() *exrouter.Route {
 			} else if strings.Contains(strings.ToLower(v), "cancel") || strings.Contains(strings.ToLower(v), "stop") {
 				stop = true
 			} else {
+				// Actual Source ID(s)
 				targets := strings.Split(ctx.Args.Get(k), ",")
 				for _, target := range targets {
 					if isNumeric(target) {
-						channels = append(channels, target)
+						// Test/Use if number is guild
+						guild, err := bot.State.Guild(target)
+						if err == nil {
+							for _, ch := range guild.Channels {
+								channels = append(channels, ch.ID)
+							}
+						} else { // Test/Use if number is channel
+							_, err := bot.State.Channel(target)
+							if err == nil {
+								channels = append(channels, target)
+							}
+						}
 					} else if strings.Contains(strings.ToLower(target), "all") {
 						channels = getAllChannels()
 					}
