@@ -245,7 +245,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "commandPrefix": "downloader_",
     "allowSkipping": true,
     "allowGlobalCommands": true,
-    "asyncHistory": true,
+    "asyncHistory": false,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "githubUpdateChecking": true,
@@ -353,7 +353,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "checkPermissions": false,
     "allowGlobalCommands": false,
     "autorunHistory": true,
-    "asyncHistory": true,
+    "asyncHistory": false,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "discordLogLevel": 3,
@@ -524,7 +524,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[OPTIONAL]`_ "asyncHistory" `[bool]`
     * _Default:_ `false`
     * Runs history commands simultaneously rather than one after the other.
-      * **NOTE:** May result in Discord API Rate Limiting, difficulty troubleshooting, exploding CPUs, melted RAM.
+      * **WARNING!!! May result in Discord API Rate Limiting with many channels**, difficulty troubleshooting, exploding CPUs, melted RAM.
 * _`[DEFAULTS]`_ "downloadRetryMax" `[int]`
     * _Default:_ `3`
 * _`[DEFAULTS]`_ "downloadTimeout" `[int]`
