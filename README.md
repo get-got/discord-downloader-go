@@ -189,7 +189,7 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
-`Example - Barebones settings.json:`
+`settings.json Example - Barebones:`
 ```javascript
 {
     "credentials": {
@@ -204,7 +204,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 }
 ```
 
-`Example - Selfbot settings.json:`
+`settings.json Example - Selfbot:`
 ```javascript
 {
     "credentials": {
@@ -225,7 +225,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 }
 ```
 
-`Example - Advanced settings.json:`
+`settings.json Example - Advanced:`
 ```javascript
 {
     "credentials": {
@@ -290,26 +290,60 @@ This setup exempts many options so they will use default values _(see below)_. I
 }
 ```
 
-`Example - Pretty Much Every Setting settings.json:`
+`settings.json Example - Pretty Much Everything:`
 ```javascript
 {
-    "credentials": {
-        "token": "YOUR_TOKEN",
-        "userBot": true,
-        "twitterAccessToken": "aaa",
-        "twitterAccessTokenSecret": "bbb",
-        "twitterConsumerKey": "ccc",
-        "twitterConsumerSecret": "ddd",
-        "flickrApiKey": "eee",
-        "googleDriveCredentialsJSON": "googleDriveCreds.json"
+    "_constants": {
+        "DOWNLOAD_FOLDER":              "X:/Discord Downloads",
+        "MY_TOKEN":                     "aaabbbccc111222333",
+        "TWITTER_ACCESS_TOKEN_SECRET":  "aaabbbccc111222333",
+        "TWITTER_ACCESS_TOKEN":         "aaabbbccc111222333",
+        "TWITTER_CONSUMER_KEY":         "aaabbbccc111222333",
+        "TWITTER_CONSUMER_SECRET":      "aaabbbccc111222333",
+        "FLICKR_API_KEY":               "aaabbbccc111222333",
+        "GOOGLE_DRIVE_CREDS":           "googleDriveCreds.json",
+
+        "MY_USER_ID":       "000111222333444555",
+        "BOBS_USER_ID":     "000111222333444555",
+
+        "SERVER_MAIN":               "000111222333444555",
+        "CHANNEL_MAIN_GENERAL":      "000111222333444555",
+        "CHANNEL_MAIN_MEMES":        "000111222333444555",
+        "CHANNEL_MAIN_SPAM":         "000111222333444555",
+        "CHANNEL_MAIN_PHOTOS":       "000111222333444555",
+        "CHANNEL_MAIN_ARCHIVE":      "000111222333444555",
+        "CHANNEL_MAIN_BOT_ADMIN":    "000111222333444555",
+
+        "SERVER_BOBS":              "000111222333444555",
+        "CHANNEL_BOBS_GENERAL":     "000111222333444555",
+        "CHANNEL_BOBS_MEMES":       "000111222333444555",
+        "CHANNEL_BOBS_SPAM":        "000111222333444555",
+        "CHANNEL_BOBS_BOT_ADMIN":   "000111222333444555",
+
+        "SERVER_GAMERZ":                "000111222333444555",
+        "CHANNEL_GAMERZ_GENERAL":       "000111222333444555",
+        "CHANNEL_GAMERZ_MEMES":         "000111222333444555",
+        "CHANNEL_GAMERZ_VIDEOS":        "000111222333444555",
+        "CHANNEL_GAMERZ_SPAM":          "000111222333444555",
+        "CHANNEL_GAMERZ_SCREENSHOTS":   "000111222333444555"
     },
-    "admins": [ "YOUR_DISCORD_USER_ID", "YOUR_FRIENDS_DISCORD_USER_ID" ],
+    "credentials": {
+        "token": "MY_TOKEN",
+        "userBot": true,
+        "twitterAccessToken": "TWITTER_ACCESS_TOKEN",
+        "twitterAccessTokenSecret": "TWITTER_ACCESS_TOKEN_SECRET",
+        "twitterConsumerKey": "TWITTER_CONSUMER_KEY",
+        "twitterConsumerSecret": "TWITTER_CONSUMER_SECRET",
+        "flickrApiKey": "FLICKR_API_KEY",
+        "googleDriveCredentialsJSON": "GOOGLE_DRIVE_CREDS"
+    },
+    "admins": [ "MY_USER_ID", "BOBS_USER_ID" ],
     "adminChannels": [
         {
-            "channel": "CHANNEL_IN_MY_SERVER"
+            "channel": "CHANNEL_MAIN_BOT_ADMIN"
         },
         {
-            "channel": "CHANNEL_IN_FRIENDS_SERVER"
+            "channel": "CHANNEL_BOBS_BOT_ADMIN"
         }
     ],
     "debugOutput": true,
@@ -337,11 +371,11 @@ This setup exempts many options so they will use default values _(see below)_. I
     "inflateCount": 69,
     "numberFormatEuropean": true,
     "all": {
-        "destination": "X:/Discord Downloads/Unregistered",
+        "destination": "DOWNLOAD_FOLDER/Unregistered",
         "allowCommands": false,
         "errorMessages": false,
         "scanEdits": true,
-        "ignoreBots": true,
+        "ignoreBots": false,
         "overwriteAutorunHistory": false,
         "updatePresence": false,
         "reactWhenDownloaded": false,
@@ -359,29 +393,33 @@ This setup exempts many options so they will use default values _(see below)_. I
         "extensionBlacklist": [
             ".htm",
             ".html",
-            ".php"
+            ".php",
+            ".bat",
+            ".sh",
+            ".jar",
+            ".exe"
         ],
-        "saveAllLinksToFile": "X:/Discord Downloads/Unregistered/Log.txt"
+        "saveAllLinksToFile": "DOWNLOAD_FOLDER/Unregistered/Log.txt"
     },
     "allBlacklistChannels": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
-    "allBlacklistServers": [ "SERVER_I_DONT_LIKE", "OTHER_SERVER_I_DONT_LIKE" ],
+    "allBlacklistServers": [ "SERVER_MAIN", "SERVER_BOBS" ],
     "servers": [
         {
-            "servers": [ "SERVER_1", "SERVER_2", "SERVER_3" ],
-            "destination": "Public Servers",
-            "divideFoldersByServer": true,
+            "server": "SERVER_MAIN",
+            "destination": "DOWNLOAD_FOLDER/- My Server",
             "divideFoldersByChannel": true
         },
         {
-            "server": "MY_SERVER",
-            "destination": "My Server",
+            "servers": [ "SERVER_BOBS", "SERVER_GAMERZ" ],
+            "destination": "DOWNLOAD_FOLDER/- Friends Servers",
+            "divideFoldersByServer": true,
             "divideFoldersByChannel": true
-        },
+        }
     ],
     "channels": [
         {
-            "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
-            "destination": "X:/Discord Downloads/Media",
+            "channel": "CHANNEL_MAIN_SPAM",
+            "destination": "DOWNLOAD_FOLDER/Spam",
             "overwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
@@ -390,20 +428,27 @@ This setup exempts many options so they will use default values _(see below)_. I
             "saveOtherFiles": false
         },
         {
-            "channel": "THIS_CHANNEL_IS_STEALTHY",
-            "destination": "X:/Discord Downloads/XXX",
-            "allowCommands": false,
-            "errorMessages": false,
-            "updatePresence": false,
-            "reactWhenDownloaded": false
+            "channel": "CHANNEL_BOBS_SPAM",
+            "destination": "DOWNLOAD_FOLDER/Spam - Bob",
+            "overwriteAllowSkipping": false,
+            "saveImages": true,
+            "saveVideos": true,
+            "saveAudioFiles": true,
+            "saveTextFiles": false,
+            "saveOtherFiles": false
         },
         {
-            "channels": [ "CHANNEL_1", "CHANNEL_2", "CHANNEL_3", "CHANNEL_4", "CHANNEL_5" ],
-            "destination": "X:/Discord Downloads/Public Discord Memes",
-            "allowCommands": false,
-            "errorMessages": false,
-            "updatePresence": false,
-            "reactWhenDownloaded": false
+            "channels": [ "CHANNEL_MAIN_MEMES", "CHANNEL_BOBS_MEMES", "CHANNEL_GAMERZ_MEMES" ],
+            "destination": "DOWNLOAD_FOLDER/Our Memes",
+            "allowCommands": true,
+            "errorMessages": true,
+            "updatePresence": true,
+            "reactWhenDownloaded": true,
+            "saveImages": true,
+            "saveVideos": true,
+            "saveAudioFiles": false,
+            "saveTextFiles": false,
+            "saveOtherFiles": true
         }
     ]
 }
