@@ -50,6 +50,7 @@ func getAllChannels() []string {
 			}
 		}
 	} else {
+		// Compile all config channels
 		for _, channel := range config.Channels {
 			if channel.ChannelIDs != nil {
 				for _, subchannel := range *channel.ChannelIDs {
@@ -59,6 +60,7 @@ func getAllChannels() []string {
 				channels = append(channels, channel.ChannelID)
 			}
 		}
+		// Compile all channels sourced from config servers
 		for _, server := range config.Servers {
 			if server.ServerIDs != nil {
 				for _, subserver := range *server.ServerIDs {

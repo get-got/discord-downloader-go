@@ -226,19 +226,23 @@ func main() {
 		}
 	}()
 
-	// Autorun History on Launch
+	// Compile list of channels to autorun history
 	var autorunHistoryChannels []configurationChannel
-	for _, item := range config.Channels {
-		if item.OverwriteAutorunHistory != nil {
-			if *item.OverwriteAutorunHistory {
-				autorunHistoryChannels = append(autorunHistoryChannels, item)
+	for _, channel := range getAllChannels() {
+		if isChannelRegistered(channel) {
+			channelConfig := getChannelConfig(channel)
+			if channelConfig.OverwriteAutorunHistory != nil {
+				if *channelConfig.OverwriteAutorunHistory {
+					autorunHistoryChannels = append(autorunHistoryChannels, channelConfig)
+				}
+				continue
 			}
-			continue
-		}
-		if config.AutorunHistory {
-			autorunHistoryChannels = append(autorunHistoryChannels, item)
+			if config.AutorunHistory {
+				autorunHistoryChannels = append(autorunHistoryChannels, channelConfig)
+			}
 		}
 	}
+	// Process autorun history
 	for _, item := range autorunHistoryChannels {
 		if item.ChannelID != "" {
 			if config.AsynchronousHistory {
