@@ -641,8 +641,9 @@ Key | Description
 `{{countNoCommas}}`         | Raw total count of downloads (without comma formatting)
 `{{count}}`                 | Raw total count of downloads
 `{{countShort}}`            | Shortened total count of downloads
-`{{numGuilds}}`             | Number of guilds bot is a member of
-`{{numChannels}}`           | Number of bound channels
+`{{numServers}}`            | Number of servers bot is in
+`{{numBoundServers}}`       | Number of bound servers
+`{{numBoundChannels}}`      | Number of bound channels
 `{{numAdminChannels}}`      | Number of admin channels
 `{{numAdmins}}`             | Number of designated admins
 `{{timeSavedShort}}`        | Last save time formatted as `3:04pm`
