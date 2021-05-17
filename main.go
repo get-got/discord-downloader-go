@@ -29,7 +29,9 @@ var (
 	imgStore *duplo.Store
 	loop     chan os.Signal
 
-	googleDriveService *drive.Service
+	twitterConnected     bool
+	googleDriveConnected bool
+	googleDriveService   *drive.Service
 
 	startTime        time.Time
 	timeLastUpdated  time.Time
@@ -149,6 +151,7 @@ func main() {
 			log.Println(color.HiRedString("Error encountered while connecting to Twitter API, the bot won't use the Twitter API. Error: %s", err.Error()))
 		} else {
 			log.Println(color.HiMagentaString("Connected to Twitter API (@%s)", twitterSelf.ScreenName))
+			twitterConnected = true
 		}
 	} else {
 		log.Println(color.MagentaString("Twitter API credentials missing, the bot won't use the Twitter API."))
@@ -172,6 +175,7 @@ func main() {
 					log.Println(color.HiRedString("Error setting up Google Drive Client:\t%s", err))
 				} else {
 					log.Println(color.HiMagentaString("Connected to Google Drive Client"))
+					googleDriveConnected = true
 				}
 			}
 		}
@@ -200,6 +204,9 @@ func main() {
 	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
 	log.Println(color.RedString("CTRL+C to exit..."))
 
+	// Log Status
+	logStatusMessage("launched")
+
 	//#region Background Tasks
 
 	// Tickers
@@ -221,6 +228,8 @@ func main() {
 					log.Println(color.GreenString("Logging in..."))
 					botLogin()
 					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
+					// Log Status
+					logStatusMessage("reconnected")
 				}
 			}
 		}

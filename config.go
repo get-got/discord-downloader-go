@@ -245,9 +245,14 @@ type configurationChannel struct {
 
 //#region Admin Channels
 
+var (
+	acdLogStatus bool = true
+)
+
 type configurationAdminChannel struct {
 	// Required
-	ChannelID string `json:"channel"` // required
+	ChannelID string `json:"channel"`             // required
+	LogStatus *bool  `json:"logStatus,omitempty"` // optional, defaults
 
 	/* IDEAS / TODO:
 
@@ -314,6 +319,10 @@ func loadConfig() {
 		}
 		if config.All != nil {
 			channelDefault(config.All)
+		}
+
+		for i := 0; i < len(config.AdminChannels); i++ {
+			adminChannelDefault(&config.AdminChannels[i])
 		}
 
 		// Debug Output
@@ -656,6 +665,12 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.ExtensionBlacklist == nil {
 		channel.ExtensionBlacklist = &ccdExtensionBlacklist
+	}
+}
+
+func adminChannelDefault(channel *configurationAdminChannel) {
+	if channel.LogStatus == nil {
+		channel.LogStatus = &acdLogStatus
 	}
 }
 

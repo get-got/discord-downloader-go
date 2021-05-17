@@ -283,6 +283,41 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 	}
 }
 
+func logStatusMessage(status string) {
+	for _, adminChannel := range config.AdminChannels {
+		if *adminChannel.LogStatus {
+			message := fmt.Sprintf("%s has %s and connected to %d server(s)...\n", projectLabel, status, len(bot.State.Guilds))
+			message += fmt.Sprintf("\n• Uptime is %s", uptime())
+			message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
+			message += fmt.Sprintf("\n• Bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount())
+			if config.All != nil {
+				message += "\n• **ALL MODE ENABLED -** Bot will use all available channels"
+			}
+			message += fmt.Sprintf("\n• ***Listening to %s channel(s)...***\n", formatNumber(int64(len(getAllChannels()))))
+			if twitterConnected {
+				message += "\n• Connected to Twitter API"
+			}
+			if googleDriveConnected {
+				message += "\n• Connected to Google Drive"
+			}
+			// Send
+			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for startup to %s", adminChannel.ChannelID))
+				}
+				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
+			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for startup to %s", adminChannel.ChannelID))
+				}
+				bot.ChannelMessageSend(adminChannel.ChannelID, message)
+			} else {
+				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending status log to %s", adminChannel.ChannelID))
+			}
+		}
+	}
+}
+
 //#endregion
 
 //#region Permissions
