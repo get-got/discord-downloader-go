@@ -351,7 +351,7 @@ func botLogin() {
 		log.Println(color.HiRedString("Discord login failed:\t%s", err))
 		properExit()
 	}
-	bot.LogLevel = 0 // reset
+	bot.LogLevel = config.DiscordLogLevel // reset
 	bot.ShouldReconnectOnError = true
 
 	// Fetch Bot's User Info
