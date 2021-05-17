@@ -108,7 +108,7 @@ You can either create a `settings.json` following the examples & variables liste
 1. Download & put executable within it's own folder.
 2. Configure Main Settings (or run once to have settings generated). [_(SEE BELOW)_](#list-of-settings)
 3. Enter your login credentials in the `"credentials"` section. [_(SEE BELOW)_](#list-of-settings)
-4. Put your Discord User ID as in the `"admins"` array of the settings. [_(SEE BELOW)_](#list-of-settings)
+4. Put your Discord User ID as in the `"admins"` list of the settings. [_(SEE BELOW)_](#list-of-settings)
 5. Put a Discord Channel ID for a private channel you have access to into the `"adminChannels"`. [_(SEE BELOW)_](#list-of-settings)
 6. Put your desired Discord Channel IDs into the `"channels"` section. [_(SEE BELOW)_](#list-of-settings)
 - I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
@@ -451,9 +451,9 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[OPTIONAL]`_ "googleDriveCredentialsJSON" `[string]`
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
-* _`[OPTIONAL]`_ "admins" `[array of strings]`
-    * Array of User ID strings for users allowed to use admin commands
-* _`[OPTIONAL]`_ "adminChannels" `[array of key/value objects]`
+* _`[OPTIONAL]`_ "admins" `[list of strings]`
+    * List of User ID strings for users allowed to use admin commands
+* _`[OPTIONAL]`_ "adminChannels" `[list of key/value objects]`
     * **channel** `[string]`
 * _`[DEFAULTS]`_ "debugOutput" `[bool]`
     * _Default:_ `false`
@@ -538,22 +538,22 @@ This setup exempts many options so they will use default values _(see below)_. I
 * **"all"** `[key/value objects]`
     * **Follow `channels` below for variables, except channel & server ID(s) are not used.**
     * If a pre-existing config for the channel or server is not found, it will download from any and every channel it has access to using your specified settings.
-* "allBlacklistServers" `[array of strings]`
+* "allBlacklistServers" `[list of strings]`
     * _Unused by Default_
     * Blacklists servers (by ID) from `all`.
-* "allBlacklistChannels" `[array of strings]`
+* "allBlacklistChannels" `[list of strings]`
     * _Unused by Default_
     * Blacklists channels (by ID) from `all`.
-* _`[THIS OR CHANNELS]`_ **"servers"** `[array of key/value objects]`
+* _`[USE THIS OR CHANNELS]`_ **"servers"** `[list of key/value variables]`
     * _`[THIS OR BELOW]`_ **"server"** `[string]`
         * Server ID to monitor.
-    * _`[THIS OR ABOVE]`_ **"servers"** `[array of strings]`
+    * _`[THIS OR ABOVE]`_ **"servers"** `[list of strings]`
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
-    * **ALL OTHER VARIABLES ARE SAME AS `"channels"` BELOW**
-* _`[THIS OR SERVERS]`_ **"channels"** `[array of key/value objects]`
+    * **ALL OTHER VARIABLES ARE SAME AS BELOW**
+* _`[USE THIS OR SERVERS]`_ **"channels"** `[list of key/value variables]`
     * _`[THIS OR BELOW]`_ **"channel"** `[string]`
         * Channel ID to monitor.
-    * _`[THIS OR ABOVE]`_ **"channels"** `[array of strings]`
+    * _`[THIS OR ABOVE]`_ **"channels"** `[list of strings]`
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     * **"destination"** `[string]`
         * Folder path for saving files, can be full path or local subfolder.
@@ -583,7 +583,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[OPTIONAL]`_ "reactWhenDownloadedEmoji" `[string]`
         * _Unused by Default_
         * Uses specified emoji rather than random server emojis. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
-    * _`[DEFAULTS]`_ "blacklistReactEmojis" `[array of strings]`
+    * _`[DEFAULTS]`_ "blacklistReactEmojis" `[list of strings]`
         * _Unused by Default_
         * Block specific emojis from being used for reacts. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
     * _`[DEFAULTS]`_ "typeWhileProcessing" `[bool]`
@@ -603,10 +603,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[DEFAULTS]`_ "usersAllWhitelisted" `[bool]`
         * _Default:_ `true`
         * Allow messages from all users to be handled. Set to `false` if you wish to use `userWhitelist` to only permit specific users messages to be handled.
-    * _`[OPTIONAL]`_ "userWhitelist" `[array of strings]`
-        * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot. **Only accepts User ID's in the array.**
-    * _`[OPTIONAL]`_ "userBlacklist" `[array of strings]`
-        * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the array.**
+    * _`[OPTIONAL]`_ "userWhitelist" `[list of strings]`
+        * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot. **Only accepts User ID's in the list.**
+    * _`[OPTIONAL]`_ "userBlacklist" `[list of strings]`
+        * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the list.**
     * _`[DEFAULTS]`_ "divideFoldersByServer" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by server of origin _(e.g. "My Server", "My Friends Server")_
@@ -632,10 +632,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[DEFAULTS]`_ "savePossibleDuplicates" `[bool]`
         * _Default:_ `false`
         * Save file even if exact filename already exists or exact URL is already recorded in database.
-    * _`[DEFAULTS]`_ "extensionBlacklist" `[array of strings]`
+    * _`[DEFAULTS]`_ "extensionBlacklist" `[list of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
-    * _`[OPTIONAL]`_ "domainBlacklist" `[array of strings]`
+    * _`[OPTIONAL]`_ "domainBlacklist" `[list of strings]`
         * Ignores files from specified domains. Ensure you use proper formatting.
     * _`[OPTIONAL]`_ "saveAllLinksToFile" `[string]`
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
