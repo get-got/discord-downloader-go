@@ -259,7 +259,7 @@ func main() {
 			} else {
 				handleHistory(nil, item.ChannelID, "", "")
 			}
-		} else if *item.ChannelIDs != nil {
+		} else if item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
 				if config.AsynchronousHistory {
 					go handleHistory(nil, subchannel, "", "")
