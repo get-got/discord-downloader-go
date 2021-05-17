@@ -435,6 +435,9 @@ func startDownload(inputURL string, filename string, path string, message *disco
 					log.Println(logPrefixErrorHere, color.HiRedString(fmtBotSendPerm, message.ChannelID))
 				}
 			}
+			if status.Error != nil {
+				logErrorMessage(fmt.Sprintf("%s...\n%s", getDownloadStatusString(status.Status), status.Error))
+			}
 		}
 	}
 
@@ -928,6 +931,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		return mDownloadStatus(downloadSuccess)
+	} else if config.DebugOutput {
+		log.Println(logPrefixErrorHere, logPrefixDebug, color.RedString("Ignoring \"%s\" due to not being from registered channel..."))
 	}
 	return mDownloadStatus(downloadFailed)
 }

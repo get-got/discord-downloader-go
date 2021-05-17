@@ -247,17 +247,18 @@ type configurationChannel struct {
 
 var (
 	acdLogStatus bool = true
+	acdLogErrors bool = true
 )
 
 type configurationAdminChannel struct {
 	// Required
 	ChannelID string `json:"channel"`             // required
 	LogStatus *bool  `json:"logStatus,omitempty"` // optional, defaults
+	LogErrors *bool  `json:"logErrors,omitempty"` // optional, defaults
 
 	/* IDEAS / TODO:
 
 	* UnrestrictAdminCommands *bool `json:"unrestrictAdminCommands,omitempty"` // optional, defaults
-	* SendErrorLogs *bool `json:"sendErrorLogs,omitempty"` // optional
 	* SendHourlyDigest *bool `json:"sendHourlyDigest,omitempty"` // optional
 	* SendDailyDigest *bool `json:"sendDailyDigest,omitempty"` // optional
 
@@ -671,6 +672,9 @@ func channelDefault(channel *configurationChannel) {
 func adminChannelDefault(channel *configurationAdminChannel) {
 	if channel.LogStatus == nil {
 		channel.LogStatus = &acdLogStatus
+	}
+	if channel.LogErrors == nil {
+		channel.LogErrors = &acdLogErrors
 	}
 }
 

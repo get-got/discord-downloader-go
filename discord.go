@@ -41,7 +41,7 @@ func discordSnowflakeToTimestamp(snowflake string, format string) string {
 
 func getAllChannels() []string {
 	var channels []string
-	if config.All != nil {
+	if config.All != nil { // ALL MODE
 		for _, guild := range bot.State.Guilds {
 			for _, channel := range guild.Channels {
 				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
@@ -49,7 +49,7 @@ func getAllChannels() []string {
 				}
 			}
 		}
-	} else {
+	} else { // STANDARD MODE
 		// Compile all config channels
 		for _, channel := range config.Channels {
 			if channel.ChannelIDs != nil {
@@ -313,6 +313,28 @@ func logStatusMessage(status string) {
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
 			} else {
 				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending status log to %s", adminChannel.ChannelID))
+			}
+		}
+	}
+}
+
+func logErrorMessage(err string) {
+	for _, adminChannel := range config.AdminChannels {
+		if *adminChannel.LogErrors {
+			message := fmt.Sprintf("***ERROR ENCOUNTERED:***\n%s", err)
+			// Send
+			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for error to %s", adminChannel.ChannelID))
+				}
+				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
+			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for error to %s", adminChannel.ChannelID))
+				}
+				bot.ChannelMessageSend(adminChannel.ChannelID, message)
+			} else {
+				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending error log to %s", adminChannel.ChannelID))
 			}
 		}
 	}
