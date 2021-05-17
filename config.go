@@ -83,6 +83,7 @@ func defaultConfiguration() configuration {
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
+		DiscordLogLevel:                discordgo.LogError,
 		FilterDuplicateImages:          false,
 		FilterDuplicateImagesThreshold: 0,
 		// Appearance
@@ -113,6 +114,7 @@ type configuration struct {
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
 	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults
+	DiscordLogLevel                int                         `json:"discordLogLevel,omitempty"`                // optional, defaults
 	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
 	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	// Appearance

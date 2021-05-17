@@ -249,6 +249,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
     "githubUpdateChecking": true,
+    "discordLogLevel": 2,
     "filterDuplicateImages": true,
     "filterDuplicateImagesThreshold": 75,
     "presenceEnabled": true,
@@ -321,6 +322,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "asyncHistory": true,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
+    "discordLogLevel": 3,
     "githubUpdateChecking": false,
     "filterDuplicateImages": true,
     "filterDuplicateImagesThreshold": 50,
@@ -485,6 +487,12 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ "githubUpdateChecking" `[bool]`
     * _Default:_ `true`
     * Check for updates from this repo.
+* _`[DEFAULTS]`_ "discordLogLevel" `[int]`
+    * _Default:_ `0`
+    * 0 = LogError
+    * 1 = LogWarning
+    * 2 = LogInformational
+    * 3 = LogDebug _(everything)_
 * _`[DEFAULTS]`_ "filterDuplicateImages" `[bool]`
     * _Default:_ `false`
     * **Experimental** feature to filter out images that are too similar to other cached images.
