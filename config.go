@@ -96,6 +96,7 @@ func defaultConfiguration() configuration {
 }
 
 type configuration struct {
+	Constants map[string]string `json:"_constants,omitempty"`
 	// Required
 	Credentials configurationCredentials `json:"credentials"` // required
 	// Setup
@@ -273,15 +274,31 @@ func loadConfig() {
 			fixed = strings.ReplaceAll(fixed, "\\\\\\", "\\\\")
 		}
 		//TODO: Not even sure if this is realistic to do but would be nice to have line comma & trailing comma fixing
-		// Re-convert
-		configContent = []byte(fixed)
+
 		// Parse
 		newConfig := defaultConfiguration()
-		err = json.Unmarshal(configContent, &newConfig)
+		err = json.Unmarshal([]byte(fixed), &newConfig)
 		if err != nil {
 			log.Println(color.HiRedString("Failed to parse settings file...\t%s", err))
 			log.Println(logPrefixHelper, color.MagentaString("Please ensure you're following proper JSON format syntax."))
 			properExit()
+		}
+		// Constants
+		if newConfig.Constants != nil {
+			for key, value := range newConfig.Constants {
+				if strings.Contains(fixed, key) {
+					fixed = strings.ReplaceAll(fixed, key, value)
+				}
+			}
+			// Re-parse
+			newConfig = defaultConfiguration()
+			err = json.Unmarshal([]byte(fixed), &newConfig)
+			if err != nil {
+				log.Println(color.HiRedString("Failed to re-parse settings file after replacing constants...\t%s", err))
+				log.Println(logPrefixHelper, color.MagentaString("Please ensure you're following proper JSON format syntax."))
+				properExit()
+			}
+			newConfig.Constants = nil
 		}
 		config = newConfig
 
