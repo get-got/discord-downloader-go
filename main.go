@@ -236,41 +236,29 @@ func main() {
 	}()
 
 	// Compile list of channels to autorun history
-	var autorunHistoryChannels []configurationChannel
+	var autorunHistoryChannels []string
 	for _, channel := range getAllChannels() {
-		if isChannelRegistered(channel) {
-			channelConfig := getChannelConfig(channel)
-			if channelConfig.OverwriteAutorunHistory != nil {
-				if *channelConfig.OverwriteAutorunHistory {
-					autorunHistoryChannels = append(autorunHistoryChannels, channelConfig)
-				}
-				continue
+		channelConfig := getChannelConfig(channel)
+		if channelConfig.OverwriteAutorunHistory != nil {
+			if *channelConfig.OverwriteAutorunHistory {
+				autorunHistoryChannels = append(autorunHistoryChannels, channel)
 			}
-			if config.AutorunHistory {
-				autorunHistoryChannels = append(autorunHistoryChannels, channelConfig)
-			}
+			continue
+		}
+		if config.AutorunHistory {
+			autorunHistoryChannels = append(autorunHistoryChannels, channel)
 		}
 	}
 	// Process autorun history
-	for _, item := range autorunHistoryChannels {
-		if item.ChannelID != "" {
-			if config.AsynchronousHistory {
-				go handleHistory(nil, item.ChannelID, "", "")
-			} else {
-				handleHistory(nil, item.ChannelID, "", "")
-			}
-		} else if item.ChannelIDs != nil {
-			for _, subchannel := range *item.ChannelIDs {
-				if config.AsynchronousHistory {
-					go handleHistory(nil, subchannel, "", "")
-				} else {
-					handleHistory(nil, subchannel, "", "")
-				}
-			}
+	for _, channel := range autorunHistoryChannels {
+		if config.AsynchronousHistory {
+			go handleHistory(nil, channel, "", "")
+		} else {
+			handleHistory(nil, channel, "", "")
 		}
 	}
 	if len(autorunHistoryChannels) > 0 {
-		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed"))
+		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed (for %d channel(s))", len(autorunHistoryChannels)))
 		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
 
