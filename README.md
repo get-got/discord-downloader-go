@@ -334,7 +334,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "embedColor": "#FF0000",
     "inflateCount": 69,
     "numberFormatEuropean": true,
-    "allChannels": {
+    "all": {
         "destination": "X:/Discord Downloads/Unregistered",
         "allowCommands": false,
         "errorMessages": false,
@@ -361,8 +361,21 @@ This setup exempts many options so they will use default values _(see below)_. I
         ],
         "saveAllLinksToFile": "X:/Discord Downloads/Unregistered/Log.txt"
     },
-    "allChannelsBlacklist": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
-    "allChannelsServerBlacklist": [ "SERVER_I_DONT_LIKE", "OTHER_SERVER_I_DONT_LIKE" ],
+    "allBlacklistChannels": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
+    "allBlacklistServers": [ "SERVER_I_DONT_LIKE", "OTHER_SERVER_I_DONT_LIKE" ],
+    "servers": [
+        {
+            "servers": [ "SERVER_1", "SERVER_2", "SERVER_3" ],
+            "destination": "Public Servers",
+            "divideFoldersByServer": true,
+            "divideFoldersByChannel": true
+        },
+        {
+            "server": "MY_SERVER",
+            "destination": "My Server",
+            "divideFoldersByChannel": true
+        },
+    ],
     "channels": [
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
@@ -511,7 +524,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[THIS OR ABOVE]`_ **"servers"** `[array of strings]`
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
     * **ALL OTHER VARIABLES ARE SAME AS `"channels"` BELOW**
-* _`[THIS OR SERVER]`_ **"channels"** `[array of key/value objects]`
+* _`[THIS OR SERVERS]`_ **"channels"** `[array of key/value objects]`
     * _`[THIS OR BELOW]`_ **"channel"** `[string]`
         * Channel ID to monitor.
     * _`[THIS OR ABOVE]`_ **"channels"** `[array of strings]`
