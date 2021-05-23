@@ -473,46 +473,64 @@ This setup exempts many options so they will use default values _(see below)_. I
         }
     }
     ```
+    * <sub>[ `settings._constants` ]</sub>
 ---
 * **"credentials"** `[key/value object]`
+    * <sub>[ `settings.credentials` ]</sub>
     * **"token"** `[string]`
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
+        * <sub>[ `settings.credentials.token` ]</sub>
     * **"email"** `[string]`
         * _Required for User Login without 2FA, don't include if using Bot Login._
+        * <sub>[ `settings.credentials.email` ]</sub>
     * **"password"** `[string]`
         * _Required for User Login without 2FA, don't include if using Bot Login._
+        * <sub>[ `settings.credentials.password` ]</sub>
     * _`[DEFAULTS]`_ **"userBot"** `[bool]`
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
+        * <sub>[ `settings.credentials.userBot` ]</sub>
     ---
     * _`[OPTIONAL]`_ "twitterAccessToken" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
+        * <sub>[ `settings.credentials.twitterAccessToken` ]</sub>
     * _`[OPTIONAL]`_ "twitterAccessTokenSecret" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
+        * <sub>[ `settings.credentials.twitterAccessTokenSecret` ]</sub>
     * _`[OPTIONAL]`_ "twitterConsumerKey" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
+        * <sub>[ `settings.credentials.twitterConsumerKey` ]</sub>
     * _`[OPTIONAL]`_ "twitterConsumerSecret" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
+        * <sub>[ `settings.credentials.twitterConsumerSecret` ]</sub>
     * _`[OPTIONAL]`_ "flickrApiKey" `[string]`
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
+        * <sub>[ `settings.credentials.flickrApiKey` ]</sub>
     * _`[OPTIONAL]`_ "googleDriveCredentialsJSON" `[string]`
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
+        * <sub>[ `settings.credentials.googleDriveCredentialsJSON` ]</sub>
 ---
 * _`[OPTIONAL]`_ "admins" `[list of strings]`
     * List of User ID strings for users allowed to use admin commands
+    * <sub>[ `settings.admins` ]</sub>
 * _`[OPTIONAL]`_ "adminChannels" `[list of key/value objects]`
+    * <sub>[ `settings.adminChannels` ]</sub>
     * **"channel"** `[string]`
         * _Channel ID for admin commands & logging._
+        * <sub>[ `settings.adminChannel.channel` ]</sub>
     * _`[DEFAULTS]`_ "logStatus" `[bool]`
         * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
+        * <sub>[ `settings.adminChannel.logStatus` ]</sub>
     * _`[DEFAULTS]`_ "logErrors" `[bool]`
         * _Default:_ `true`
         * _Send error messages to admin channel(s) when encountering errors._
+        * <sub>[ `settings.adminChannel.logErrors` ]</sub>
     * _`[DEFAULTS]`_ "unlockCommands" `[bool]`
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
+        * <sub>[ `settings.adminChannel.unlockCommands` ]</sub>
 ---
 * _`[DEFAULTS]`_ "debugOutput" `[bool]`
     * _Default:_ `false`
