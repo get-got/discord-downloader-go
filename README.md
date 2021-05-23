@@ -508,7 +508,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Send status messages to admin channel(s) upon launch._
     * _`[DEFAULTS]`_ "logErrors" `[bool]`
         * _Default:_ `true`
-        * _Send status messages to admin channel(s) upon launch._
+        * _Send error messages to admin channel(s) when encountering errors._
     * _`[DEFAULTS]`_ "unlockCommands" `[bool]`
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
