@@ -460,7 +460,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented.
 
 * **"_constants"** `[list of key/value strings]`
-    * `settings._constants`
+    * _settings.\_constants_
     * Use constants to replace values throughout the rest of the settings.
         * ***Note:*** _If a constants name is used within another longer constants name, make sure the longer one is higher in order than the shorter one, otherwise the longer one will not be used properly. (i.e. if you have MY\_CONSTANT and MY\_CONSTANT\_TWO, put MY\_CONSTANT\_TWO above MY\_CONSTANT)_
     * **Basic Example:**
