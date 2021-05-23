@@ -354,8 +354,13 @@ func botLogin() {
 	// Fetch Bot's User Info
 	user, err = bot.User("@me")
 	if err != nil {
-		log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
-		loop <- syscall.SIGINT
+		user = bot.State.User
+		if user == nil {
+			log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
+			loop <- syscall.SIGINT
+		} else {
+			log.Println(color.RedString("Using backup user data, hopefully it works..."))
+		}
 	} else if user == nil {
 		log.Println(color.HiRedString("No error encountered obtaining bot user details, but it's empty..."))
 		loop <- syscall.SIGINT
