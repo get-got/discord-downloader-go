@@ -38,6 +38,9 @@ type downloadStatus int
 const (
 	downloadSuccess downloadStatus = iota
 
+	downloadIgnored
+
+	downloadSkipped
 	downloadSkippedDuplicate
 	downloadSkippedUnpermittedDomain
 	downloadSkippedUnpermittedType
@@ -79,6 +82,11 @@ func getDownloadStatusString(status downloadStatus) string {
 	case downloadSuccess:
 		return "Download Succeeded"
 	//
+	case downloadIgnored:
+		return "Download Ignored"
+	//
+	case downloadSkipped:
+		return "Download Skipped"
 	case downloadSkippedDuplicate:
 		return "Download Skipped - Duplicate"
 	case downloadSkippedUnpermittedDomain:
@@ -455,6 +463,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 	if historyCmd {
 		logPrefix = logPrefixHistory + " "
 	}
+
 	if stringInSlice(message.ChannelID, getAllChannels()) {
 		var channelConfig configurationChannel
 		if isChannelRegistered(message.ChannelID) {
@@ -931,8 +940,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		return mDownloadStatus(downloadSuccess)
-	} else if config.DebugOutput {
-		log.Println(logPrefixErrorHere, logPrefixDebug, color.RedString("Ignoring \"%s\" due to not being from registered channel..."))
 	}
-	return mDownloadStatus(downloadFailed)
+
+	return mDownloadStatus(downloadIgnored)
 }
