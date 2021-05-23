@@ -78,7 +78,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		}
 		if m.Content == "" && len(m.Attachments) == 0 {
 			if config.DebugOutput {
-				log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", reason))
+				log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", "Message is corrupted due to endpoint restriction"))
 			}
 		}
 
