@@ -457,7 +457,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 ## List of Settings
 :small_blue_diamond: means the setting defaults to a prespecified value. List below should say all default values.
 
-:small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented.
+:small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented if missing.
 
 * **"_constants"**
     * — _settings.\_constants : list of name:value strings_
