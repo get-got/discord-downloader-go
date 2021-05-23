@@ -566,7 +566,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
 * :small_orange_diamond: "asyncHistory"
     * — _settings.asyncHistory : boolean_
-    * _Default:_ `false`
     * Runs history commands simultaneously rather than one after the other.
       * **WARNING!!! May result in Discord API Rate Limiting with many channels**, difficulty troubleshooting, exploding CPUs, melted RAM.
 * :small_blue_diamond: "downloadRetryMax"
