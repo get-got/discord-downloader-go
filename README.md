@@ -507,6 +507,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Send status messages to admin channel(s) upon launch._
     * **logErrors** `[bool]`
         * _Send status messages to admin channel(s) upon launch._
+    * **unlockCommands** `[bool]`
+        * _Unrestrict admin commands so anyone can use within this admin channel._
 
 
 * _`[DEFAULTS]`_ "debugOutput" `[bool]`

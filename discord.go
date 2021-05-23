@@ -354,6 +354,14 @@ func logErrorMessage(err string) {
 
 // Checks if message author is a specified bot admin.
 func isBotAdmin(m *discordgo.Message) bool {
+	// configurationAdminChannel.UnlockCommands Bypass
+	if isAdminChannelRegistered(m.ChannelID) {
+		channelConfig := getAdminChannelConfig(m.ChannelID)
+		if *channelConfig.UnlockCommands == true {
+			return true
+		}
+	}
+
 	return m.Author.ID == user.ID || stringInSlice(m.Author.ID, config.Admins)
 }
 

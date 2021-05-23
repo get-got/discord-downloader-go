@@ -246,15 +246,17 @@ type configurationChannel struct {
 //#region Admin Channels
 
 var (
-	acdLogStatus bool = true
-	acdLogErrors bool = true
+	acdLogStatus      bool = true
+	acdLogErrors      bool = true
+	acdUnlockCommands bool = false
 )
 
 type configurationAdminChannel struct {
 	// Required
-	ChannelID string `json:"channel"`             // required
-	LogStatus *bool  `json:"logStatus,omitempty"` // optional, defaults
-	LogErrors *bool  `json:"logErrors,omitempty"` // optional, defaults
+	ChannelID      string `json:"channel"`                  // required
+	LogStatus      *bool  `json:"logStatus,omitempty"`      // optional, defaults
+	LogErrors      *bool  `json:"logErrors,omitempty"`      // optional, defaults
+	UnlockCommands *bool  `json:"unlockCommands,omitempty"` // optional, defaults
 
 	/* IDEAS / TODO:
 
@@ -675,6 +677,9 @@ func adminChannelDefault(channel *configurationAdminChannel) {
 	}
 	if channel.LogErrors == nil {
 		channel.LogErrors = &acdLogErrors
+	}
+	if channel.UnlockCommands == nil {
+		channel.UnlockCommands = &acdUnlockCommands
 	}
 }
 
