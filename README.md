@@ -480,60 +480,59 @@ This setup exempts many options so they will use default values _(see below)_. I
     ```
 ---
 * **"credentials"** `[key/value object]`
-    * _`settings.credentials`_
+    * _settings.credentials_
     * **"token"** `[string]`
-        * _`settings.credentials.token`_
+        * _settings.credentials.token_
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
     * **"email"** `[string]`
-        * _`settings.credentials.email`_
+        * _settings.credentials.email_
         * _Required for User Login without 2FA, don't include if using Bot Login._
     * **"password"** `[string]`
-        * _`settings.credentials.password`_
+        * _settings.credentials.password_
         * _Required for User Login without 2FA, don't include if using Bot Login._
     * :small_blue_diamond: **"userBot"** `[bool]`
-        * _`settings.credentials.userBot`_
+        * _settings.credentials.userBot_
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
     ---
     * :small_orange_diamond: "twitterAccessToken" `[string]`
-        * _`settings.credentials.twitterAccessToken`_
+        * _settings.credentials.twitterAccessToken_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-        * <sub>[ `settings.credentials.twitterAccessToken` ]</sub>
     * :small_orange_diamond: "twitterAccessTokenSecret" `[string]`
-        * _`settings.credentials.twitterAccessTokenSecret`_
+        * _settings.credentials.twitterAccessTokenSecret_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "twitterConsumerKey" `[string]`
-        * _`settings.credentials.twitterConsumerKey`_
+        * _settings.credentials.twitterConsumerKey_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "twitterConsumerSecret" `[string]`
-        * _`settings.credentials.twitterConsumerSecret`_
+        * _settings.credentials.twitterConsumerSecret_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "flickrApiKey" `[string]`
-        * _`settings.credentials.flickrApiKey`_
+        * _settings.credentials.flickrApiKey_
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
     * :small_orange_diamond: "googleDriveCredentialsJSON" `[string]`
-        * _`settings.credentials.googleDriveCredentialsJSON`_
+        * _settings.credentials.googleDriveCredentialsJSON_
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
 ---
 * :small_orange_diamond: "admins" `[list of strings]`
-    * _`settings.admins`_
+    * _settings.admins_
     * List of User ID strings for users allowed to use admin commands
 * :small_orange_diamond: "adminChannels" `[list of key/value objects]`
-    * _`settings.adminChannels`_
+    * _settings.adminChannels_
     * **"channel"** `[string]`
-        * _`settings.adminChannel.channel`_
+        * _settings.adminChannel.channel_
         * _Channel ID for admin commands & logging._
     * :small_blue_diamond: "logStatus" `[bool]`
-        * _`settings.adminChannel.logStatus`_
+        * _settings.adminChannel.logStatus_
         * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
     * :small_blue_diamond: "logErrors" `[bool]`
-        * _`settings.adminChannel.logErrors`_
+        * _settings.adminChannel.logErrors_
         * _Default:_ `true`
         * _Send error messages to admin channel(s) when encountering errors._
     * :small_blue_diamond: "unlockCommands" `[bool]`
-        * _`settings.adminChannel.unlockCommands`_
+        * _settings.adminChannel.unlockCommands_
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
 ---
