@@ -471,11 +471,13 @@ This setup exempts many options so they will use default values _(see below)_. I
 ---
 
 ## List of Settings
+:small_red_triangle: means the setting (or alternative) is **required**.
+
 :small_blue_diamond: means the setting defaults to a prespecified value. List below should say all default values.
 
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented if missing.
 
-* **"_constants"**
+* :small_orange_diamond: **"_constants"**
     * — _settings.\_constants : list of name:value strings_
     * Use constants to replace values throughout the rest of the settings.
         * ***Note:*** _If a constants name is used within another longer constants name, make sure the longer one is higher in order than the shorter one, otherwise the longer one will not be used properly. (i.e. if you have MY\_CONSTANT and MY\_CONSTANT\_TWO, put MY\_CONSTANT\_TWO above MY\_CONSTANT)_
@@ -495,21 +497,21 @@ This setup exempts many options so they will use default values _(see below)_. I
     }
     ```
 ---
-* **"credentials"**
+* :small_red_triangle: **"credentials"**
     * — _settings.credentials : setting:value list_
-    * **"token"**
+    * :small_red_triangle: **"token"**
         * — _settings.credentials.token : string_
-        * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
-    * **"email"**
+        * _REQUIRED FOR BOT APPLICATION LOGIN OR USER LOGIN WITH 2FA, don't include if using User Login without 2FA._
+    * :small_red_triangle: **"email"**
         * — _settings.credentials.email : string_
-        * _Required for User Login without 2FA, don't include if using Bot Login._
-    * **"password"**
+        * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Login._
+    * :small_red_triangle: **"password"**
         * — _settings.credentials.password : string_
-        * _Required for User Login without 2FA, don't include if using Bot Login._
+        * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Login._
     * :small_blue_diamond: **"userBot"**
         * — _settings.credentials.userBot : boolean_
         * _Default:_ `false`
-        * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
+        * _SET TO `true` FOR A USER LOGIN WITH 2FA, keep as `false` if using a Bot Application._
     ---
     * :small_orange_diamond: "twitterAccessToken"
         * — _settings.credentials.twitterAccessToken : string_
@@ -671,25 +673,25 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _Unused by Default_
     * Blacklists channels (by ID) from `all`.
 ---
-* _`[USE THIS OR "channels"]`_ **"servers"**
+* :small_red_triangle: _`[USE THIS OR "channels"]`_ **"servers"**
     * — _settings.servers : list of setting:value groups_
-    * _`[USE THIS OR "servers"]`_ **"server"**
+    * :small_red_triangle: _`[USE THIS OR "servers"]`_ **"server"**
         * — _settings.servers[].server : string_
         * Server ID to monitor.
-    * _`[USE THIS OR "server"]`_ **"servers"**
+    * :small_red_triangle: _`[USE THIS OR "server"]`_ **"servers"**
         * — _settings.servers[].servers : list of strings_
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
     * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
-* _`[USE THIS OR "servers"]`_ **"channels"**
+* :small_red_triangle: _`[USE THIS OR "servers"]`_ **"channels"**
     * — _settings.channels : list of setting:value groups_
-    * _`[USE THIS OR "channels"]`_ **"channel"**
+    * :small_red_triangle: _`[USE THIS OR "channels"]`_ **"channel"**
         * — _settings.channels[].channel : string_
         * Channel ID to monitor.
-    * _`[USE THIS OR "channel"]`_ **"channels"**
+    * :small_red_triangle: _`[USE THIS OR "channel"]`_ **"channels"**
         * — _settings.channels[].channels : list of strings_
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     ---
-    * **"destination"**
+    * :small_red_triangle: **"destination"**
         * — _settings.channels[].destination : string_
         * Folder path for saving files, can be full path or local subfolder.
     * :small_blue_diamond: "enabled"
