@@ -47,8 +47,8 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 	if isAdminChannelRegistered(m.ChannelID) {
 		//TODO: Make this its own function
 		// If message content is empty (likely due to userbot/selfbot)
+		ubIssue := "Message is corrupted due to endpoint restriction"
 		if m.Content == "" && len(m.Attachments) == 0 {
-			reason := "Message is corrupted due to endpoint restriction"
 			// Get message history
 			mCache, err := bot.ChannelMessages(m.ChannelID, 25, "", "", "")
 			if err == nil {
@@ -70,15 +70,15 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 						}
 					}
 				} else if config.DebugOutput {
-					log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", reason))
+					log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", ubIssue))
 				}
 			} else if config.DebugOutput {
-				log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", reason, err))
+				log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
 			}
 		}
 		if m.Content == "" && len(m.Attachments) == 0 {
 			if config.DebugOutput {
-				log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", "Message is corrupted due to endpoint restriction"))
+				log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
 			}
 		}
 
