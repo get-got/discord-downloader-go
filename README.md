@@ -679,9 +679,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[USE THIS OR "server"]`_ **"servers"**
         * — _settings.servers[].servers : list of strings_
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
-    ---
     * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
----
 * _`[USE THIS OR "servers"]`_ **"channels"**
     * — _settings.channels : list of setting:value groups_
     * _`[USE THIS OR "channels"]`_ **"channel"**
