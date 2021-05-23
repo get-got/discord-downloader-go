@@ -484,7 +484,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[DEFAULTS]`_ **"userBot"** `[bool]`
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
----
+    ---
     * _`[OPTIONAL]`_ "twitterAccessToken" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _`[OPTIONAL]`_ "twitterAccessTokenSecret" `[string]`
