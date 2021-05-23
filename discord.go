@@ -192,7 +192,10 @@ func updateDiscordPresence() {
 //#region Embeds
 
 func getEmbedColor(channelID string) int {
+	var err error
 	var color *string
+	var channelInfo *discordgo.Channel
+
 	// Assign Defined Color
 	if config.EmbedColor != nil {
 		if *config.EmbedColor != "" {
@@ -241,8 +244,13 @@ func getEmbedColor(channelID string) int {
 	}
 
 	// User color
-	if bot.State.UserColor(user.ID, channelID) != 0 {
-		return bot.State.UserColor(user.ID, channelID)
+	channelInfo, err = bot.State.Channel(channelID)
+	if err == nil {
+		if channelInfo.Type != discordgo.ChannelTypeDM && channelInfo.Type != discordgo.ChannelTypeGroupDM {
+			if bot.State.UserColor(user.ID, channelID) != 0 {
+				return bot.State.UserColor(user.ID, channelID)
+			}
+		}
 	}
 
 	// Random color
