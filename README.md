@@ -460,7 +460,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented.
 
 * **"_constants"** `[list of key/value strings]`
-    * _settings.\_constants_
+    * — _settings.\_constants_
     * Use constants to replace values throughout the rest of the settings.
         * ***Note:*** _If a constants name is used within another longer constants name, make sure the longer one is higher in order than the shorter one, otherwise the longer one will not be used properly. (i.e. if you have MY\_CONSTANT and MY\_CONSTANT\_TWO, put MY\_CONSTANT\_TWO above MY\_CONSTANT)_
     * **Basic Example:**
@@ -480,59 +480,59 @@ This setup exempts many options so they will use default values _(see below)_. I
     ```
 ---
 * **"credentials"** `[key/value object]`
-    * _settings.credentials_
+    * — _settings.credentials_
     * **"token"** `[string]`
-        * _settings.credentials.token_
+        * — _settings.credentials.token_
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
     * **"email"** `[string]`
-        * _settings.credentials.email_
+        * — _settings.credentials.email_
         * _Required for User Login without 2FA, don't include if using Bot Login._
     * **"password"** `[string]`
-        * _settings.credentials.password_
+        * — _settings.credentials.password_
         * _Required for User Login without 2FA, don't include if using Bot Login._
     * :small_blue_diamond: **"userBot"** `[bool]`
-        * _settings.credentials.userBot_
+        * — _settings.credentials.userBot_
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
     ---
     * :small_orange_diamond: "twitterAccessToken" `[string]`
-        * _settings.credentials.twitterAccessToken_
+        * — _settings.credentials.twitterAccessToken_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "twitterAccessTokenSecret" `[string]`
-        * _settings.credentials.twitterAccessTokenSecret_
+        * — _settings.credentials.twitterAccessTokenSecret_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "twitterConsumerKey" `[string]`
-        * _settings.credentials.twitterConsumerKey_
+        * — _settings.credentials.twitterConsumerKey_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "twitterConsumerSecret" `[string]`
-        * _settings.credentials.twitterConsumerSecret_
+        * — _settings.credentials.twitterConsumerSecret_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * :small_orange_diamond: "flickrApiKey" `[string]`
-        * _settings.credentials.flickrApiKey_
+        * — _settings.credentials.flickrApiKey_
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
     * :small_orange_diamond: "googleDriveCredentialsJSON" `[string]`
-        * _settings.credentials.googleDriveCredentialsJSON_
+        * — _settings.credentials.googleDriveCredentialsJSON_
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
 ---
 * :small_orange_diamond: "admins" `[list of strings]`
-    * _settings.admins_
+    * — _settings.admins_
     * List of User ID strings for users allowed to use admin commands
 * :small_orange_diamond: "adminChannels" `[list of key/value objects]`
-    * _settings.adminChannels_
+    * — _settings.adminChannels_
     * **"channel"** `[string]`
-        * _settings.adminChannel.channel_
+        * — _settings.adminChannel.channel_
         * _Channel ID for admin commands & logging._
     * :small_blue_diamond: "logStatus" `[bool]`
-        * _settings.adminChannel.logStatus_
+        * — _settings.adminChannel.logStatus_
         * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
     * :small_blue_diamond: "logErrors" `[bool]`
-        * _settings.adminChannel.logErrors_
+        * — _settings.adminChannel.logErrors_
         * _Default:_ `true`
         * _Send error messages to admin channel(s) when encountering errors._
     * :small_blue_diamond: "unlockCommands" `[bool]`
-        * _settings.adminChannel.unlockCommands_
+        * — _settings.adminChannel.unlockCommands_
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
 ---
