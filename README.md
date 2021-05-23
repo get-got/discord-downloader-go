@@ -501,13 +501,16 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[OPTIONAL]`_ "admins" `[list of strings]`
     * List of User ID strings for users allowed to use admin commands
 * _`[OPTIONAL]`_ "adminChannels" `[list of key/value objects]`
-    * **channel** `[string]`
+    * **"channel"** `[string]`
         * _Channel ID for admin commands & logging._
-    * **logStatus** `[bool]`
+    * _`[DEFAULTS]`_ "logStatus" `[bool]`
+        * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
-    * **logErrors** `[bool]`
+    * _`[DEFAULTS]`_ "logErrors" `[bool]`
+        * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
-    * **unlockCommands** `[bool]`
+    * _`[DEFAULTS]`_ "unlockCommands" `[bool]`
+        * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
 
 
