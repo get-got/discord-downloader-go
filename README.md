@@ -38,6 +38,8 @@ This is a program that connects to a Discord Bot or User to locally download fil
     For list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
 </h4>
 
+---
+
 ### Sections
 * [**List of Features**](#features)
 * [**Getting Started**](#getting-started)
