@@ -52,6 +52,8 @@ This is a program that connects to a Discord Bot or User to locally download fil
     </a>
 </h3>
 
+---
+
 ## Features
 
 ### Supported Download Sources
@@ -81,12 +83,16 @@ Command     | Arguments? | Description
 `exit`, `kill`, `reload`    | No    | **(BOT ADMINS ONLY)** Exits the bot _(or restarts if using a keep-alive process manager)_.
 `emojis`    | Optionally specify server IDs to download emojis from; separate by commas | **(BOT ADMINS ONLY)** Saves all emojis for channel.
 
+---
+
 ## **WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
 While this project works for user logins, I do not reccomend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
+
+---
 
 ## Getting Started
 _Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)_
@@ -131,6 +137,8 @@ You can either create a `settings.json` following the examples & variables liste
 * **Finding Emoji ID:** _Enable Discord Developer Mode (see above),_ right click on the emoji and `Copy ID`.
 * **Finding DM/PM ID:** Inspect Element on the DM icon for the desired user. Look for `href="/channels/@me/CHANNEL_ID_HERE"`. Using this ID in place of a normal channel ID should work perfectly fine.
 
+---
+
 ### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
 * _Better command formatting & support_
 * Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
@@ -144,6 +152,8 @@ You can either create a `settings.json` following the examples & variables liste
 * _Various fixes, improvements, and dependency updates that I also contributed to Seklfreak's original project._
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
+
+---
 
 ## Guide: Downloading History (Old Messages)
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
@@ -176,6 +186,8 @@ Argument / Flag         | Details
 * `ddg history 000111000111000 --since=2020-01-02`
 * `ddg history 000111000111000 --since=2020-10-12 --before=2021-05-06`
 * `ddg history 000111000111000 --since=000555000555000 --before=2021-05-06`
+
+---
 
 ## Guide: Settings / Configuration
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
@@ -454,6 +466,8 @@ This setup exempts many options so they will use default values _(see below)_. I
 }
 ```
 
+---
+
 ## List of Settings
 :small_blue_diamond: means the setting defaults to a prespecified value. List below should say all default values.
 
@@ -613,17 +627,17 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.presenceOverwrite : string_
     * _Unused by Default_
     * Replace counter status with custom string.
-    * [see Presence Placeholders for customization...](#presence-placeholders)
+    * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
 * :small_orange_diamond: "presenceOverwriteDetails"
     * — _settings.presenceOverwriteDetails : string_
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
-    * [see Presence Placeholders for customization...](#presence-placeholders)
+    * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
 * :small_orange_diamond: "presenceOverwriteState"
     * — _settings.presenceOverwriteState : string_
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
-    * [see Presence Placeholders for customization...](#presence-placeholders)
+    * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
 ---
 * :small_blue_diamond: "filenameDateFormat"
     * — _settings.filenameDateFormat : string_
@@ -794,7 +808,9 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].saveAllLinksToFile : string_
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
 
-### Presence Placeholders
+---
+
+### Presence Placeholders for Settings
 _For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`_
 Key | Description
 --- | ---
@@ -826,6 +842,8 @@ Key | Description
 `{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
+
+---
 
 ## Development
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
