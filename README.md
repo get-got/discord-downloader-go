@@ -455,6 +455,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 ```
 
 ## List of Settings
+:small_blue_diamond: means the setting defaults to a prespecified value. List below should say all default values.
+:small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented.
+
 * **"_constants"** <sub>`settings._constants`</sub> `[list of key/value strings]`
     * Use constants to replace values throughout the rest of the settings.
         * ***Note:*** _If a constants name is used within another longer constants name, make sure the longer one is higher in order than the shorter one, otherwise the longer one will not be used properly. (i.e. if you have MY\_CONSTANT and MY\_CONSTANT\_TWO, put MY\_CONSTANT\_TWO above MY\_CONSTANT)_
@@ -482,120 +485,120 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Required for User Login without 2FA, don't include if using Bot Login._
     * **"password"** <sub>`settings.credentials.password`</sub> `[string]`
         * _Required for User Login without 2FA, don't include if using Bot Login._
-    * _`[DEFAULTS]`_ **"userBot"** <sub>`settings.credentials.userBot`</sub> `[bool]`
+    * :small_blue_diamond: **"userBot"** <sub>`settings.credentials.userBot`</sub> `[bool]`
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
     ---
-    * _`[OPTIONAL]`_ "twitterAccessToken" <sub>`settings.credentials.twitterAccessToken`</sub> `[string]`
+    * :small_orange_diamond: "twitterAccessToken" <sub>`settings.credentials.twitterAccessToken`</sub> `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
         * <sub>[ `settings.credentials.twitterAccessToken` ]</sub>
-    * _`[OPTIONAL]`_ "twitterAccessTokenSecret" <sub>`settings.credentials.twitterAccessTokenSecret`</sub> `[string]`
+    * :small_orange_diamond: "twitterAccessTokenSecret" <sub>`settings.credentials.twitterAccessTokenSecret`</sub> `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ "twitterConsumerKey" <sub>`settings.credentials.twitterConsumerKey`</sub> `[string]`
+    * :small_orange_diamond: "twitterConsumerKey" <sub>`settings.credentials.twitterConsumerKey`</sub> `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ "twitterConsumerSecret" <sub>`settings.credentials.twitterConsumerSecret`</sub> `[string]`
+    * :small_orange_diamond: "twitterConsumerSecret" <sub>`settings.credentials.twitterConsumerSecret`</sub> `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * _`[OPTIONAL]`_ "flickrApiKey" <sub>`settings.credentials.flickrApiKey`</sub> `[string]`
+    * :small_orange_diamond: "flickrApiKey" <sub>`settings.credentials.flickrApiKey`</sub> `[string]`
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
-    * _`[OPTIONAL]`_ "googleDriveCredentialsJSON" <sub>`settings.credentials.googleDriveCredentialsJSON`</sub> `[string]`
+    * :small_orange_diamond: "googleDriveCredentialsJSON" <sub>`settings.credentials.googleDriveCredentialsJSON`</sub> `[string]`
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
 ---
-* _`[OPTIONAL]`_ "admins" <sub>`settings.admins`</sub> `[list of strings]`
+* :small_orange_diamond: "admins" <sub>`settings.admins`</sub> `[list of strings]`
     * List of User ID strings for users allowed to use admin commands
-* _`[OPTIONAL]`_ "adminChannels" <sub>`settings.adminChannels`</sub> `[list of key/value objects]`
+* :small_orange_diamond: "adminChannels" <sub>`settings.adminChannels`</sub> `[list of key/value objects]`
     * **"channel"** <sub>`settings.adminChannel.channel`</sub> `[string]`
         * _Channel ID for admin commands & logging._
-    * _`[DEFAULTS]`_ "logStatus" <sub>`settings.adminChannel.logStatus`</sub> `[bool]`
+    * :small_blue_diamond: "logStatus" <sub>`settings.adminChannel.logStatus`</sub> `[bool]`
         * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
-    * _`[DEFAULTS]`_ "logErrors" <sub>`settings.adminChannel.logErrors`</sub> `[bool]`
+    * :small_blue_diamond: "logErrors" <sub>`settings.adminChannel.logErrors`</sub> `[bool]`
         * _Default:_ `true`
         * _Send error messages to admin channel(s) when encountering errors._
-    * _`[DEFAULTS]`_ "unlockCommands" <sub>`settings.adminChannel.unlockCommands`</sub> `[bool]`
+    * :small_blue_diamond: "unlockCommands" <sub>`settings.adminChannel.unlockCommands`</sub> `[bool]`
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
 ---
-* _`[DEFAULTS]`_ "debugOutput" `[bool]`
+* :small_blue_diamond: "debugOutput" `[bool]`
     * _Default:_ `false`
     * Output debugging information.
-* _`[DEFAULTS]`_ "commandPrefix" `[string]`
+* :small_blue_diamond: "commandPrefix" `[string]`
     * _Default:_ `"ddg "`
-* _`[DEFAULTS]`_ "allowSkipping" `[bool]`
+* :small_blue_diamond: "allowSkipping" `[bool]`
     * _Default:_ `true`
     * Allow scanning for keywords to skip content downloading.
     * `"skip", "ignore", "don't save", "no save"`
-* _`[DEFAULTS]`_ "scanOwnMessages" `[bool]`
+* :small_blue_diamond: "scanOwnMessages" `[bool]`
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
-* _`[DEFAULTS]`_ "checkPermissions" `[bool]`
+* :small_blue_diamond: "checkPermissions" `[bool]`
     * _Default:_ `true`
     * Checks Discord permissions before attempting requests/actions.
-* _`[DEFAULTS]`_ "allowGlobalCommands" `[bool]`
+* :small_blue_diamond: "allowGlobalCommands" `[bool]`
     * _Default:_ `true`
     * Allow certain commands to be used even if not registered in `channels` or `adminChannels`.
-* _`[OPTIONAL]`_ "autorunHistory" `[bool]`
+* :small_orange_diamond: "autorunHistory" `[bool]`
     * Autorun history for all registered channels in background upon launch.
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
-* _`[OPTIONAL]`_ "asyncHistory" `[bool]`
+* :small_orange_diamond: "asyncHistory" `[bool]`
     * _Default:_ `false`
     * Runs history commands simultaneously rather than one after the other.
       * **WARNING!!! May result in Discord API Rate Limiting with many channels**, difficulty troubleshooting, exploding CPUs, melted RAM.
-* _`[DEFAULTS]`_ "downloadRetryMax" `[int]`
+* :small_blue_diamond: "downloadRetryMax" `[int]`
     * _Default:_ `3`
-* _`[DEFAULTS]`_ "downloadTimeout" `[int]`
+* :small_blue_diamond: "downloadTimeout" `[int]`
     * _Default:_ `60`
-* _`[DEFAULTS]`_ "githubUpdateChecking" `[bool]`
+* :small_blue_diamond: "githubUpdateChecking" `[bool]`
     * _Default:_ `true`
     * Check for updates from this repo.
-* _`[DEFAULTS]`_ "discordLogLevel" `[int]`
+* :small_blue_diamond: "discordLogLevel" `[int]`
     * _Default:_ `0`
     * 0 = LogError
     * 1 = LogWarning
     * 2 = LogInformational
     * 3 = LogDebug _(everything)_
-* _`[DEFAULTS]`_ "filterDuplicateImages" `[bool]`
+* :small_blue_diamond: "filterDuplicateImages" `[bool]`
     * _Default:_ `false`
     * **Experimental** feature to filter out images that are too similar to other cached images.
     * _Caching of image data is stored via a database file; it will not read all pre-existing images._
-* _`[DEFAULTS]`_ "filterDuplicateImagesThreshold" `[float64]`
+* :small_blue_diamond: "filterDuplicateImagesThreshold" `[float64]`
     * _Default:_ `0`
     * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
 ---
-* _`[DEFAULTS]`_ "presenceEnabled" `[bool]`
+* :small_blue_diamond: "presenceEnabled" `[bool]`
     * _Default:_ `true`
-* _`[DEFAULTS]`_ "presenceStatus" `[string]`
+* :small_blue_diamond: "presenceStatus" `[string]`
     * _Default:_ `"idle"`
     * Presence status type.
     * `"online"`, `"idle"`, `"dnd"`, `"invisible"`, `"offline"`
-* _`[DEFAULTS]`_ "presenceType" `[int]`
+* :small_blue_diamond: "presenceType" `[int]`
     * _Default:_ `0`
     * Presence label type. _("Playing \<activity\>", "Listening to \<activity\>", etc)_
     * `Game = 0, Streaming = 1, Listening = 2, Watching = 3, Custom = 4`
         * If Bot User, Streaming & Custom won't work properly.
-* _`[OPTIONAL]`_ "presenceOverwrite" `[string]`
+* :small_orange_diamond: "presenceOverwrite" `[string]`
     * _Unused by Default_
     * Replace counter status with custom string.
     * [see Presence Placeholders for customization...](#presence-placeholders)
-* _`[OPTIONAL]`_ "presenceOverwriteDetails" `[string]`
+* :small_orange_diamond: "presenceOverwriteDetails" `[string]`
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
     * [see Presence Placeholders for customization...](#presence-placeholders)
-* _`[OPTIONAL]`_ "presenceOverwriteState" `[string]`
+* :small_orange_diamond: "presenceOverwriteState" `[string]`
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
     * [see Presence Placeholders for customization...](#presence-placeholders)
 ---
-* _`[DEFAULTS]`_ "filenameDateFormat" `[string]`
+* :small_blue_diamond: "filenameDateFormat" `[string]`
     * _Default:_ `"2006-01-02_15-04-05 "`
     * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-* _`[OPTIONAL]`_ "embedColor" `[string]`
+* :small_orange_diamond: "embedColor" `[string]`
     * _Unused by Default_
     * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
-* _`[OPTIONAL]`_ "inflateCount" `[int]`
+* :small_orange_diamond: "inflateCount" `[int]`
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
-* _`[DEFAULTS]`_ "numberFormatEuropean" `[bool]`
+* :small_blue_diamond: "numberFormatEuropean" `[bool]`
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
 ---
@@ -623,87 +626,87 @@ This setup exempts many options so they will use default values _(see below)_. I
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     * **"destination"** `[string]`
         * Folder path for saving files, can be full path or local subfolder.
-    * _`[DEFAULTS]`_ "enabled" `[bool]`
+    * :small_blue_diamond: "enabled" `[bool]`
         * _Default:_ `true`
         * Toggles bot functionality for channel.
-    * _`[DEFAULTS]`_ "allowCommands" `[bool]`
+    * :small_blue_diamond: "allowCommands" `[bool]`
         * _Default:_ `true`
         * Allow use of commands like ping, help, etc.
-    * _`[DEFAULTS]`_ "errorMessages" `[bool]`
+    * :small_blue_diamond: "errorMessages" `[bool]`
         * _Default:_ `true`
         * Send response messages when downloads fail or other download-related errors are encountered.
-    * _`[DEFAULTS]`_ "scanEdits" `[bool]`
+    * :small_blue_diamond: "scanEdits" `[bool]`
         * _Default:_ `true`
         * Check edits for un-downloaded media.
-    * _`[DEFAULTS]`_ "ignoreBots" `[bool]`
+    * :small_blue_diamond: "ignoreBots" `[bool]`
         * _Default:_ `false`
         * Ignores messages from Bot users.
-    * _`[OPTIONAL]`_ overwriteAutorunHistory `[bool]`
+    * :small_orange_diamond: overwriteAutorunHistory `[bool]`
         * Overwrite global setting for autorunning history for all registered channels in background upon launch.
-    * _`[DEFAULTS]`_ "updatePresence" `[bool]`
+    * :small_blue_diamond: "updatePresence" `[bool]`
         * _Default:_ `true`
         * Update Discord Presence when download succeeds within this channel.
-    * _`[DEFAULTS]`_ "reactWhenDownloaded" `[bool]`
+    * :small_blue_diamond: "reactWhenDownloaded" `[bool]`
         * _Default:_ `true`
         * Confirmation reaction that file(s) successfully downloaded.
-    * _`[OPTIONAL]`_ "reactWhenDownloadedEmoji" `[string]`
+    * :small_orange_diamond: "reactWhenDownloadedEmoji" `[string]`
         * _Unused by Default_
         * Uses specified emoji rather than random server emojis. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
-    * _`[DEFAULTS]`_ "blacklistReactEmojis" `[list of strings]`
+    * :small_blue_diamond: "blacklistReactEmojis" `[list of strings]`
         * _Unused by Default_
         * Block specific emojis from being used for reacts. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
-    * _`[DEFAULTS]`_ "typeWhileProcessing" `[bool]`
+    * :small_blue_diamond: "typeWhileProcessing" `[bool]`
         * _Default:_ `false`
         * Shows _"<name> is typing..."_ while processing things that aren't processed instantly, like history cataloging.
-    * _`[OPTIONAL]`_ "overwriteFilenameDateFormat" `[string]`
+    * :small_orange_diamond: "overwriteFilenameDateFormat" `[string]`
         * _Unused by Default_
         * Overwrites the global setting `filenameDateFormat` _(see above)_
         * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-    * _`[OPTIONAL]`_ "overwriteAllowSkipping" `[bool]`
+    * :small_orange_diamond: "overwriteAllowSkipping" `[bool]`
         * _Unused by Default_
         * Allow scanning for keywords to skip content downloading.
         * `"skip", "ignore", "don't save", "no save"`
-    * _`[OPTIONAL]`_ "overwriteEmbedColor" `[string]`
+    * :small_orange_diamond: "overwriteEmbedColor" `[string]`
         * _Unused by Default_
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
-    * _`[DEFAULTS]`_ "usersAllWhitelisted" `[bool]`
+    * :small_blue_diamond: "usersAllWhitelisted" `[bool]`
         * _Default:_ `true`
         * Allow messages from all users to be handled. Set to `false` if you wish to use `userWhitelist` to only permit specific users messages to be handled.
-    * _`[OPTIONAL]`_ "userWhitelist" `[list of strings]`
+    * :small_orange_diamond: "userWhitelist" `[list of strings]`
         * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot. **Only accepts User ID's in the list.**
-    * _`[OPTIONAL]`_ "userBlacklist" `[list of strings]`
+    * :small_orange_diamond: "userBlacklist" `[list of strings]`
         * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the list.**
-    * _`[DEFAULTS]`_ "divideFoldersByServer" `[bool]`
+    * :small_blue_diamond: "divideFoldersByServer" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by server of origin _(e.g. "My Server", "My Friends Server")_
-    * _`[DEFAULTS]`_ "divideFoldersByChannel" `[bool]`
+    * :small_blue_diamond: "divideFoldersByChannel" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by channel of origin _(e.g. "my-channel", "my-other-channel")_
-    * _`[DEFAULTS]`_ "divideFoldersByUser" `[bool]`
+    * :small_blue_diamond: "divideFoldersByUser" `[bool]`
         * _Default:_ `false`
         * Separate files into subfolders by user who sent _(e.g. "Me#1234", "My Friend#0000")_
-    * _`[DEFAULTS]`_ "divideFoldersByType" `[bool]`
+    * :small_blue_diamond: "divideFoldersByType" `[bool]`
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
-    * _`[DEFAULTS]`_ "saveImages" `[bool]`
+    * :small_blue_diamond: "saveImages" `[bool]`
         * _Default:_ `true`
-    * _`[DEFAULTS]`_ "saveVideos" `[bool]`
+    * :small_blue_diamond: "saveVideos" `[bool]`
         * _Default:_ `true`
-    * _`[DEFAULTS]`_ "saveAudioFiles" `[bool]`
+    * :small_blue_diamond: "saveAudioFiles" `[bool]`
         * _Default:_ `false`
-    * _`[DEFAULTS]`_ "saveTextFiles" `[bool]`
+    * :small_blue_diamond: "saveTextFiles" `[bool]`
         * _Default:_ `false`
-    * _`[DEFAULTS]`_ "saveOtherFiles" `[bool]`
+    * :small_blue_diamond: "saveOtherFiles" `[bool]`
         * _Default:_ `false`
-    * _`[DEFAULTS]`_ "savePossibleDuplicates" `[bool]`
+    * :small_blue_diamond: "savePossibleDuplicates" `[bool]`
         * _Default:_ `false`
         * Save file even if exact filename already exists or exact URL is already recorded in database.
-    * _`[DEFAULTS]`_ "extensionBlacklist" `[list of strings]`
+    * :small_blue_diamond: "extensionBlacklist" `[list of strings]`
         * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * Ignores files containing specified extensions. Ensure you use proper formatting.
-    * _`[OPTIONAL]`_ "domainBlacklist" `[list of strings]`
+    * :small_orange_diamond: "domainBlacklist" `[list of strings]`
         * Ignores files from specified domains. Ensure you use proper formatting.
-    * _`[OPTIONAL]`_ "saveAllLinksToFile" `[string]`
+    * :small_orange_diamond: "saveAllLinksToFile" `[string]`
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
 
 ### Presence Placeholders
