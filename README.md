@@ -473,6 +473,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         }
     }
     ```
+---
 * **"credentials"** `[key/value object]`
     * **"token"** `[string]`
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
@@ -483,6 +484,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[DEFAULTS]`_ **"userBot"** `[bool]`
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
+---
     * _`[OPTIONAL]`_ "twitterAccessToken" `[string]`
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
     * _`[OPTIONAL]`_ "twitterAccessTokenSecret" `[string]`
