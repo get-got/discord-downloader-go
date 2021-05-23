@@ -459,7 +459,8 @@ This setup exempts many options so they will use default values _(see below)_. I
 
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented.
 
-* **"_constants"** <sub>`settings._constants`</sub> `[list of key/value strings]`
+* **"_constants"** `[list of key/value strings]`
+    * `settings._constants`
     * Use constants to replace values throughout the rest of the settings.
         * ***Note:*** _If a constants name is used within another longer constants name, make sure the longer one is higher in order than the shorter one, otherwise the longer one will not be used properly. (i.e. if you have MY\_CONSTANT and MY\_CONSTANT\_TWO, put MY\_CONSTANT\_TWO above MY\_CONSTANT)_
     * **Basic Example:**
@@ -478,45 +479,61 @@ This setup exempts many options so they will use default values _(see below)_. I
     }
     ```
 ---
-* **"credentials"** <sub>`settings.credentials`</sub> `[key/value object]`
-    * <sub>[ `settings.credentials` ]</sub>
-    * **"token"** <sub>`settings.credentials.token`</sub> `[string]`
+* **"credentials"** `[key/value object]`
+    * _`settings.credentials`_
+    * **"token"** `[string]`
+        * _`settings.credentials.token`_
         * _Required for Bot Login or User Login with 2FA, don't include if using User Login without 2FA._
-    * **"email"** <sub>`settings.credentials.email`</sub> `[string]`
+    * **"email"** `[string]`
+        * _`settings.credentials.email`_
         * _Required for User Login without 2FA, don't include if using Bot Login._
-    * **"password"** <sub>`settings.credentials.password`</sub> `[string]`
+    * **"password"** `[string]`
+        * _`settings.credentials.password`_
         * _Required for User Login without 2FA, don't include if using Bot Login._
-    * :small_blue_diamond: **"userBot"** <sub>`settings.credentials.userBot`</sub> `[bool]`
+    * :small_blue_diamond: **"userBot"** `[bool]`
+        * _`settings.credentials.userBot`_
         * _Default:_ `false`
         * _Set to `true` for a User Login with 2FA, keep as `false` if using a normal Bot._
     ---
-    * :small_orange_diamond: "twitterAccessToken" <sub>`settings.credentials.twitterAccessToken`</sub> `[string]`
+    * :small_orange_diamond: "twitterAccessToken" `[string]`
+        * _`settings.credentials.twitterAccessToken`_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
         * <sub>[ `settings.credentials.twitterAccessToken` ]</sub>
-    * :small_orange_diamond: "twitterAccessTokenSecret" <sub>`settings.credentials.twitterAccessTokenSecret`</sub> `[string]`
+    * :small_orange_diamond: "twitterAccessTokenSecret" `[string]`
+        * _`settings.credentials.twitterAccessTokenSecret`_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * :small_orange_diamond: "twitterConsumerKey" <sub>`settings.credentials.twitterConsumerKey`</sub> `[string]`
+    * :small_orange_diamond: "twitterConsumerKey" `[string]`
+        * _`settings.credentials.twitterConsumerKey`_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * :small_orange_diamond: "twitterConsumerSecret" <sub>`settings.credentials.twitterConsumerSecret`</sub> `[string]`
+    * :small_orange_diamond: "twitterConsumerSecret" `[string]`
+        * _`settings.credentials.twitterConsumerSecret`_
         * _Won't use Twitter API for fetching media from tweets if credentials are missing._
-    * :small_orange_diamond: "flickrApiKey" <sub>`settings.credentials.flickrApiKey`</sub> `[string]`
+    * :small_orange_diamond: "flickrApiKey" `[string]`
+        * _`settings.credentials.flickrApiKey`_
         * _Won't use Flickr API for fetching media from posts/albums if credentials are missing._
-    * :small_orange_diamond: "googleDriveCredentialsJSON" <sub>`settings.credentials.googleDriveCredentialsJSON`</sub> `[string]`
+    * :small_orange_diamond: "googleDriveCredentialsJSON" `[string]`
+        * _`settings.credentials.googleDriveCredentialsJSON`_
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
 ---
-* :small_orange_diamond: "admins" <sub>`settings.admins`</sub> `[list of strings]`
+* :small_orange_diamond: "admins" `[list of strings]`
+    * _`settings.admins`_
     * List of User ID strings for users allowed to use admin commands
-* :small_orange_diamond: "adminChannels" <sub>`settings.adminChannels`</sub> `[list of key/value objects]`
-    * **"channel"** <sub>`settings.adminChannel.channel`</sub> `[string]`
+* :small_orange_diamond: "adminChannels" `[list of key/value objects]`
+    * _`settings.adminChannels`_
+    * **"channel"** `[string]`
+        * _`settings.adminChannel.channel`_
         * _Channel ID for admin commands & logging._
-    * :small_blue_diamond: "logStatus" <sub>`settings.adminChannel.logStatus`</sub> `[bool]`
+    * :small_blue_diamond: "logStatus" `[bool]`
+        * _`settings.adminChannel.logStatus`_
         * _Default:_ `true`
         * _Send status messages to admin channel(s) upon launch._
-    * :small_blue_diamond: "logErrors" <sub>`settings.adminChannel.logErrors`</sub> `[bool]`
+    * :small_blue_diamond: "logErrors" `[bool]`
+        * _`settings.adminChannel.logErrors`_
         * _Default:_ `true`
         * _Send error messages to admin channel(s) when encountering errors._
-    * :small_blue_diamond: "unlockCommands" <sub>`settings.adminChannel.unlockCommands`</sub> `[bool]`
+    * :small_blue_diamond: "unlockCommands" `[bool]`
+        * _`settings.adminChannel.unlockCommands`_
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
 ---
