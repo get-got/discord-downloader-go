@@ -504,10 +504,10 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _REQUIRED FOR BOT APPLICATION LOGIN OR USER LOGIN WITH 2FA, don't include if using User Login without 2FA._
     * :small_red_triangle: **"email"**
         * — _settings.credentials.email : string_
-        * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Login._
+        * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Application Login._
     * :small_red_triangle: **"password"**
         * — _settings.credentials.password : string_
-        * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Login._
+        * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Application Login._
     * :small_blue_diamond: **"userBot"**
         * — _settings.credentials.userBot : boolean_
         * _Default:_ `false`
@@ -673,21 +673,21 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _Unused by Default_
     * Blacklists channels (by ID) from `all`.
 ---
-* :small_red_triangle: _`[USE THIS OR "channels"]`_ **"servers"**
+* :small_red_triangle: **"servers"** _`[USE THIS OR "channels"]`_
     * — _settings.servers : list of setting:value groups_
-    * :small_red_triangle: _`[USE THIS OR "servers"]`_ **"server"**
+    * :small_red_triangle: **"server"** _`[USE THIS OR "servers"]`_
         * — _settings.servers[].server : string_
         * Server ID to monitor.
-    * :small_red_triangle: _`[USE THIS OR "server"]`_ **"servers"**
+    * :small_red_triangle: **"servers"** _`[USE THIS OR "server"]`_
         * — _settings.servers[].servers : list of strings_
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
     * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
-* :small_red_triangle: _`[USE THIS OR "servers"]`_ **"channels"**
+* :small_red_triangle: **"channels"** _`[USE THIS OR "servers"]`_
     * — _settings.channels : list of setting:value groups_
-    * :small_red_triangle: _`[USE THIS OR "channels"]`_ **"channel"**
+    * :small_red_triangle: **"channel"** _`[USE THIS OR "channels"]`_
         * — _settings.channels[].channel : string_
         * Channel ID to monitor.
-    * :small_red_triangle: _`[USE THIS OR "channel"]`_ **"channels"**
+    * :small_red_triangle: **"channels"** _`[USE THIS OR "channel"]`_
         * — _settings.channels[].channels : list of strings_
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     ---
