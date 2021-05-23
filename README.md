@@ -496,8 +496,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[OPTIONAL]`_ "googleDriveCredentialsJSON" `[string]`
         * _Path for Google Drive API credentials JSON file._
         * _Won't use Google Drive API for fetching files if credentials are missing._
-
-
+---
 * _`[OPTIONAL]`_ "admins" `[list of strings]`
     * List of User ID strings for users allowed to use admin commands
 * _`[OPTIONAL]`_ "adminChannels" `[list of key/value objects]`
@@ -512,8 +511,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _`[DEFAULTS]`_ "unlockCommands" `[bool]`
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
-
-
+---
 * _`[DEFAULTS]`_ "debugOutput" `[bool]`
     * _Default:_ `false`
     * Output debugging information.
@@ -559,8 +557,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ "filterDuplicateImagesThreshold" `[float64]`
     * _Default:_ `0`
     * Threshold for what the bot considers too similar of an image comparison score. Lower = more similar (lowest is around -109.7), Higher = less similar (does not really have a maximum, would require your own testing).
-
-
+---
 * _`[DEFAULTS]`_ "presenceEnabled" `[bool]`
     * _Default:_ `true`
 * _`[DEFAULTS]`_ "presenceStatus" `[string]`
@@ -584,8 +581,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
     * [see Presence Placeholders for customization...](#presence-placeholders)
-
-
+---
 * _`[DEFAULTS]`_ "filenameDateFormat" `[string]`
     * _Default:_ `"2006-01-02_15-04-05 "`
     * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
@@ -598,8 +594,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 * _`[DEFAULTS]`_ "numberFormatEuropean" `[bool]`
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
-
-
+---
 * **"all"** `[key/value objects]`
     * **Follow `channels` below for variables, except channel & server ID(s) are not used.**
     * If a pre-existing config for the channel or server is not found, it will download from any and every channel it has access to using your specified settings.
@@ -609,16 +604,14 @@ This setup exempts many options so they will use default values _(see below)_. I
 * "allBlacklistChannels" `[list of strings]`
     * _Unused by Default_
     * Blacklists channels (by ID) from `all`.
-
-
+---
 * _`[USE THIS OR CHANNELS]`_ **"servers"** `[list of key/value variables]`
     * _`[THIS OR BELOW]`_ **"server"** `[string]`
         * Server ID to monitor.
     * _`[THIS OR ABOVE]`_ **"servers"** `[list of strings]`
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
     * **ALL OTHER VARIABLES ARE SAME AS BELOW**
-
-
+---
 * _`[USE THIS OR SERVERS]`_ **"channels"** `[list of key/value variables]`
     * _`[THIS OR BELOW]`_ **"channel"** `[string]`
         * Channel ID to monitor.
