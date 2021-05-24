@@ -205,7 +205,7 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
 <details>
-<summary><h3>SETTINGS EXAMPLE - Barebones:</h3></summary>
+<summary><h4>SETTINGS EXAMPLE - Barebones:</h4></summary>
 
 ```javascript
 {
@@ -224,7 +224,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><h3>SETTINGS EXAMPLE - Selfbot:</h3></summary>
+<summary><h4>SETTINGS EXAMPLE - Selfbot:</h4></summary>
 
 ```javascript
 {
@@ -249,7 +249,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><h3>SETTINGS EXAMPLE - Advanced:</h3></summary>
+<summary><h4>SETTINGS EXAMPLE - Advanced:</h4></summary>
 
 ```javascript
 {
@@ -318,7 +318,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><h3>SETTINGS EXAMPLE - Pretty Much Everything:</h3></summary>
+<summary><h4>SETTINGS EXAMPLE - Pretty Much Everything:</h4></summary>
 
 ```javascript
 {
@@ -495,7 +495,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented if missing.
 
 <details>
-<summary>All Settings</summary>
+<summary><h4>LIST OF ALL SETTINGS</h4></summary>
 
 * :small_orange_diamond: **"_constants"**
     * — _settings.\_constants : list of name:value strings_
@@ -860,6 +860,8 @@ This setup exempts many options so they will use default values _(see below)_. I
 
 ### Presence Placeholders for Settings
 _For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`_
+<details>
+
 Key | Description
 --- | ---
 `{{dgVersion}}`             | discord-go version
@@ -890,6 +892,8 @@ Key | Description
 `{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
+
+</details>
 
 ---
 
