@@ -45,7 +45,7 @@ func init() {
 	startTime = time.Now()
 	historyStatus = make(map[string]string)
 
-	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString("Welcome to %s v%s!", projectName, projectVersion))
 	log.Println(color.CyanString("> discord-go v%s, Discord API v%s", discordgo.VERSION, discordgo.APIVersion))
