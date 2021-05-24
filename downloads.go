@@ -444,7 +444,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 				}
 			}
 			if status.Error != nil {
-				logErrorMessage(fmt.Sprintf("%s...\n%s", getDownloadStatusString(status.Status), status.Error))
+				logErrorMessage(fmt.Sprintf("**%s**\n\n%s", getDownloadStatusString(status.Status), status.Error))
 			}
 		}
 	}
