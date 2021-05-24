@@ -23,12 +23,11 @@
         <img src="https://img.shields.io/discord/780985109608005703?logo=discord"alt="Join the Discord">
     </a>
 </p>
-<h2 align="center">
+<h3 align="center">
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
         <b>DOWNLOAD LATEST RELEASE</b>
     </a>
-</h2>
-<h3 align="center">
+    <br/>
     <a href="https://discord.com/invite/6Z6FJZVaDV">
         <b>Need help? Have suggestions? Join the Discord server!</b>
     </a>
