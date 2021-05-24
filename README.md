@@ -875,8 +875,7 @@ Key | Description
 ## FAQ
 * ***Q: How do I install?***
 * **A: [SEE #getting-started](#getting-started)** 
-
-
+---
 * ***Q: How do I convert from Seklfreak's discord-image-downloader-go?***
 * **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
 
