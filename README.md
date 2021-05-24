@@ -58,7 +58,7 @@ This is a program that connects to a Discord Bot or User to locally download fil
 ## Features
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> LIST OF FEATURES & COMMANDS</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> LIST OF FEATURES & COMMANDS</b></summary>
 
 ### Supported Download Sources
 * Discord File Attachments
@@ -102,7 +102,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 ## Getting Started
 <details>
-<summary><b><i>(COLLAPSABLE)</i> GETTING STARTED, HOW-TO, OTHER INFO...</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> GETTING STARTED, HOW-TO, OTHER INFO...</b></summary>
 
 _Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)_
 
@@ -168,7 +168,7 @@ You can either create a `settings.json` following the examples & variables liste
 
 ## Guide: Downloading History (Old Messages)
 <details>
-<summary><b><i>(COLLAPSABLE)</i> HISTORY GUIDE</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> HISTORY GUIDE</b></summary>
 
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
 
@@ -218,7 +218,7 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> SETTINGS EXAMPLE - Barebones:</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> SETTINGS EXAMPLE - Barebones:</b></summary>
 
 ```javascript
 {
@@ -237,7 +237,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> SETTINGS EXAMPLE - Selfbot:</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> SETTINGS EXAMPLE - Selfbot:</b></summary>
 
 ```javascript
 {
@@ -262,7 +262,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> SETTINGS EXAMPLE - Advanced:</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> SETTINGS EXAMPLE - Advanced:</b></summary>
 
 ```javascript
 {
@@ -331,7 +331,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> SETTINGS EXAMPLE - Pretty Much Everything:</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> SETTINGS EXAMPLE - Pretty Much Everything:</b></summary>
 
 ```javascript
 {
@@ -508,7 +508,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented if missing.
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> LIST OF ALL SETTINGS</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> LIST OF ALL SETTINGS</b></summary>
 
 * :small_orange_diamond: **"_constants"**
     * — _settings.\_constants : list of name:value strings_
@@ -874,7 +874,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 ### Presence Placeholders for Settings
 _For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`_
 <details>
-<summary><b><i>(COLLAPSABLE)</i></b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i></b></summary>
 
 Key | Description
 --- | ---
@@ -925,7 +925,7 @@ Key | Description
 * Versioning is `[MAJOR].[MINOR].[PATCH]`
 
 <details>
-<summary><b><i>(COLLAPSABLE)</i> CREDITS & SOURCES</b></summary>
+<summary><b><i>(COLLAPSABLE SECTION)</i> CREDITS & SOURCES</b></summary>
 
 ### Credits & Dependencies
 * [github.com/Seklfreak/discord-image-downloader-go - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
