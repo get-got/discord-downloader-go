@@ -204,7 +204,9 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
-`settings.json Example - Barebones:`
+<details>
+<summary>settings.json Example - Barebones:</summary>
+
 ```javascript
 {
     "credentials": {
@@ -219,7 +221,11 @@ This setup exempts many options so they will use default values _(see below)_. I
 }
 ```
 
-`settings.json Example - Selfbot:`
+</details>
+
+<details>
+<summary>settings.json Example - Selfbot:</summary>
+
 ```javascript
 {
     "credentials": {
@@ -239,6 +245,11 @@ This setup exempts many options so they will use default values _(see below)_. I
     ]
 }
 ```
+
+</details>
+
+<details>
+<summary>settings.json Example - Advanced:</summary>
 
 `settings.json Example - Advanced:`
 ```javascript
@@ -305,7 +316,11 @@ This setup exempts many options so they will use default values _(see below)_. I
 }
 ```
 
-`settings.json Example - Pretty Much Everything:`
+</details>
+
+<details>
+<summary>settings.json Example - Pretty Much Everything:</summary>
+
 ```javascript
 {
     "_constants": {
@@ -468,6 +483,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     ]
 }
 ```
+
+</details>
 
 ---
 
