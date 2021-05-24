@@ -251,7 +251,6 @@ This setup exempts many options so they will use default values _(see below)_. I
 <details>
 <summary>settings.json Example - Advanced:</summary>
 
-`settings.json Example - Advanced:`
 ```javascript
 {
     "credentials": {
@@ -494,6 +493,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 :small_blue_diamond: means the setting defaults to a prespecified value. List below should say all default values.
 
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented if missing.
+
+<details>
+<summary>All Settings</summary>
 
 * :small_orange_diamond: **"_constants"**
     * — _settings.\_constants : list of name:value strings_
@@ -886,6 +888,8 @@ Key | Description
 `{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
+
+</details>
 
 ---
 
