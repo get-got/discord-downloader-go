@@ -28,6 +28,11 @@
         <b>DOWNLOAD LATEST RELEASE</b>
     </a>
 </h2>
+<h3 align="center">
+    <a href="https://discord.com/invite/6Z6FJZVaDV">
+        <b>Need help? Have suggestions? Join the Discord server!</b>
+    </a>
+</h3>
 
 This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels in real-time as well as old messages. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization. _See [Features](#Features) below for full list!_
 
@@ -48,12 +53,6 @@ This is a program that connects to a Discord Bot or User to locally download fil
 * [**List of Settings**](#list-of-settings)
 * [**FAQ (Frequently Asked Questions)**](#faq)
 * [**Development, Credits, Dependencies**](#development)
-  
-<h3 align="center">
-    <a href="https://discord.com/invite/6Z6FJZVaDV">
-        <b>Need help? Have suggestions? Join the Discord server!</b>
-    </a>
-</h3>
 
 ---
 
