@@ -694,6 +694,9 @@ func channelDefault(channel *configurationChannel) {
 		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
 	}
 
+	if channel.Filters == nil {
+		channel.Filters = &configurationChannel_Filters{}
+	}
 	if channel.Filters.BlockedExtensions == nil {
 		channel.Filters.BlockedExtensions = &ccfdBlockedExtensions
 	}
@@ -701,6 +704,9 @@ func channelDefault(channel *configurationChannel) {
 		channel.Filters.BlockedPhrases = &ccfdBlockedPhrases
 	}
 
+	if channel.LogLinks == nil {
+		channel.LogLinks = &configurationChannel_Log{}
+	}
 	if channel.LogLinks.DestinationIsFolder == nil {
 		channel.LogLinks.DestinationIsFolder = &ccldDestinationIsFolder
 	}
@@ -714,6 +720,9 @@ func channelDefault(channel *configurationChannel) {
 		channel.LogLinks.DivideLogsByUser = &ccldDivideLogsByUser
 	}
 
+	if channel.LogMessages == nil {
+		channel.LogMessages = &configurationChannel_Log{}
+	}
 	if channel.LogMessages.DestinationIsFolder == nil {
 		channel.LogMessages.DestinationIsFolder = &ccldDestinationIsFolder
 	}
