@@ -205,7 +205,7 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
 <details>
-<summary><h4>SETTINGS EXAMPLE - Barebones:</h4></summary>
+<summary><b>SETTINGS EXAMPLE - Barebones:</b></summary>
 
 ```javascript
 {
@@ -224,7 +224,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><h4>SETTINGS EXAMPLE - Selfbot:</h4></summary>
+<summary><b>SETTINGS EXAMPLE - Selfbot:</b></summary>
 
 ```javascript
 {
@@ -249,7 +249,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><h4>SETTINGS EXAMPLE - Advanced:</h4></summary>
+<summary><b>SETTINGS EXAMPLE - Advanced:</b></summary>
 
 ```javascript
 {
@@ -318,7 +318,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary><h4>SETTINGS EXAMPLE - Pretty Much Everything:</h4></summary>
+<summary><b>SETTINGS EXAMPLE - Pretty Much Everything:</b></summary>
 
 ```javascript
 {
@@ -495,7 +495,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 :small_orange_diamond: means the setting is optional and the feature(s) related to the setting will not be implemented if missing.
 
 <details>
-<summary><h4>LIST OF ALL SETTINGS</h4></summary>
+<summary><b>LIST OF ALL SETTINGS</b></summary>
 
 * :small_orange_diamond: **"_constants"**
     * — _settings.\_constants : list of name:value strings_
