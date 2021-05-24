@@ -253,7 +253,7 @@ type configurationChannel_Log struct {
 	Destination      string  `json:"destination"`                // required
 	Prefix           *string `json:"prefix,omitempty"`           // optional
 	Suffix           *string `json:"suffix,omitempty"`           // optional
-	MoreData         *bool   `json:"moreData,omitempty"`         // optional, defaults
+	UserData         *bool   `json:"userData,omitempty"`         // optional, defaults
 	FilterDuplicates *bool   `json:"filterDuplicates,omitempty"` // optional, defaults
 }
 

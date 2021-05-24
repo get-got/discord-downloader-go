@@ -968,8 +968,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 					}
 					// More Data
 					additionalInfo := ""
-					if channelConfig.LogLinks.MoreData != nil {
-						if *channelConfig.LogLinks.MoreData == true {
+					if channelConfig.LogLinks.UserData != nil {
+						if *channelConfig.LogLinks.UserData == true {
 							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", message.GuildID, message.ChannelID, message.Author.Username, message.Author.Discriminator, message.Author.ID, message.Timestamp)
 						}
 					}
