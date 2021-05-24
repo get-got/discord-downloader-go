@@ -251,10 +251,10 @@ type configurationChannel_Filters struct {
 }
 type configurationChannel_Log struct {
 	Destination      string  `json:"destination"`                // required
-	FilterDuplicates *bool   `json:"filterDuplicates,omitempty"` // optional, defaults
 	Prefix           *string `json:"prefix,omitempty"`           // optional
 	Suffix           *string `json:"suffix,omitempty"`           // optional
 	MoreData         *bool   `json:"moreData,omitempty"`         // optional, defaults
+	FilterDuplicates *bool   `json:"filterDuplicates,omitempty"` // optional, defaults
 }
 
 //#endregion

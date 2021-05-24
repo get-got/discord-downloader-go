@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -153,47 +154,63 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		// Log Messages to File
 		if channelConfig.LogMessages != nil {
 			if channelConfig.LogMessages.Destination != "" {
-				// Writer
-				f, err := os.OpenFile(channelConfig.LogMessages.Destination, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-				if err != nil {
-					log.Println(color.RedString("[channelConfig.LogMessages] Failed to open log file:\t%s", err))
-					f.Close()
+				// Read
+				currentLog, err := ioutil.ReadFile(channelConfig.LogMessages.Destination)
+				currentLogS := ""
+				if err == nil {
+					currentLogS = string(currentLog)
 				}
-				defer f.Close()
-
-				//TODO: FilterDuplicates
-
-				var newLine string
-				// Prepend
-				prefix := ""
-				if channelConfig.LogMessages.Prefix != nil {
-					prefix = *channelConfig.LogMessages.Prefix
-				}
-				// More Data
-				additionalInfo := ""
-				if channelConfig.LogMessages.MoreData != nil {
-					if *channelConfig.LogMessages.MoreData == true {
-						additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Timestamp)
+				canLog := true
+				// Filter Duplicates
+				if channelConfig.LogMessages.FilterDuplicates != nil {
+					if *channelConfig.LogMessages.FilterDuplicates {
+						if strings.Contains(currentLogS, fmt.Sprintf("[%s/%s/%s]", m.GuildID, m.ChannelID, m.ID)) {
+							canLog = false
+						}
 					}
 				}
-				if len(m.Attachments) > 0 {
-					additionalInfo += fmt.Sprintf("<%d ATTACHMENTS> ", len(m.Attachments))
-				}
-				// Append
-				suffix := ""
-				if channelConfig.LogMessages.Suffix != nil {
-					suffix = *channelConfig.LogMessages.Suffix
-				}
-				// New Line
-				contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
-				if err == nil {
-					newLine += "\n" + prefix + additionalInfo + contentFmt + suffix
-				} else {
-					newLine += "\n" + prefix + additionalInfo + m.Content + suffix
-				}
 
-				if _, err = f.WriteString(newLine); err != nil {
-					log.Println(color.RedString("[channelConfig.LogMessages] Failed to append file:\t%s", err))
+				if canLog {
+					// Writer
+					f, err := os.OpenFile(channelConfig.LogMessages.Destination, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+					if err != nil {
+						log.Println(color.RedString("[channelConfig.LogMessages] Failed to open log file:\t%s", err))
+						f.Close()
+					}
+					defer f.Close()
+
+					var newLine string
+					// Prepend
+					prefix := ""
+					if channelConfig.LogMessages.Prefix != nil {
+						prefix = *channelConfig.LogMessages.Prefix
+					}
+					// More Data
+					additionalInfo := ""
+					if channelConfig.LogMessages.UserData != nil {
+						if *channelConfig.LogMessages.UserData == true {
+							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID, m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Timestamp)
+						}
+					}
+					if len(m.Attachments) > 0 {
+						additionalInfo += fmt.Sprintf("<%d ATTACHMENTS> ", len(m.Attachments))
+					}
+					// Append
+					suffix := ""
+					if channelConfig.LogMessages.Suffix != nil {
+						suffix = *channelConfig.LogMessages.Suffix
+					}
+					// New Line
+					contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
+					if err == nil {
+						newLine += "\n" + prefix + additionalInfo + contentFmt + suffix
+					} else {
+						newLine += "\n" + prefix + additionalInfo + m.Content + suffix
+					}
+
+					if _, err = f.WriteString(newLine); err != nil {
+						log.Println(color.RedString("[channelConfig.LogMessages] Failed to append file:\t%s", err))
+					}
 				}
 			}
 		}

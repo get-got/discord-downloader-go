@@ -935,20 +935,32 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Log Links to File
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
+				// Read
+				currentLog, err := ioutil.ReadFile(channelConfig.LogLinks.Destination)
+				currentLogS := ""
+				if err == nil {
+					currentLogS = string(currentLog)
+				}
 				// Writer
-				f, err := os.OpenFile(channelConfig.LogLinks.Destination, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+				f, err := os.OpenFile(channelConfig.LogLinks.Destination, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 				if err != nil {
 					log.Println(color.RedString("[channelConfig.LogLinks] Failed to open log file:\t%s", err))
 					f.Close()
 				}
 				defer f.Close()
 
-				//TODO: FilterDuplicates
-
 				var newLine string
 				rawLinks := getRawLinks(message)
 				// Each Link
 				for _, rawLink := range rawLinks {
+					// Filter Duplicates
+					if channelConfig.LogLinks.FilterDuplicates != nil {
+						if *channelConfig.LogLinks.FilterDuplicates {
+							if strings.Contains(currentLogS, rawLink.Link) {
+								continue
+							}
+						}
+					}
 					// Prepend
 					prefix := ""
 					if channelConfig.LogLinks.Prefix != nil {
