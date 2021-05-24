@@ -164,6 +164,89 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			}
 		}
 
+		// Filters
+		if channelConfig.Filters != nil {
+			shouldAbort := false
+
+			if channelConfig.Filters.AllowedPhrases != nil ||
+				channelConfig.Filters.AllowedUsers != nil ||
+				channelConfig.Filters.AllowedRoles != nil {
+				shouldAbort = true
+			}
+
+			if channelConfig.Filters.BlockedPhrases != nil {
+				for _, phrase := range *channelConfig.Filters.BlockedPhrases {
+					if strings.Contains(m.Content, phrase) {
+						shouldAbort = true
+						if config.DebugOutput {
+							log.Println(logPrefixDebug, color.YellowString("blockedPhrases found \"%s\" in message, planning to abort...", phrase))
+						}
+						break
+					}
+				}
+			}
+			if channelConfig.Filters.AllowedPhrases != nil {
+				for _, phrase := range *channelConfig.Filters.AllowedPhrases {
+					if strings.Contains(m.Content, phrase) {
+						shouldAbort = false
+						if config.DebugOutput {
+							log.Println(logPrefixDebug, color.YellowString("allowedPhrases found \"%s\" in message, planning to process...", phrase))
+						}
+						break
+					}
+				}
+			}
+
+			if channelConfig.Filters.BlockedUsers != nil {
+				if stringInSlice(m.Author.ID, *channelConfig.Filters.BlockedUsers) {
+					shouldAbort = true
+					if config.DebugOutput {
+						log.Println(logPrefixDebug, color.YellowString("blockedUsers caught %s, planning to abort...", m.Author.ID))
+					}
+				}
+			}
+			if channelConfig.Filters.AllowedUsers != nil {
+				if stringInSlice(m.Author.ID, *channelConfig.Filters.AllowedUsers) {
+					shouldAbort = false
+					if config.DebugOutput {
+						log.Println(logPrefixDebug, color.YellowString("allowedUsers caught %s, planning to process...", m.Author.ID))
+					}
+				}
+			}
+
+			if channelConfig.Filters.BlockedRoles != nil {
+				for _, role := range m.Member.Roles {
+					if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
+						shouldAbort = true
+						if config.DebugOutput {
+							log.Println(logPrefixDebug, color.YellowString("blockedRoles caught %s, planning to abort...", role))
+						}
+						break
+					}
+				}
+			}
+			if channelConfig.Filters.AllowedRoles != nil {
+				for _, role := range m.Member.Roles {
+					if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
+						shouldAbort = false
+						if config.DebugOutput {
+							log.Println(logPrefixDebug, color.YellowString("allowedRoles caught %s, planning to allow...", role))
+						}
+						break
+					}
+				}
+			}
+
+			// Abort
+			if shouldAbort {
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiYellowString("Filter decided to abort message processing..."))
+				}
+				return -1
+			}
+
+		}
+
 		// Skipping
 		canSkip := config.AllowSkipping
 		if channelConfig.OverwriteAllowSkipping != nil {

@@ -806,6 +806,30 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].domainBlacklist : list of strings_
         * Ignores files from specified domains. Ensure you use proper formatting.
     ---
+    * :small_orange_diamond: "filters"
+        * — _settings.channels[].filters : setting:value group_
+        * _Filter prioritizes Users before Roles before Phrases._
+        * :small_orange_diamond: "blockedPhrases"
+            * — _settings.channels[].filters.blockedPhrases : list of strings_
+            * List of phrases to make the bot ignore this message.
+            * Will ignore any message containing a blocked phrase UNLESS it also has an allowed phrase. Messages will be processed by default.
+        * :small_orange_diamond: "allowedPhrases"
+            * — _settings.channels[].filters.allowedPhrases : list of strings_
+            * List of phrases to allow the bot to process the message.
+            * _If used without blockedPhrases,_ no messages will be processed unless they contain an allowed phrase.
+        * :small_orange_diamond: "blockedUsers"
+            * — _settings.channels[].filters.blockedUsers : list of strings_
+            * Will ignore messages from the following users.
+        * :small_orange_diamond: "allowedUsers"
+            * — _settings.channels[].filters.allowedUsers : list of strings_
+            * Will ONLY process messages if they were sent from the following users.
+        * :small_orange_diamond: "blockedRoles"
+            * — _settings.channels[].filters.blockedRoles : list of strings_
+            * Will ignore messages from users with any of the following roles.
+        * :small_orange_diamond: "allowedRoles"
+            * — _settings.channels[].filters.allowedRoles : list of strings_
+            * Will ONLY process messages if they were sent from users with any of the following roles.
+    ---
     * :small_orange_diamond: "saveAllLinksToFile"
         * — _settings.channels[].saveAllLinksToFile : string_
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.

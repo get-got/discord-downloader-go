@@ -229,16 +229,19 @@ type configurationChannel struct {
 	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	ExtensionBlacklist     *[]string `json:"extensionBlacklist,omitempty"`     // optional, defaults
 	DomainBlacklist        *[]string `json:"domainBlacklist,omitempty"`        // optional, defaults
-	SaveAllLinksToFile     *string   `json:"saveAllLinksToFile,omitempty"`     // optional
+	// Misc Rules
+	Filters            *configurationChannel_Filters `json:"filters,omitempty"`            // optional
+	SaveAllLinksToFile *string                       `json:"saveAllLinksToFile,omitempty"` // optional
+}
+type configurationChannel_Filters struct {
+	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"`
+	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"`
 
-	/* IDEAS / TODO:
+	BlockedUsers *[]string `json:"blockedUsers,omitempty"`
+	AllowedUsers *[]string `json:"allowedUsers,omitempty"`
 
-	// These require an efficient way to check roles. I haven't really looked into it.
-	* RolesAllWhitelisted *bool     `json:"rolesAllWhitelisted,omitempty"` // optional, defaults to true
-	* RoleWhitelist       *[]string `json:"roleWhitelist,omitempty"`       // optional
-	* RoleBlacklist       *[]string `json:"roleBlacklist,omitempty"`       // optional
-
-	*/
+	BlockedRoles *[]string `json:"blockedRoles,omitempty"`
+	AllowedRoles *[]string `json:"allowedRoles,omitempty"`
 }
 
 //#endregion
