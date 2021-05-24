@@ -172,7 +172,8 @@ var (
 	ccdSaveTextFiles          bool = false
 	ccdSaveOtherFiles         bool = false
 	ccdSavePossibleDuplicates bool = false
-	ccdExtensionBlacklist          = []string{
+	// Filters
+	ccfdBlockedExtensions = []string{
 		".htm",
 		".html",
 		".php",
@@ -183,6 +184,12 @@ var (
 		".sh",
 		".py",
 		".jar",
+	}
+	ccfdBlockedPhrases = []string{
+		"skip",
+		"ignore",
+		"don't save",
+		"no save",
 	}
 )
 
@@ -211,18 +218,16 @@ type configurationChannel struct {
 	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
 	// Rules for Saving
-	DivideFoldersByServer  *bool     `json:"divideFoldersByServer,omitempty"`  // optional, defaults
-	DivideFoldersByChannel *bool     `json:"divideFoldersByChannel,omitempty"` // optional, defaults
-	DivideFoldersByUser    *bool     `json:"divideFoldersByUser,omitempty"`    // optional, defaults
-	DivideFoldersByType    *bool     `json:"divideFoldersByType,omitempty"`    // optional, defaults
-	SaveImages             *bool     `json:"saveImages,omitempty"`             // optional, defaults
-	SaveVideos             *bool     `json:"saveVideos,omitempty"`             // optional, defaults
-	SaveAudioFiles         *bool     `json:"saveAudioFiles,omitempty"`         // optional, defaults
-	SaveTextFiles          *bool     `json:"saveTextFiles,omitempty"`          // optional, defaults
-	SaveOtherFiles         *bool     `json:"saveOtherFiles,omitempty"`         // optional, defaults
-	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates,omitempty"` // optional, defaults
-	ExtensionBlacklist     *[]string `json:"extensionBlacklist,omitempty"`     // optional, defaults
-	DomainBlacklist        *[]string `json:"domainBlacklist,omitempty"`        // optional, defaults
+	DivideFoldersByServer  *bool `json:"divideFoldersByServer,omitempty"`  // optional, defaults
+	DivideFoldersByChannel *bool `json:"divideFoldersByChannel,omitempty"` // optional, defaults
+	DivideFoldersByUser    *bool `json:"divideFoldersByUser,omitempty"`    // optional, defaults
+	DivideFoldersByType    *bool `json:"divideFoldersByType,omitempty"`    // optional, defaults
+	SaveImages             *bool `json:"saveImages,omitempty"`             // optional, defaults
+	SaveVideos             *bool `json:"saveVideos,omitempty"`             // optional, defaults
+	SaveAudioFiles         *bool `json:"saveAudioFiles,omitempty"`         // optional, defaults
+	SaveTextFiles          *bool `json:"saveTextFiles,omitempty"`          // optional, defaults
+	SaveOtherFiles         *bool `json:"saveOtherFiles,omitempty"`         // optional, defaults
+	SavePossibleDuplicates *bool `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	// Misc Rules
 	Filters     *configurationChannel_Filters `json:"filters,omitempty"`     // optional
 	LogLinks    *configurationChannel_Log     `json:"logLinks,omitempty"`    // optional
@@ -237,6 +242,12 @@ type configurationChannel_Filters struct {
 
 	BlockedRoles *[]string `json:"blockedRoles,omitempty"` // optional
 	AllowedRoles *[]string `json:"allowedRoles,omitempty"` // optional
+
+	BlockedExtensions *[]string `json:"blockedExtensions,omitempty"` // optional
+	AllowedExtensions *[]string `json:"allowedExtensions,omitempty"` // optional
+
+	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
+	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
 }
 type configurationChannel_Log struct {
 	Destination      string  `json:"destination"`                // required
@@ -667,8 +678,12 @@ func channelDefault(channel *configurationChannel) {
 	if channel.SavePossibleDuplicates == nil {
 		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
 	}
-	if channel.ExtensionBlacklist == nil {
-		channel.ExtensionBlacklist = &ccdExtensionBlacklist
+
+	if channel.Filters.BlockedExtensions == nil {
+		channel.Filters.BlockedExtensions = &ccfdBlockedExtensions
+	}
+	if channel.Filters.BlockedPhrases == nil {
+		channel.Filters.BlockedPhrases = &ccfdBlockedPhrases
 	}
 }
 

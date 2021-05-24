@@ -561,11 +561,30 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Check extension
-		if stringInSlice(extension, *channelConfig.ExtensionBlacklist) || stringInSlice(extension, []string{".com", ".net", ".org"}) {
-			if !historyCmd {
-				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
+		if channelConfig.Filters.AllowedExtensions != nil || channelConfig.Filters.BlockedExtensions != nil {
+			shouldAbort := false
+			if channelConfig.Filters.AllowedExtensions != nil {
+				shouldAbort = true
 			}
-			return mDownloadStatus(downloadSkippedUnpermittedExtension)
+
+			if channelConfig.Filters.BlockedExtensions != nil {
+				if stringInSlice(extension, *channelConfig.Filters.BlockedExtensions) {
+					shouldAbort = true
+				}
+			}
+			if channelConfig.Filters.AllowedExtensions != nil {
+				if stringInSlice(extension, *channelConfig.Filters.AllowedExtensions) {
+					shouldAbort = false
+				}
+			}
+
+			// Abort
+			if shouldAbort {
+				if !historyCmd {
+					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
+				}
+				return mDownloadStatus(downloadSkippedUnpermittedExtension)
+			}
 		}
 
 		// Fix content type
@@ -598,14 +617,29 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Check Domain
-		if channelConfig.DomainBlacklist != nil {
-			if parsedURL != nil {
-				if stringInSlice(parsedURL.Hostname(), *channelConfig.DomainBlacklist) {
-					if !historyCmd {
-						log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", parsedURL.Hostname(), inputURL))
-					}
-					return mDownloadStatus(downloadSkippedUnpermittedDomain)
+		if channelConfig.Filters.AllowedDomains != nil || channelConfig.Filters.BlockedDomains != nil {
+			shouldAbort := false
+			if channelConfig.Filters.AllowedDomains != nil {
+				shouldAbort = true
+			}
+
+			if channelConfig.Filters.BlockedDomains != nil {
+				if stringInSlice(parsedURL.Hostname(), *channelConfig.Filters.BlockedDomains) {
+					shouldAbort = true
 				}
+			}
+			if channelConfig.Filters.AllowedDomains != nil {
+				if stringInSlice(parsedURL.Hostname(), *channelConfig.Filters.AllowedDomains) {
+					shouldAbort = false
+				}
+			}
+
+			// Abort
+			if shouldAbort {
+				if !historyCmd {
+					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", parsedURL.Hostname(), inputURL))
+				}
+				return mDownloadStatus(downloadSkippedUnpermittedDomain)
 			}
 		}
 
