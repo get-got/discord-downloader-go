@@ -785,17 +785,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Unused by Default_
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
     ---
-    * :small_blue_diamond: "usersAllWhitelisted"
-        * — _settings.channels[].usersAllWhitelisted : boolean_
-        * _Default:_ `true`
-        * Allow messages from all users to be handled. Set to `false` if you wish to use `userWhitelist` to only permit specific users messages to be handled.
-    * :small_orange_diamond: "userWhitelist"
-        * — _settings.channels[].userWhitelist : list of strings_
-        * Use with `usersAllWhitelisted` as `false` to only permit specific users to have their messages handled by the bot. **Only accepts User ID's in the list.**
-    * :small_orange_diamond: "userBlacklist"
-        * — _settings.channels[].userBlacklist : list of strings_
-        * Use with `usersAllWhitelisted` as the default `true` to block certain users messages from being handled by the bot. **Only accepts User ID's in the list.**
-    ---
     * :small_blue_diamond: "divideFoldersByServer"
         * — _settings.channels[].divideFoldersByServer : boolean_
         * _Default:_ `false`

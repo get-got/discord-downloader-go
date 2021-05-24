@@ -198,21 +198,6 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			}
 		}
 
-		// User Whitelisting
-		if !*channelConfig.UsersAllWhitelisted && channelConfig.UserWhitelist != nil {
-			if !stringInSlice(m.Author.ID, *channelConfig.UserWhitelist) {
-				log.Println(color.HiYellowString("Message handling skipped due to user not being whitelisted."))
-				return -1
-			}
-		}
-		// User Blacklisting
-		if channelConfig.UserBlacklist != nil {
-			if stringInSlice(m.Author.ID, *channelConfig.UserBlacklist) {
-				log.Println(color.HiYellowString("Message handling skipped due to user being blacklisted."))
-				return -1
-			}
-		}
-
 		// Filters
 		if channelConfig.Filters != nil {
 			shouldAbort := false

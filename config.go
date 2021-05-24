@@ -161,8 +161,6 @@ var (
 	ccdReactWhenDownloadedEmoji string   = ""
 	ccdBlacklistReactEmojis     []string = []string{}
 	ccdTypeWhileProcessing      bool     = false
-	// Rules for Access
-	ccdUsersAllWhitelisted bool = true
 	// Rules for Saving
 	ccdDivideFoldersByServer  bool = false
 	ccdDivideFoldersByChannel bool = false
@@ -212,10 +210,6 @@ type configurationChannel struct {
 	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
 	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
-	// Rules for Access
-	UsersAllWhitelisted *bool     `json:"usersAllWhitelisted,omitempty"` // optional, defaults to true
-	UserWhitelist       *[]string `json:"userWhitelist,omitempty"`       // optional, only relevant if above is false
-	UserBlacklist       *[]string `json:"userBlacklist,omitempty"`       // optional
 	// Rules for Saving
 	DivideFoldersByServer  *bool     `json:"divideFoldersByServer,omitempty"`  // optional, defaults
 	DivideFoldersByChannel *bool     `json:"divideFoldersByChannel,omitempty"` // optional, defaults
@@ -641,10 +635,6 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.TypeWhileProcessing == nil {
 		channel.TypeWhileProcessing = &ccdTypeWhileProcessing
-	}
-	// Rules for Access
-	if channel.UsersAllWhitelisted == nil {
-		channel.UsersAllWhitelisted = &ccdUsersAllWhitelisted
 	}
 	// Rules for Saving
 	if channel.DivideFoldersByServer == nil {
