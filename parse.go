@@ -114,7 +114,7 @@ func getInstagramInfo(url string) (string, string) {
 	resp, err := http.Get(url)
 
 	if err != nil {
-		return "N/A", "N/A"
+		return "unknown", "unknown"
 	}
 
 	defer resp.Body.Close()
@@ -158,7 +158,7 @@ ParseLoop:
 			}
 		}
 	}
-	return "N/A", "N/A"
+	return "unknown", "unknown"
 }
 
 func getInstagramVideoUrl(url string) string {
