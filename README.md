@@ -46,6 +46,7 @@ This is a program that connects to a Discord Bot or User to locally download fil
 * [**Guide: Downloading History _(Old Messages)_**](#guide-downloading-history-old-messages)
 * [**Guide: Settings / Configuration**](#guide-settings--configuration)
 * [**List of Settings**](#list-of-settings)
+* [**FAQ (Frequently Asked Questions)**](#faq)
 * [**Development, Credits, Dependencies**](#development)
   
 <h3 align="center">
@@ -868,6 +869,16 @@ Key | Description
 `{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
+
+---
+
+## FAQ
+* ***Q: How do I install?***
+* **A: [SEE #getting-started](#getting-started)** 
+
+
+* ***Q: How do I convert from Seklfreak's discord-image-downloader-go?***
+* **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
 
 ---
 
