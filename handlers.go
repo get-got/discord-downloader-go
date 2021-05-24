@@ -172,6 +172,9 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				channelConfig.Filters.AllowedUsers != nil ||
 				channelConfig.Filters.AllowedRoles != nil {
 				shouldAbort = true
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("Filter will be ignoring by default..."))
+				}
 			}
 
 			if channelConfig.Filters.BlockedPhrases != nil {
@@ -179,7 +182,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					if strings.Contains(m.Content, phrase) {
 						shouldAbort = true
 						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.YellowString("blockedPhrases found \"%s\" in message, planning to abort...", phrase))
+							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedPhrases found \"%s\" in message, planning to abort...", phrase))
 						}
 						break
 					}
@@ -190,7 +193,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					if strings.Contains(m.Content, phrase) {
 						shouldAbort = false
 						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.YellowString("allowedPhrases found \"%s\" in message, planning to process...", phrase))
+							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedPhrases found \"%s\" in message, planning to process...", phrase))
 						}
 						break
 					}
@@ -201,7 +204,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				if stringInSlice(m.Author.ID, *channelConfig.Filters.BlockedUsers) {
 					shouldAbort = true
 					if config.DebugOutput {
-						log.Println(logPrefixDebug, color.YellowString("blockedUsers caught %s, planning to abort...", m.Author.ID))
+						log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedUsers caught %s, planning to abort...", m.Author.ID))
 					}
 				}
 			}
@@ -209,7 +212,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				if stringInSlice(m.Author.ID, *channelConfig.Filters.AllowedUsers) {
 					shouldAbort = false
 					if config.DebugOutput {
-						log.Println(logPrefixDebug, color.YellowString("allowedUsers caught %s, planning to process...", m.Author.ID))
+						log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedUsers caught %s, planning to process...", m.Author.ID))
 					}
 				}
 			}
@@ -219,7 +222,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
 						shouldAbort = true
 						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.YellowString("blockedRoles caught %s, planning to abort...", role))
+							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedRoles caught %s, planning to abort...", role))
 						}
 						break
 					}
@@ -230,7 +233,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
 						shouldAbort = false
 						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.YellowString("allowedRoles caught %s, planning to allow...", role))
+							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedRoles caught %s, planning to allow...", role))
 						}
 						break
 					}
@@ -240,9 +243,13 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			// Abort
 			if shouldAbort {
 				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiYellowString("Filter decided to abort message processing..."))
+					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.HiYellowString("Filter decided to ignore message..."))
 				}
 				return -1
+			} else {
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.HiYellowString("Filter approved message..."))
+				}
 			}
 
 		}
