@@ -168,7 +168,7 @@ You can either create a `settings.json` following the examples & variables liste
 
 ## Guide: Downloading History (Old Messages)
 <details>
-<summary><b><i>(COLLAPSABLE)</i> HISTORY GUIDE...</b></summary>
+<summary><b><i>(COLLAPSABLE)</i> HISTORY GUIDE</b></summary>
 
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
 
