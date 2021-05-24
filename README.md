@@ -205,7 +205,7 @@ The following example is for a Bot Application _(using a token)_, bound to 1 cha
 This setup exempts many options so they will use default values _(see below)_. It shows the bare minimum required settings for the bot to function.
 
 <details>
-<summary>settings.json Example - Barebones:</summary>
+<summary><h3>SETTINGS EXAMPLE - Barebones:</h3></summary>
 
 ```javascript
 {
@@ -224,7 +224,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary>settings.json Example - Selfbot:</summary>
+<summary><h3>SETTINGS EXAMPLE - Selfbot:</h3></summary>
 
 ```javascript
 {
@@ -249,7 +249,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary>settings.json Example - Advanced:</summary>
+<summary><h3>SETTINGS EXAMPLE - Advanced:</h3></summary>
 
 ```javascript
 {
@@ -318,7 +318,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 </details>
 
 <details>
-<summary>settings.json Example - Pretty Much Everything:</summary>
+<summary><h3>SETTINGS EXAMPLE - Pretty Much Everything:</h3></summary>
 
 ```javascript
 {
@@ -854,6 +854,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].saveAllLinksToFile : string_
         * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
 
+</details>
+
 ---
 
 ### Presence Placeholders for Settings
@@ -888,8 +890,6 @@ Key | Description
 `{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
-
-</details>
 
 ---
 
