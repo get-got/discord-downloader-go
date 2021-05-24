@@ -157,31 +157,35 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				logPath := channelConfig.LogMessages.Destination
 				if *channelConfig.LogMessages.DestinationIsFolder == true {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
-						logPath += string(os.PathSeparator) + "Log_Messages"
+						logPath += string(os.PathSeparator)
 					}
-					if *channelConfig.LogMessages.DivideLogsByServer == true {
-						if m.GuildID == "" {
-							ch, err := bot.State.Channel(m.ChannelID)
-							if err == nil {
-								if ch.Type == discordgo.ChannelTypeDM {
-									logPath += " DM"
-								} else if ch.Type == discordgo.ChannelTypeGroupDM {
-									logPath += " GroupDM"
+					err := os.MkdirAll(logPath, 0755)
+					if err == nil {
+						logPath += "Log_Messages"
+						if *channelConfig.LogMessages.DivideLogsByServer == true {
+							if m.GuildID == "" {
+								ch, err := bot.State.Channel(m.ChannelID)
+								if err == nil {
+									if ch.Type == discordgo.ChannelTypeDM {
+										logPath += " DM"
+									} else if ch.Type == discordgo.ChannelTypeGroupDM {
+										logPath += " GroupDM"
+									} else {
+										logPath += " Unknown"
+									}
 								} else {
 									logPath += " Unknown"
 								}
 							} else {
-								logPath += " Unknown"
+								logPath += " SID_" + m.GuildID
 							}
-						} else {
-							logPath += " SID_" + m.GuildID
 						}
-					}
-					if *channelConfig.LogMessages.DivideLogsByChannel == true {
-						logPath += " CID_" + m.ChannelID
-					}
-					if *channelConfig.LogMessages.DivideLogsByUser == true {
-						logPath += " UID_" + m.Author.ID
+						if *channelConfig.LogMessages.DivideLogsByChannel == true {
+							logPath += " CID_" + m.ChannelID
+						}
+						if *channelConfig.LogMessages.DivideLogsByUser == true {
+							logPath += " UID_" + m.Author.ID
+						}
 					}
 					logPath += ".txt"
 				}

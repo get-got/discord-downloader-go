@@ -938,31 +938,35 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				logPath := channelConfig.LogLinks.Destination
 				if *channelConfig.LogLinks.DestinationIsFolder == true {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
-						logPath += string(os.PathSeparator) + "Log_Links"
+						logPath += string(os.PathSeparator)
 					}
-					if *channelConfig.LogLinks.DivideLogsByServer == true {
-						if message.GuildID == "" {
-							ch, err := bot.State.Channel(message.ChannelID)
-							if err == nil {
-								if ch.Type == discordgo.ChannelTypeDM {
-									logPath += " DM"
-								} else if ch.Type == discordgo.ChannelTypeGroupDM {
-									logPath += " GroupDM"
+					err := os.MkdirAll(logPath, 0755)
+					if err == nil {
+						logPath += "Log_Links"
+						if *channelConfig.LogLinks.DivideLogsByServer == true {
+							if message.GuildID == "" {
+								ch, err := bot.State.Channel(message.ChannelID)
+								if err == nil {
+									if ch.Type == discordgo.ChannelTypeDM {
+										logPath += " DM"
+									} else if ch.Type == discordgo.ChannelTypeGroupDM {
+										logPath += " GroupDM"
+									} else {
+										logPath += " Unknown"
+									}
 								} else {
 									logPath += " Unknown"
 								}
 							} else {
-								logPath += " Unknown"
+								logPath += " SID_" + message.GuildID
 							}
-						} else {
-							logPath += " SID_" + message.GuildID
 						}
-					}
-					if *channelConfig.LogLinks.DivideLogsByChannel == true {
-						logPath += " CID_" + message.ChannelID
-					}
-					if *channelConfig.LogLinks.DivideLogsByUser == true {
-						logPath += " UID_" + message.Author.ID
+						if *channelConfig.LogLinks.DivideLogsByChannel == true {
+							logPath += " CID_" + message.ChannelID
+						}
+						if *channelConfig.LogLinks.DivideLogsByUser == true {
+							logPath += " UID_" + message.Author.ID
+						}
 					}
 					logPath += ".txt"
 				}
