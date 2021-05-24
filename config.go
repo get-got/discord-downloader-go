@@ -230,18 +230,26 @@ type configurationChannel struct {
 	ExtensionBlacklist     *[]string `json:"extensionBlacklist,omitempty"`     // optional, defaults
 	DomainBlacklist        *[]string `json:"domainBlacklist,omitempty"`        // optional, defaults
 	// Misc Rules
-	Filters            *configurationChannel_Filters `json:"filters,omitempty"`            // optional
-	SaveAllLinksToFile *string                       `json:"saveAllLinksToFile,omitempty"` // optional
+	Filters     *configurationChannel_Filters `json:"filters,omitempty"`     // optional
+	LogLinks    *configurationChannel_Log     `json:"logLinks,omitempty"`    // optional
+	LogMessages *configurationChannel_Log     `json:"logMessages,omitempty"` // optional
 }
 type configurationChannel_Filters struct {
-	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"`
-	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"`
+	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"` // optional
+	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"` // optional
 
-	BlockedUsers *[]string `json:"blockedUsers,omitempty"`
-	AllowedUsers *[]string `json:"allowedUsers,omitempty"`
+	BlockedUsers *[]string `json:"blockedUsers,omitempty"` // optional
+	AllowedUsers *[]string `json:"allowedUsers,omitempty"` // optional
 
-	BlockedRoles *[]string `json:"blockedRoles,omitempty"`
-	AllowedRoles *[]string `json:"allowedRoles,omitempty"`
+	BlockedRoles *[]string `json:"blockedRoles,omitempty"` // optional
+	AllowedRoles *[]string `json:"allowedRoles,omitempty"` // optional
+}
+type configurationChannel_Log struct {
+	Destination      string  `json:"destination"`                // required
+	FilterDuplicates *bool   `json:"filterDuplicates,omitempty"` // optional, defaults
+	Prefix           *string `json:"prefix,omitempty"`           // optional
+	Suffix           *string `json:"suffix,omitempty"`           // optional
+	MoreData         *bool   `json:"moreData,omitempty"`         // optional, defaults
 }
 
 //#endregion

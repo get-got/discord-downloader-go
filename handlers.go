@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -147,6 +148,54 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
 		} else {
 			log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
+		}
+
+		// Log Messages to File
+		if channelConfig.LogMessages != nil {
+			if channelConfig.LogMessages.Destination != "" {
+				// Writer
+				f, err := os.OpenFile(channelConfig.LogMessages.Destination, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+				if err != nil {
+					log.Println(color.RedString("[channelConfig.LogMessages] Failed to open log file:\t%s", err))
+					f.Close()
+				}
+				defer f.Close()
+
+				//TODO: FilterDuplicates
+
+				var newLine string
+				// Prepend
+				prefix := ""
+				if channelConfig.LogMessages.Prefix != nil {
+					prefix = *channelConfig.LogMessages.Prefix
+				}
+				// More Data
+				additionalInfo := ""
+				if channelConfig.LogMessages.MoreData != nil {
+					if *channelConfig.LogMessages.MoreData == true {
+						additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Timestamp)
+					}
+				}
+				if len(m.Attachments) > 0 {
+					additionalInfo += fmt.Sprintf("<%d ATTACHMENTS> ", len(m.Attachments))
+				}
+				// Append
+				suffix := ""
+				if channelConfig.LogMessages.Suffix != nil {
+					suffix = *channelConfig.LogMessages.Suffix
+				}
+				// New Line
+				contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
+				if err == nil {
+					newLine += "\n" + prefix + additionalInfo + contentFmt + suffix
+				} else {
+					newLine += "\n" + prefix + additionalInfo + m.Content + suffix
+				}
+
+				if _, err = f.WriteString(newLine); err != nil {
+					log.Println(color.RedString("[channelConfig.LogMessages] Failed to append file:\t%s", err))
+				}
+			}
 		}
 
 		// User Whitelisting

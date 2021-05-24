@@ -898,25 +898,46 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			log.Println(logPrefixDebug, color.YellowString("#%d - %s total.", thisDownloadID, time.Since(startTime)))
 		}
 
-		// Save All Links to File
-		if channelConfig.SaveAllLinksToFile != nil {
-			filepath := *channelConfig.SaveAllLinksToFile
-			if filepath != "" {
-				f, err := os.OpenFile(filepath, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		// Log Links to File
+		if channelConfig.LogLinks != nil {
+			if channelConfig.LogLinks.Destination != "" {
+				// Writer
+				f, err := os.OpenFile(channelConfig.LogLinks.Destination, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 				if err != nil {
-					log.Println(color.RedString("[SaveAllLinksToFile] Failed to open file:\t%s", err))
+					log.Println(color.RedString("[channelConfig.LogLinks] Failed to open log file:\t%s", err))
 					f.Close()
 				}
 				defer f.Close()
 
-				var addedContent string
+				//TODO: FilterDuplicates
+
+				var newLine string
 				rawLinks := getRawLinks(message)
+				// Each Link
 				for _, rawLink := range rawLinks {
-					addedContent = addedContent + "\n" + rawLink.Link
+					// Prepend
+					prefix := ""
+					if channelConfig.LogLinks.Prefix != nil {
+						prefix = *channelConfig.LogLinks.Prefix
+					}
+					// More Data
+					additionalInfo := ""
+					if channelConfig.LogLinks.MoreData != nil {
+						if *channelConfig.LogLinks.MoreData == true {
+							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", message.GuildID, message.ChannelID, message.Author.Username, message.Author.Discriminator, message.Author.ID, message.Timestamp)
+						}
+					}
+					// Append
+					suffix := ""
+					if channelConfig.LogLinks.Suffix != nil {
+						suffix = *channelConfig.LogLinks.Suffix
+					}
+					// New Line
+					newLine += "\n" + prefix + additionalInfo + rawLink.Link + suffix
 				}
 
-				if _, err = f.WriteString(addedContent); err != nil {
-					log.Println(color.RedString("[SaveAllLinksToFile] Failed to append file:\t%s", err))
+				if _, err = f.WriteString(newLine); err != nil {
+					log.Println(color.RedString("[channelConfig.LogLinks] Failed to append file:\t%s", err))
 				}
 			}
 		}
