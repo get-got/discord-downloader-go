@@ -154,8 +154,39 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		// Log Messages to File
 		if channelConfig.LogMessages != nil {
 			if channelConfig.LogMessages.Destination != "" {
+				logPath := channelConfig.LogMessages.Destination
+				if *channelConfig.LogMessages.DestinationIsFolder == true {
+					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
+						logPath += string(os.PathSeparator) + "Log_Messages"
+					}
+					if *channelConfig.LogMessages.DivideLogsByServer == true {
+						if m.GuildID == "" {
+							ch, err := bot.State.Channel(m.ChannelID)
+							if err == nil {
+								if ch.Type == discordgo.ChannelTypeDM {
+									logPath += " DM"
+								} else if ch.Type == discordgo.ChannelTypeGroupDM {
+									logPath += " GroupDM"
+								} else {
+									logPath += " Unknown"
+								}
+							} else {
+								logPath += " Unknown"
+							}
+						} else {
+							logPath += " SID_" + m.GuildID
+						}
+					}
+					if *channelConfig.LogMessages.DivideLogsByChannel == true {
+						logPath += " CID_" + m.ChannelID
+					}
+					if *channelConfig.LogMessages.DivideLogsByUser == true {
+						logPath += " UID_" + m.Author.ID
+					}
+					logPath += ".txt"
+				}
 				// Read
-				currentLog, err := ioutil.ReadFile(channelConfig.LogMessages.Destination)
+				currentLog, err := ioutil.ReadFile(logPath)
 				currentLogS := ""
 				if err == nil {
 					currentLogS = string(currentLog)
@@ -172,7 +203,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 
 				if canLog {
 					// Writer
-					f, err := os.OpenFile(channelConfig.LogMessages.Destination, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+					f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 					if err != nil {
 						log.Println(color.RedString("[channelConfig.LogMessages] Failed to open log file:\t%s", err))
 						f.Close()

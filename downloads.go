@@ -935,14 +935,45 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Log Links to File
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
+				logPath := channelConfig.LogLinks.Destination
+				if *channelConfig.LogLinks.DestinationIsFolder == true {
+					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
+						logPath += string(os.PathSeparator) + "Log_Links"
+					}
+					if *channelConfig.LogLinks.DivideLogsByServer == true {
+						if message.GuildID == "" {
+							ch, err := bot.State.Channel(message.ChannelID)
+							if err == nil {
+								if ch.Type == discordgo.ChannelTypeDM {
+									logPath += " DM"
+								} else if ch.Type == discordgo.ChannelTypeGroupDM {
+									logPath += " GroupDM"
+								} else {
+									logPath += " Unknown"
+								}
+							} else {
+								logPath += " Unknown"
+							}
+						} else {
+							logPath += " SID_" + message.GuildID
+						}
+					}
+					if *channelConfig.LogLinks.DivideLogsByChannel == true {
+						logPath += " CID_" + message.ChannelID
+					}
+					if *channelConfig.LogLinks.DivideLogsByUser == true {
+						logPath += " UID_" + message.Author.ID
+					}
+					logPath += ".txt"
+				}
 				// Read
-				currentLog, err := ioutil.ReadFile(channelConfig.LogLinks.Destination)
+				currentLog, err := ioutil.ReadFile(logPath)
 				currentLogS := ""
 				if err == nil {
 					currentLogS = string(currentLog)
 				}
 				// Writer
-				f, err := os.OpenFile(channelConfig.LogLinks.Destination, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
+				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 				if err != nil {
 					log.Println(color.RedString("[channelConfig.LogLinks] Failed to open log file:\t%s", err))
 					f.Close()

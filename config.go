@@ -172,25 +172,6 @@ var (
 	ccdSaveTextFiles          bool = false
 	ccdSaveOtherFiles         bool = false
 	ccdSavePossibleDuplicates bool = false
-	// Filters
-	ccfdBlockedExtensions = []string{
-		".htm",
-		".html",
-		".php",
-		".exe",
-		".dll",
-		".bin",
-		".cmd",
-		".sh",
-		".py",
-		".jar",
-	}
-	ccfdBlockedPhrases = []string{
-		"skip",
-		"ignore",
-		"don't save",
-		"no save",
-	}
 )
 
 type configurationChannel struct {
@@ -233,6 +214,28 @@ type configurationChannel struct {
 	LogLinks    *configurationChannel_Log     `json:"logLinks,omitempty"`    // optional
 	LogMessages *configurationChannel_Log     `json:"logMessages,omitempty"` // optional
 }
+
+var (
+	ccfdBlockedExtensions = []string{
+		".htm",
+		".html",
+		".php",
+		".exe",
+		".dll",
+		".bin",
+		".cmd",
+		".sh",
+		".py",
+		".jar",
+	}
+	ccfdBlockedPhrases = []string{
+		"skip",
+		"ignore",
+		"don't save",
+		"no save",
+	}
+)
+
 type configurationChannel_Filters struct {
 	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"` // optional
 	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"` // optional
@@ -249,12 +252,24 @@ type configurationChannel_Filters struct {
 	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
 	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
 }
+
+var (
+	ccldDestinationIsFolder bool = false
+	ccldDivideLogsByServer  bool = true
+	ccldDivideLogsByChannel bool = true
+	ccldDivideLogsByUser    bool = false
+)
+
 type configurationChannel_Log struct {
-	Destination      string  `json:"destination"`                // required
-	Prefix           *string `json:"prefix,omitempty"`           // optional
-	Suffix           *string `json:"suffix,omitempty"`           // optional
-	UserData         *bool   `json:"userData,omitempty"`         // optional, defaults
-	FilterDuplicates *bool   `json:"filterDuplicates,omitempty"` // optional, defaults
+	Destination         string  `json:"destination"`                   // required
+	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty"` // optional, defaults
+	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty"`  // optional, defaults
+	DivideLogsByChannel *bool   `json:"divideLogsByChannel,omitempty"` // optional, defaults
+	DivideLogsByUser    *bool   `json:"divideLogsByUser,omitempty"`    // optional, defaults
+	FilterDuplicates    *bool   `json:"filterDuplicates,omitempty"`    // optional, defaults
+	Prefix              *string `json:"prefix,omitempty"`              // optional
+	Suffix              *string `json:"suffix,omitempty"`              // optional
+	UserData            *bool   `json:"userData,omitempty"`            // optional, defaults
 }
 
 //#endregion
@@ -684,6 +699,32 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.Filters.BlockedPhrases == nil {
 		channel.Filters.BlockedPhrases = &ccfdBlockedPhrases
+	}
+
+	if channel.LogLinks.DestinationIsFolder == nil {
+		channel.LogLinks.DestinationIsFolder = &ccldDestinationIsFolder
+	}
+	if channel.LogLinks.DivideLogsByServer == nil {
+		channel.LogLinks.DivideLogsByServer = &ccldDivideLogsByServer
+	}
+	if channel.LogLinks.DivideLogsByChannel == nil {
+		channel.LogLinks.DivideLogsByChannel = &ccldDivideLogsByChannel
+	}
+	if channel.LogLinks.DivideLogsByUser == nil {
+		channel.LogLinks.DivideLogsByUser = &ccldDivideLogsByUser
+	}
+
+	if channel.LogMessages.DestinationIsFolder == nil {
+		channel.LogMessages.DestinationIsFolder = &ccldDestinationIsFolder
+	}
+	if channel.LogMessages.DivideLogsByServer == nil {
+		channel.LogMessages.DivideLogsByServer = &ccldDivideLogsByServer
+	}
+	if channel.LogMessages.DivideLogsByChannel == nil {
+		channel.LogMessages.DivideLogsByChannel = &ccldDivideLogsByChannel
+	}
+	if channel.LogMessages.DivideLogsByUser == nil {
+		channel.LogMessages.DivideLogsByUser = &ccldDivideLogsByUser
 	}
 }
 
