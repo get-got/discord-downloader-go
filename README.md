@@ -432,16 +432,33 @@ This setup exempts many options so they will use default values _(see below)_. I
         "saveTextFiles": false,
         "saveOtherFiles": true,
         "savePossibleDuplicates": true,
-        "extensionBlacklist": [
-            ".htm",
-            ".html",
-            ".php",
-            ".bat",
-            ".sh",
-            ".jar",
-            ".exe"
-        ],
-        "saveAllLinksToFile": "DOWNLOAD_FOLDER/Unregistered/Log.txt"
+        "filters": {
+            "blockedExtensions": [
+                ".htm",
+                ".html",
+                ".php",
+                ".bat",
+                ".sh",
+                ".jar",
+                ".exe"
+            ]
+        },
+        "logLinks": {
+            "destination": "log_links",
+            "destinationIsFolder": true,
+            "divideLogsByServer": true,
+            "divideLogsByChannel": true,
+            "divideLogsByUser": true,
+            "userData": true
+        },
+        "logMessages": {
+            "destination": "log_messages",
+            "destinationIsFolder": true,
+            "divideLogsByServer": true,
+            "divideLogsByChannel": true,
+            "divideLogsByUser": true,
+            "userData": true
+        }
     },
     "allBlacklistChannels": [ "CHANNEL_I_DONT_LIKE", "OTHER_CHANNEL_I_DONT_LIKE" ],
     "allBlacklistServers": [ "SERVER_MAIN", "SERVER_BOBS" ],
@@ -852,9 +869,46 @@ This setup exempts many options so they will use default values _(see below)_. I
             * — _settings.channels[].filters.allowedRoles : list of strings_
             * Will ONLY process messages if they were sent from users with any of the following roles.
     ---
-    * :small_orange_diamond: "saveAllLinksToFile"
-        * — _settings.channels[].saveAllLinksToFile : string_
-        * Saves all sent links to file, does not account for any filetypes or duplicates, it just simply appends every raw link sent in the channel to the specified file.
+    * :small_orange_diamond: "logLinks"
+        * — _settings.channels[].logLinks : setting:value group_
+        * :small_red_triangle: "destination"
+            * — _settings.channels[].logLinks.destination : string_
+            * Filepath for single log file to be stored, or directory path for multiple logs to be stored.
+        * :small_blue_diamond: "destinationIsFolder"
+            * — _settings.channels[].logLinks.destinationIsFolder : bool_
+            * _Default:_ `false`
+            * `true` if `"destination"` above is for a directory for multiple logs.
+        * :small_blue_diamond: "divideLogsByServer"
+            * — _settings.channels[].logLinks.divideLogsByServer : bool_
+            * _Default:_ `true`
+            * *ONLY USED IF `"destinationIsFolder"` ABOVE IS `true`*
+            * Separates log files by Server ID.
+        * :small_blue_diamond: "divideLogsByChannel"
+            * — _settings.channels[].logLinks.divideLogsByChannel : bool_
+            * _Default:_ `true`
+            * *ONLY USED IF `"destinationIsFolder"` ABOVE IS `true`*
+            * Separates log files by Channel ID.
+        * :small_blue_diamond: "divideLogsByUser"
+            * — _settings.channels[].logLinks.divideLogsByUser : bool_
+            * _Default:_ `false`
+            * *ONLY USED IF `"destinationIsFolder"` ABOVE IS `true`*
+            * Separates log files by User ID.
+        * :small_blue_diamond: "filterDuplicates"
+            * — _settings.channels[].logLinks.filterDuplicates : bool_
+            * _Default:_ `false`
+            * Filters out duplicate links (or messages) from being logged if already present in log file.
+        * :small_orange_diamond: "prefix"
+            * — _settings.channels[].logLinks.prefix : string_
+            * Prepend log line with string.
+        * :small_orange_diamond: "suffix"
+            * — _settings.channels[].logLinks.suffix : string_
+            * Append log line with string.
+        * :small_blue_diamond: "userData"
+            * — _settings.channels[].logLinks.userData : bool_
+            * _Default:_ `false`
+            * Include additional data such as SERVER/CHANNEL/USER ID's for logged files/messages.
+    * :small_orange_diamond: "logMessages"
+        * ***Identical to `"logLinks"` above.***
 
 </details>
 
