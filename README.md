@@ -868,6 +868,18 @@ This setup exempts many options so they will use default values _(see below)_. I
         * :small_orange_diamond: "allowedRoles"
             * — _settings.channels[].filters.allowedRoles : list of strings_
             * Will ONLY process messages if they were sent from users with any of the following roles.
+        * :small_orange_diamond: "blockedExtensions"
+            * — _settings.channels[].filters.blockedExtensions : list of strings_
+            * List of file extensions for the bot to ignore (include periods).
+        * :small_orange_diamond: "allowedExtensions"
+            * — _settings.channels[].filters.allowedExtensions : list of strings_
+            * Will ONLY process files if they have the following extensions (include periods).
+        * :small_orange_diamond: "blockedDomains"
+            * — _settings.channels[].filters.blockedDomains : list of strings_
+            * List of file source domains (websites) for the bot to ignore.
+        * :small_orange_diamond: "allowedDomains"
+            * — _settings.channels[].filters.allowedDomains : list of strings_
+            * Will ONLY process files if they were sent from any of the following domains (websites).
     ---
     * :small_orange_diamond: "logLinks"
         * — _settings.channels[].logLinks : setting:value group_

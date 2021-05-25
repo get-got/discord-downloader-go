@@ -291,7 +291,6 @@ type configurationAdminChannel struct {
 
 	/* IDEAS / TODO:
 
-	* UnrestrictAdminCommands *bool `json:"unrestrictAdminCommands,omitempty"` // optional, defaults
 	* SendHourlyDigest *bool `json:"sendHourlyDigest,omitempty"` // optional
 	* SendDailyDigest *bool `json:"sendDailyDigest,omitempty"` // optional
 
