@@ -837,13 +837,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].savePossibleDuplicates : boolean_
         * _Default:_ `false`
         * Save file even if exact filename already exists or exact URL is already recorded in database.
-    * :small_blue_diamond: "extensionBlacklist"
-        * — _settings.channels[].extensionBlacklist : list of strings_
-        * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
-        * Ignores files containing specified extensions. Ensure you use proper formatting.
-    * :small_orange_diamond: "domainBlacklist"
-        * — _settings.channels[].domainBlacklist : list of strings_
-        * Ignores files from specified domains. Ensure you use proper formatting.
     ---
     * :small_orange_diamond: "filters"
         * — _settings.channels[].filters : setting:value group_
@@ -871,6 +864,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * :small_orange_diamond: "blockedExtensions"
             * — _settings.channels[].filters.blockedExtensions : list of strings_
             * List of file extensions for the bot to ignore (include periods).
+            * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
         * :small_orange_diamond: "allowedExtensions"
             * — _settings.channels[].filters.allowedExtensions : list of strings_
             * Will ONLY process files if they have the following extensions (include periods).
