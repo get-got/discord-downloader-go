@@ -841,10 +841,11 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_orange_diamond: "filters"
         * — _settings.channels[].filters : setting:value group_
         * _Filter prioritizes Users before Roles before Phrases._
-        * :small_orange_diamond: "blockedPhrases"
+        * :small_blue_diamond: "blockedPhrases"
             * — _settings.channels[].filters.blockedPhrases : list of strings_
             * List of phrases to make the bot ignore this message.
             * Will ignore any message containing a blocked phrase UNLESS it also has an allowed phrase. Messages will be processed by default.
+            * _Default:_ `[ "skip", "ignore", "don't save", "no save" ]`
         * :small_orange_diamond: "allowedPhrases"
             * — _settings.channels[].filters.allowedPhrases : list of strings_
             * List of phrases to allow the bot to process the message.
@@ -861,7 +862,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * :small_orange_diamond: "allowedRoles"
             * — _settings.channels[].filters.allowedRoles : list of strings_
             * Will ONLY process messages if they were sent from users with any of the following roles.
-        * :small_orange_diamond: "blockedExtensions"
+        * :small_blue_diamond: "blockedExtensions"
             * — _settings.channels[].filters.blockedExtensions : list of strings_
             * List of file extensions for the bot to ignore (include periods).
             * _Default:_ `[ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ]`
