@@ -191,6 +191,63 @@ func main() {
 	bot.AddHandler(messageCreate)
 	bot.AddHandler(messageUpdate)
 
+	// Source Validation
+	var invalidSources int
+	if config.DebugOutput {
+		log.Println(logPrefixDebug, color.HiYellowString("Validating configured sources..."))
+	}
+	if config.AdminChannels != nil {
+		for _, adminChannel := range config.AdminChannels {
+			_, err := bot.State.Channel(adminChannel.ChannelID)
+			if err != nil {
+				invalidSources++
+				log.Println(color.HiRedString("Bot cannot access admin channel %s...\t%s", adminChannel.ChannelID, err))
+			}
+		}
+	}
+	for _, server := range config.Servers {
+		if server.ServerIDs != nil {
+			for _, subserver := range *server.ServerIDs {
+				_, err := bot.State.Guild(subserver)
+				if err != nil {
+					invalidSources++
+					log.Println(color.HiRedString("Bot cannot access subserver %s...\t%s", subserver, err))
+				}
+			}
+		} else {
+			_, err := bot.State.Guild(server.ServerID)
+			if err != nil {
+				invalidSources++
+				log.Println(color.HiRedString("Bot cannot access server %s...\t%s", server.ServerID, err))
+			}
+		}
+	}
+	for _, channel := range config.Channels {
+		if channel.ChannelIDs != nil {
+			for _, subchannel := range *channel.ChannelIDs {
+				_, err := bot.State.Channel(subchannel)
+				if err != nil {
+					invalidSources++
+					log.Println(color.HiRedString("Bot cannot access subchannel %s...\t%s", subchannel, err))
+				}
+			}
+
+		} else {
+			_, err := bot.State.Channel(channel.ChannelID)
+			if err != nil {
+				invalidSources++
+				log.Println(color.HiRedString("Bot cannot access channel %s...\t%s", channel.ChannelID, err))
+			}
+		}
+	}
+	if config.DebugOutput {
+		if invalidSources > 0 {
+			log.Println(logPrefixDebug, color.HiRedString("Found %d invalid sources in configuration...", invalidSources))
+		} else {
+			log.Println(logPrefixDebug, color.HiGreenString("All sources successfully validated!"))
+		}
+	}
+
 	// Start Presence
 	timeLastUpdated = time.Now()
 	updateDiscordPresence()
