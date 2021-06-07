@@ -405,12 +405,12 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 	return fileItems
 }
 
-func startDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool) downloadStatusStruct {
+func startDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool, emojiCmd bool) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	logPrefixErrorHere := color.HiRedString("[startDownload]")
 
 	for i := 0; i < config.DownloadRetryMax; i++ {
-		status = tryDownload(inputURL, filename, path, message, fileTime, historyCmd)
+		status = tryDownload(inputURL, filename, path, message, fileTime, historyCmd, emojiCmd)
 		if status.Status < downloadFailed { // Success or Skip
 			break
 		} else {
@@ -452,7 +452,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 	return status
 }
 
-func tryDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool) downloadStatusStruct {
+func tryDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool, emojiCmd bool) downloadStatusStruct {
 	cachedDownloadID++
 	thisDownloadID := cachedDownloadID
 
@@ -464,7 +464,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		logPrefix = logPrefixHistory + " "
 	}
 
-	if stringInSlice(message.ChannelID, getAllChannels()) {
+	if stringInSlice(message.ChannelID, getAllChannels()) || emojiCmd {
 		var channelConfig configurationChannel
 		if isChannelRegistered(message.ChannelID) {
 			channelConfig = getChannelConfig(message.ChannelID)

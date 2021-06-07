@@ -367,6 +367,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				m,
 				file.Time,
 				history,
+				false,
 			)
 			if status.Status == downloadSuccess {
 				downloadCount++

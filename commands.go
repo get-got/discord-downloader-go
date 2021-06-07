@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -361,6 +362,7 @@ func handleCommands() *exrouter.Route {
 					// Determine which guild(s)
 					guilds := []string{ctx.Msg.GuildID}
 					if args != "" {
+						guilds = nil
 						_guilds := strings.Split(args, ",")
 						if len(_guilds) > 0 {
 							for _, guild := range _guilds {
@@ -372,6 +374,7 @@ func handleCommands() *exrouter.Route {
 
 					for _, guild := range guilds {
 						i := 0
+						s := 0
 
 						guildName := guild
 						guildNameO := guild
@@ -383,28 +386,45 @@ func handleCommands() *exrouter.Route {
 
 						destination := "emojis" + string(os.PathSeparator) + guildName + string(os.PathSeparator)
 
-						emojis, err := bot.GuildEmojis(guild)
-						if err == nil {
-							for _, emoji := range emojis {
-								var message discordgo.Message
-								message.ChannelID = ctx.Msg.ChannelID
-								tryDownload(
-									"https://cdn.discordapp.com/emojis/"+emoji.ID,
-									emoji.Name,
-									destination,
-									&message,
-									time.Now(),
-									false)
-
-								i++
-							}
-							_, err = replyEmbed(ctx.Msg, "Command — Emojis",
-								fmt.Sprintf("`%d` emojis downloaded!\n• Destination: `%s`\n• Server: `%s`",
-									i, destination, guildNameO,
-								),
-							)
+						err = os.MkdirAll(destination, 0755)
+						if err != nil {
+							log.Println(logPrefixHere, color.HiRedString("Error while creating destination folder \"%s\": %s", destination, err))
 						} else {
-							log.Println(err)
+							emojis, err := bot.GuildEmojis(guild)
+							if err == nil {
+								for _, emoji := range emojis {
+									var message discordgo.Message
+									message.ChannelID = ctx.Msg.ChannelID
+									url := "https://cdn.discordapp.com/emojis/" + emoji.ID
+
+									status := startDownload(
+										url,
+										emoji.ID,
+										destination,
+										&message,
+										time.Now(),
+										false, true)
+
+									if status.Status == downloadSuccess {
+										i++
+									} else {
+										s++
+										log.Println(logPrefixHere, color.HiRedString("Failed to download emoji \"%s\": \t[%d - %s] %v", url, status.Status, getDownloadStatusString(status.Status), status.Error))
+									}
+								}
+								destinationOut := destination
+								abs, err := filepath.Abs(destination)
+								if err == nil {
+									destinationOut = abs
+								}
+								_, err = replyEmbed(ctx.Msg, "Command — Emojis",
+									fmt.Sprintf("`%d` emojis downloaded, `%d` skipped or failed\n• Destination: `%s`\n• Server: `%s`",
+										i, s, destinationOut, guildNameO,
+									),
+								)
+							} else {
+								log.Println(err)
+							}
 						}
 					}
 				}
