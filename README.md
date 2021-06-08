@@ -280,6 +280,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         }
     ],
     "debugOutput": true,
+    "showMessages": true,
     "commandPrefix": "downloader_",
     "allowSkipping": true,
     "allowGlobalCommands": true,
@@ -389,6 +390,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         }
     ],
     "debugOutput": true,
+    "showMessages": true,
     "commandPrefix": "d_",
     "allowSkipping": true,
     "scanOwnMessages": true,
@@ -608,6 +610,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.debugOutput : boolean_
     * _Default:_ `false`
     * Output debugging information.
+* :small_blue_diamond: "showMessages"
+    * — _settings.showMessages : boolean_
+    * _Default:_ `true`
+    * Show all messages. debugOutput set to true overrides this.
 * :small_blue_diamond: "commandPrefix"
     * — _settings.commandPrefix : string_
     * _Default:_ `"ddg "`
