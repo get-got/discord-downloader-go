@@ -85,6 +85,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		}
 
 		// Log
+		/*
 		var sendLabel string
 		if config.DebugOutput {
 			sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
@@ -100,6 +101,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		} else {
 			log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
 		}
+		*/
 	}
 
 	// Registered Channel
@@ -135,6 +137,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		}
 
 		// Log
+		/*
 		var sendLabel string
 		if config.DebugOutput {
 			sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
@@ -145,7 +148,6 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		if len(m.Attachments) > 0 {
 			content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
 		}
-		/*
 		if edited {
 			log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
 		} else {
