@@ -49,6 +49,7 @@ type configurationCredentials struct {
 var (
 	// Setup
 	cdDebugOutput          bool   = false
+	cdShowMessages         bool   = true
 	cdCommandPrefix        string = "ddg "
 	cdAllowSkipping        bool   = true
 	cdScanOwnMessages      bool   = false
@@ -73,6 +74,7 @@ func defaultConfiguration() configuration {
 		// Setup
 		Admins:                         []string{},
 		DebugOutput:                    cdDebugOutput,
+		ShowMessages:                   cdShowMessages,
 		CommandPrefix:                  cdCommandPrefix,
 		AllowSkipping:                  cdAllowSkipping,
 		ScanOwnMessages:                cdScanOwnMessages,
@@ -104,6 +106,7 @@ type configuration struct {
 	Admins                         []string                    `json:"admins"`                                   // optional
 	AdminChannels                  []configurationAdminChannel `json:"adminChannels"`                            // optional
 	DebugOutput                    bool                        `json:"debugOutput"`                              // optional, defaults
+	ShowMessages                   bool                        `json:"showMessages"`                             // optional, defaults
 	CommandPrefix                  string                      `json:"commandPrefix"`                            // optional, defaults
 	AllowSkipping                  bool                        `json:"allowSkipping"`                            // optional, defaults
 	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
