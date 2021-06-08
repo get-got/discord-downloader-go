@@ -24,7 +24,8 @@ func trimDownloadedLinks(linkList map[string]string, channelID string) map[strin
 			}
 		}
 
-		if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
+		//if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
+		if alreadyDownloaded == false && *channelConfig.SavePossibleDuplicates {
 			newList[link] = filename
 		} else if config.DebugOutput {
 			log.Println(logPrefixFileSkip, color.GreenString("Found URL has already been downloaded for this channel: %s", link))
