@@ -583,6 +583,17 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				if !historyCmd {
 					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
 				}
+
+				file, ferr := os.OpenFile(message.ChannelID + ".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				if err != nil {
+					fmt.Println(ferr)
+				}
+				_, werr := file.WriteString(inputURL + " (Unpermitted extension)\n")
+				if werr != nil {
+					fmt.Println(werr)
+				}
+				file.Close()
+
 				return mDownloadStatus(downloadSkippedUnpermittedExtension)
 			}
 		}
@@ -652,6 +663,17 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			if !historyCmd {
 				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, inputURL))
 			}
+
+			file, ferr := os.OpenFile(message.ChannelID + ".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				fmt.Println(ferr)
+			}
+			_, werr := file.WriteString(inputURL + " (Unpermitted filetype)\n")
+			if werr != nil {
+				fmt.Println(werr)
+			}
+			file.Close()
+
 			return mDownloadStatus(downloadSkippedUnpermittedType)
 		}
 
@@ -790,20 +812,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Format filename/path
-		filenameDateFormat := config.FilenameDateFormat
-		if channelConfig.OverwriteFilenameDateFormat != nil {
-			if *channelConfig.OverwriteFilenameDateFormat != "" {
-				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
-			}
-		}
-		messageTime := time.Now()
-		if message.Timestamp != "" {
-			messageTimestamp, err := message.Timestamp.Parse()
-			if err == nil {
-				messageTime = messageTimestamp
-			}
-		}
-		completePath := path + subfolder + messageTime.Format(filenameDateFormat) + filename
+
+		completePath := path + subfolder + filename
 
 		// Check if exists
 		if _, err := os.Stat(completePath); err == nil {
