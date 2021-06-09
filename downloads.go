@@ -210,6 +210,9 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			}
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
+		} else {
+			//stop looking for link matches here. fixes unsupported type on twitter
+			return nil
 		}
 	}
 	if regexUrlTwitterStatus.MatchString(inputURL) {
@@ -220,6 +223,9 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			}
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
+		} else {
+			//stop looking for link matches here. fixes unsupported type on twitter
+			return nil
 		}
 	}
 
@@ -584,7 +590,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
 				}
 
-				file, ferr := os.OpenFile(message.ChannelID + ".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				file, ferr := os.OpenFile(message.ChannelID+".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 				if err != nil {
 					fmt.Println(ferr)
 				}
@@ -664,7 +670,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, inputURL))
 			}
 
-			file, ferr := os.OpenFile(message.ChannelID + ".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			file, ferr := os.OpenFile(message.ChannelID+".txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
 				fmt.Println(ferr)
 			}
