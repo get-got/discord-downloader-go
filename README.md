@@ -842,7 +842,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_blue_diamond: "savePossibleDuplicates"
         * — _settings.channels[].savePossibleDuplicates : boolean_
         * _Default:_ `false`
-        * Save file even if exact filename already exists or exact URL is already recorded in database.
+        * Save file even if exact filename already exists. (will NOT download if exact URL is already recorded in database.)
     ---
     * :small_orange_diamond: "filters"
         * — _settings.channels[].filters : setting:value group_
