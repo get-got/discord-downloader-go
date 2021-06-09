@@ -9,7 +9,7 @@ import (
 const (
 	regexpFilename                = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{1,9}$$`
 	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
-	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)$`
+	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)(\/)?$`
 	regexpUrlInstagram            = `^http(s?):\/\/(www\.)?instagram\.com\/p\/[^/]+\/(\?[^/]+)?$`
 	regexpUrlImgurSingle          = `^http(s?):\/\/(i\.)?imgur\.com\/[A-Za-z0-9]+(\.gifv)?$`
 	regexpUrlImgurAlbum           = `^http(s?):\/\/imgur\.com\/(a\/|gallery\/|r\/[^\/]+\/)[A-Za-z0-9]+(#[A-Za-z0-9]+)?$`

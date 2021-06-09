@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -195,6 +196,21 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 
 func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	logPrefixErrorHere := color.HiRedString("[getDownloadLinks]")
+	/*
+		Throw out photo/[0-9]+ and mobile.
+		Throw out trailing slash.
+
+		These are specifically for Twitter. Why are they not in their respective if cases?
+		Sometimes MatchString(inputURL) is called multiple (3 or so) times with the same url, somehow gets around else { return nil }
+		and goes down the execution chain, causing unsupported type text.
+	*/
+
+	inputURL = strings.ReplaceAll(inputURL, "mobile.twitter", "twitter")
+	photo := regexp.MustCompile(`(\/)?photo(\/)?([0-9]+)?(\/)?$`)
+	trailingslash := regexp.MustCompile(`(\/)$`)
+
+	inputURL = photo.ReplaceAllString(inputURL, "")
+	inputURL = trailingslash.ReplaceAllString(inputURL, "")
 
 	/* TODO: Download Support...
 	- TikTok: Tried, once the connection is closed the cdn URL is rendered invalid
