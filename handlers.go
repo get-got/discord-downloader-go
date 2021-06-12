@@ -335,12 +335,11 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.HiYellowString("Filter decided to ignore message..."))
 				}
 				return -1
-			} else {
+			} /*else {
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.HiYellowString("Filter approved message..."))
 				}
-			}
-
+			}*/
 		}
 
 		// Skipping
