@@ -19,7 +19,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
-	"github.com/hako/durafmt"
 	"github.com/rivo/duplo"
 	"mvdan.cc/xurls/v2"
 )
@@ -456,8 +455,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 	cachedDownloadID++
 	thisDownloadID := cachedDownloadID
 
-	startTime := time.Now()
-
 	logPrefixErrorHere := color.HiRedString("[tryDownload]")
 	logPrefix := ""
 	if historyCmd {
@@ -516,12 +513,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			return mDownloadStatus(downloadFailedDownloadingResponse, err)
 		}
 		defer response.Body.Close()
-
-		// Download duration
-		if config.DebugOutput && !historyCmd {
-			log.Println(logPrefixDebug, color.YellowString("#%d - %s to download.", thisDownloadID, durafmt.ParseShort(time.Since(startTime)).String()))
-		}
-		downloadTime := time.Now()
 
 		// Read
 		bodyOfResp, err := ioutil.ReadAll(response.Body)
@@ -843,12 +834,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", inputURL, err))
 		}
 
-		// Write duration
-		if config.DebugOutput && !historyCmd {
-			log.Println(logPrefixDebug, color.YellowString("#%d - %s to save.", thisDownloadID, durafmt.ParseShort(time.Since(downloadTime)).String()))
-		}
-		writeTime := time.Now()
-
 		// Output
 		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 
@@ -869,12 +854,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			log.Println(logPrefixErrorHere, color.HiRedString("Error writing to database: %s", err))
 			return mDownloadStatus(downloadFailedWritingDatabase, err)
 		}
-
-		// Storage & output duration
-		if config.DebugOutput && !historyCmd {
-			log.Println(logPrefixDebug, color.YellowString("#%d - %s to update database.", thisDownloadID, durafmt.ParseShort(time.Since(writeTime)).String()))
-		}
-		finishTime := time.Now()
 
 		// React
 		if !historyCmd && *channelConfig.ReactWhenDownloaded && message.Author != nil {
@@ -915,10 +894,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			} else {
 				log.Println(logPrefixErrorHere, color.RedString("Bot does not have permission to add reactions in %s", message.ChannelID))
 			}
-			// React duration
-			if config.DebugOutput {
-				log.Println(logPrefixDebug, color.YellowString("#%d - %s to react with \"%s\".", thisDownloadID, durafmt.ParseShort(time.Since(finishTime)).String(), reaction))
-			}
 		}
 
 		if !historyCmd {
@@ -926,10 +901,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			if *channelConfig.UpdatePresence {
 				updateDiscordPresence()
 			}
-		}
-
-		if config.DebugOutput && !historyCmd {
-			log.Println(logPrefixDebug, color.YellowString("#%d - %s total.", thisDownloadID, time.Since(startTime)))
 		}
 
 		// Log Links to File
