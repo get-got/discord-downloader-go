@@ -194,7 +194,7 @@ func main() {
 	// Source Validation
 	var invalidSources int
 	if config.DebugOutput {
-		log.Println(logPrefixDebug, color.HiYellowString("Validating configured sources..."))
+		log.Println(logPrefixDebug, color.HiYellowString("Validating configured channels/servers..."))
 	}
 	if config.AdminChannels != nil {
 		for _, adminChannel := range config.AdminChannels {
@@ -242,9 +242,9 @@ func main() {
 	}
 	if config.DebugOutput {
 		if invalidSources > 0 {
-			log.Println(logPrefixDebug, color.HiRedString("Found %d invalid sources in configuration...", invalidSources))
+			log.Println(logPrefixDebug, color.HiRedString("Found %d invalid channels/servers in configuration...", invalidSources))
 		} else {
-			log.Println(logPrefixDebug, color.HiGreenString("All sources successfully validated!"))
+			log.Println(logPrefixDebug, color.HiGreenString("All channels/servers successfully validated!"))
 		}
 	}
 
