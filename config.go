@@ -49,7 +49,7 @@ type configurationCredentials struct {
 var (
 	// Setup
 	cdDebugOutput          bool   = false
-	cdMessageOutput        bool   = false
+	cdMessageOutput        bool   = true
 	cdCommandPrefix        string = "ddg "
 	cdAllowSkipping        bool   = true
 	cdScanOwnMessages      bool   = false
