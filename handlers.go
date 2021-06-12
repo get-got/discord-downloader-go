@@ -135,20 +135,23 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		}
 
 		// Log
-		var sendLabel string
-		if config.DebugOutput {
-			sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
-		} else {
-			sendLabel = fmt.Sprintf("%s in %s", getUserIdentifier(*m.Author), getSourceName(m.GuildID, m.ChannelID))
-		}
-		content := m.Content
-		if len(m.Attachments) > 0 {
-			content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
-		}
-		if edited {
-			log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
-		} else {
-			log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
+		if config.MessageOutput {
+			var sendLabel string
+			if config.DebugOutput {
+				sendLabel = fmt.Sprintf("%s/%s/%s", m.GuildID, m.ChannelID, m.Author.ID)
+			} else {
+				sendLabel = fmt.Sprintf("%s in %s", getUserIdentifier(*m.Author), getSourceName(m.GuildID, m.ChannelID))
+			}
+			content := m.Content
+			if len(m.Attachments) > 0 {
+				content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
+			}
+
+			if edited {
+				log.Println(color.CyanString("Edited Message [%s]: %s", sendLabel, content))
+			} else {
+				log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
+			}
 		}
 
 		// Log Messages to File

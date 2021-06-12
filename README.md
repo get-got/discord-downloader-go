@@ -608,6 +608,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.debugOutput : boolean_
     * _Default:_ `false`
     * Output debugging information.
+* :small_blue_diamond: "messageOutput"
+    * — _settings.messageOutput : boolean_
+    * _Default:_ `true`
+    * Output handled Discord messages.
 * :small_blue_diamond: "commandPrefix"
     * — _settings.commandPrefix : string_
     * _Default:_ `"ddg "`
