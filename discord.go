@@ -311,12 +311,12 @@ func logStatusMessage(status string) {
 			// Send
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission
 				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for startup to %s", adminChannel.ChannelID))
+					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for startup to admin channel %s", adminChannel.ChannelID))
 				}
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for startup to %s", adminChannel.ChannelID))
+					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for startup to admin channel %s", adminChannel.ChannelID))
 				}
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
 			} else {
