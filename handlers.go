@@ -47,42 +47,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 
 	// Admin Channel
 	if isAdminChannelRegistered(m.ChannelID) {
-		//TODO: Make this its own function
-		// If message content is empty (likely due to userbot/selfbot)
-		ubIssue := "Message is corrupted due to endpoint restriction"
-		if m.Content == "" && len(m.Attachments) == 0 {
-			// Get message history
-			mCache, err := bot.ChannelMessages(m.ChannelID, 25, "", "", "")
-			if err == nil {
-				if len(mCache) > 0 {
-					for _, mCached := range mCache {
-						if mCached.ID == m.ID {
-							// Fix original message having empty Guild ID
-							guildID := m.GuildID
-							// Replace message
-							m = mCached
-							// ^^
-							if m.GuildID == "" && guildID != "" {
-								m.GuildID = guildID
-							}
-							// Parse commands
-							dgr.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
-
-							break
-						}
-					}
-				} else if config.DebugOutput {
-					log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", ubIssue))
-				}
-			} else if config.DebugOutput {
-				log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
-			}
-		}
-		if m.Content == "" && len(m.Attachments) == 0 {
-			if config.DebugOutput {
-				log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
-			}
-		}
+		m = fixMessage(m)
 
 		// Log
 		var sendLabel string
@@ -114,26 +79,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			return -1
 		}
 
-		//TODO: Make this its own function
-		// If message content is empty (likely due to userbot/selfbot)
-		if m.Content == "" && len(m.Attachments) == 0 {
-			nms, err := bot.ChannelMessages(m.ChannelID, 15, "", "", "")
-			if err == nil {
-				if len(nms) > 0 {
-					for _, nm := range nms {
-						if nm.ID == m.ID {
-							id := m.GuildID
-							m = nm
-							if m.GuildID == "" && id != "" {
-								m.GuildID = id
-							}
-							dgr.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
-							break
-						}
-					}
-				}
-			}
-		}
+		m = fixMessage(m)
 
 		// Log
 		if config.MessageOutput {

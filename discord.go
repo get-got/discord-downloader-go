@@ -483,3 +483,42 @@ func messageToLower(message *discordgo.Message) *discordgo.Message {
 	newMessage.Content = strings.ToLower(newMessage.Content)
 	return &newMessage
 }
+
+func fixMessage(m *discordgo.Message) *discordgo.Message {
+	// If message content is empty (likely due to userbot/selfbot)
+	ubIssue := "Message is corrupted due to endpoint restriction"
+	if m.Content == "" && len(m.Attachments) == 0 {
+		// Get message history
+		mCache, err := bot.ChannelMessages(m.ChannelID, 20, "", "", "")
+		if err == nil {
+			if len(mCache) > 0 {
+				for _, mCached := range mCache {
+					if mCached.ID == m.ID {
+						// Fix original message having empty Guild ID
+						guildID := m.GuildID
+						// Replace message
+						m = mCached
+						// ^^
+						if m.GuildID == "" && guildID != "" {
+							m.GuildID = guildID
+						}
+						// Parse commands
+						dgr.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
+
+						break
+					}
+				}
+			} else if config.DebugOutput {
+				log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", ubIssue))
+			}
+		} else if config.DebugOutput {
+			log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
+		}
+	}
+	if m.Content == "" && len(m.Attachments) == 0 {
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
+		}
+	}
+	return m
+}
