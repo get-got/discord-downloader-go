@@ -389,23 +389,17 @@ func loadConfig() {
 func createConfig() {
 	log.Println(logPrefixSetup, color.YellowString("Creating new settings file..."))
 
-	enteredToken := placeholderToken
-	enteredEmail := placeholderEmail
-	enteredPassword := placeholderPassword
-
-	enteredAdmin := "REPLACE_WITH_YOUR_DISCORD_USER_ID"
-
 	enteredBaseChannel := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
 	enteredBaseDestination := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
 
 	// Separate from Defaultconfiguration because there's some elements we want to strip for settings creation
 	defaultConfig := configuration{
 		Credentials: configurationCredentials{
-			Token:    enteredToken,
-			Email:    enteredEmail,
-			Password: enteredPassword,
+			Token:    placeholderToken,
+			Email:    placeholderEmail,
+			Password: placeholderPassword,
 		},
-		Admins:          []string{enteredAdmin},
+		Admins:          []string{"REPLACE_WITH_YOUR_DISCORD_USER_ID"},
 		CommandPrefix:   cdCommandPrefix,
 		AllowSkipping:   cdAllowSkipping,
 		ScanOwnMessages: cdScanOwnMessages,
@@ -560,7 +554,7 @@ func createConfig() {
 				inputToken = strings.ReplaceAll(inputToken, "\n", "")
 				inputToken = strings.ReplaceAll(inputToken, "\r", "")
 				if inputToken != "" {
-					enteredToken = inputToken
+					defaultConfig.Credentials.Token = inputToken
 				} else {
 					log.Println(color.HiRedString("Please input token..."))
 					goto EnterToken
@@ -572,14 +566,14 @@ func createConfig() {
 				inputEmail = strings.ReplaceAll(inputEmail, "\n", "")
 				inputEmail = strings.ReplaceAll(inputEmail, "\r", "")
 				if strings.Contains(inputEmail, "@") {
-					enteredEmail = inputEmail
+					defaultConfig.Credentials.Email = inputEmail
 				EnterPassword:
 					log.Print(color.HiCyanString("Enter password: "))
 					inputPassword, _ := reader.ReadString('\n')
 					inputPassword = strings.ReplaceAll(inputPassword, "\n", "")
 					inputPassword = strings.ReplaceAll(inputPassword, "\r", "")
 					if inputPassword != "" {
-						enteredPassword = inputPassword
+						defaultConfig.Credentials.Password = inputPassword
 					} else {
 						log.Println(color.HiRedString("Please input password..."))
 						goto EnterPassword
@@ -599,7 +593,7 @@ func createConfig() {
 			inputAdmin = strings.ReplaceAll(inputAdmin, "\n", "")
 			inputAdmin = strings.ReplaceAll(inputAdmin, "\r", "")
 			if isNumeric(inputAdmin) {
-				enteredAdmin = inputAdmin
+				defaultConfig.Admins = []string{inputAdmin}
 			} else {
 				log.Println(color.HiRedString("Please input your Discord User ID..."))
 				goto EnterAdmin

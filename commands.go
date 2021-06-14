@@ -422,6 +422,9 @@ func handleCommands() *exrouter.Route {
 										i, s, destinationOut, guildNameO,
 									),
 								)
+								if err != nil {
+									log.Println(logPrefixHere, color.HiRedString("Failed to send status message for emoji downloads:\t%s", err))
+								}
 							} else {
 								log.Println(err)
 							}
