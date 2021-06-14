@@ -117,7 +117,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		//TODO: Make this its own function
 		// If message content is empty (likely due to userbot/selfbot)
 		if m.Content == "" && len(m.Attachments) == 0 {
-			nms, err := bot.ChannelMessages(m.ChannelID, 10, "", "", "")
+			nms, err := bot.ChannelMessages(m.ChannelID, 15, "", "", "")
 			if err == nil {
 				if len(nms) > 0 {
 					for _, nm := range nms {
@@ -128,6 +128,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 								m.GuildID = id
 							}
 							dgr.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
+							break
 						}
 					}
 				}
