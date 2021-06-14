@@ -261,6 +261,9 @@ var (
 	ccldDivideLogsByServer  bool = true
 	ccldDivideLogsByChannel bool = true
 	ccldDivideLogsByUser    bool = false
+	ccldDivideLogsByStatus  bool = false
+	ccldLogDownloads        bool = true
+	ccldLogFailures         bool = true
 )
 
 type configurationChannelLog struct {
@@ -269,6 +272,9 @@ type configurationChannelLog struct {
 	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty"`  // optional, defaults
 	DivideLogsByChannel *bool   `json:"divideLogsByChannel,omitempty"` // optional, defaults
 	DivideLogsByUser    *bool   `json:"divideLogsByUser,omitempty"`    // optional, defaults
+	DivideLogsByStatus  *bool   `json:"divideLogsByStatus,omitempty"`  // optional, defaults
+	LogDownloads        *bool   `json:"logDownloads,omitempty"`        // optional, defaults
+	LogFailures         *bool   `json:"logFailures,omitempty"`         // optional, defaults
 	FilterDuplicates    *bool   `json:"filterDuplicates,omitempty"`    // optional, defaults
 	Prefix              *string `json:"prefix,omitempty"`              // optional
 	Suffix              *string `json:"suffix,omitempty"`              // optional
@@ -714,6 +720,15 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.LogLinks.DivideLogsByUser == nil {
 		channel.LogLinks.DivideLogsByUser = &ccldDivideLogsByUser
+	}
+	if channel.LogLinks.DivideLogsByStatus == nil {
+		channel.LogLinks.DivideLogsByStatus = &ccldDivideLogsByStatus
+	}
+	if channel.LogLinks.LogDownloads == nil {
+		channel.LogLinks.LogDownloads = &ccldLogDownloads
+	}
+	if channel.LogLinks.LogFailures == nil {
+		channel.LogLinks.LogFailures = &ccldLogFailures
 	}
 
 	if channel.LogMessages == nil {

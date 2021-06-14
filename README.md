@@ -904,6 +904,22 @@ This setup exempts many options so they will use default values _(see below)_. I
             * _Default:_ `false`
             * *ONLY USED IF `"destinationIsFolder"` ABOVE IS `true`*
             * Separates log files by User ID.
+        * :small_blue_diamond: "divideLogsByStatus"
+            * — _settings.channels[].logLinks.divideLogsByStatus : bool_
+            * _Default:_ `false`
+            * *ONLY USED IF `"destinationIsFolder"` ABOVE IS `true`*
+            * Separates log files download status.
+            * *DOES NOT APPLY TO `"logMessages"` BELOW*
+        * :small_blue_diamond: "logDownloads"
+            * — _settings.channels[].logLinks.logDownloads : bool_
+            * _Default:_ `true`
+            * Includes successfully downloaded links in logs.
+            * *DOES NOT APPLY TO `"logMessages"` BELOW*
+        * :small_blue_diamond: "logFailures"
+            * — _settings.channels[].logLinks.logFailures : bool_
+            * _Default:_ `true`
+            * Includes failed/skipped/ignored links in logs.
+            * *DOES NOT APPLY TO `"logMessages"` BELOW*
         * :small_blue_diamond: "filterDuplicates"
             * — _settings.channels[].logLinks.filterDuplicates : bool_
             * _Default:_ `false`
@@ -919,7 +935,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             * _Default:_ `false`
             * Include additional data such as SERVER/CHANNEL/USER ID's for logged files/messages.
     * :small_orange_diamond: "logMessages"
-        * ***Identical to `"logLinks"` above.***
+        * ***Identical to `"logLinks"` above unless noted otherwise.***
 
 </details>
 

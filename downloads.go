@@ -417,7 +417,8 @@ func startDownload(inputURL string, filename string, path string, message *disco
 		}
 	}
 
-	if status.Status >= downloadFailed && !historyCmd { // Any kind of failure
+	// Any kind of failure
+	if status.Status >= downloadFailed && !historyCmd && !emojiCmd {
 		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", inputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
 		if isChannelRegistered(message.ChannelID) {
 			channelConfig := getChannelConfig(message.ChannelID)
@@ -444,6 +445,117 @@ func startDownload(inputURL string, filename string, path string, message *disco
 			}
 			if status.Error != nil {
 				logErrorMessage(fmt.Sprintf("**%s**\n\n%s", getDownloadStatusString(status.Status), status.Error))
+			}
+		}
+	}
+
+	// Log Links to File
+	if isChannelRegistered(message.ChannelID) {
+		channelConfig := getChannelConfig(message.ChannelID)
+		if channelConfig.LogLinks != nil {
+			if channelConfig.LogLinks.Destination != "" {
+				logPath := channelConfig.LogLinks.Destination
+				if *channelConfig.LogLinks.DestinationIsFolder == true {
+					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
+						logPath += string(os.PathSeparator)
+					}
+					err := os.MkdirAll(logPath, 0755)
+					if err == nil {
+						logPath += "Log_Links"
+						if *channelConfig.LogLinks.DivideLogsByServer == true {
+							if message.GuildID == "" {
+								ch, err := bot.State.Channel(message.ChannelID)
+								if err == nil {
+									if ch.Type == discordgo.ChannelTypeDM {
+										logPath += " DM"
+									} else if ch.Type == discordgo.ChannelTypeGroupDM {
+										logPath += " GroupDM"
+									} else {
+										logPath += " Unknown"
+									}
+								} else {
+									logPath += " Unknown"
+								}
+							} else {
+								logPath += " SID_" + message.GuildID
+							}
+						}
+						if *channelConfig.LogLinks.DivideLogsByChannel == true {
+							logPath += " CID_" + message.ChannelID
+						}
+						if *channelConfig.LogLinks.DivideLogsByUser == true {
+							logPath += " UID_" + message.Author.ID
+						}
+						if *channelConfig.LogLinks.DivideLogsByStatus == true {
+							if status.Status >= downloadFailed {
+								logPath += " - FAILED"
+							} else if status.Status >= downloadSkipped {
+								logPath += " - SKIPPED"
+							} else if status.Status == downloadIgnored {
+								logPath += " - IGNORED"
+							} else if status.Status == downloadSuccess {
+								logPath += " - DOWNLOADED"
+							}
+						}
+					}
+					logPath += ".txt"
+				}
+				// Read
+				currentLog, err := ioutil.ReadFile(logPath)
+				currentLogS := ""
+				if err == nil {
+					currentLogS = string(currentLog)
+				}
+				// Writer
+				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
+				if err != nil {
+					log.Println(color.RedString("[channelConfig.LogLinks] Failed to open log file:\t%s", err))
+					f.Close()
+				}
+				defer f.Close()
+
+				var newLine string
+				shouldLog := true
+
+				// Log Failures
+				if status.Status > downloadSuccess {
+					shouldLog = *channelConfig.LogLinks.LogFailures // will not log if LogFailures is false
+				} else if *channelConfig.LogLinks.LogDownloads { // Log Downloads
+					shouldLog = true
+				}
+				// Filter Duplicates
+				if channelConfig.LogLinks.FilterDuplicates != nil {
+					if *channelConfig.LogLinks.FilterDuplicates {
+						if strings.Contains(currentLogS, inputURL) {
+							shouldLog = false
+						}
+					}
+				}
+				if shouldLog {
+					// Prepend
+					prefix := ""
+					if channelConfig.LogLinks.Prefix != nil {
+						prefix = *channelConfig.LogLinks.Prefix
+					}
+					// More Data
+					additionalInfo := ""
+					if channelConfig.LogLinks.UserData != nil {
+						if *channelConfig.LogLinks.UserData == true {
+							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", message.GuildID, message.ChannelID, message.Author.Username, message.Author.Discriminator, message.Author.ID, message.Timestamp)
+						}
+					}
+					// Append
+					suffix := ""
+					if channelConfig.LogLinks.Suffix != nil {
+						suffix = *channelConfig.LogLinks.Suffix
+					}
+					// New Line
+					newLine += "\n" + prefix + additionalInfo + inputURL + suffix
+
+					if _, err = f.WriteString(newLine); err != nil {
+						log.Println(color.RedString("[channelConfig.LogLinks] Failed to append file:\t%s", err))
+					}
+				}
 			}
 		}
 	}
@@ -900,97 +1012,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			timeLastUpdated = time.Now()
 			if *channelConfig.UpdatePresence {
 				updateDiscordPresence()
-			}
-		}
-
-		// Log Links to File
-		if channelConfig.LogLinks != nil {
-			if channelConfig.LogLinks.Destination != "" {
-				logPath := channelConfig.LogLinks.Destination
-				if *channelConfig.LogLinks.DestinationIsFolder == true {
-					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
-						logPath += string(os.PathSeparator)
-					}
-					err := os.MkdirAll(logPath, 0755)
-					if err == nil {
-						logPath += "Log_Links"
-						if *channelConfig.LogLinks.DivideLogsByServer == true {
-							if message.GuildID == "" {
-								ch, err := bot.State.Channel(message.ChannelID)
-								if err == nil {
-									if ch.Type == discordgo.ChannelTypeDM {
-										logPath += " DM"
-									} else if ch.Type == discordgo.ChannelTypeGroupDM {
-										logPath += " GroupDM"
-									} else {
-										logPath += " Unknown"
-									}
-								} else {
-									logPath += " Unknown"
-								}
-							} else {
-								logPath += " SID_" + message.GuildID
-							}
-						}
-						if *channelConfig.LogLinks.DivideLogsByChannel == true {
-							logPath += " CID_" + message.ChannelID
-						}
-						if *channelConfig.LogLinks.DivideLogsByUser == true {
-							logPath += " UID_" + message.Author.ID
-						}
-					}
-					logPath += ".txt"
-				}
-				// Read
-				currentLog, err := ioutil.ReadFile(logPath)
-				currentLogS := ""
-				if err == nil {
-					currentLogS = string(currentLog)
-				}
-				// Writer
-				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
-				if err != nil {
-					log.Println(color.RedString("[channelConfig.LogLinks] Failed to open log file:\t%s", err))
-					f.Close()
-				}
-				defer f.Close()
-
-				var newLine string
-				rawLinks := getRawLinks(message)
-				// Each Link
-				for _, rawLink := range rawLinks {
-					// Filter Duplicates
-					if channelConfig.LogLinks.FilterDuplicates != nil {
-						if *channelConfig.LogLinks.FilterDuplicates {
-							if strings.Contains(currentLogS, rawLink.Link) {
-								continue
-							}
-						}
-					}
-					// Prepend
-					prefix := ""
-					if channelConfig.LogLinks.Prefix != nil {
-						prefix = *channelConfig.LogLinks.Prefix
-					}
-					// More Data
-					additionalInfo := ""
-					if channelConfig.LogLinks.UserData != nil {
-						if *channelConfig.LogLinks.UserData == true {
-							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", message.GuildID, message.ChannelID, message.Author.Username, message.Author.Discriminator, message.Author.ID, message.Timestamp)
-						}
-					}
-					// Append
-					suffix := ""
-					if channelConfig.LogLinks.Suffix != nil {
-						suffix = *channelConfig.LogLinks.Suffix
-					}
-					// New Line
-					newLine += "\n" + prefix + additionalInfo + rawLink.Link + suffix
-				}
-
-				if _, err = f.WriteString(newLine); err != nil {
-					log.Println(color.RedString("[channelConfig.LogLinks] Failed to append file:\t%s", err))
-				}
 			}
 		}
 
