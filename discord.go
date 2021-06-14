@@ -291,22 +291,51 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 	}
 }
 
-func logStatusMessage(status string) {
+type logStatusType int
+
+const (
+	logStatusStartup logStatusType = iota
+	logStatusReconnect
+	logStatusExit
+)
+
+func logStatusLabel(status logStatusType) string {
+	switch status {
+	case logStatusStartup:
+		return "has launched"
+	case logStatusReconnect:
+		return "has reconnected"
+	case logStatusExit:
+		return "is exiting"
+	}
+	return "<<ERROR>>"
+}
+
+func logStatusMessage(status logStatusType) {
 	for _, adminChannel := range config.AdminChannels {
 		if *adminChannel.LogStatus {
-			message := fmt.Sprintf("%s has %s and connected to %d server(s)...\n", projectLabel, status, len(bot.State.Guilds))
-			message += fmt.Sprintf("\n• Uptime is %s", uptime())
-			message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
-			message += fmt.Sprintf("\n• Bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount())
-			if config.All != nil {
-				message += "\n• **ALL MODE ENABLED -** Bot will use all available channels"
-			}
-			message += fmt.Sprintf("\n• ***Listening to %s channel(s)...***\n", formatNumber(int64(len(getAllChannels()))))
-			if twitterConnected {
-				message += "\n• Connected to Twitter API"
-			}
-			if googleDriveConnected {
-				message += "\n• Connected to Google Drive"
+			var message string
+
+			if status == logStatusStartup || status == logStatusReconnect {
+				message += fmt.Sprintf("%s %s and connected to %d server(s)...\n", projectLabel, logStatusLabel(status), len(bot.State.Guilds))
+				message += fmt.Sprintf("\n• Uptime is %s", uptime())
+				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
+				message += fmt.Sprintf("\n• Bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount())
+				if config.All != nil {
+					message += "\n• **ALL MODE ENABLED -** Bot will use all available channels"
+				}
+				message += fmt.Sprintf("\n• ***Listening to %s channel(s)...***\n", formatNumber(int64(len(getAllChannels()))))
+				if twitterConnected {
+					message += "\n• Connected to Twitter API"
+				}
+				if googleDriveConnected {
+					message += "\n• Connected to Google Drive"
+				}
+			} else if status == logStatusExit {
+				message += fmt.Sprintf("%s %s...\n", projectLabel, logStatusLabel(status))
+				message += fmt.Sprintf("\n• Uptime was %s", uptime())
+				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
+				message += fmt.Sprintf("\n• Bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount())
 			}
 			// Send
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission

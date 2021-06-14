@@ -262,7 +262,7 @@ func main() {
 	log.Println(color.RedString("CTRL+C to exit..."))
 
 	// Log Status
-	logStatusMessage("launched")
+	logStatusMessage(logStatusStartup)
 
 	//#region Background Tasks
 
@@ -286,7 +286,7 @@ func main() {
 					botLogin()
 					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
 					// Log Status
-					logStatusMessage("reconnected")
+					logStatusMessage(logStatusReconnect)
 				}
 			}
 		}
@@ -362,6 +362,8 @@ func main() {
 	// Infinite loop until interrupted
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
 	<-loop
+
+	logStatusMessage(logStatusExit)
 
 	log.Println(color.GreenString("Logging out of discord..."))
 	bot.Close()
