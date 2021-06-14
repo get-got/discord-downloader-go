@@ -190,16 +190,16 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 
 					// Check Before/Since
-					message_int64, _ := strconv.ParseInt(message.ID, 10, 64)
+					message64, _ := strconv.ParseInt(message.ID, 10, 64)
 					if before != "" {
-						before_int64, _ := strconv.ParseInt(before, 10, 64)
-						if message_int64 > before_int64 {
+						before64, _ := strconv.ParseInt(before, 10, 64)
+						if message64 > before64 {
 							continue
 						}
 					}
 					if since != "" {
-						since_int64, _ := strconv.ParseInt(since, 10, 64)
-						if message_int64 < since_int64 {
+						since64, _ := strconv.ParseInt(since, 10, 64)
+						if message64 < since64 {
 							continue
 						}
 					}

@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	DISCORD_EPOCH = 1420070400000
+	discordEpoch = 1420070400000
 )
 
 //TODO: Clean these two
@@ -22,7 +22,7 @@ const (
 func discordTimestampToSnowflake(format string, timestamp string) string {
 	t, err := time.Parse(format, timestamp)
 	if err == nil {
-		return fmt.Sprint(((t.Local().UnixNano() / int64(time.Millisecond)) - DISCORD_EPOCH) << 22)
+		return fmt.Sprint(((t.Local().UnixNano() / int64(time.Millisecond)) - discordEpoch) << 22)
 	}
 	log.Println(color.HiRedString("Failed to convert timestamp to discord snowflake... Format: '%s', Timestamp: '%s' - Error:\t%s",
 		format, timestamp, err),
@@ -35,7 +35,7 @@ func discordSnowflakeToTimestamp(snowflake string, format string) string {
 	if err != nil {
 		return ""
 	}
-	t := time.Unix(0, ((i>>22)+DISCORD_EPOCH)*1000000)
+	t := time.Unix(0, ((i>>22)+discordEpoch)*1000000)
 	return t.Local().Format(format)
 }
 
@@ -285,10 +285,10 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 				Embed:   buildEmbed(m.ChannelID, title, description),
 			},
 		)
-	} else {
-		log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
-		return nil, nil
 	}
+
+	log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
+	return nil, nil
 }
 
 type logStatusType int

@@ -655,7 +655,7 @@ func getRedditPostUrls(link string) (map[string]string, error) {
 	headers["User-Agent"] = sneakyUserAgent
 	err := getJSONwithHeaders(link+".json", redditThread, headers)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Failed to parse json from reddit post:\t%s", err))
+		return nil, fmt.Errorf("Failed to parse json from reddit post:\t%s", err)
 	}
 
 	redditPost := (*redditThread)[0].Data.Children.([]interface{})[0].(map[string]interface{})
@@ -676,11 +676,11 @@ func getMastodonPostUrls(link string) (map[string]string, error) {
 	var post map[string]interface{}
 	err := getJSON(link+".json", &post)
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Failed to parse json from mastodon post:\t%s", err))
+		return nil, fmt.Errorf("Failed to parse json from mastodon post:\t%s", err)
 	}
 	// Check for returned error
 	if errmsg, exists := post["error"]; exists {
-		return nil, errors.New(fmt.Sprintf("Mastodon JSON returned an error:\t%s", errmsg))
+		return nil, fmt.Errorf("Mastodon JSON returned an error:\t%s", errmsg)
 	}
 
 	// Check validity

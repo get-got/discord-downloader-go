@@ -213,9 +213,9 @@ type configurationChannel struct {
 	SaveOtherFiles         *bool `json:"saveOtherFiles,omitempty"`         // optional, defaults
 	SavePossibleDuplicates *bool `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	// Misc Rules
-	Filters     *configurationChannel_Filters `json:"filters,omitempty"`     // optional
-	LogLinks    *configurationChannel_Log     `json:"logLinks,omitempty"`    // optional
-	LogMessages *configurationChannel_Log     `json:"logMessages,omitempty"` // optional
+	Filters     *configurationChannelFilters `json:"filters,omitempty"`     // optional
+	LogLinks    *configurationChannelLog     `json:"logLinks,omitempty"`    // optional
+	LogMessages *configurationChannelLog     `json:"logMessages,omitempty"` // optional
 }
 
 var (
@@ -239,7 +239,7 @@ var (
 	}
 )
 
-type configurationChannel_Filters struct {
+type configurationChannelFilters struct {
 	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"` // optional
 	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"` // optional
 
@@ -263,7 +263,7 @@ var (
 	ccldDivideLogsByUser    bool = false
 )
 
-type configurationChannel_Log struct {
+type configurationChannelLog struct {
 	Destination         string  `json:"destination"`                   // required
 	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty"` // optional, defaults
 	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty"`  // optional, defaults
@@ -697,7 +697,7 @@ func channelDefault(channel *configurationChannel) {
 	}
 
 	if channel.Filters == nil {
-		channel.Filters = &configurationChannel_Filters{}
+		channel.Filters = &configurationChannelFilters{}
 	}
 	if channel.Filters.BlockedExtensions == nil {
 		channel.Filters.BlockedExtensions = &ccfdBlockedExtensions
@@ -707,7 +707,7 @@ func channelDefault(channel *configurationChannel) {
 	}
 
 	if channel.LogLinks == nil {
-		channel.LogLinks = &configurationChannel_Log{}
+		channel.LogLinks = &configurationChannelLog{}
 	}
 	if channel.LogLinks.DestinationIsFolder == nil {
 		channel.LogLinks.DestinationIsFolder = &ccldDestinationIsFolder
@@ -723,7 +723,7 @@ func channelDefault(channel *configurationChannel) {
 	}
 
 	if channel.LogMessages == nil {
-		channel.LogMessages = &configurationChannel_Log{}
+		channel.LogMessages = &configurationChannelLog{}
 	}
 	if channel.LogMessages.DestinationIsFolder == nil {
 		channel.LogMessages.DestinationIsFolder = &ccldDestinationIsFolder
