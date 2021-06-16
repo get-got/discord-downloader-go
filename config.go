@@ -10,6 +10,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
+	"github.com/muhammadmuzzammil1998/jsonc"
 	"gopkg.in/ini.v1"
 )
 
@@ -309,8 +310,16 @@ type configurationAdminChannel struct {
 //#endregion
 
 func loadConfig() {
+	// Determine settings file type
+	if _, err := os.Stat(configFileBase + ".json"); err == nil {
+		configFile = configFileBase + ".json"
+		configFileC = false
+	} else if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
+		configFile = configFileBase + ".jsonc"
+		configFileC = true
+	}
 	// Load settings
-	configContent, err := ioutil.ReadFile(configPath)
+	configContent, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		log.Println(color.HiRedString("Failed to open settings file...\t%s", err))
 		createConfig()
@@ -326,7 +335,13 @@ func loadConfig() {
 
 		// Parse
 		newConfig := defaultConfiguration()
-		err = json.Unmarshal([]byte(fixed), &newConfig)
+		if configFileC {
+			log.Println(color.HiGreenString("aaa"))
+			err = jsonc.Unmarshal([]byte(fixed), &newConfig)
+		} else {
+			log.Println(color.HiGreenString("bbb"))
+			err = json.Unmarshal([]byte(fixed), &newConfig)
+		}
 		if err != nil {
 			log.Println(color.HiRedString("Failed to parse settings file...\t%s", err))
 			log.Println(logPrefixHelper, color.MagentaString("Please ensure you're following proper JSON format syntax."))
@@ -341,7 +356,13 @@ func loadConfig() {
 			}
 			// Re-parse
 			newConfig = defaultConfiguration()
-			err = json.Unmarshal([]byte(fixed), &newConfig)
+			if configFileC {
+				log.Println(color.HiGreenString("ccc"))
+				err = jsonc.Unmarshal([]byte(fixed), &newConfig)
+			} else {
+				log.Println(color.HiGreenString("ddd"))
+				err = json.Unmarshal([]byte(fixed), &newConfig)
+			}
 			if err != nil {
 				log.Println(color.HiRedString("Failed to re-parse settings file after replacing constants...\t%s", err))
 				log.Println(logPrefixHelper, color.MagentaString("Please ensure you're following proper JSON format syntax."))
@@ -384,7 +405,7 @@ func loadConfig() {
 			(config.Credentials.Email == "" || config.Credentials.Email == placeholderEmail) &&
 			(config.Credentials.Password == "" || config.Credentials.Password == placeholderPassword) {
 			log.Println(color.HiRedString("No valid discord login found. Token, Email, and Password are all invalid..."))
-			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
+			log.Println(color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configFile))
 			log.Println(logPrefixHelper, color.MagentaString("If your credentials are already properly saved, please ensure you're following proper JSON format syntax."))
 			log.Println(logPrefixHelper, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			properExit()
@@ -617,12 +638,12 @@ func createConfig() {
 	if err != nil {
 		log.Println(logPrefixSetup, color.HiRedString("Failed to format new settings...\t%s", err))
 	} else {
-		err := ioutil.WriteFile(configPath, defaultJSON, 0644)
+		err := ioutil.WriteFile(configFile, defaultJSON, 0644)
 		if err != nil {
 			log.Println(logPrefixSetup, color.HiRedString("Failed to save new settings file...\t%s", err))
 		} else {
 			log.Println(logPrefixSetup, color.HiYellowString("Created new settings file..."))
-			log.Println(logPrefixSetup, color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configPath))
+			log.Println(logPrefixSetup, color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configFile))
 			log.Println(logPrefixHelper, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			log.Println(logPrefixHelper, color.MagentaString("See README on GitHub for help and more info..."))
 		}

@@ -17,13 +17,18 @@ const (
 	projectReleaseURL    = projectRepoURL + "/releases/latest"
 	projectReleaseApiURL = "https://api.github.com/repos/" + projectRepo + "/releases/latest"
 
-	configPath       = "settings.json"
+	configFileBase   = "settings"
 	databasePath     = "database"
 	cachePath        = "cache"
 	historyCachePath = cachePath + string(os.PathSeparator) + "history"
 	imgStorePath     = cachePath + string(os.PathSeparator) + "imgStore"
 
 	defaultReact = "✅"
+)
+
+var (
+	configFile  string
+	configFileC bool
 )
 
 // Log prefixes aren't to be used for constant messages where context is obvious.

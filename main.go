@@ -55,7 +55,7 @@ func main() {
 	var err error
 
 	// Config
-	log.Println(color.YellowString("Loading settings from \"%s\"...", configPath))
+	log.Println(color.YellowString("Loading settings from \"%s\"...", configFile))
 	loadConfig()
 	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount()))
 
@@ -325,7 +325,7 @@ func main() {
 		log.Println(color.HiRedString("[Watchers] Error creating NewWatcher:\t%s", err))
 	}
 	defer watcher.Close()
-	err = watcher.Add(configPath)
+	err = watcher.Add(configFile)
 	if err != nil {
 		log.Println(color.HiRedString("[Watchers] Error adding watcher for settings:\t%s", err))
 	}
@@ -340,7 +340,7 @@ func main() {
 					// It double-fires the event without time check, might depend on OS but this works anyways
 					if time.Now().Sub(configReloadLastTime).Milliseconds() > 1 {
 						time.Sleep(1 * time.Second)
-						log.Println(color.YellowString("Detected changes in \"%s\", reloading settings...", configPath))
+						log.Println(color.YellowString("Detected changes in \"%s\", reloading settings...", configFile))
 						loadConfig()
 						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount()))
 

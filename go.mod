@@ -20,6 +20,7 @@ require (
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
 	github.com/hashicorp/go-version v1.3.0
 	github.com/kennygrant/sanitize v1.2.4
+	github.com/muhammadmuzzammil1998/jsonc v0.0.0-20201229145248-615b0916ca38
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/rivo/duplo v0.0.0-20180323201418-c4ec823d58cd
 	golang.org/x/net v0.0.0-20210505214959-0714010a04ed
