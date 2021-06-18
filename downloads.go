@@ -783,17 +783,28 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Names
 		sourceChannelName := message.ChannelID
 		sourceName := "UNKNOWN"
-		sourceChannel, err := bot.State.Channel(message.ChannelID)
+		sourceChannel, _ := bot.State.Channel(message.ChannelID)
 		if sourceChannel != nil {
+			// Channel Naming
 			if sourceChannel.Name != "" {
 				sourceChannelName = sourceChannel.Name
 			}
 			switch sourceChannel.Type {
 			case discordgo.ChannelTypeGuildText:
+				// Server Naming
 				if sourceChannel.GuildID != "" {
 					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
 					if sourceGuild != nil && sourceGuild.Name != "" {
 						sourceName = "\"" + sourceGuild.Name + "\""
+					}
+				}
+				// Category Naming
+				if sourceChannel.ParentID != "" {
+					sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
+					if sourceParent != nil {
+						if sourceParent.Name != "" {
+							sourceChannelName = sourceParent.Name + " - " + sourceChannelName
+						}
 					}
 				}
 			case discordgo.ChannelTypeDM:
