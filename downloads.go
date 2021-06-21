@@ -459,7 +459,6 @@ func startDownload(inputURL string, filename string, path string, message *disco
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
-					logPath = filepath.Clean(logPath)
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Links"
@@ -501,7 +500,6 @@ func startDownload(inputURL string, filename string, path string, message *disco
 					}
 					logPath += ".txt"
 				}
-				logPath = filepath.Clean(logPath)
 				// Read
 				currentLog, err := ioutil.ReadFile(logPath)
 				currentLogS := ""
@@ -599,7 +597,6 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		if !strings.HasSuffix(path, string(os.PathSeparator)) {
 			path = path + string(os.PathSeparator)
 		}
-		path = filepath.Clean(path)
 
 		// Create folder
 		err = os.MkdirAll(path, 0755)
@@ -920,7 +917,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				messageTime = messageTimestamp
 			}
 		}
-		completePath := filepath.Clean(path + subfolder + messageTime.Format(filenameDateFormat) + filename)
+		completePath := path + subfolder + messageTime.Format(filenameDateFormat) + filename
 
 		// Check if exists
 		if _, err := os.Stat(completePath); err == nil {

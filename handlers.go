@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -110,7 +109,6 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
-					logPath = filepath.Clean(logPath)
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Messages"
@@ -141,7 +139,6 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					}
 					logPath += ".txt"
 				}
-				logPath = filepath.Clean(logPath)
 				// Read
 				currentLog, err := ioutil.ReadFile(logPath)
 				currentLogS := ""
