@@ -386,7 +386,7 @@ func handleCommands() *exrouter.Route {
 
 						destination := "emojis" + string(os.PathSeparator) + guildName + string(os.PathSeparator)
 
-						err = os.MkdirAll(destination, 0755)
+						err = os.MkdirAll(filepath.Clean(destination), 0755)
 						if err != nil {
 							log.Println(logPrefixHere, color.HiRedString("Error while creating destination folder \"%s\": %s", destination, err))
 						} else {

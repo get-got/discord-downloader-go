@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -77,7 +78,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 		// Open Cache File?
 		if historyCachePath != "" {
-			filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
+			filepath := filepath.Clean(historyCachePath + string(os.PathSeparator) + subjectChannelID)
 			if f, err := ioutil.ReadFile(filepath); err == nil {
 				beforeID = string(f)
 				if commandingMessage != nil && config.DebugOutput {
@@ -109,13 +110,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 				// Write to cache file
 				if historyCachePath != "" {
-					err := os.MkdirAll(historyCachePath, 0755)
+					err := os.MkdirAll(filepath.Clean(historyCachePath), 0755)
 					if err != nil {
 						log.Println(logPrefixHistory, color.HiRedString("Error while creating history cache folder \"%s\": %s", historyCachePath, err))
 					}
 
-					filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
-					f, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+					fp := filepath.Clean(historyCachePath + string(os.PathSeparator) + subjectChannelID)
+					f, err := os.OpenFile(fp, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 					if err != nil {
 						log.Println(logPrefixHistory, color.RedString("Failed to open cache file:\t%s", err))
 					}
@@ -266,7 +267,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 		// Delete Cache File
 		if historyCachePath != "" {
-			filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
+			filepath := filepath.Clean(historyCachePath + string(os.PathSeparator) + subjectChannelID)
 			if _, err := os.Stat(filepath); err == nil {
 				err = os.Remove(filepath)
 				if err != nil {
