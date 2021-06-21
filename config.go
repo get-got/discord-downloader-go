@@ -336,10 +336,8 @@ func loadConfig() {
 		// Parse
 		newConfig := defaultConfiguration()
 		if configFileC {
-			log.Println(color.HiGreenString("aaa"))
 			err = jsonc.Unmarshal([]byte(fixed), &newConfig)
 		} else {
-			log.Println(color.HiGreenString("bbb"))
 			err = json.Unmarshal([]byte(fixed), &newConfig)
 		}
 		if err != nil {
@@ -357,10 +355,8 @@ func loadConfig() {
 			// Re-parse
 			newConfig = defaultConfiguration()
 			if configFileC {
-				log.Println(color.HiGreenString("ccc"))
 				err = jsonc.Unmarshal([]byte(fixed), &newConfig)
 			} else {
-				log.Println(color.HiGreenString("ddd"))
 				err = json.Unmarshal([]byte(fixed), &newConfig)
 			}
 			if err != nil {
