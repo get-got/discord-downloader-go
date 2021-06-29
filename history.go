@@ -215,7 +215,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				// Error requesting messages
 				if message != nil {
 					if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
-						_, err = replyEmbed(message, "Command — History", fmt.Sprintf("Encountered an error requesting messages: %s", err.Error()))
+						_, err = replyEmbed(message, "Command — History", fmt.Sprintf("Encountered an error requesting messages for %s: %s", subjectChannelID, err.Error()))
 						if err != nil {
 							log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send error message:\t%s", err))
 						}
