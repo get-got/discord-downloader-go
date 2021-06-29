@@ -516,7 +516,7 @@ func messageToLower(message *discordgo.Message) *discordgo.Message {
 func fixMessage(m *discordgo.Message) *discordgo.Message {
 	// If message content is empty (likely due to userbot/selfbot)
 	ubIssue := "Message is corrupted due to endpoint restriction"
-	if m.Content == "" && len(m.Attachments) == 0 {
+	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
 		// Get message history
 		mCache, err := bot.ChannelMessages(m.ChannelID, 20, "", "", "")
 		if err == nil {
@@ -544,7 +544,7 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 			log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
 		}
 	}
-	if m.Content == "" && len(m.Attachments) == 0 {
+	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
 		if config.DebugOutput {
 			log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
 		}
