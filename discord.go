@@ -278,16 +278,17 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 
 // Shortcut function for quickly replying a styled embed with Title & Description
 func replyEmbed(m *discordgo.Message, title string, description string) (*discordgo.Message, error) {
-	if hasPerms(m.ChannelID, discordgo.PermissionSendMessages) {
-		return bot.ChannelMessageSendComplex(m.ChannelID,
-			&discordgo.MessageSend{
-				Content: m.Author.Mention(),
-				Embed:   buildEmbed(m.ChannelID, title, description),
-			},
-		)
+	if m != nil {
+		if hasPerms(m.ChannelID, discordgo.PermissionSendMessages) {
+			return bot.ChannelMessageSendComplex(m.ChannelID,
+				&discordgo.MessageSend{
+					Content: m.Author.Mention(),
+					Embed:   buildEmbed(m.ChannelID, title, description),
+				},
+			)
+		}
+		log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
 	}
-
-	log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
 	return nil, nil
 }
 
