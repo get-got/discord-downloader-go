@@ -735,6 +735,9 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_red_triangle: **"servers"** _`[USE THIS OR "server"]`_
         * — _settings.servers[].servers : list of strings_
         * Server IDs to monitor, for if you want the same configuration for multiple servers.
+    * :small_orange_diamond: "blacklistChannels"
+        * — _settings.servers[].blacklistChannels : list of strings_
+        * Blacklist specific channels from the encompassing server(s).
     * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
 * :small_red_triangle: **"channels"** _`[USE THIS OR "servers"]`_
     * — _settings.channels : list of setting:value groups_
