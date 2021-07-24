@@ -91,7 +91,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		// Initial Status Message
 		if commandingMessage != nil {
 			if hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
-				message, err = replyEmbed(commandingMessage, "Command — History", "Starting to save channel history, please wait...")
+				message, err = replyEmbed(commandingMessage, "Command — History", fmt.Sprintf("Starting to save history, please wait...\n\n`Server:` **%s**\n`Channel:` _#%s_\n\n",
+					getGuildName(getChannelGuildID(subjectChannelID)),
+					getChannelName(subjectChannelID),
+				))
 				if err != nil {
 					log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send command embed message:\t%s", err))
 				}
@@ -133,9 +136,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						d, i, beforeTime))
 					if message != nil {
 						if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
-							content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n%s`(%d)` _Processing more messages, please wait..._",
+							content := fmt.Sprintf("``%s:`` **%s files downloaded**\n``%s messages processed``\n\n`Server:` **%s**\n`Channel:` _#%s_\n\n%s`(%d)` _Processing more messages, please wait..._",
 								durafmt.ParseShort(time.Since(historyStartTime)).String(),
-								formatNumber(d), formatNumber(i), rangeContent, batch)
+								formatNumber(d), formatNumber(i),
+								getGuildName(getChannelGuildID(subjectChannelID)),
+								getChannelName(subjectChannelID),
+								rangeContent, batch)
 							message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 								ID:      message.ID,
 								Channel: message.ChannelID,
@@ -233,11 +239,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		if commandingMessage != nil {
 			if message != nil {
 				if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
-					contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\nFinished cataloging history for ``%s``\n``%d`` message history requests\n\n%s_Duration was %s_",
+					contentFinal := fmt.Sprintf("``%s:`` **%s total files downloaded!**\n``%s total messages processed``\n\n`Server:` **%s**\n`Channel:` _#%s_\n\n**FINISHED!**\nRan ``%d`` message history requests\n\n%s_Duration was %s_",
 						durafmt.ParseShort(time.Since(historyStartTime)).String(),
 						formatNumber(int64(d)), formatNumber(int64(i)),
-						subjectChannelID, batch,
-						rangeContent,
+						getGuildName(getChannelGuildID(subjectChannelID)),
+						getChannelName(subjectChannelID),
+						batch, rangeContent,
 						durafmt.Parse(time.Since(historyStartTime)).String(),
 					)
 					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
