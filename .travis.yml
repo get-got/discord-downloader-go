@@ -7,7 +7,7 @@ install:
   - go get github.com/mitchellh/gox
 
 script:
-  - env GO111MODULE=on gox -output="bin/discord-downloader-go-{{.OS}}-{{.Arch}}" -osarch="windows/amd64 darwin/amd64 linux/amd64 linux/arm"
+  - env GO111MODULE=on gox -output="bin/discord-downloader-go-{{.OS}}-{{.Arch}}" -osarch="windows/amd64 linux/amd64 linux/arm"
 
 deploy:
   provider: releases
@@ -15,7 +15,6 @@ deploy:
     secure: VEt15uzzoleub7mqC7iTlxdZOb5Bv+FGAbB39rKoFRsPPMCR04X/P/lQBmTnIjb4/FyZw0DzlWTX6svmglMB/5Ne6L9WYhyJgLdjCiK2qmPmC1dNOYM8wRGV+FOFCPmWKgppE7Bu7+83RjYqachS8u7SLsCcyx9mINx4r434Bvd3iPyvQqMCBctwRLPTbg4rvRfIo6lHJUiEOQgWnzt8OZnVhgSmUUJqg1oYcrWarjTx+NcMPG9HySDLYlUtsJKHv73TPaXLPIyebC4hLyZ8Mm70qynMaxo8x7zDjYeqO46i7gIrBnTTMujukZpVkjd3PpkeNpSFFMIoEIAG+nvPTbF9kIGNLbMGb9rA/dkziaGbbgCU8GggXaqXlvsa8r/DGiqMNE86+ET3XqVtDs/So74LpxqqT6SSX0njx/zZfuAcrOpmFa+LBTWaUGk0p1kl8DI/K9Gg3d3PeGlCK94OyZNpANZm4KYYoENAiMYp+vtQC22ICR6DROPCN85us1OAplvq1E27W4ooL0pvBvmD+O89jg4iZ+2hlmNlohyByPsLnUtNpjhb03EJRg3FKdOBKMXBKK5FpuR7+39dtARi/lb4pxvNMbvEMZtboUlpKrkPJuoh4PC9x8NCPhaHrR4SFX8WdH15K3Okcl5w1gqA+YAQL61AwXM8shCLZPnOB9k=
   file:
     - "bin/discord-downloader-go-windows-amd64.exe"
-    - "bin/discord-downloader-go-darwin-amd64"
     - "bin/discord-downloader-go-linux-amd64"
     - "bin/discord-downloader-go-linux-arm"
   skip_cleanup: true
