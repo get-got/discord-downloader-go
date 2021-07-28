@@ -316,16 +316,19 @@ func logStatusMessage(status logStatusType) {
 	for _, adminChannel := range config.AdminChannels {
 		if *adminChannel.LogStatus {
 			var message string
+			var label string
 
 			if status == logStatusStartup || status == logStatusReconnect {
-				message += fmt.Sprintf("%s %s and connected to %d server(s)...\n", projectLabel, logStatusLabel(status), len(bot.State.Guilds))
+				label = "startup"
+				message += fmt.Sprintf("%s %s and connected to %d server%s...\n", projectLabel, logStatusLabel(status), len(bot.State.Guilds), pluralS(len(bot.State.Guilds)))
 				message += fmt.Sprintf("\n• Uptime is %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
-				message += fmt.Sprintf("\n• Bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount())
+				message += fmt.Sprintf("\n• Bound to %d channel%s and %d server%s", getBoundChannelsCount(), pluralS(getBoundChannelsCount()), getBoundServersCount(), pluralS(getBoundServersCount()))
 				if config.All != nil {
 					message += "\n• **ALL MODE ENABLED -** Bot will use all available channels"
 				}
-				message += fmt.Sprintf("\n• ***Listening to %s channel(s)...***\n", formatNumber(int64(len(getAllChannels()))))
+				allChannels := getAllChannels()
+				message += fmt.Sprintf("\n• ***Listening to %s channel%s...***\n", formatNumber(int64(len(allChannels))), pluralS(len(allChannels)))
 				if twitterConnected {
 					message += "\n• Connected to Twitter API"
 				}
@@ -333,21 +336,19 @@ func logStatusMessage(status logStatusType) {
 					message += "\n• Connected to Google Drive"
 				}
 			} else if status == logStatusExit {
+				label = "exit"
 				message += fmt.Sprintf("%s %s...\n", projectLabel, logStatusLabel(status))
 				message += fmt.Sprintf("\n• Uptime was %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
-				message += fmt.Sprintf("\n• Bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount())
+				message += fmt.Sprintf("\n• Bound to %d channel%s and %d server%s", getBoundChannelsCount(), pluralS(getBoundChannelsCount()), getBoundServersCount(), pluralS(getBoundServersCount()))
 			}
 			// Send
-			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission
-				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for startup to admin channel %s", adminChannel.ChannelID))
-				}
+			if config.DebugOutput {
+				log.Println(logPrefixDebug, color.HiCyanString("Sending log for %s to admin channel %s", label, adminChannel.ChannelID))
+			}
+			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) {
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
-				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for startup to admin channel %s", adminChannel.ChannelID))
-				}
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
 			} else {
 				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending status log to %s", adminChannel.ChannelID))

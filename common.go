@@ -99,6 +99,28 @@ func boolS(val bool) string {
 	return "OFF"
 }
 
+func pluralS(num int) string {
+	if num == 1 {
+		return ""
+	}
+	return "s"
+}
+
+func wrapHyphens(i string, l int) string {
+	n := i
+	if len(n) < l {
+		n = "- " + n + " -"
+		for len(n) < l {
+			n = "-" + n + "-"
+		}
+	}
+	return n
+}
+
+func wrapHyphensW(i string) string {
+	return wrapHyphens(i, 80)
+}
+
 //#endregion
 
 //#region Requests

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/url"
@@ -47,24 +48,28 @@ func init() {
 
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
-	log.Println(color.HiCyanString("Welcome to %s v%s!", projectName, projectVersion))
-	log.Println(color.CyanString("> discord-go v%s, Discord API v%s", discordgo.VERSION, discordgo.APIVersion))
+	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
+	log.Println(logPrefixVersion, color.CyanString("discord-go v%s using Discord API v%s", discordgo.VERSION, discordgo.APIVersion))
 }
 
 func main() {
 	var err error
 
 	// Config
-	log.Println(color.YellowString("Loading settings from \"%s\"...", configFile))
+	initConfig()
+	log.Println(logPrefixSettings, color.YellowString("Loading from \"%s\"...", configFile))
 	loadConfig()
-	log.Println(color.HiYellowString("Settings loaded, bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount()))
+	log.Println(logPrefixSettings, color.HiYellowString("Loaded - bound to %d channel%s and %d server%s",
+		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+		getBoundServersCount(), pluralS(getBoundServersCount()),
+	))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
-			log.Println(color.HiCyanString("Update Available!", projectReleaseURL))
-			log.Println(color.CyanString("* " + projectReleaseURL))
-			log.Println(color.HiCyanString("See changelog for information..."))
+			log.Println(logPrefixVersion, color.HiCyanString("*** Update Available! ***", projectReleaseURL))
+			log.Println(logPrefixVersion, color.CyanString(projectReleaseURL))
+			log.Println(logPrefixVersion, color.HiCyanString("*** See changelog for information ***"))
 			time.Sleep(5 * time.Second)
 		}
 	}
@@ -72,10 +77,10 @@ func main() {
 	//#region Database/Cache Initialization
 
 	// Database
-	log.Println(color.YellowString("Opening database..."))
+	log.Println(logPrefixDatabase, color.YellowString("Opening database..."))
 	myDB, err = db.OpenDB(databasePath)
 	if err != nil {
-		log.Println(color.HiRedString("Unable to open database: %s", err))
+		log.Println(logPrefixDatabase, color.HiRedString("Unable to open database: %s", err))
 		return
 	}
 	if myDB.Use("Downloads") == nil {
@@ -102,19 +107,23 @@ func main() {
 	}
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
+	log.Println(logPrefixDatabase, color.HiYellowString("Database opened, contains %d entries...", cachedDownloadID))
 
 	// Image Store
 	if config.FilterDuplicateImages {
 		imgStore = duplo.New()
 		if _, err := os.Stat(imgStorePath); err == nil {
-			log.Println(color.YellowString("Opening image filter database..."))
+			log.Println(logPrefixDatabase, color.YellowString("Opening image filter database..."))
 			storeFile, err := ioutil.ReadFile(imgStorePath)
 			if err != nil {
-				log.Println(color.HiRedString("Error opening imgStore file:\t%s", err))
+				log.Println(logPrefixDatabase, color.HiRedString("Error opening imgStore file:\t%s", err))
 			} else {
 				err = imgStore.GobDecode(storeFile)
 				if err != nil {
-					log.Println(color.HiRedString("Error decoding imgStore:\t%s", err))
+					log.Println(logPrefixDatabase, color.HiRedString("Error decoding imgStore:\t%s", err))
+				}
+				if imgStore != nil {
+					log.Println(logPrefixDatabase, color.HiYellowString("filterDuplicateImages database opened", imgStore.Size()))
 				}
 			}
 		}
@@ -127,7 +136,7 @@ func main() {
 	// Regex
 	err = compileRegex()
 	if err != nil {
-		log.Println(color.HiRedString("Error initializing Regex:\t%s", err))
+		log.Println(logPrefixRegex, color.HiRedString("Error initializing:\t%s", err))
 		return
 	}
 
@@ -137,7 +146,7 @@ func main() {
 		config.Credentials.TwitterConsumerKey != "" &&
 		config.Credentials.TwitterConsumerSecret != "" {
 
-		log.Println(color.MagentaString("Connecting to Twitter API..."))
+		log.Println(logPrefixTwitter, color.MagentaString("Connecting to API..."))
 
 		twitterClient = anaconda.NewTwitterApiWithCredentials(
 			config.Credentials.TwitterAccessToken,
@@ -148,33 +157,34 @@ func main() {
 
 		twitterSelf, err := twitterClient.GetSelf(url.Values{})
 		if err != nil {
-			log.Println(color.HiRedString("Error encountered while connecting to Twitter API, the bot won't use the Twitter API. Error: %s", err.Error()))
+			log.Println(logPrefixTwitter, color.HiRedString("API Login Error: %s", err.Error()))
+			log.Println(logPrefixTwitter, color.MagentaString("Error encountered while connecting to API, the bot won't use the Twitter API."))
 		} else {
-			log.Println(color.HiMagentaString("Connected to Twitter API (@%s)", twitterSelf.ScreenName))
+			log.Println(logPrefixTwitter, color.HiMagentaString("Connected to API @%s", twitterSelf.ScreenName))
 			twitterConnected = true
 		}
 	} else {
-		log.Println(color.MagentaString("Twitter API credentials missing, the bot won't use the Twitter API."))
+		log.Println(logPrefixTwitter, color.MagentaString("API credentials missing, the bot won't use the Twitter API."))
 	}
 
 	// Google Drive Client
 	if config.Credentials.GoogleDriveCredentialsJSON != "" {
-		log.Println(color.MagentaString("Connecting to Google Drive Client..."))
+		log.Println(logPrefixGoogleDrive, color.MagentaString("Connecting..."))
 		ctx := context.Background()
 		authJson, err := ioutil.ReadFile(config.Credentials.GoogleDriveCredentialsJSON)
 		if err != nil {
-			log.Println(color.HiRedString("Error opening Google Credentials JSON:\t%s", err))
+			log.Println(logPrefixGoogleDrive, color.HiRedString("Error opening Google Credentials JSON:\t%s", err))
 		} else {
 			googleConfig, err := google.JWTConfigFromJSON(authJson, drive.DriveReadonlyScope)
 			if err != nil {
-				log.Println(color.HiRedString("Error parsing Google Credentials JSON:\t%s", err))
+				log.Println(logPrefixGoogleDrive, color.HiRedString("Error parsing Google Credentials JSON:\t%s", err))
 			} else {
 				client := googleConfig.Client(ctx)
 				googleDriveService, err = drive.New(client)
 				if err != nil {
-					log.Println(color.HiRedString("Error setting up Google Drive Client:\t%s", err))
+					log.Println(logPrefixGoogleDrive, color.HiRedString("Error setting up client:\t%s", err))
 				} else {
-					log.Println(color.HiMagentaString("Connected to Google Drive Client"))
+					log.Println(logPrefixGoogleDrive, color.HiMagentaString("Connected!"))
 					googleDriveConnected = true
 				}
 			}
@@ -194,7 +204,7 @@ func main() {
 	// Source Validation
 	var invalidSources int
 	if config.DebugOutput {
-		log.Println(logPrefixDebug, color.HiYellowString("Validating configured channels/servers..."))
+		log.Println(logPrefixDebugLabel("Validation"), color.HiYellowString("Validating configured channels/servers..."))
 	}
 	if config.AdminChannels != nil {
 		for _, adminChannel := range config.AdminChannels {
@@ -211,14 +221,14 @@ func main() {
 				_, err := bot.State.Guild(subserver)
 				if err != nil {
 					invalidSources++
-					log.Println(color.HiRedString("Bot cannot access subserver %s...\t%s", subserver, err))
+					log.Println(color.HiRedString(logPrefixDebugLabel("Validation"), "Bot cannot access subserver %s...\t%s", subserver, err))
 				}
 			}
 		} else {
 			_, err := bot.State.Guild(server.ServerID)
 			if err != nil {
 				invalidSources++
-				log.Println(color.HiRedString("Bot cannot access server %s...\t%s", server.ServerID, err))
+				log.Println(color.HiRedString(logPrefixDebugLabel("Validation"), "Bot cannot access server %s...\t%s", server.ServerID, err))
 			}
 		}
 	}
@@ -242,9 +252,9 @@ func main() {
 	}
 	if config.DebugOutput {
 		if invalidSources > 0 {
-			log.Println(logPrefixDebug, color.HiRedString("Found %d invalid channels/servers in configuration...", invalidSources))
+			log.Println(logPrefixDebugLabel("Validation"), color.HiRedString("Found %d invalid channels/servers in configuration...", invalidSources))
 		} else {
-			log.Println(logPrefixDebug, color.HiGreenString("All channels/servers successfully validated!"))
+			log.Println(logPrefixDebugLabel("Validation"), color.HiGreenString("All channels/servers successfully validated!"))
 		}
 	}
 
@@ -256,9 +266,9 @@ func main() {
 
 	// Output Done
 	if config.DebugOutput {
-		log.Println(logPrefixDebug, color.YellowString("Startup finished, took %s...", uptime()))
+		log.Println(color.YellowString("Startup finished, took %s...", uptime()))
 	}
-	log.Println(color.HiCyanString("%s is online! Connected to %d server(s)", projectLabel, len(bot.State.Guilds)))
+	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("%s v%s is online and connected to %d server%s", projectLabel, projectVersion, len(bot.State.Guilds), pluralS(len(bot.State.Guilds))))))
 	log.Println(color.RedString("CTRL+C to exit..."))
 
 	// Log Status
@@ -315,7 +325,7 @@ func main() {
 		}
 	}
 	if len(autorunHistoryChannels) > 0 {
-		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed (for %d channel(s))", len(autorunHistoryChannels)))
+		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed (for %d channel%s)", len(autorunHistoryChannels), pluralS(len(autorunHistoryChannels))))
 		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
 
@@ -340,9 +350,12 @@ func main() {
 					// It double-fires the event without time check, might depend on OS but this works anyways
 					if time.Now().Sub(configReloadLastTime).Milliseconds() > 1 {
 						time.Sleep(1 * time.Second)
-						log.Println(color.YellowString("Detected changes in \"%s\", reloading settings...", configFile))
+						log.Println(logPrefixSettings, color.YellowString("Detected changes in \"%s\", reloading...", configFile))
 						loadConfig()
-						log.Println(color.HiYellowString("Settings reloaded, bound to %d channel(s) and %d server(s)", getBoundChannelsCount(), getBoundServersCount()))
+						log.Println(logPrefixSettings, color.HiYellowString("Reloaded - bound to %d channel%s and %d server%s",
+							getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+							getBoundServersCount(), pluralS(getBoundServersCount()),
+						))
 
 						updateDiscordPresence()
 					}
@@ -365,10 +378,10 @@ func main() {
 
 	logStatusMessage(logStatusExit)
 
-	log.Println(color.GreenString("Logging out of discord..."))
+	log.Println(logPrefixDiscord, color.GreenString("Logging out of discord..."))
 	bot.Close()
 
-	log.Println(color.YellowString("Closing database..."))
+	log.Println(logPrefixDatabase, color.YellowString("Closing database..."))
 	myDB.Close()
 
 	log.Println(color.HiRedString("Exiting... "))
@@ -378,7 +391,7 @@ func botLogin() {
 	var err error
 
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
-		log.Println(color.GreenString("Connecting to Discord via Token..."))
+		log.Println(logPrefixDiscord, color.GreenString("Connecting to Discord via Token..."))
 		if config.Credentials.UserBot {
 			bot, err = discordgo.New(config.Credentials.Token)
 		} else {
@@ -386,16 +399,16 @@ func botLogin() {
 		}
 	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
 		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
-		log.Println(color.GreenString("Connecting to Discord via Login..."))
+		log.Println(logPrefixDiscord, color.GreenString("Connecting via Login..."))
 		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
 	} else {
-		log.Println(color.HiRedString("No valid credentials for Discord..."))
+		log.Println(logPrefixDiscord, color.HiRedString("No valid credentials for Discord..."))
 		properExit()
 	}
 	if err != nil {
 		// Newer discordgo throws this error for some reason with Email/Password login
 		if err.Error() != "Unable to fetch discord authentication token. <nil>" {
-			log.Println(color.HiRedString("Error logging into Discord: %s", err))
+			log.Println(logPrefixDiscord, color.HiRedString("Error logging in: %s", err))
 			properExit()
 		}
 	}
@@ -404,7 +417,7 @@ func botLogin() {
 	bot.LogLevel = -1 // to ignore dumb wsapi error
 	err = bot.Open()
 	if err != nil {
-		log.Println(color.HiRedString("Discord login failed:\t%s", err))
+		log.Println(logPrefixDiscord, color.HiRedString("Discord login failed:\t%s", err))
 		properExit()
 	}
 	bot.LogLevel = config.DiscordLogLevel // reset
@@ -415,25 +428,25 @@ func botLogin() {
 	if err != nil {
 		user = bot.State.User
 		if user == nil {
-			log.Println(color.HiRedString("Error obtaining bot user details: %s", err))
+			log.Println(logPrefixDiscord, color.HiRedString("Error obtaining user details: %s", err))
 			loop <- syscall.SIGINT
 		} else {
-			log.Println(color.RedString("Using backup user data, hopefully it works..."))
+			log.Println(logPrefixDiscord, color.RedString("Using backup user data, hopefully it works..."))
 		}
 	} else if user == nil {
-		log.Println(color.HiRedString("No error encountered obtaining bot user details, but it's empty..."))
+		log.Println(logPrefixDiscord, color.HiRedString("No error encountered obtaining user details, but it's empty..."))
 		loop <- syscall.SIGINT
 	} else {
-		log.Println(color.HiGreenString("Discord logged into %s", getUserIdentifier(*user)))
+		log.Println(logPrefixDiscord, color.HiGreenString("Logged into %s", getUserIdentifier(*user)))
 		if user.Bot {
-			log.Println(logPrefixHelper, color.MagentaString("This is a Bot User"))
-			log.Println(logPrefixHelper, color.MagentaString("- Status presence details are limited."))
-			log.Println(logPrefixHelper, color.MagentaString("- Server access is restricted to servers you have permission to add the bot to."))
+			log.Println(logPrefixDiscord, color.MagentaString("This is a Bot User"))
+			log.Println(logPrefixDiscord, color.MagentaString("- Status presence details are limited."))
+			log.Println(logPrefixDiscord, color.MagentaString("- Access is restricted to servers you have permission to add the bot to."))
 		} else {
-			log.Println(logPrefixHelper, color.MagentaString("This is a User Account (Self-Bot)"))
-			log.Println(logPrefixHelper, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
-			log.Println(logPrefixHelper, color.MagentaString("- See GitHub page for link to Discord's official statement."))
-			log.Println(logPrefixHelper, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
+			log.Println(logPrefixDiscord, color.MagentaString("This is a User Account (Self-Bot)"))
+			log.Println(logPrefixDiscord, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
+			log.Println(logPrefixDiscord, color.MagentaString("- See GitHub page for link to Discord's official statement."))
+			log.Println(logPrefixDiscord, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
 		}
 	}
 }

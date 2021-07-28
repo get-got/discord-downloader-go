@@ -59,9 +59,9 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
 		}
 		if edited {
-			log.Println(color.CyanString("Edited in Admin Channel [%s]: %s", sendLabel, content))
+			log.Println(color.HiGreenString("[ADMIN CHANNEL] "), color.CyanString("Edited [%s]: %s", sendLabel, content))
 		} else {
-			log.Println(color.CyanString("Message in Admin Channel [%s]: %s", sendLabel, content))
+			log.Println(color.HiGreenString("[ADMIN CHANNEL] "), color.CyanString("Message [%s]: %s", sendLabel, content))
 		}
 	}
 

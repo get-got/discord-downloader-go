@@ -33,14 +33,27 @@ var (
 
 // Log prefixes aren't to be used for constant messages where context is obvious.
 var (
-	logPrefixSetup   = color.HiGreenString("[Setup]")
-	logPrefixDebug   = color.HiYellowString("[Debug]")
-	logPrefixHelper  = color.HiMagentaString("[Help]")
+	logPrefixSetup = color.HiGreenString("[Setup]")
+
+	logPrefixDebug = color.HiYellowString("[Debug]")
+
+	logPrefixHistory = color.HiGreenString("[History]")
 	logPrefixInfo    = color.CyanString("[Info]")
-	logPrefixHistory = color.HiCyanString("[History]")
+
+	logPrefixDatabase    = color.BlueString("[Database]")
+	logPrefixSettings    = color.GreenString("[Settings]")
+	logPrefixVersion     = color.HiMagentaString("[Version]")
+	logPrefixRegex       = color.HiRedString("[Regex]")
+	logPrefixDiscord     = color.HiBlueString("[Discord]")
+	logPrefixTwitter     = color.HiCyanString("[Twitter]")
+	logPrefixGoogleDrive = color.HiGreenString("[Google Drive]")
 
 	logPrefixFileSkip = color.GreenString(">>> SKIPPING FILE:")
 )
+
+func logPrefixDebugLabel(label string) string {
+	return color.HiYellowString("[Debug: %s]", label)
+}
 
 const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
