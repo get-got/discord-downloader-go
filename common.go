@@ -192,7 +192,7 @@ func getJSONwithHeaders(url string, target interface{}, headers map[string]strin
 func filenameFromURL(inputURL string) string {
 	base := path.Base(inputURL)
 	parts := strings.Split(base, "?")
-	return parts[0]
+	return path.Clean(parts[0])
 }
 
 func filepathExtension(filepath string) string {
