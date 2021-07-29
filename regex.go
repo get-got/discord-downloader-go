@@ -7,7 +7,6 @@ import (
 //TODO: Reddit short url ... https://redd.it/post_code
 
 const (
-	regexpFilename                = `^^[^/\\:*?"<>|]{1,150}\.[A-Za-z0-9]{1,9}$$`
 	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
 	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)$`
 	regexpUrlInstagram            = `^http(s?):\/\/(www\.)?instagram\.com\/p\/[^/]+\/(\?[^/]+)?$`
@@ -30,7 +29,6 @@ const (
 )
 
 var (
-	regexFilename                *regexp.Regexp
 	regexUrlTwitter              *regexp.Regexp
 	regexUrlTwitterStatus        *regexp.Regexp
 	regexUrlInstagram            *regexp.Regexp
@@ -55,10 +53,6 @@ var (
 func compileRegex() error {
 	var err error
 
-	regexFilename, err = regexp.Compile(regexpFilename)
-	if err != nil {
-		return err
-	}
 	regexUrlTwitter, err = regexp.Compile(regexpUrlTwitter)
 	if err != nil {
 		return err
