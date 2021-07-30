@@ -311,13 +311,12 @@ type configurationAdminChannel struct {
 //#endregion
 
 func initConfig() {
-	// Determine settings file type
-	if _, err := os.Stat(configFileBase + ".json"); err == nil {
-		configFile = configFileBase + ".json"
-		configFileC = false
-	} else if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
+	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
 		configFile = configFileBase + ".jsonc"
 		configFileC = true
+	} else {
+		configFile = configFileBase + ".json"
+		configFileC = false
 	}
 }
 
@@ -639,6 +638,7 @@ func createConfig() {
 	if err != nil {
 		log.Println(logPrefixSetup, color.HiRedString("Failed to format new settings...\t%s", err))
 	} else {
+		configFile = configFileBase + ".json"
 		err := ioutil.WriteFile(configFile, defaultJSON, 0644)
 		if err != nil {
 			log.Println(logPrefixSetup, color.HiRedString("Failed to save new settings file...\t%s", err))
