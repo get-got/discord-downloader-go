@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/Necroforger/dgrouter/exrouter"
@@ -336,8 +335,8 @@ func handleCommands() *exrouter.Route {
 				} else {
 					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s requested exit, goodbye...", getUserIdentifier(*ctx.Msg.Author)))
-				loop <- syscall.SIGINT
+				log.Println(logPrefixHere, color.HiCyanString("%s (bot admin) requested exit, goodbye...", getUserIdentifier(*ctx.Msg.Author)))
+				properExit()
 			} else {
 				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 					_, err := replyEmbed(ctx.Msg, "Command — Exit", cmderrLackingBotAdminPerms)
