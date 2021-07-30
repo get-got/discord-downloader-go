@@ -321,7 +321,16 @@ func initConfig() {
 }
 
 func loadConfig() {
-	initConfig()
+	// Determine json type
+	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
+		configFile = configFileBase + ".jsonc"
+		configFileC = true
+	} else {
+		configFile = configFileBase + ".json"
+		configFileC = false
+	}
+	// .
+	log.Println(logPrefixSettings, color.YellowString("Loading from \"%s\"...", configFile))
 	// Load settings
 	configContent, err := ioutil.ReadFile(configFile)
 	if err != nil {
@@ -638,7 +647,6 @@ func createConfig() {
 	if err != nil {
 		log.Println(logPrefixSetup, color.HiRedString("Failed to format new settings...\t%s", err))
 	} else {
-		configFile = configFileBase + ".json"
 		err := ioutil.WriteFile(configFile, defaultJSON, 0644)
 		if err != nil {
 			log.Println(logPrefixSetup, color.HiRedString("Failed to save new settings file...\t%s", err))

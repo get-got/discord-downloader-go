@@ -56,8 +56,6 @@ func main() {
 	var err error
 
 	// Config
-	initConfig()
-	log.Println(logPrefixSettings, color.YellowString("Loading from \"%s\"...", configFile))
 	loadConfig()
 	log.Println(logPrefixSettings, color.HiYellowString("Loaded - bound to %d channel%s and %d server%s",
 		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
