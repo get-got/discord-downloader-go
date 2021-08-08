@@ -73,7 +73,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			return -1
 		}
 		// Ignore if told so by config
-		if !*channelConfig.Enabled || (edited && !*channelConfig.ScanEdits) {
+		if (!history && !*channelConfig.Enabled) || (edited && !*channelConfig.ScanEdits) {
 			return -1
 		}
 
