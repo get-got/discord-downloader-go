@@ -229,12 +229,18 @@ func handleCommands() *exrouter.Route {
 				} else if isNumeric(before) {
 					beforeID = before
 				}
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, before %s", beforeID))
+				}
 			} else if strings.Contains(strings.ToLower(v), sinceKey) {
 				since = strings.ReplaceAll(strings.ToLower(v), sinceKey, "")
 				if isDate(since) {
 					sinceID = discordTimestampToSnowflake("2006-01-02", since)
 				} else if isNumeric(since) {
 					sinceID = since
+				}
+				if config.DebugOutput {
+					log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, since %s", sinceID))
 				}
 			} else if strings.Contains(strings.ToLower(v), "cancel") || strings.Contains(strings.ToLower(v), "stop") {
 				stop = true
