@@ -224,7 +224,7 @@ func handleCommands() *exrouter.Route {
 			// Actually Parse Args
 			if strings.Contains(strings.ToLower(v), beforeKey) {
 				before = strings.ReplaceAll(strings.ToLower(v), beforeKey, "")
-				if isDate(since) {
+				if isDate(before) {
 					beforeID = discordTimestampToSnowflake("2006-01-02", before)
 				} else if isNumeric(before) {
 					beforeID = before
