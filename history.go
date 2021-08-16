@@ -189,24 +189,29 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					bot.ChannelTyping(commandingMessage.ChannelID)
 				}
 				for _, message := range messages {
+
 					// Ordered to Cancel
 					if historyStatus[message.ChannelID] == "cancel" {
 						delete(historyStatus, message.ChannelID)
 						break MessageRequestingLoop
 					}
 
-					// Check Before/Since
+					// Check Range
 					message64, _ := strconv.ParseInt(message.ID, 10, 64)
-					if before != "" {
+
+					if before != "" && since != "" {
+						//
+					} else if before != "" {
 						before64, _ := strconv.ParseInt(before, 10, 64)
 						if message64 > before64 {
-							continue
+							delete(historyStatus, message.ChannelID)
+							break MessageRequestingLoop
 						}
-					}
-					if since != "" {
+					} else if since != "" {
 						since64, _ := strconv.ParseInt(since, 10, 64)
 						if message64 < since64 {
-							continue
+							delete(historyStatus, message.ChannelID)
+							break MessageRequestingLoop
 						}
 					}
 
