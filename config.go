@@ -146,6 +146,10 @@ type configuration struct {
 	 */
 }
 
+type constStruct struct {
+	Constants map[string]string `json:"_constants,omitempty"`
+}
+
 //#endregion
 
 //#region Channels

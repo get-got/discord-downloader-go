@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -120,6 +121,14 @@ func wrapHyphens(i string, l int) string {
 
 func wrapHyphensW(i string) string {
 	return wrapHyphens(i, 80)
+}
+
+func stripSymbols(i string) string {
+	re, err := regexp.Compile(`[^\w]`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return re.ReplaceAllString(i, " ")
 }
 
 //#endregion

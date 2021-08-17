@@ -22,6 +22,7 @@ const (
 	cachePath        = "cache"
 	historyCachePath = cachePath + string(os.PathSeparator) + "history"
 	imgStorePath     = cachePath + string(os.PathSeparator) + "imgStore"
+	constantsPath    = cachePath + string(os.PathSeparator) + "constants.json"
 
 	defaultReact = "✅"
 )

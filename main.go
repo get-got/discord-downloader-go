@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -271,6 +273,64 @@ func main() {
 
 	// Log Status
 	logStatusMessage(logStatusStartup)
+
+	// Cache constants
+	constants := make(map[string]string)
+	//--- Compile constants
+	for _, server := range bot.State.Guilds {
+		serverKey := fmt.Sprintf("SERVER_%s", stripSymbols(server.Name))
+		serverKey = strings.ReplaceAll(serverKey, " ", "_")
+		for strings.Contains(serverKey, "__") {
+			serverKey = strings.ReplaceAll(serverKey, "__", "_")
+		}
+		serverKey = strings.ToUpper(serverKey)
+		if constants[serverKey] == "" {
+			constants[serverKey] = server.ID
+		} else if config.DebugOutput {
+			log.Println(logPrefixDebug, "[Constants]", color.HiYellowString("%s already cached (processing %s, has %s stored)", serverKey, server.ID, constants[serverKey]))
+		}
+		for _, channel := range server.Channels {
+			if channel.Type != discordgo.ChannelTypeGuildCategory {
+				categoryName := ""
+				if channel.ParentID != "" {
+					channelParent, err := bot.State.Channel(channel.ParentID)
+					if err == nil {
+						categoryName = channelParent.Name
+					}
+				}
+				channelKey := fmt.Sprintf("CHANNEL_%s_%s_%s", stripSymbols(server.Name), stripSymbols(categoryName), stripSymbols(channel.Name))
+				channelKey = strings.ReplaceAll(channelKey, " ", "_")
+				for strings.Contains(channelKey, "__") {
+					channelKey = strings.ReplaceAll(channelKey, "__", "_")
+				}
+				channelKey = strings.ToUpper(channelKey)
+				if constants[channelKey] == "" {
+					constants[channelKey] = channel.ID
+				} else if config.DebugOutput {
+					log.Println(logPrefixDebug, "[Constants]", color.HiYellowString("%s already cached (processing %s/%s, has %s stored)", channelKey, server.ID, channel.ID, constants[channelKey]))
+				}
+			}
+		}
+	}
+	//--- Save constants
+	os.MkdirAll(cachePath, 0755)
+	if _, err := os.Stat(constantsPath); err == nil {
+		err = os.Remove(constantsPath)
+		if err != nil {
+			log.Println("[Constants]", color.HiRedString("Encountered error deleting cache file:\t%s", err))
+		}
+	}
+	constantsStruct := constStruct{}
+	constantsStruct.Constants = constants
+	newJson, err := json.MarshalIndent(constantsStruct, "", "\t")
+	if err != nil {
+		log.Println("[Constants]", color.HiRedString("Failed to format constants...\t%s", err))
+	} else {
+		err := ioutil.WriteFile(constantsPath, newJson, 0644)
+		if err != nil {
+			log.Println("[Constants]", color.HiRedString("Failed to save new constants file...\t%s", err))
+		}
+	}
 
 	//#region Background Tasks
 
