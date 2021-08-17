@@ -295,10 +295,11 @@ var (
 
 type configurationAdminChannel struct {
 	// Required
-	ChannelID      string `json:"channel"`                  // required
-	LogStatus      *bool  `json:"logStatus,omitempty"`      // optional, defaults
-	LogErrors      *bool  `json:"logErrors,omitempty"`      // optional, defaults
-	UnlockCommands *bool  `json:"unlockCommands,omitempty"` // optional, defaults
+	ChannelID      string    `json:"channel"`                  // required
+	ChannelIDs     *[]string `json:"channels,omitempty"`       // ---> alternative to ChannelID
+	LogStatus      *bool     `json:"logStatus,omitempty"`      // optional, defaults
+	LogErrors      *bool     `json:"logErrors,omitempty"`      // optional, defaults
+	UnlockCommands *bool     `json:"unlockCommands,omitempty"` // optional, defaults
 
 	/* IDEAS / TODO:
 
@@ -915,8 +916,15 @@ func getChannelConfig(ChannelID string) configurationChannel {
 func isAdminChannelRegistered(ChannelID string) bool {
 	if config.AdminChannels != nil {
 		for _, item := range config.AdminChannels {
+			// Single Channel Config
 			if ChannelID == item.ChannelID {
 				return true
+			}
+			// Multi-Channel Config
+			if item.ChannelIDs != nil {
+				if stringInSlice(ChannelID, *item.ChannelIDs) {
+					return true
+				}
 			}
 		}
 	}
@@ -926,8 +934,17 @@ func isAdminChannelRegistered(ChannelID string) bool {
 func getAdminChannelConfig(ChannelID string) configurationAdminChannel {
 	if config.AdminChannels != nil {
 		for _, item := range config.AdminChannels {
+			// Single Channel Config
 			if ChannelID == item.ChannelID {
 				return item
+			}
+			// Multi-Channel Config
+			if item.ChannelIDs != nil {
+				for _, subchannel := range *item.ChannelIDs {
+					if ChannelID == subchannel {
+						return item
+					}
+				}
 			}
 		}
 	}

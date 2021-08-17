@@ -588,9 +588,12 @@ This setup exempts many options so they will use default values _(see below)_. I
     * List of User ID strings for users allowed to use admin commands
 * :small_orange_diamond: "adminChannels"
     * — _settings.adminChannels : list of setting:value groups_
-    * :small_red_triangle: **"channel"**
+    * :small_red_triangle: **"channel"** _`[USE THIS OR "channels"]`_
         * — _settings.adminChannel.channel : string_
         * _Channel ID for admin commands & logging._
+    * :small_red_triangle: **"channels"** _`[USE THIS OR "channel"]`_
+        * — _settings.adminChannel.channels : list of strings_
+        * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     * :small_blue_diamond: "logStatus"
         * — _settings.adminChannel.logStatus : boolean_
         * _Default:_ `true`
