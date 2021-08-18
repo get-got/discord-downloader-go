@@ -55,6 +55,9 @@ var (
 func logPrefixDebugLabel(label string) string {
 	return color.HiYellowString("[Debug: %s]", label)
 }
+func logPrefixErrorLabel(label string) string {
+	return color.HiRedString("[Error: %s]", label)
+}
 
 const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
