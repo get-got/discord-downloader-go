@@ -971,7 +971,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// React
-		if !historyCmd && *channelConfig.ReactWhenDownloaded && message.Author != nil {
+		if (!historyCmd || *channelConfig.ReactWhenDownloadedHistory) && *channelConfig.ReactWhenDownloaded && message.Author != nil {
 			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
 				if message.GuildID != "" {

@@ -789,6 +789,10 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].reactWhenDownloadedEmoji : string_
         * _Unused by Default_
         * Uses specified emoji rather than random server emojis. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
+    * :small_blue_diamond: "reactWhenDownloadedHistory"
+        * — _settings.channels[].reactWhenDownloadedHistory : boolean_
+        * _Default:_ `false`
+        * Reacts to old messages when processing history.
     * :small_blue_diamond: "blacklistReactEmojis"
         * — _settings.channels[].blacklistReactEmojis : list of strings_
         * _Unused by Default_
