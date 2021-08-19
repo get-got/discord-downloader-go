@@ -360,18 +360,17 @@ func logStatusMessage(status logStatusType) {
 func logErrorMessage(err string) {
 	for _, adminChannel := range config.AdminChannels {
 		if *adminChannel.LogErrors {
-			message := fmt.Sprintf("***ERROR ENCOUNTERED:***\n%s", err)
 			// Send
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for error to %s", adminChannel.ChannelID))
 				}
-				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
+				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Error", err))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for error to %s", adminChannel.ChannelID))
 				}
-				bot.ChannelMessageSend(adminChannel.ChannelID, message)
+				bot.ChannelMessageSend(adminChannel.ChannelID, err)
 			} else {
 				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending error log to %s", adminChannel.ChannelID))
 			}
