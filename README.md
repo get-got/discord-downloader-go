@@ -700,6 +700,11 @@ This setup exempts many options so they will use default values _(see below)_. I
     * Replace counter status state with custom string (only works for User, not Bot).
     * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
 ---
+    * :small_blue_diamond: "reactWhenDownloaded"
+        * — _settings.reactWhenDownloaded : boolean_
+        * _Default:_ `true`
+        * Confirmation reaction that file(s) successfully downloaded. Is overwritten by the channel/server equivelant of this setting.
+---
 * :small_blue_diamond: "filenameDateFormat"
     * — _settings.filenameDateFormat : string_
     * _Default:_ `"2006-01-02_15-04-05 "`

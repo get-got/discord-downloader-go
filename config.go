@@ -58,10 +58,11 @@ var (
 	cdAllowGlobalCommands  bool   = true
 	cdGithubUpdateChecking bool   = true
 	// Appearance
-	cdPresenceEnabled bool               = true
-	cdPresenceStatus  string             = string(discordgo.StatusIdle)
-	cdPresenceType    discordgo.GameType = discordgo.GameTypeGame
-	cdInflateCount    int64              = 0
+	cdPresenceEnabled     bool               = true
+	cdPresenceStatus      string             = string(discordgo.StatusIdle)
+	cdPresenceType        discordgo.GameType = discordgo.GameTypeGame
+	cdReactWhenDownloaded                    = true
+	cdInflateCount        int64              = 0
 )
 
 func defaultConfiguration() configuration {
@@ -93,6 +94,7 @@ func defaultConfiguration() configuration {
 		PresenceEnabled:      cdPresenceEnabled,
 		PresenceStatus:       cdPresenceStatus,
 		PresenceType:         cdPresenceType,
+		ReactWhenDownloaded:  cdReactWhenDownloaded,
 		FilenameDateFormat:   "2006-01-02_15-04-05 ",
 		InflateCount:         &cdInflateCount,
 		NumberFormatEuropean: false,
@@ -128,6 +130,7 @@ type configuration struct {
 	PresenceOverwrite        *string            `json:"presenceOverwrite,omitempty"`        // optional, unused if undefined
 	PresenceOverwriteDetails *string            `json:"presenceOverwriteDetails,omitempty"` // optional, unused if undefined
 	PresenceOverwriteState   *string            `json:"presenceOverwriteState,omitempty"`   // optional, unused if undefined
+	ReactWhenDownloaded      bool               `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
 	FilenameDateFormat       string             `json:"filenameDateFormat,omitempty"`       // optional, defaults
 	EmbedColor               *string            `json:"embedColor,omitempty"`               // optional, defaults to role if undefined, then defaults random if no role color
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
@@ -447,9 +450,10 @@ func createConfig() {
 		AllowSkipping:   cdAllowSkipping,
 		ScanOwnMessages: cdScanOwnMessages,
 
-		PresenceEnabled: cdPresenceEnabled,
-		PresenceStatus:  cdPresenceStatus,
-		PresenceType:    cdPresenceType,
+		PresenceEnabled:     cdPresenceEnabled,
+		PresenceStatus:      cdPresenceStatus,
+		PresenceType:        cdPresenceType,
+		ReactWhenDownloaded: cdReactWhenDownloaded,
 
 		GithubUpdateChecking: cdGithubUpdateChecking,
 		DebugOutput:          cdDebugOutput,
