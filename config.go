@@ -61,7 +61,7 @@ var (
 	cdPresenceEnabled     bool               = true
 	cdPresenceStatus      string             = string(discordgo.StatusIdle)
 	cdPresenceType        discordgo.GameType = discordgo.GameTypeGame
-	cdReactWhenDownloaded                    = true
+	cdReactWhenDownloaded bool               = true
 	cdInflateCount        int64              = 0
 )
 

@@ -469,6 +469,24 @@ func getUserIdentifier(usr discordgo.User) string {
 	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
 
+//TODO: Clean below
+
+func getChannelState(channelID string) *discordgo.Channel {
+	sourceChannel, _ := bot.State.Channel(channelID)
+	if sourceChannel != nil {
+		return sourceChannel
+	}
+	return &discordgo.Channel{}
+}
+
+func getGuildState(guildID string) *discordgo.Guild {
+	sourceGuild, _ := bot.State.Guild(guildID)
+	if sourceGuild != nil {
+		return sourceGuild
+	}
+	return &discordgo.Guild{}
+}
+
 func getChannelGuildID(channelID string) string {
 	sourceChannel, _ := bot.State.Channel(channelID)
 	if sourceChannel != nil {
