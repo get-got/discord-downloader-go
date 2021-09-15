@@ -168,7 +168,6 @@ var (
 	ccdIgnoreBots    bool = false
 	// Appearance
 	ccdUpdatePresence             bool     = true
-	ccdReactWhenDownloaded        bool     = true
 	ccdReactWhenDownloadedEmoji   string   = ""
 	ccdReactWhenDownloadedHistory bool     = false
 	ccdBlacklistReactEmojis       []string = []string{}
@@ -569,7 +568,7 @@ func createConfig() {
 			IgnoreBots:    &ccdIgnoreBots,
 
 			UpdatePresence:             &ccdUpdatePresence,
-			ReactWhenDownloaded:        &ccdReactWhenDownloaded,
+			ReactWhenDownloadedEmoji:   &ccdReactWhenDownloadedEmoji,
 			ReactWhenDownloadedHistory: &ccdReactWhenDownloadedHistory,
 
 			DivideFoldersByType: &ccdDivideFoldersByType,
@@ -693,9 +692,6 @@ func channelDefault(channel *configurationChannel) {
 	// Appearance
 	if channel.UpdatePresence == nil {
 		channel.UpdatePresence = &ccdUpdatePresence
-	}
-	if channel.ReactWhenDownloaded == nil {
-		channel.ReactWhenDownloaded = &ccdReactWhenDownloaded
 	}
 	if channel.ReactWhenDownloadedEmoji == nil {
 		channel.ReactWhenDownloadedEmoji = &ccdReactWhenDownloadedEmoji
