@@ -403,12 +403,15 @@ func handleCommands() *exrouter.Route {
 									url := "https://cdn.discordapp.com/emojis/" + emoji.ID
 
 									status := startDownload(
-										url,
-										emoji.ID,
-										destination,
-										&message,
-										time.Now(),
-										false, true)
+										downloadRequestStruct{
+											InputURL:   url,
+											Filename:   emoji.ID,
+											Path:       destination,
+											Message:    &message,
+											FileTime:   time.Now(),
+											HistoryCmd: false,
+											EmojiCmd:   true,
+										})
 
 									if status.Status == downloadSuccess {
 										i++

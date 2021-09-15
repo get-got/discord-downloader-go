@@ -307,14 +307,15 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				log.Println(logPrefixDebug, color.CyanString("FOUND FILE: "+file.Link))
 			}
 			status := startDownload(
-				file.Link,
-				file.Filename,
-				channelConfig.Destination,
-				m,
-				file.Time,
-				history,
-				false,
-			)
+				downloadRequestStruct{
+					InputURL:   file.Link,
+					Filename:   file.Filename,
+					Path:       channelConfig.Destination,
+					Message:    m,
+					FileTime:   file.Time,
+					HistoryCmd: history,
+					EmojiCmd:   false,
+				})
 			if status.Status == downloadSuccess {
 				downloadCount++
 			}

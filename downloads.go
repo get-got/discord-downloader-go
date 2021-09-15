@@ -23,7 +23,7 @@ import (
 	"mvdan.cc/xurls/v2"
 )
 
-type download struct {
+type downloadItem struct {
 	URL         string
 	Time        time.Time
 	Destination string
@@ -407,12 +407,24 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 	return fileItems
 }
 
-func startDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool, emojiCmd bool) downloadStatusStruct {
+type downloadRequestStruct struct {
+	InputURL       string
+	Filename       string
+	Path           string
+	Message        *discordgo.Message
+	FileTime       time.Time
+	HistoryCmd     bool
+	EmojiCmd       bool
+	ManualDownload bool
+}
+
+func startDownload(download downloadRequestStruct) downloadStatusStruct {
+	//func startDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool, emojiCmd bool) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	logPrefixErrorHere := color.HiRedString("[startDownload]")
 
 	for i := 0; i < config.DownloadRetryMax; i++ {
-		status = tryDownload(inputURL, filename, path, message, fileTime, historyCmd, emojiCmd)
+		status = tryDownload(download)
 		if status.Status < downloadFailed { // Success or Skip
 			break
 		} else {
@@ -421,29 +433,29 @@ func startDownload(inputURL string, filename string, path string, message *disco
 	}
 
 	// Any kind of failure
-	if status.Status >= downloadFailed && !historyCmd && !emojiCmd {
-		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", inputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		if isChannelRegistered(message.ChannelID) {
-			channelConfig := getChannelConfig(message.ChannelID)
-			if !historyCmd && *channelConfig.ErrorMessages {
+	if status.Status >= downloadFailed && !download.HistoryCmd && !download.EmojiCmd {
+		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
+		if isChannelRegistered(download.Message.ChannelID) {
+			channelConfig := getChannelConfig(download.Message.ChannelID)
+			if !download.HistoryCmd && *channelConfig.ErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
-					inputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status))
+					download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status))
 				if status.Error != nil {
 					content += fmt.Sprintf("\n```ERROR: %s```", status.Error)
 				}
 				// Failure Notice
-				if hasPerms(message.ChannelID, discordgo.PermissionSendMessages) {
-					_, err := bot.ChannelMessageSendComplex(message.ChannelID,
+				if hasPerms(download.Message.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
 						&discordgo.MessageSend{
-							Content: fmt.Sprintf("<@!%s>", message.Author.ID),
-							Embed:   buildEmbed(message.ChannelID, "Download Failure", content),
+							Content: fmt.Sprintf("<@!%s>", download.Message.Author.ID),
+							Embed:   buildEmbed(download.Message.ChannelID, "Download Failure", content),
 						})
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", message.ChannelID, err))
+						log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", download.Message.ChannelID, err))
 					}
 				} else {
-					log.Println(logPrefixErrorHere, color.HiRedString(fmtBotSendPerm, message.ChannelID))
+					log.Println(logPrefixErrorHere, color.HiRedString(fmtBotSendPerm, download.Message.ChannelID))
 				}
 			}
 			if status.Error != nil {
@@ -453,8 +465,8 @@ func startDownload(inputURL string, filename string, path string, message *disco
 	}
 
 	// Log Links to File
-	if isChannelRegistered(message.ChannelID) {
-		channelConfig := getChannelConfig(message.ChannelID)
+	if isChannelRegistered(download.Message.ChannelID) {
+		channelConfig := getChannelConfig(download.Message.ChannelID)
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
 				logPath := channelConfig.LogLinks.Destination
@@ -466,8 +478,8 @@ func startDownload(inputURL string, filename string, path string, message *disco
 					if err == nil {
 						logPath += "Log_Links"
 						if *channelConfig.LogLinks.DivideLogsByServer == true {
-							if message.GuildID == "" {
-								ch, err := bot.State.Channel(message.ChannelID)
+							if download.Message.GuildID == "" {
+								ch, err := bot.State.Channel(download.Message.ChannelID)
 								if err == nil {
 									if ch.Type == discordgo.ChannelTypeDM {
 										logPath += " DM"
@@ -480,14 +492,14 @@ func startDownload(inputURL string, filename string, path string, message *disco
 									logPath += " Unknown"
 								}
 							} else {
-								logPath += " SID_" + message.GuildID
+								logPath += " SID_" + download.Message.GuildID
 							}
 						}
 						if *channelConfig.LogLinks.DivideLogsByChannel == true {
-							logPath += " CID_" + message.ChannelID
+							logPath += " CID_" + download.Message.ChannelID
 						}
 						if *channelConfig.LogLinks.DivideLogsByUser == true {
-							logPath += " UID_" + message.Author.ID
+							logPath += " UID_" + download.Message.Author.ID
 						}
 						if *channelConfig.LogLinks.DivideLogsByStatus == true {
 							if status.Status >= downloadFailed {
@@ -529,7 +541,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 				// Filter Duplicates
 				if channelConfig.LogLinks.FilterDuplicates != nil {
 					if *channelConfig.LogLinks.FilterDuplicates {
-						if strings.Contains(currentLogS, inputURL) {
+						if strings.Contains(currentLogS, download.InputURL) {
 							shouldLog = false
 						}
 					}
@@ -544,7 +556,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 					additionalInfo := ""
 					if channelConfig.LogLinks.UserData != nil {
 						if *channelConfig.LogLinks.UserData == true {
-							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", message.GuildID, message.ChannelID, message.Author.Username, message.Author.Discriminator, message.Author.ID, message.Timestamp)
+							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", download.Message.GuildID, download.Message.ChannelID, download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID, download.Message.Timestamp)
 						}
 					}
 					// Append
@@ -553,7 +565,7 @@ func startDownload(inputURL string, filename string, path string, message *disco
 						suffix = *channelConfig.LogLinks.Suffix
 					}
 					// New Line
-					newLine += "\n" + prefix + additionalInfo + inputURL + suffix
+					newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
 
 					if _, err = f.WriteString(newLine); err != nil {
 						log.Println(color.RedString("[channelConfig.LogLinks] Failed to append file:\t%s", err))
@@ -566,20 +578,20 @@ func startDownload(inputURL string, filename string, path string, message *disco
 	return status
 }
 
-func tryDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool, emojiCmd bool) downloadStatusStruct {
+func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 	cachedDownloadID++
 	thisDownloadID := cachedDownloadID
 
 	logPrefixErrorHere := color.HiRedString("[tryDownload]")
 	logPrefix := ""
-	if historyCmd {
+	if download.HistoryCmd {
 		logPrefix = logPrefixHistory + " "
 	}
 
-	if stringInSlice(message.ChannelID, getAllChannels()) || emojiCmd {
+	if stringInSlice(download.Message.ChannelID, getAllChannels()) || download.EmojiCmd || download.ManualDownload {
 		var channelConfig configurationChannel
-		if isChannelRegistered(message.ChannelID) {
-			channelConfig = getChannelConfig(message.ChannelID)
+		if isChannelRegistered(download.Message.ChannelID) {
+			channelConfig = getChannelConfig(download.Message.ChannelID)
 		} else {
 			channelDefault(&channelConfig)
 		}
@@ -587,24 +599,24 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		var err error
 
 		// Source validation
-		_, err = url.ParseRequestURI(inputURL)
+		_, err = url.ParseRequestURI(download.InputURL)
 		if err != nil {
 			return mDownloadStatus(downloadFailedInvalidSource, err)
 		}
 
 		// Clean/fix path
-		if path == "" || path == string(os.PathSeparator) {
+		if download.Path == "" || download.Path == string(os.PathSeparator) {
 			log.Println(logPrefixErrorHere, color.HiRedString("Destination cannot be empty path..."))
 			return mDownloadStatus(downloadFailedInvalidPath, err)
 		}
-		if !strings.HasSuffix(path, string(os.PathSeparator)) {
-			path = path + string(os.PathSeparator)
+		if !strings.HasSuffix(download.Path, string(os.PathSeparator)) {
+			download.Path = download.Path + string(os.PathSeparator)
 		}
 
 		// Create folder
-		err = os.MkdirAll(path, 0755)
+		err = os.MkdirAll(download.Path, 0755)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while creating destination folder \"%s\": %s", path, err))
+			log.Println(logPrefixErrorHere, color.HiRedString("Error while creating destination folder \"%s\": %s", download.Path, err))
 			return mDownloadStatus(downloadFailedCreatingFolder, err)
 		}
 
@@ -613,17 +625,17 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		client := &http.Client{
 			Timeout: timeout,
 		}
-		request, err := http.NewRequest("GET", inputURL, nil)
+		request, err := http.NewRequest("GET", download.InputURL, nil)
 		request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36")
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while requesting \"%s\": %s", inputURL, err))
+			log.Println(logPrefixErrorHere, color.HiRedString("Error while requesting \"%s\": %s", download.InputURL, err))
 			return mDownloadStatus(downloadFailedRequesting, err)
 		}
 		request.Header.Add("Accept-Encoding", "identity")
 		response, err := client.Do(request)
 		if err != nil {
 			if !strings.Contains(err.Error(), "no such host") && !strings.Contains(err.Error(), "connection refused") {
-				log.Println(logPrefixErrorHere, color.HiRedString("Error while receiving response from \"%s\": %s", inputURL, err))
+				log.Println(logPrefixErrorHere, color.HiRedString("Error while receiving response from \"%s\": %s", download.InputURL, err))
 			}
 			return mDownloadStatus(downloadFailedDownloadingResponse, err)
 		}
@@ -632,13 +644,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Read
 		bodyOfResp, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Could not read response from \"%s\": %s", inputURL, err))
+			log.Println(logPrefixErrorHere, color.HiRedString("Could not read response from \"%s\": %s", download.InputURL, err))
 			return mDownloadStatus(downloadFailedReadResponse, err)
 		}
 
 		// Filename
-		if filename == "" {
-			filename = filenameFromURL(response.Request.URL.String())
+		if download.Filename == "" {
+			download.Filename = filenameFromURL(response.Request.URL.String())
 			for key, iHeader := range response.Header {
 				if key == "Content-Disposition" {
 					_, params, err := mime.ParseMediaType(iHeader[0])
@@ -648,20 +660,20 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 							newFilename = params["filename"]
 						}
 						if newFilename != "" {
-							filename = newFilename
+							download.Filename = newFilename
 						}
 					}
 				}
 			}
 		}
 
-		extension := strings.ToLower(filepath.Ext(filename))
+		extension := strings.ToLower(filepath.Ext(download.Filename))
 
 		contentType := http.DetectContentType(bodyOfResp)
 		contentTypeParts := strings.Split(contentType, "/")
 		contentTypeFound := contentTypeParts[0]
 
-		parsedURL, err := url.Parse(inputURL)
+		parsedURL, err := url.Parse(download.InputURL)
 		if err != nil {
 			log.Println(logPrefixErrorHere, color.RedString("Error while parsing url:\t%s", err))
 		}
@@ -686,8 +698,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 
 			// Abort
 			if shouldAbort {
-				if !historyCmd {
-					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, inputURL))
+				if !download.HistoryCmd {
+					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedExtension)
 			}
@@ -707,20 +719,24 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Filename extension fix
-		if filepath.Ext(filename) == "" {
+		if filepath.Ext(download.Filename) == "" {
 			possibleExtension, _ := mime.ExtensionsByType(contentType)
 			if len(possibleExtension) > 0 {
-				filename += possibleExtension[0]
+				download.Filename += possibleExtension[0]
 			}
 		}
 
-		extension = strings.ToLower(filepath.Ext(filename))
-		baseFilename := filename[0 : len(filename)-len(extension)]
+		extension = strings.ToLower(filepath.Ext(download.Filename))
+		baseFilename := download.Filename[0 : len(download.Filename)-len(extension)]
 
 		// Ignore deleted files from hosting services like imgur
 		if strings.ToLower(baseFilename) == "removed" {
-			log.Println(logPrefixFileSkip, color.GreenString("Detected removed file at %s", inputURL))
+			log.Println(logPrefixFileSkip, color.GreenString("Detected removed file at %s", download.InputURL))
 			return mDownloadStatus(downloadSkippedRemovedFile)
+		}
+		// Ignore deleted files
+		if true { // setting?
+
 		}
 
 		// Check Domain
@@ -743,8 +759,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 
 			// Abort
 			if shouldAbort {
-				if !historyCmd {
-					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", parsedURL.Hostname(), inputURL))
+				if !download.HistoryCmd {
+					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", parsedURL.Hostname(), download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedDomain)
 			}
@@ -756,8 +772,8 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			(*channelConfig.SaveAudioFiles && contentTypeFound == "audio") ||
 			(*channelConfig.SaveTextFiles && contentTypeFound == "text") ||
 			(*channelConfig.SaveOtherFiles && contentTypeFound == "application")) {
-			if !historyCmd {
-				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, inputURL))
+			if !download.HistoryCmd {
+				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
 			}
 			return mDownloadStatus(downloadSkippedUnpermittedType)
 		}
@@ -776,7 +792,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 						log.Println(color.YellowString("Similarity Score: %f", match.Score))
 					}*/
 					if match.Score < config.FilterDuplicateImagesThreshold {
-						log.Println(logPrefixFileSkip, color.GreenString("Duplicate detected (Score of %f) found at %s", match.Score, inputURL))
+						log.Println(logPrefixFileSkip, color.GreenString("Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
 						return mDownloadStatus(downloadSkippedDetectedDuplicate)
 					}
 				}
@@ -785,9 +801,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Names
-		sourceChannelName := message.ChannelID
+		sourceChannelName := download.Message.ChannelID
 		sourceName := "UNKNOWN"
-		sourceChannel, _ := bot.State.Channel(message.ChannelID)
+		sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
 		if sourceChannel != nil {
 			// Channel Naming
 			if sourceChannel.Name != "" {
@@ -819,7 +835,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		subfolder := ""
-		if message.Author != nil {
+		if download.Message.Author != nil {
 			// Subfolder Division - Server Nesting
 			if *channelConfig.DivideFoldersByServer {
 				subfolderSuffix := ""
@@ -833,9 +849,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 					subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
 					subfolder = subfolder + subfolderSuffix
 					// Create folder.
-					err := os.MkdirAll(path+subfolder, 0755)
+					err := os.MkdirAll(download.Path+subfolder, 0755)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", path, err))
+						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -852,9 +868,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				if subfolderSuffix != "" {
 					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 					// Create folder.
-					err := os.MkdirAll(path+subfolder, 0755)
+					err := os.MkdirAll(download.Path+subfolder, 0755)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating channel subfolder \"%s\": %s", path, err))
+						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating channel subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -862,9 +878,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 
 			// Subfolder Division - User Nesting
 			if *channelConfig.DivideFoldersByUser {
-				subfolderSuffix := message.Author.ID
-				if message.Author.Username != "" {
-					subfolderSuffix = message.Author.Username + "#" + message.Author.Discriminator
+				subfolderSuffix := download.Message.Author.ID
+				if download.Message.Author.Username != "" {
+					subfolderSuffix = download.Message.Author.Username + "#" + download.Message.Author.Discriminator
 					for _, key := range pathBlacklist {
 						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
 					}
@@ -872,9 +888,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				if subfolderSuffix != "" {
 					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 					// Create folder.
-					err := os.MkdirAll(path+subfolder, 0755)
+					err := os.MkdirAll(download.Path+subfolder, 0755)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating user subfolder \"%s\": %s", path, err))
+						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating user subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -882,7 +898,7 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		}
 
 		// Subfolder Division - Content Type
-		if *channelConfig.DivideFoldersByType && message.Author != nil {
+		if *channelConfig.DivideFoldersByType && download.Message.Author != nil {
 			subfolderSuffix := ""
 			switch contentTypeFound {
 			case "image":
@@ -899,9 +915,9 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			if subfolderSuffix != "" {
 				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 				// Create folder.
-				err := os.MkdirAll(path+subfolder, 0755)
+				err := os.MkdirAll(download.Path+subfolder, 0755)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating type subfolder \"%s\": %s", path+subfolder, err))
+					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating type subfolder \"%s\": %s", download.Path+subfolder, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
@@ -915,13 +931,13 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			}
 		}
 		messageTime := time.Now()
-		if message.Timestamp != "" {
-			messageTimestamp, err := message.Timestamp.Parse()
+		if download.Message.Timestamp != "" {
+			messageTimestamp, err := download.Message.Timestamp.Parse()
 			if err == nil {
 				messageTime = messageTimestamp
 			}
 		}
-		completePath := path + subfolder + messageTime.Format(filenameDateFormat) + filename
+		completePath := download.Path + subfolder + messageTime.Format(filenameDateFormat) + download.Filename
 
 		// Check if exists
 		if _, err := os.Stat(completePath); err == nil {
@@ -937,11 +953,11 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 					}
 					i = i + 1
 				}
-				if !historyCmd {
+				if !download.HistoryCmd {
 					log.Println(color.GreenString("Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead", tmpPath, completePath))
 				}
 			} else {
-				if !historyCmd {
+				if !download.HistoryCmd {
 					log.Println(logPrefixFileSkip, color.GreenString("Matching filenames, possible duplicate..."))
 				}
 				return mDownloadStatus(downloadSkippedDuplicate)
@@ -951,30 +967,30 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 		// Write
 		err = ioutil.WriteFile(completePath, bodyOfResp, 0644)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while writing file to disk \"%s\": %s", inputURL, err))
+			log.Println(logPrefixErrorHere, color.HiRedString("Error while writing file to disk \"%s\": %s", download.InputURL, err))
 			return mDownloadStatus(downloadFailedWritingFile, err)
 		}
 
 		// Change file time
-		err = os.Chtimes(completePath, fileTime, fileTime)
+		err = os.Chtimes(completePath, download.FileTime, download.FileTime)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", inputURL, err))
+			log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", download.InputURL, err))
 		}
 
 		// Output
 		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 
 		userID := user.ID
-		if message.Author != nil {
-			userID = message.Author.ID
+		if download.Message.Author != nil {
+			userID = download.Message.Author.ID
 		}
 		// Store in db
-		err = dbInsertDownload(&download{
-			URL:         inputURL,
+		err = dbInsertDownload(&downloadItem{
+			URL:         download.InputURL,
 			Time:        time.Now(),
 			Destination: completePath,
-			Filename:    filename,
-			ChannelID:   message.ChannelID,
+			Filename:    download.Filename,
+			ChannelID:   download.Message.ChannelID,
 			UserID:      userID,
 		})
 		if err != nil {
@@ -988,17 +1004,17 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 			shouldReact = *channelConfig.ReactWhenDownloaded
 		}
 		if channelConfig.ReactWhenDownloadedHistory != nil {
-			if historyCmd && !*channelConfig.ReactWhenDownloadedHistory {
+			if download.HistoryCmd && !*channelConfig.ReactWhenDownloadedHistory {
 				shouldReact = false
 			}
 		}
-		if message.Author != nil && shouldReact {
+		if download.Message.Author != nil && shouldReact {
 			reaction := ""
 			if *channelConfig.ReactWhenDownloadedEmoji == "" {
-				if message.GuildID != "" {
-					guild, err := bot.State.Guild(message.GuildID)
+				if download.Message.GuildID != "" {
+					guild, err := bot.State.Guild(download.Message.GuildID)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", message.GuildID, err))
+						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", download.Message.GuildID, err))
 					} else {
 						emojis := guild.Emojis
 						if len(emojis) > 1 {
@@ -1022,17 +1038,17 @@ func tryDownload(inputURL string, filename string, path string, message *discord
 				reaction = *channelConfig.ReactWhenDownloadedEmoji
 			}
 			// Add Reaction
-			if hasPerms(message.ChannelID, discordgo.PermissionAddReactions) {
-				err = bot.MessageReactionAdd(message.ChannelID, message.ID, reaction)
+			if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
+				err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction)
 				if err != nil {
 					log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
 				}
 			} else {
-				log.Println(logPrefixErrorHere, color.RedString("Bot does not have permission to add reactions in %s", message.ChannelID))
+				log.Println(logPrefixErrorHere, color.RedString("Bot does not have permission to add reactions in %s", download.Message.ChannelID))
 			}
 		}
 
-		if !historyCmd {
+		if !download.HistoryCmd {
 			timeLastUpdated = time.Now()
 			if *channelConfig.UpdatePresence {
 				updateDiscordPresence()
