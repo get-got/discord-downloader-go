@@ -303,6 +303,9 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		var downloadCount int64
 		files := getFileLinks(m)
 		for _, file := range files {
+			if file.Link == "" {
+				continue
+			}
 			if config.DebugOutput {
 				log.Println(logPrefixDebug, color.CyanString("FOUND FILE: "+file.Link))
 			}
