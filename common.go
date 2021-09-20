@@ -1,11 +1,8 @@
 package main
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -224,25 +221,6 @@ func isNumeric(s string) bool {
 func isDate(s string) bool {
 	_, err := time.Parse("2006-01-02", s)
 	return err == nil
-}
-
-func hash(filepath string) (string, error) {
-	var ret string
-
-	file, err := os.Open(filepath)
-	if err != nil {
-		return ret, err
-	}
-
-	defer file.Close()
-
-	hash := md5.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return ret, err
-	}
-	hashInBytes := hash.Sum(nil)[:16]
-	ret = hex.EncodeToString(hashInBytes)
-	return ret, nil
 }
 
 //#endregion
