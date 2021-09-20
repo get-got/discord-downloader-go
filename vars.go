@@ -25,18 +25,11 @@ const (
 	constantsPath    = cachePath + string(os.PathSeparator) + "constants.json"
 
 	defaultReact = "✅"
-
-	exampleBadImgur  = "https://i.imgur.com/oBsM4iw.jpg"
-	exampleBadReddit = "https://i.redd.it/inyxtnitnrs61.jpg"
-	exampleBadTumblr = "https://68.media.tumblr.com/946e056f3ccdbe66035a6c813688098c/tumblr_okjnvdxQ5Y1svlqo6o1_400.gif"
-	exampleBadGfycat = "https://gfycat.com/SilverDelightfulBlacklemur"
 )
 
 var (
 	configFile  string
 	configFileC bool
-
-	example404s map[string]string
 )
 
 // Log prefixes aren't to be used for constant messages where context is obvious.

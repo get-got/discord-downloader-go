@@ -419,7 +419,6 @@ type downloadRequestStruct struct {
 }
 
 func startDownload(download downloadRequestStruct) downloadStatusStruct {
-	//func startDownload(inputURL string, filename string, path string, message *discordgo.Message, fileTime time.Time, historyCmd bool, emojiCmd bool) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	logPrefixErrorHere := color.HiRedString("[startDownload]")
 
