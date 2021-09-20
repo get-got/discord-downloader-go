@@ -45,7 +45,6 @@ const (
 	downloadSkippedUnpermittedType
 	downloadSkippedUnpermittedExtension
 	downloadSkippedDetectedDuplicate
-	downloadSkippedRemovedFile
 
 	downloadFailed
 	downloadFailed404
@@ -98,8 +97,6 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Download Skipped - Unpermitted File Extension"
 	case downloadSkippedDetectedDuplicate:
 		return "Download Skipped - Detected Duplicate"
-	case downloadSkippedRemovedFile:
-		return "Download Skipped - Removed File"
 	//
 	case downloadFailed:
 		return "Download Failed"
@@ -733,19 +730,6 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if len(possibleExtension) > 0 {
 				download.Filename += possibleExtension[0]
 			}
-		}
-
-		extension = strings.ToLower(filepath.Ext(download.Filename))
-		baseFilename := download.Filename[0 : len(download.Filename)-len(extension)]
-
-		// Ignore deleted files from hosting services like imgur
-		if strings.ToLower(baseFilename) == "removed" {
-			log.Println(logPrefixFileSkip, color.GreenString("Detected removed file at %s", download.InputURL))
-			return mDownloadStatus(downloadSkippedRemovedFile)
-		}
-		// Ignore deleted files
-		if true { // setting?
-
 		}
 
 		// Check Domain
