@@ -159,7 +159,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm, message.ChannelID))
 						}
 					} else {
-						log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Tried to edit status message but it doesn't exist.", subjectChannelID, commander))
+						log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Tried to edit status message but it doesn't exist."))
 					}
 				}
 				// Update presence
