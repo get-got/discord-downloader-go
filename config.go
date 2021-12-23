@@ -966,7 +966,7 @@ func isCommandableChannel(m *discordgo.Message) bool {
 		return true
 	} else if isChannelRegistered(m.ChannelID) {
 		channelConfig := getChannelConfig(m.ChannelID)
-		if *channelConfig.AllowCommands || isBotAdmin(m) {
+		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
 	}
