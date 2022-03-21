@@ -763,6 +763,10 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].enabled : boolean_
         * _Default:_ `true`
         * Toggles bot functionality for channel.
+    * :small_blue_diamond: "save"
+        * — _settings.channels[].save : boolean_
+        * _Default:_ `true`
+        * Toggles whether the files actually get downloaded/saved.
     * :small_blue_diamond: "allowCommands"
         * — _settings.channels[].allowCommands : boolean_
         * _Default:_ `true`

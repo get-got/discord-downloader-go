@@ -162,6 +162,7 @@ type constStruct struct {
 var (
 	// Setup
 	ccdEnabled          bool = true
+	ccdSave             bool = true
 	ccdAllowCommands    bool = true
 	ccdErrorMessages    bool = true
 	ccdScanEdits        bool = true
@@ -196,6 +197,7 @@ type configurationChannel struct {
 	Destination         string    `json:"destination"`                 // required
 	// Setup
 	Enabled                 *bool     `json:"enabled,omitempty"`                 // optional, defaults
+	Save                    *bool     `json:"save,omitempty"`                    // optional, defaults
 	AllowCommands           *bool     `json:"allowCommands,omitempty"`           // optional, defaults
 	ErrorMessages           *bool     `json:"errorMessages,omitempty"`           // optional, defaults
 	ScanEdits               *bool     `json:"scanEdits,omitempty"`               // optional, defaults
@@ -566,6 +568,7 @@ func createConfig() {
 			Destination: enteredBaseDestination,
 
 			Enabled:       &ccdEnabled,
+			Save:          &ccdSave,
 			AllowCommands: &ccdAllowCommands,
 			ErrorMessages: &ccdErrorMessages,
 			ScanEdits:     &ccdScanEdits,
@@ -680,6 +683,9 @@ func channelDefault(channel *configurationChannel) {
 	// Setup
 	if channel.Enabled == nil {
 		channel.Enabled = &ccdEnabled
+	}
+	if channel.Save == nil {
+		channel.Save = &ccdSave
 	}
 	if channel.AllowCommands == nil {
 		channel.AllowCommands = &ccdAllowCommands

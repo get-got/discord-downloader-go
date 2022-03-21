@@ -959,20 +959,22 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Write
-		err = ioutil.WriteFile(completePath, bodyOfResp, 0644)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while writing file to disk \"%s\": %s", download.InputURL, err))
-			return mDownloadStatus(downloadFailedWritingFile, err)
-		}
+		if *channelConfig.Save {
+			err = ioutil.WriteFile(completePath, bodyOfResp, 0644)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.HiRedString("Error while writing file to disk \"%s\": %s", download.InputURL, err))
+				return mDownloadStatus(downloadFailedWritingFile, err)
+			}
 
-		// Change file time
-		err = os.Chtimes(completePath, download.FileTime, download.FileTime)
-		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", download.InputURL, err))
+			// Change file time
+			err = os.Chtimes(completePath, download.FileTime, download.FileTime)
+			if err != nil {
+				log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", download.InputURL, err))
+			}
+			log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
+		} else {
+			log.Println(logPrefix + color.HiGreenString("Did not save %s sent in %s#%s --- file saving disabled...", contentTypeFound, sourceName, sourceChannelName))
 		}
-
-		// Output
-		log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 
 		userID := user.ID
 		if download.Message.Author != nil {
