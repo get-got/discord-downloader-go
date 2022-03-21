@@ -204,6 +204,8 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	- Facebook Videos: Previously supported but they split mp4 into separate audio and video streams
 	*/
 
+	inputURL = strings.ReplaceAll(inputURL, "fxtwitter.com", "twitter.com")
+
 	if regexUrlTwitter.MatchString(inputURL) {
 		links, err := getTwitterUrls(inputURL)
 		if err != nil {
