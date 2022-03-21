@@ -185,8 +185,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				}
 				sinceID = ""
 				// Process Messages
-				if *channelConfig.TypeWhileProcessing && hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
-					bot.ChannelTyping(commandingMessage.ChannelID)
+				if channelConfig.TypeWhileProcessing != nil && commandingMessage != nil {
+					if *channelConfig.TypeWhileProcessing && hasPerms(commandingMessage.ChannelID, discordgo.PermissionSendMessages) {
+						bot.ChannelTyping(commandingMessage.ChannelID)
+					}
 				}
 				for _, message := range messages {
 
