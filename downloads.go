@@ -1042,6 +1042,63 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 		}
 
+		// Log Media To Channel(s)
+		var logMediaChannels []string
+		if channelConfig.SendFileToChannel != nil {
+			if *channelConfig.SendFileToChannel != "" {
+				logMediaChannels = append(logMediaChannels, *channelConfig.SendFileToChannel)
+			}
+		}
+		if channelConfig.SendFileToChannels != nil {
+			for _, logChannel := range *channelConfig.SendFileToChannels {
+				logMediaChannels = append(logMediaChannels, logChannel)
+			}
+		}
+		for _, logChannel := range logMediaChannels {
+			if logChannel != "" {
+				if hasPerms(logChannel, discordgo.PermissionSendMessages) {
+					actualFile := false
+					if channelConfig.SendFileDirectly != nil {
+						actualFile = *channelConfig.SendFileDirectly
+					}
+					// File
+					if actualFile {
+						_, err := bot.ChannelMessageSendComplex(logChannel,
+							&discordgo.MessageSend{
+								File: &discordgo.File{Name: download.Filename, Reader: bytes.NewReader(bodyOfResp)},
+							},
+						)
+						if err != nil {
+							log.Println(logPrefixErrorHere, color.HiRedString("File log message failed to send:\t%s", err))
+						}
+					} else { // Embed
+						embed := &discordgo.MessageEmbed{
+							Title: fmt.Sprintf("Downloaded: %s", download.Filename),
+							Color: getEmbedColor(logChannel),
+							Footer: &discordgo.MessageEmbedFooter{
+								IconURL: projectIcon,
+								Text:    fmt.Sprintf("%s v%s", projectName, projectVersion),
+							},
+						}
+						if contentTypeFound == "image" {
+							embed.Image = &discordgo.MessageEmbedImage{URL: download.InputURL}
+						} else if contentTypeFound == "video" {
+							embed.Video = &discordgo.MessageEmbedVideo{URL: download.InputURL}
+						} else {
+							embed.Description = fmt.Sprintf("Unsupported filetype: %s\n%s", contentTypeFound, download.InputURL)
+						}
+						_, err := bot.ChannelMessageSendComplex(logChannel,
+							&discordgo.MessageSend{Embed: embed},
+						)
+						if err != nil {
+							log.Println(logPrefixErrorHere, color.HiRedString("File log message failed to send:\t%s", err))
+						}
+					}
+				}
+			}
+		}
+
+		// Update Presence
 		if !download.HistoryCmd {
 			timeLastUpdated = time.Now()
 			if *channelConfig.UpdatePresence {

@@ -782,6 +782,17 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_orange_diamond: overwriteAutorunHistory
         * — _settings.channels[].overwriteAutorunHistory : boolean_
         * Overwrite global setting for autorunning history for all registered channels in background upon launch.
+    * :small_orange_diamond: "sendFileToChannel"
+        * — _settings.channels[].sendFileToChannel : string_
+        * Forwards/crossposts/logs downloaded files to specified channel (or channels if used as `sendFileToChannels` below). By default will send as the actual file
+    * :small_orange_diamond: "sendFileToChannels"
+        * — _settings.channels[].sendFileToChannels : list of strings_
+        * List form of `sendFileToChannel` above.
+    * :small_blue_diamond: "sendFileDirectly"
+        * — _settings.channels[].sendFileDirectly : boolean_
+        * _Default:_ `true`
+        * Sends raw file to channel(s) rather than embedded download link.
+    ---
     * :small_blue_diamond: "updatePresence"
         * — _settings.channels[].updatePresence : boolean_
         * _Default:_ `true`

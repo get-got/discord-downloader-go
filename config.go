@@ -161,11 +161,12 @@ type constStruct struct {
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
-	ccdEnabled       bool = true
-	ccdAllowCommands bool = true
-	ccdErrorMessages bool = true
-	ccdScanEdits     bool = true
-	ccdIgnoreBots    bool = false
+	ccdEnabled          bool = true
+	ccdAllowCommands    bool = true
+	ccdErrorMessages    bool = true
+	ccdScanEdits        bool = true
+	ccdIgnoreBots       bool = false
+	ccdSendFileDirectly bool = true
 	// Appearance
 	ccdUpdatePresence             bool     = true
 	ccdReactWhenDownloadedEmoji   string   = ""
@@ -194,12 +195,15 @@ type configurationChannel struct {
 	BlacklistChannelIDs *[]string `json:"blacklistChannels,omitempty"` // for server.ServerID & server.ServerIDs
 	Destination         string    `json:"destination"`                 // required
 	// Setup
-	Enabled                 *bool `json:"enabled,omitempty"`                 // optional, defaults
-	AllowCommands           *bool `json:"allowCommands,omitempty"`           // optional, defaults
-	ErrorMessages           *bool `json:"errorMessages,omitempty"`           // optional, defaults
-	ScanEdits               *bool `json:"scanEdits,omitempty"`               // optional, defaults
-	IgnoreBots              *bool `json:"ignoreBots,omitempty"`              // optional, defaults
-	OverwriteAutorunHistory *bool `json:"overwriteAutorunHistory,omitempty"` // optional
+	Enabled                 *bool     `json:"enabled,omitempty"`                 // optional, defaults
+	AllowCommands           *bool     `json:"allowCommands,omitempty"`           // optional, defaults
+	ErrorMessages           *bool     `json:"errorMessages,omitempty"`           // optional, defaults
+	ScanEdits               *bool     `json:"scanEdits,omitempty"`               // optional, defaults
+	IgnoreBots              *bool     `json:"ignoreBots,omitempty"`              // optional, defaults
+	OverwriteAutorunHistory *bool     `json:"overwriteAutorunHistory,omitempty"` // optional
+	SendFileToChannel       *string   `json:"sendFileToChannel"`                 // optional, defaults
+	SendFileToChannels      *[]string `json:"sendFileToChannels"`                // optional, defaults
+	SendFileDirectly        *bool     `json:"sendFileDirectly"`                  // optional, defaults
 	// Appearance
 	UpdatePresence             *bool     `json:"updatePresence,omitempty"`             // optional, defaults
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
@@ -688,6 +692,9 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.IgnoreBots == nil {
 		channel.IgnoreBots = &ccdIgnoreBots
+	}
+	if channel.SendFileDirectly == nil {
+		channel.SendFileDirectly = &ccdSendFileDirectly
 	}
 	// Appearance
 	if channel.UpdatePresence == nil {
