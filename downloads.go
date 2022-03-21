@@ -776,15 +776,15 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if config.FilterDuplicateImages && contentTypeFound == "image" && extension != ".gif" && extension != ".webp" {
 			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
 			if err != nil {
-				log.Println(color.HiRedString("Error converting buffer to image for hashing:\t%s", err))
+				log.Println(color.HiRedString("[FilterDuplicateImages] Error converting buffer to image for hashing:\t%s", err))
 			} else {
 				hash, _ := duplo.CreateHash(img)
 				matches := imgStore.Query(hash)
 				sort.Sort(matches)
 				for _, match := range matches {
-					/*if config.DebugOutput {
-						log.Println(color.YellowString("Similarity Score: %f", match.Score))
-					}*/
+					if config.DebugOutput {
+						log.Println(logPrefixDebugLabel("FilterDuplicateImages"), color.YellowString("Similarity score to #%d: %f", match.ID, match.Score))
+					}
 					if match.Score < config.FilterDuplicateImagesThreshold {
 						log.Println(logPrefixFileSkip, color.GreenString("Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
 						return mDownloadStatus(downloadSkippedDetectedDuplicate)
