@@ -675,6 +675,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 		}
 
+		if len(download.Filename) >= 260 {
+			download.Filename = download.Filename[:255]
+		}
+
 		extension := strings.ToLower(filepath.Ext(download.Filename))
 
 		contentType := http.DetectContentType(bodyOfResp)
