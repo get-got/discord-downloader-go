@@ -189,12 +189,12 @@ var (
 
 type configurationChannel struct {
 	// Main
-	ChannelID           string    `json:"channel,omitempty"`           // used for config.Channels
-	ChannelIDs          *[]string `json:"channels,omitempty"`          // ---> alternative to ChannelID
-	ServerID            string    `json:"server,omitempty"`            // used for config.Servers
-	ServerIDs           *[]string `json:"servers,omitempty"`           // ---> alternative to ServerID
-	BlacklistChannelIDs *[]string `json:"blacklistChannels,omitempty"` // for server.ServerID & server.ServerIDs
-	Destination         string    `json:"destination"`                 // required
+	ChannelID       string    `json:"channel,omitempty"`         // used for config.Channels
+	ChannelIDs      *[]string `json:"channels,omitempty"`        // ---> alternative to ChannelID
+	ServerID        string    `json:"server,omitempty"`          // used for config.Servers
+	ServerIDs       *[]string `json:"servers,omitempty"`         // ---> alternative to ServerID
+	ServerBlacklist *[]string `json:"serverBlacklist,omitempty"` // for server.ServerID & server.ServerIDs
+	Destination     string    `json:"destination"`               // required
 	// Setup
 	Enabled                 *bool     `json:"enabled,omitempty"`                 // optional, defaults
 	Save                    *bool     `json:"save,omitempty"`                    // optional, defaults
@@ -837,9 +837,15 @@ func isChannelRegistered(ChannelID string) bool {
 				for _, channel := range guild.Channels {
 					if ChannelID == channel.ID {
 						// Channel Blacklisting within Server
-						if item.BlacklistChannelIDs != nil {
-							if stringInSlice(ChannelID, *item.BlacklistChannelIDs) {
+						if item.ServerBlacklist != nil {
+							if stringInSlice(ChannelID, *item.ServerBlacklist) {
 								return false
+							}
+							// Categories
+							if channel.ParentID != "" {
+								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
+									return false
+								}
 							}
 						}
 						return true
@@ -855,9 +861,15 @@ func isChannelRegistered(ChannelID string) bool {
 					for _, channel := range guild.Channels {
 						if ChannelID == channel.ID {
 							// Channel Blacklisting within Servers
-							if item.BlacklistChannelIDs != nil {
-								if stringInSlice(ChannelID, *item.BlacklistChannelIDs) {
+							if item.ServerBlacklist != nil {
+								if stringInSlice(ChannelID, *item.ServerBlacklist) {
 									return false
+								}
+								// Categories
+								if channel.ParentID != "" {
+									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
+										return false
+									}
 								}
 							}
 							return true
