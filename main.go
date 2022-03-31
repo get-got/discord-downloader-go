@@ -25,26 +25,27 @@ import (
 )
 
 var (
-	bot      *discordgo.Session
-	user     *discordgo.User
-	dgr      *exrouter.Route
+	// Bot
+	bot  *discordgo.Session
+	user *discordgo.User
+	dgr  *exrouter.Route
+	// Storage
 	myDB     *db.DB
 	imgStore *duplo.Store
-	loop     chan os.Signal
-
+	// APIs
 	twitterConnected     bool
 	googleDriveConnected bool
 	googleDriveService   *drive.Service
-
-	startTime        time.Time
-	timeLastUpdated  time.Time
-	cachedDownloadID int
-
+	// Gen
+	loop                 chan os.Signal
+	startTime            time.Time
+	timeLastUpdated      time.Time
+	cachedDownloadID     int
+	configReloadLastTime time.Time
+	// Validation
 	invalidAdminChannels []string
 	invalidChannels      []string
 	invalidServers       []string
-
-	configReloadLastTime time.Time
 )
 
 func init() {
@@ -291,7 +292,7 @@ func main() {
 
 	//#endregion
 
-	// Output Done
+	// Startup Done
 	if config.DebugOutput {
 		log.Println(color.YellowString("Startup finished, took %s...", uptime()))
 	}
@@ -372,12 +373,13 @@ func main() {
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
 				updateDiscordPresence()
 			case <-ticker15s.C:
-				if time.Since(bot.LastHeartbeatAck).Seconds() > 180 {
-					log.Println(color.HiRedString("Discord seems to have lost connection, reconnecting..."))
-					log.Println(color.YellowString("Closing connections..."))
+				if time.Since(bot.LastHeartbeatAck).Seconds() > 3*60 {
+					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 3 minutes, attempting to reconnect..."))
+					log.Println(color.YellowString("Closing Discord connections..."))
 					bot.Client.CloseIdleConnections()
 					bot.CloseWithCode(1001)
-					log.Println(color.RedString("Connections closed!"))
+					bot = nil
+					log.Println(color.RedString("Discord connections closed!"))
 					log.Println(color.GreenString("Logging in..."))
 					botLogin()
 					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
