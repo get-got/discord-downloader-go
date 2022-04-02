@@ -53,14 +53,14 @@ func handleCommands() *exrouter.Route {
 					)
 					if pong != nil {
 						if selfbot {
+							bot.ChannelMessageEdit(pong.ChannelID, pong.ID, fmt.Sprintf("%s **Command — Ping**\n\n%s", mention, content))
+						} else {
 							bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 								ID:      pong.ID,
 								Channel: pong.ChannelID,
 								Content: &mention,
 								Embed:   buildEmbed(ctx.Msg.ChannelID, "Command — Ping", content),
 							})
-						} else {
-							bot.ChannelMessageEdit(ctx.Msg.ChannelID, pong.ChannelID, fmt.Sprintf("%s **Command — Ping**\n\n%s", mention, content))
 						}
 					}
 					// Log
