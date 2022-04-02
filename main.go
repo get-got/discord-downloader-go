@@ -26,9 +26,10 @@ import (
 
 var (
 	// Bot
-	bot  *discordgo.Session
-	user *discordgo.User
-	dgr  *exrouter.Route
+	bot     *discordgo.Session
+	user    *discordgo.User
+	dgr     *exrouter.Route
+	selfbot bool = false
 	// Storage
 	myDB     *db.DB
 	imgStore *duplo.Store
@@ -518,8 +519,6 @@ func botLogin() {
 		if user == nil {
 			log.Println(logPrefixDiscord, color.HiRedString("Error obtaining user details: %s", err))
 			loop <- syscall.SIGINT
-		} else {
-			log.Println(logPrefixDiscord, color.RedString("Using backup user data, hopefully it works..."))
 		}
 	} else if user == nil {
 		log.Println(logPrefixDiscord, color.HiRedString("No error encountered obtaining user details, but it's empty..."))
@@ -537,4 +536,6 @@ func botLogin() {
 			log.Println(logPrefixDiscord, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
 		}
 	}
+
+	selfbot = bot.State.User.Email != ""
 }

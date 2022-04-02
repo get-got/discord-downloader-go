@@ -280,12 +280,16 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 func replyEmbed(m *discordgo.Message, title string, description string) (*discordgo.Message, error) {
 	if m != nil {
 		if hasPerms(m.ChannelID, discordgo.PermissionSendMessages) {
-			return bot.ChannelMessageSendComplex(m.ChannelID,
-				&discordgo.MessageSend{
-					Content: m.Author.Mention(),
-					Embed:   buildEmbed(m.ChannelID, title, description),
-				},
-			)
+			if selfbot {
+				return bot.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s **%s**\n\n%s", m.Author.Mention(), title, description))
+			} else {
+				return bot.ChannelMessageSendComplex(m.ChannelID,
+					&discordgo.MessageSend{
+						Content: m.Author.Mention(),
+						Embed:   buildEmbed(m.ChannelID, title, description),
+					},
+				)
+			}
 		}
 		log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
 	}
@@ -346,7 +350,7 @@ func logStatusMessage(status logStatusType) {
 			if config.DebugOutput {
 				log.Println(logPrefixDebug, color.HiCyanString("Sending log for %s to admin channel %s", label, adminChannel.ChannelID))
 			}
-			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) {
+			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot {
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
@@ -361,7 +365,7 @@ func logErrorMessage(err string) {
 	for _, adminChannel := range config.AdminChannels {
 		if *adminChannel.LogErrors {
 			// Send
-			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) { // not confident this is the right permission
+			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot { // not confident this is the right permission
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for error to %s", adminChannel.ChannelID))
 				}

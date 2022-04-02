@@ -142,17 +142,29 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 								getGuildName(getChannelGuildID(subjectChannelID)),
 								getChannelName(subjectChannelID),
 								rangeContent, batch)
-							message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-								ID:      message.ID,
-								Channel: message.ChannelID,
-								Embed:   buildEmbed(message.ChannelID, "Command — History", content),
-							})
-							// Edit failure, so send replacement status
-							if err != nil {
-								log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", err))
-								message, err = replyEmbed(message, "Command — History", content)
+							if selfbot {
+								message, err = bot.ChannelMessageEdit(message.ChannelID, message.ID, fmt.Sprintf("**Command — History**\n\n%s", content))
+								// Edit failure, so send replacement status
 								if err != nil {
-									log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", err))
+									log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", err))
+									message, err = replyEmbed(message, "Command — History", content)
+									if err != nil {
+										log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", err))
+									}
+								}
+							} else {
+								message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+									ID:      message.ID,
+									Channel: message.ChannelID,
+									Embed:   buildEmbed(message.ChannelID, "Command — History", content),
+								})
+								// Edit failure, so send replacement status
+								if err != nil {
+									log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", err))
+									message, err = replyEmbed(message, "Command — History", content)
+									if err != nil {
+										log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", err))
+									}
 								}
 							}
 						} else {
@@ -254,17 +266,29 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						batch, rangeContent,
 						durafmt.Parse(time.Since(historyStartTime)).String(),
 					)
-					message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
-						ID:      message.ID,
-						Channel: message.ChannelID,
-						Embed:   buildEmbed(message.ChannelID, "Command — History", contentFinal),
-					})
-					// Edit failure
-					if err != nil {
-						log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", err))
-						message, err = replyEmbed(message, "Command — History", contentFinal)
+					if selfbot {
+						message, err = bot.ChannelMessageEdit(message.ChannelID, message.ID, fmt.Sprintf("**Command — History**\n\n%s", contentFinal))
+						// Edit failure
 						if err != nil {
-							log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", err))
+							log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", err))
+							message, err = replyEmbed(message, "Command — History", contentFinal)
+							if err != nil {
+								log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", err))
+							}
+						}
+					} else {
+						message, err = bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
+							ID:      message.ID,
+							Channel: message.ChannelID,
+							Embed:   buildEmbed(message.ChannelID, "Command — History", contentFinal),
+						})
+						// Edit failure
+						if err != nil {
+							log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to edit status message, sending new one:\t%s", err))
+							message, err = replyEmbed(message, "Command — History", contentFinal)
+							if err != nil {
+								log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Failed to send replacement status message:\t%s", err))
+							}
 						}
 					}
 				} else {

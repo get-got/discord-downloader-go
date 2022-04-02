@@ -448,13 +448,20 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 				}
 				// Failure Notice
 				if hasPerms(download.Message.ChannelID, discordgo.PermissionSendMessages) {
-					_, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
-						&discordgo.MessageSend{
-							Content: fmt.Sprintf("<@!%s>", download.Message.Author.ID),
-							Embed:   buildEmbed(download.Message.ChannelID, "Download Failure", content),
-						})
-					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+					if selfbot {
+						_, err := bot.ChannelMessageSend(download.Message.ChannelID, fmt.Sprintf("%s **Download Failure**\n\n%s", download.Message.Author.Mention(), content))
+						if err != nil {
+							log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+						}
+					} else {
+						_, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
+							&discordgo.MessageSend{
+								Content: fmt.Sprintf("<@!%s>", download.Message.Author.ID),
+								Embed:   buildEmbed(download.Message.ChannelID, "Download Failure", content),
+							})
+						if err != nil {
+							log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+						}
 					}
 				} else {
 					log.Println(logPrefixErrorHere, color.HiRedString(fmtBotSendPerm, download.Message.ChannelID))
