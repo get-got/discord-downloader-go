@@ -889,10 +889,12 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Subfolder Division - User Nesting
 			if *channelConfig.DivideFoldersByUser {
 				subfolderSuffix := download.Message.Author.ID
-				if download.Message.Author.Username != "" {
-					subfolderSuffix = download.Message.Author.Username + "#" + download.Message.Author.Discriminator
-					for _, key := range pathBlacklist {
-						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+				if !*channelConfig.DivideFoldersUseID {
+					if download.Message.Author.Username != "" {
+						subfolderSuffix = download.Message.Author.Username + "#" + download.Message.Author.Discriminator
+						for _, key := range pathBlacklist {
+							subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+						}
 					}
 				}
 				if subfolderSuffix != "" {
