@@ -844,11 +844,13 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if download.Message.Author != nil {
 			// Subfolder Division - Server Nesting
 			if *channelConfig.DivideFoldersByServer {
-				subfolderSuffix := ""
-				if sourceName != "" && sourceName != "UNKNOWN" {
-					subfolderSuffix = sourceName
-					for _, key := range pathBlacklist {
-						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+				subfolderSuffix := download.Message.GuildID
+				if !*channelConfig.DivideFoldersUseID {
+					if sourceName != "" && sourceName != "UNKNOWN" {
+						subfolderSuffix = sourceName
+						for _, key := range pathBlacklist {
+							subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+						}
 					}
 				}
 				if subfolderSuffix != "" {
@@ -864,11 +866,13 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 			// Subfolder Division - Channel Nesting
 			if *channelConfig.DivideFoldersByChannel {
-				subfolderSuffix := ""
-				if sourceChannelName != "" {
-					subfolderSuffix = sourceChannelName
-					for _, key := range pathBlacklist {
-						subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+				subfolderSuffix := download.Message.ChannelID
+				if !*channelConfig.DivideFoldersUseID {
+					if sourceChannelName != "" {
+						subfolderSuffix = sourceChannelName
+						for _, key := range pathBlacklist {
+							subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
+						}
 					}
 				}
 				if subfolderSuffix != "" {

@@ -179,6 +179,7 @@ var (
 	ccdDivideFoldersByChannel bool = false
 	ccdDivideFoldersByUser    bool = false
 	ccdDivideFoldersByType    bool = true
+	ccdDivideFoldersUseID     bool = false
 	ccdSaveImages             bool = true
 	ccdSaveVideos             bool = true
 	ccdSaveAudioFiles         bool = false
@@ -222,6 +223,7 @@ type configurationChannel struct {
 	DivideFoldersByChannel *bool `json:"divideFoldersByChannel,omitempty"` // optional, defaults
 	DivideFoldersByUser    *bool `json:"divideFoldersByUser,omitempty"`    // optional, defaults
 	DivideFoldersByType    *bool `json:"divideFoldersByType,omitempty"`    // optional, defaults
+	DivideFoldersUseID     *bool `json:"divideFoldersUseID,omitempty"`     // optional, defaults
 	SaveImages             *bool `json:"saveImages,omitempty"`             // optional, defaults
 	SaveVideos             *bool `json:"saveVideos,omitempty"`             // optional, defaults
 	SaveAudioFiles         *bool `json:"saveAudioFiles,omitempty"`         // optional, defaults
@@ -730,6 +732,9 @@ func channelDefault(channel *configurationChannel) {
 	}
 	if channel.DivideFoldersByType == nil {
 		channel.DivideFoldersByType = &ccdDivideFoldersByType
+	}
+	if channel.DivideFoldersUseID == nil {
+		channel.DivideFoldersUseID = &ccdDivideFoldersUseID
 	}
 	if channel.SaveImages == nil {
 		channel.SaveImages = &ccdSaveImages

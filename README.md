@@ -852,6 +852,10 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].divideFoldersByType : boolean_
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
+    * :small_blue_diamond: "divideFoldersUseID"
+        * — _settings.channels[].divideFoldersUseID : boolean_
+        * _Default:_ `false`
+        * Uses ID rather than Name for `"divideFoldersByServer"`, `"divideFoldersByChannel"`, `"divideFoldersByUser"`. I would recommend this if any servers you download from have server/channel/usernames changed frequently.
     * :small_blue_diamond: "saveImages"
         * — _settings.channels[].saveImages : boolean_
         * _Default:_ `true`
