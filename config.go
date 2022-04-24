@@ -95,7 +95,8 @@ func defaultConfiguration() configuration {
 		PresenceStatus:       cdPresenceStatus,
 		PresenceType:         cdPresenceType,
 		ReactWhenDownloaded:  cdReactWhenDownloaded,
-		FilenameDateFormat:   "2006-01-02_15-04-05 ",
+		FilenameDateFormat:   "2006-01-02_15-04-05",
+		FilenameFormat:       "{{date}} {{file}}",
 		InflateCount:         &cdInflateCount,
 		NumberFormatEuropean: false,
 	}
@@ -132,6 +133,7 @@ type configuration struct {
 	PresenceOverwriteState   *string            `json:"presenceOverwriteState,omitempty"`   // optional, unused if undefined
 	ReactWhenDownloaded      bool               `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
 	FilenameDateFormat       string             `json:"filenameDateFormat,omitempty"`       // optional, defaults
+	FilenameFormat           string             `json:"filenameFormat,omitempty"`           // optional, defaults
 	EmbedColor               *string            `json:"embedColor,omitempty"`               // optional, defaults to role if undefined, then defaults random if no role color
 	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
 	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
@@ -216,6 +218,7 @@ type configurationChannel struct {
 	TypeWhileProcessing        *bool     `json:"typeWhileProcessing,omitempty"`        // optional, defaults
 	// Overwrite Global Settings
 	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
+	OverwriteFilenameFormat     *string `json:"overwriteFilenameFormat,omitempty"`     // optional
 	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
 	// Rules for Saving

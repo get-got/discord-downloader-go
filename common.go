@@ -21,6 +21,14 @@ var (
 	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
 )
 
+func clearPath(p string) string {
+	r := p
+	for _, key := range pathBlacklist {
+		r = strings.ReplaceAll(r, key, "")
+	}
+	return r
+}
+
 func uptime() time.Duration {
 	return time.Since(startTime)
 }

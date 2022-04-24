@@ -847,10 +847,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				subfolderSuffix := download.Message.GuildID
 				if !*channelConfig.DivideFoldersUseID {
 					if sourceName != "" && sourceName != "UNKNOWN" {
-						subfolderSuffix = sourceName
-						for _, key := range pathBlacklist {
-							subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
-						}
+						subfolderSuffix = clearPath(sourceName)
 					}
 				}
 				if subfolderSuffix != "" {
@@ -869,10 +866,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				subfolderSuffix := download.Message.ChannelID
 				if !*channelConfig.DivideFoldersUseID {
 					if sourceChannelName != "" {
-						subfolderSuffix = sourceChannelName
-						for _, key := range pathBlacklist {
-							subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
-						}
+						subfolderSuffix = clearPath(sourceChannelName)
 					}
 				}
 				if subfolderSuffix != "" {
@@ -891,10 +885,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				subfolderSuffix := download.Message.Author.ID
 				if !*channelConfig.DivideFoldersUseID {
 					if download.Message.Author.Username != "" {
-						subfolderSuffix = download.Message.Author.Username + "#" + download.Message.Author.Discriminator
-						for _, key := range pathBlacklist {
-							subfolderSuffix = strings.ReplaceAll(subfolderSuffix, key, "")
-						}
+						subfolderSuffix = clearPath(download.Message.Author.Username + "#" + download.Message.Author.Discriminator)
 					}
 				}
 				if subfolderSuffix != "" {
@@ -935,23 +926,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 		}
 
-		// Format filename/path
-		filenameDateFormat := config.FilenameDateFormat
-		if channelConfig.OverwriteFilenameDateFormat != nil {
-			if *channelConfig.OverwriteFilenameDateFormat != "" {
-				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
-			}
-		}
-		messageTime := time.Now()
-		if download.Message.Timestamp != "" {
-			messageTimestamp, err := download.Message.Timestamp.Parse()
-			if err == nil {
-				messageTime = messageTimestamp
-			}
-		}
-		completePath := download.Path + subfolder + messageTime.Format(filenameDateFormat) + download.Filename
+		// Format Filename
+		completePath := download.Path + subfolder + filenameKeyReplacement(channelConfig, download)
 
-		// Check if exists
+		// Check if filepath exists
 		if _, err := os.Stat(completePath); err == nil {
 			if *channelConfig.SavePossibleDuplicates {
 				tmpPath := completePath

@@ -90,7 +90,7 @@ func getAllChannels() []string {
 
 //#region Presence
 
-func presenceKeyReplacement(input string) string {
+func dataKeyReplacement(input string) string {
 	//TODO: Case-insensitive key replacement. -- If no streamlined way to do it, convert to lower to find substring location but replace normally
 	if strings.Contains(input, "{{") && strings.Contains(input, "}}") {
 		countInt := int64(dbDownloadCount()) + *config.InflateCount
@@ -134,6 +134,52 @@ func presenceKeyReplacement(input string) string {
 	return input
 }
 
+func filenameKeyReplacement(channelConfig configurationChannel, download downloadRequestStruct) string {
+	//TODO: same as dataKeyReplacement
+
+	ret := config.FilenameFormat
+	if channelConfig.OverwriteFilenameFormat != nil {
+		if *channelConfig.OverwriteFilenameFormat != "" {
+			ret = *channelConfig.OverwriteFilenameFormat
+		}
+	}
+
+	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
+
+		// Format Filename Date
+		filenameDateFormat := config.FilenameDateFormat
+		if channelConfig.OverwriteFilenameDateFormat != nil {
+			if *channelConfig.OverwriteFilenameDateFormat != "" {
+				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
+			}
+		}
+		messageTime := time.Now()
+		if download.Message.Timestamp != "" {
+			messageTimestamp, err := download.Message.Timestamp.Parse()
+			if err == nil {
+				messageTime = messageTimestamp
+			}
+		}
+
+		keys := [][]string{
+			{"{{date}}", messageTime.Format(filenameDateFormat)},
+			{"{{filename}}", download.Filename},
+			{"{{messageID}}", download.Message.ID},
+			{"{{userID}}", download.Message.Author.ID},
+			{"{{username}}", download.Message.Author.Username},
+			{"{{channelID}}", download.Message.ChannelID},
+			{"{{serverID}}", download.Message.GuildID},
+			{"{{message}}", clearPath(download.Message.Content)},
+		}
+		for _, key := range keys {
+			if strings.Contains(ret, key[0]) {
+				ret = strings.ReplaceAll(ret, key[0], key[1])
+			}
+		}
+	}
+	return ret
+}
+
 func updateDiscordPresence() {
 	if config.PresenceEnabled {
 		// Vars
@@ -152,21 +198,21 @@ func updateDiscordPresence() {
 		if config.PresenceOverwrite != nil {
 			status = *config.PresenceOverwrite
 			if status != "" {
-				status = presenceKeyReplacement(status)
+				status = dataKeyReplacement(status)
 			}
 		}
 		// Overwrite Details
 		if config.PresenceOverwriteDetails != nil {
 			statusDetails = *config.PresenceOverwriteDetails
 			if statusDetails != "" {
-				statusDetails = presenceKeyReplacement(statusDetails)
+				statusDetails = dataKeyReplacement(statusDetails)
 			}
 		}
 		// Overwrite State
 		if config.PresenceOverwriteState != nil {
 			statusState = *config.PresenceOverwriteState
 			if statusState != "" {
-				statusState = presenceKeyReplacement(statusState)
+				statusState = dataKeyReplacement(statusState)
 			}
 		}
 
