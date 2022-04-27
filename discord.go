@@ -163,7 +163,7 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
-			{"{{filename}}", download.Filename},
+			{"{{file}}", download.Filename},
 			{"{{messageID}}", download.Message.ID},
 			{"{{userID}}", download.Message.Author.ID},
 			{"{{username}}", download.Message.Author.Username},
