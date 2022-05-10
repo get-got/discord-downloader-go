@@ -794,9 +794,6 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				matches := imgStore.Query(hash)
 				sort.Sort(matches)
 				for _, match := range matches {
-					if config.DebugOutput {
-						log.Println(logPrefixDebugLabel("FilterDuplicateImages"), color.YellowString("Similarity score to #%d: %f", match.ID, match.Score))
-					}
 					if match.Score < config.FilterDuplicateImagesThreshold {
 						log.Println(logPrefixFileSkip, color.GreenString("Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
 						return mDownloadStatus(downloadSkippedDetectedDuplicate)
