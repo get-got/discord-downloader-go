@@ -250,24 +250,36 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			}
 
 			if channelConfig.Filters.BlockedRoles != nil {
-				for _, role := range m.Member.Roles {
-					if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
-						shouldAbort = true
-						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedRoles caught %s, planning to abort...", role))
+				member := m.Member
+				if member == nil {
+					member, _ = bot.GuildMember(m.GuildID, m.Author.ID)
+				}
+				if member != nil {
+					for _, role := range member.Roles {
+						if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
+							shouldAbort = true
+							if config.DebugOutput {
+								log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedRoles caught %s, planning to abort...", role))
+							}
+							break
 						}
-						break
 					}
 				}
 			}
 			if channelConfig.Filters.AllowedRoles != nil {
-				for _, role := range m.Member.Roles {
-					if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
-						shouldAbort = false
-						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedRoles caught %s, planning to allow...", role))
+				member := m.Member
+				if member == nil {
+					member, _ = bot.GuildMember(m.GuildID, m.Author.ID)
+				}
+				if member != nil {
+					for _, role := range member.Roles {
+						if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
+							shouldAbort = false
+							if config.DebugOutput {
+								log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedRoles caught %s, planning to allow...", role))
+							}
+							break
 						}
-						break
 					}
 				}
 			}
