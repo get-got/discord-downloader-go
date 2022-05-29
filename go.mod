@@ -29,3 +29,7 @@ require (
 	gopkg.in/ini.v1 v1.62.0
 	mvdan.cc/xurls/v2 v2.2.0
 )
+
+replace (
+    github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.1
+)
