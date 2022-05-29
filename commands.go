@@ -282,7 +282,7 @@ func handleCommands() *exrouter.Route {
 			// Registered check
 			if isCommandableChannel(ctx.Msg) {
 				// Permission check
-				if isBotAdmin(ctx.Msg) || isLocalAdmin(ctx.Msg) {
+				if isBotAdmin(ctx.Msg) {
 					// Run
 					if !stop {
 						_, historyCommandIsSet := historyStatus[channel]
