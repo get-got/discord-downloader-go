@@ -374,7 +374,20 @@ func main() {
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
 				updateDiscordPresence()
 			case <-ticker15s.C:
-				if time.Since(bot.LastHeartbeatAck).Seconds() > 3*60 {
+				gate, err := bot.Gateway()
+				if err != nil || gate == "" {
+					log.Println(color.HiYellowString("Bot encountered a gateway error: GATEWAY: %s,\tERR: %s", gate, err))
+					log.Println(color.YellowString("Closing Discord connections..."))
+					bot.Client.CloseIdleConnections()
+					bot.CloseWithCode(1001)
+					bot = nil
+					log.Println(color.RedString("Discord connections closed!"))
+					log.Println(color.GreenString("Logging in..."))
+					botLogin()
+					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
+					// Log Status
+					logStatusMessage(logStatusReconnect)
+				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 3*60 {
 					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 3 minutes, attempting to reconnect..."))
 					log.Println(color.YellowString("Closing Discord connections..."))
 					bot.Client.CloseIdleConnections()

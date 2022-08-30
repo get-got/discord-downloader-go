@@ -206,8 +206,8 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 
 	inputURL = strings.ReplaceAll(inputURL, "mobile.twitter", "twitter")
 	inputURL = strings.ReplaceAll(inputURL, "fxtwitter.com", "twitter.com")
-	inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, "c.vxtwitter.com", "twitter.com")
+	inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
 
 	if regexUrlTwitter.MatchString(inputURL) {
 		links, err := getTwitterUrls(inputURL)
