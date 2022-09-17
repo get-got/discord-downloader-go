@@ -162,7 +162,7 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			}
 		}
 
-		nanoUid, err := nanoid.New()
+		nanoId, err := nanoid.New()
 		if err != nil {
 			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoid %s", err))
 		}
@@ -176,7 +176,7 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			{"{{channelID}}", download.Message.ChannelID},
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{message}}", clearPath(download.Message.Content)},
-			{"{{nanoUid}}", nanoUid},
+			{"{{nanoId}}", nanoId},
 		}
 		for _, key := range keys {
 			if strings.Contains(ret, key[0]) {
