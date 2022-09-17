@@ -294,6 +294,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "presenceStatus": "dnd",
     "presenceType": 3,
     "presenceOverwrite": "{{count}} files",
+    "filenameFormat": "{{date}} {{file}}",
     "filenameDateFormat": "2006.01.02-15.04.05 ",
     "embedColor": "#EE22CC",
     "inflateCount": 12345,
@@ -408,6 +409,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "presenceOverwrite": "{{count}} things",
     "presenceOverwriteDetails": "these are my details",
     "presenceOverwriteState": "this is my state",
+    "filenameFormat": "{{date}} {{file}}",
     "filenameDateFormat": "2006.01.02_15.04.05_",
     "embedColor": "#FF0000",
     "inflateCount": 69,
@@ -705,6 +707,10 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Default:_ `true`
         * Confirmation reaction that file(s) successfully downloaded. Is overwritten by the channel/server equivelant of this setting.
 ---
+* :small_blue_diamond: "filenameFormat"
+    * — _settings.filenameFormat : string_
+    * _Default:_ `"{{date}} {{file}}"`
+    * `"{{date}}"`, `"{{file}}"`, `"{{messageID}}"`, `"{{userID}}"`, `"{{username}}"`, `"{{channelID}}"`, `"{{serverID}}"`, `"{{message}}"`, `"{{fileType}}"`
 * :small_blue_diamond: "filenameDateFormat"
     * — _settings.filenameDateFormat : string_
     * _Default:_ `"2006-01-02_15-04-05 "`
