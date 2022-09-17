@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/AvraamMavridis/randomcolor"
+	"github.com/aidarkhanov/nanoid/v2"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
@@ -161,6 +162,11 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			}
 		}
 
+		nanoUid, err := nanoid.New()
+		if err != nil {
+			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoid %s", err))
+		}
+
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
@@ -170,6 +176,7 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			{"{{channelID}}", download.Message.ChannelID},
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{message}}", clearPath(download.Message.Content)},
+			{"{{nanoUid}}", nanoUid},
 		}
 		for _, key := range keys {
 			if strings.Contains(ret, key[0]) {
