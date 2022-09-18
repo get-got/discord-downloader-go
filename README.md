@@ -140,7 +140,7 @@ You can either create a `settings.json` following the examples & variables liste
 
 #### NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED!
 * Go to the Discord Application management page, choose your application, go to the `Bot` category, and ensure `Message Content Intent` is enabled.
-* 
+
 <img src="https://i.imgur.com/2GcyA2B.png"/>
 
 ### How to Find Discord IDs...
