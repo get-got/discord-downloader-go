@@ -550,5 +550,7 @@ func botLogin() {
 		}
 	}
 
-	selfbot = bot.State.User.Email != ""
+	if bot.State.User != nil {
+		selfbot = bot.State.User.Email != ""
+	}
 }
