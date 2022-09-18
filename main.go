@@ -80,6 +80,8 @@ func main() {
 		}
 	}
 
+	log.Println(logPrefixInfo, color.HiCyanString("** Need help? Discord: https://discord.gg/6Z6FJZVaDV **"))
+
 	//#region Database/Cache Initialization
 
 	// Database
