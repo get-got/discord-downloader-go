@@ -96,7 +96,7 @@ func defaultConfiguration() configuration {
 		PresenceType:         cdPresenceType,
 		ReactWhenDownloaded:  cdReactWhenDownloaded,
 		FilenameDateFormat:   "2006-01-02_15-04-05",
-		FilenameFormat:       "{{date}} {{file}}",
+		FilenameFormat:       "{{date}} {{shortID}} {{file}}",
 		InflateCount:         &cdInflateCount,
 		NumberFormatEuropean: false,
 	}

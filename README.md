@@ -710,7 +710,7 @@ This setup exempts many options so they will use default values _(see below)_. I
 * :small_blue_diamond: "filenameFormat"
     * — _settings.filenameFormat : string_
     * _Default:_ `"{{date}} {{file}}"`
-    * `"{{date}}"`, `"{{file}}"`, `"{{messageID}}"`, `"{{userID}}"`, `"{{username}}"`, `"{{channelID}}"`, `"{{serverID}}"`, `"{{message}}"`, `"{{fileType}}"`
+    * `"{{date}}"`, `"{{file}}"`, `"{{messageID}}"`, `"{{userID}}"`, `"{{username}}"`, `"{{channelID}}"`, `"{{serverID}}"`, `"{{message}}"`, `"{{fileType}}"`, `"{{nanoID}}"`, `"{{shortID}}"`
 * :small_blue_diamond: "filenameDateFormat"
     * — _settings.filenameDateFormat : string_
     * _Default:_ `"2006-01-02_15-04-05 "`
