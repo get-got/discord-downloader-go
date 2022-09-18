@@ -415,6 +415,7 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 type downloadRequestStruct struct {
 	InputURL       string
 	Filename       string
+	FileExtension  string
 	Path           string
 	Message        *discordgo.Message
 	FileTime       time.Time
@@ -689,6 +690,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		extension := strings.ToLower(filepath.Ext(download.Filename))
+		download.FileExtension = extension
 
 		contentType := http.DetectContentType(bodyOfResp)
 		contentTypeParts := strings.Split(contentType, "/")
@@ -744,6 +746,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			possibleExtension, _ := mime.ExtensionsByType(contentType)
 			if len(possibleExtension) > 0 {
 				download.Filename += possibleExtension[0]
+				download.FileExtension = possibleExtension[0]
 			}
 		}
 
