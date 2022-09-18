@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/AvraamMavridis/randomcolor"
+	"github.com/aidarkhanov/nanoid/v2"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"github.com/teris-io/shortid"
 )
 
 const (
@@ -161,6 +163,16 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			}
 		}
 
+		shortId, err := shortid.Generate()
+		if err != nil {
+			log.Println(logPrefixDebug, color.HiCyanString("Error when generating a shortId %s", err))
+		}
+
+		nanoId, err := nanoid.New()
+		if err != nil {
+			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoid %s", err))
+		}
+
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
@@ -171,6 +183,8 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			{"{{channelID}}", download.Message.ChannelID},
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{message}}", clearPath(download.Message.Content)},
+			{"{{nanoId}}", nanoId},
+			{"{{shortId}}", shortId},
 		}
 		for _, key := range keys {
 			if strings.Contains(ret, key[0]) {
