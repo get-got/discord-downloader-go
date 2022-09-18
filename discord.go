@@ -163,14 +163,14 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			}
 		}
 
-		shortId, err := shortid.Generate()
-		if err != nil {
-			log.Println(logPrefixDebug, color.HiCyanString("Error when generating a shortId %s", err))
+		shortID, err := shortid.Generate()
+		if err != nil && config.DebugOutput {
+			log.Println(logPrefixDebug, color.HiCyanString("Error when generating a shortID %s", err))
 		}
 
-		nanoId, err := nanoid.New()
-		if err != nil {
-			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoid %s", err))
+		nanoID, err := nanoid.New()
+		if err != nil && config.DebugOutput {
+			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoID %s", err))
 		}
 
 		keys := [][]string{
@@ -183,8 +183,8 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			{"{{channelID}}", download.Message.ChannelID},
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{message}}", clearPath(download.Message.Content)},
-			{"{{nanoId}}", nanoId},
-			{"{{shortId}}", shortId},
+			{"{{nanoID}}", nanoID},
+			{"{{shortID}}", shortID},
 		}
 		for _, key := range keys {
 			if strings.Contains(ret, key[0]) {
