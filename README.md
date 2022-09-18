@@ -138,6 +138,11 @@ You can either create a `settings.json` following the examples & variables liste
 * In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
 * In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
 
+#### NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED!
+* Go to the Discord Application management page, choose your application, go to the `Bot` category, and ensure `Message Content Intent` is enabled.
+* 
+<img src="https://i.imgur.com/2GcyA2B.png"/>
+
 ### How to Find Discord IDs...
 * ***Use the info command!***
 * **Discord Developer Mode:** Enable `Developer Mode` in Discord settings under `Appearance`.
