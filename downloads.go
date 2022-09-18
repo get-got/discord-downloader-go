@@ -370,12 +370,8 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	// Try without queries
 	parsedURL, err := url.Parse(inputURL)
 	if err == nil {
-		if strings.Contains(parsedURL.String(), "?format=png") {
-			parsedURL.RawQuery = "format=png"
-		} else if strings.Contains(parsedURL.String(), "?format=gif") {
-			parsedURL.RawQuery = "format=gif"
-		} else if strings.Contains(parsedURL.String(), "?format=mp4") {
-			parsedURL.RawQuery = "format=mp4"
+		if strings.Contains(parsedURL.String(), "format=") {
+			parsedURL.RawQuery = "format=" + parsedURL.Query().Get("format")
 		} else {
 			parsedURL.RawQuery = ""
 		}
