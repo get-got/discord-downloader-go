@@ -715,7 +715,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 * :small_blue_diamond: "filenameFormat"
     * — _settings.filenameFormat : string_
     * _Default:_ `"{{date}} {{file}}"`
-    * `"{{date}}"`, `"{{file}}"`, `"{{messageID}}"`, `"{{userID}}"`, `"{{username}}"`, `"{{channelID}}"`, `"{{serverID}}"`, `"{{message}}"`, `"{{fileType}}"`
+    * `"{{date}}"`, `"{{file}}"`, `"{{messageID}}"`, `"{{userID}}"`, `"{{username}}"`, `"{{channelID}}"`, `"{{serverID}}"`, `"{{message}}"`, `"{{fileType}}"`, `"{{nanoID}}"`, `"{{shortID}}"`
+    * `"{{nanoID}}"` is a 21 character unique string, eg: i25_rX9zwDdDn7Sg-ZoaH
+    * `"{{shortID}}"` is a short unique string, eg: NVovc6-QQy
 * :small_blue_diamond: "filenameDateFormat"
     * — _settings.filenameDateFormat : string_
     * _Default:_ `"2006-01-02_15-04-05 "`
