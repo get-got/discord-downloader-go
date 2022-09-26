@@ -83,6 +83,8 @@ func defaultConfiguration() configuration {
 		CheckPermissions:               cdCheckPermissions,
 		AllowGlobalCommands:            cdAllowGlobalCommands,
 		AutorunHistory:                 false,
+		AutorunHistoryBefore:           false,
+		AutorunHistorySince:            false,
 		AsynchronousHistory:            false,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
@@ -117,6 +119,8 @@ type configuration struct {
 	CheckPermissions               bool                        `json:"checkPermissions,omitempty"`               // optional, defaults
 	AllowGlobalCommands            bool                        `json:"allowGlobalCommmands,omitempty"`           // optional, defaults
 	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults
+	AutorunHistoryBefore           string                      `json:"autorunHistoryBefore,omitempty"`           // optional
+	AutorunHistorySince            string                      `json:"autorunHistorySince,omitempty"`            // optional
 	AsynchronousHistory            bool                        `json:"asyncHistory,omitempty"`                   // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
@@ -199,16 +203,18 @@ type configurationChannel struct {
 	ServerBlacklist *[]string `json:"serverBlacklist,omitempty"` // for server.ServerID & server.ServerIDs
 	Destination     string    `json:"destination"`               // required
 	// Setup
-	Enabled                 *bool     `json:"enabled,omitempty"`                 // optional, defaults
-	Save                    *bool     `json:"save,omitempty"`                    // optional, defaults
-	AllowCommands           *bool     `json:"allowCommands,omitempty"`           // optional, defaults
-	ErrorMessages           *bool     `json:"errorMessages,omitempty"`           // optional, defaults
-	ScanEdits               *bool     `json:"scanEdits,omitempty"`               // optional, defaults
-	IgnoreBots              *bool     `json:"ignoreBots,omitempty"`              // optional, defaults
-	OverwriteAutorunHistory *bool     `json:"overwriteAutorunHistory,omitempty"` // optional
-	SendFileToChannel       *string   `json:"sendFileToChannel"`                 // optional, defaults
-	SendFileToChannels      *[]string `json:"sendFileToChannels"`                // optional, defaults
-	SendFileDirectly        *bool     `json:"sendFileDirectly"`                  // optional, defaults
+	Enabled                       *bool     `json:"enabled,omitempty"`                       // optional, defaults
+	Save                          *bool     `json:"save,omitempty"`                          // optional, defaults
+	AllowCommands                 *bool     `json:"allowCommands,omitempty"`                 // optional, defaults
+	ErrorMessages                 *bool     `json:"errorMessages,omitempty"`                 // optional, defaults
+	ScanEdits                     *bool     `json:"scanEdits,omitempty"`                     // optional, defaults
+	IgnoreBots                    *bool     `json:"ignoreBots,omitempty"`                    // optional, defaults
+	OverwriteAutorunHistory       *bool     `json:"overwriteAutorunHistory,omitempty"`       // optional
+	OverwriteAutorunHistoryBefore *string   `json:"overwriteAutorunHistoryBefore,omitempty"` // optional
+	OverwriteAutorunHistorySince  *string   `json:"overwriteAutorunHistorySince,omitempty"`  // optional
+	SendFileToChannel             *string   `json:"sendFileToChannel"`                       // optional, defaults
+	SendFileToChannels            *[]string `json:"sendFileToChannels"`                      // optional, defaults
+	SendFileDirectly              *bool     `json:"sendFileDirectly"`                        // optional, defaults
 	// Appearance
 	UpdatePresence             *bool     `json:"updatePresence,omitempty"`             // optional, defaults
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults

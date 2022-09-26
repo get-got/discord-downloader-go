@@ -407,25 +407,42 @@ func main() {
 	}()
 
 	// Compile list of channels to autorun history
-	var autorunHistoryChannels []string
+	type arh struct{ channel, before, since string }
+	var autorunHistoryChannels []arh
 	for _, channel := range getAllChannels() {
 		channelConfig := getChannelConfig(channel)
 		if channelConfig.OverwriteAutorunHistory != nil {
 			if *channelConfig.OverwriteAutorunHistory {
-				autorunHistoryChannels = append(autorunHistoryChannels, channel)
+				var autorunHistoryChannel arh
+				autorunHistoryChannel.channel = channel
+				if channelConfig.OverwriteAutorunHistoryBefore != nil {
+					autorunHistoryChannel.before = *channelConfig.OverwriteAutorunHistoryBefore
+				}
+				if channelConfig.OverwriteAutorunHistorySince != nil {
+					autorunHistoryChannel.since = *channelConfig.OverwriteAutorunHistorySince
+				}
+				autorunHistoryChannels = append(autorunHistoryChannels, autorunHistoryChannel)
 			}
 			continue
 		}
 		if config.AutorunHistory {
-			autorunHistoryChannels = append(autorunHistoryChannels, channel)
+			var autorunHistoryChannel arh
+			autorunHistoryChannel.channel = channel
+			if config.AutorunHistoryBefore != "" {
+				autorunHistoryChannel.before = config.AutorunHistoryBefore
+			}
+			if config.AutorunHistorySince != "" {
+				autorunHistoryChannel.since = config.AutorunHistorySince
+			}
+			autorunHistoryChannels = append(autorunHistoryChannels, autorunHistoryChannel)
 		}
 	}
 	// Process autorun history
-	for _, channel := range autorunHistoryChannels {
+	for _, arh := range autorunHistoryChannels {
 		if config.AsynchronousHistory {
-			go handleHistory(nil, channel, "", "")
+			go handleHistory(nil, arh.channel, arh.before, arh.since)
 		} else {
-			handleHistory(nil, channel, "", "")
+			handleHistory(nil, arh.channel, arh.before, arh.since)
 		}
 	}
 	if len(autorunHistoryChannels) > 0 {

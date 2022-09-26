@@ -401,6 +401,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     "checkPermissions": false,
     "allowGlobalCommands": false,
     "autorunHistory": true,
+    "autorunHistoryBefore": "2022-02-05",
+    "autorunHistorySince": "2020-02-05",
     "asyncHistory": false,
     "downloadRetryMax": 5,
     "downloadTimeout": 120,
@@ -426,6 +428,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         "scanEdits": true,
         "ignoreBots": false,
         "overwriteAutorunHistory": false,
+        "overwriteAutorunHistoryBefore": "2022-02-05",
+        "overwriteAutorunHistorySince": "2020-02-05",
         "updatePresence": false,
         "reactWhenDownloaded": false,
         "typeWhileProcessing": false,
@@ -646,6 +650,12 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.autorunHistory : boolean_
     * Autorun history for all registered channels in background upon launch.
     * _This can take anywhere between 2 minutes and 2 hours. It depends on how many channels your bot monitors and how many messages it has to go through. It can help to disable it by-channel for channels that don't require it (see `overwriteAutorunHistory` in channel options)._
+* :small_orange_diamond: "autorunHistoryBefore"
+    * — _settings.autorunHistoryBefore : string_
+    * Date filter for `autorunHistory`
+* :small_orange_diamond: "autorunHistorySince"
+    * — _settings.autorunHistorySince : string_
+    * Date filter for `autorunHistory`
 * :small_orange_diamond: "asyncHistory"
     * — _settings.asyncHistory : boolean_
     * Runs history commands simultaneously rather than one after the other.
@@ -799,6 +809,12 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_orange_diamond: overwriteAutorunHistory
         * — _settings.channels[].overwriteAutorunHistory : boolean_
         * Overwrite global setting for autorunning history for all registered channels in background upon launch.
+    * :small_orange_diamond: overwriteAutorunHistoryBefore
+        * — _settings.channels[].overwriteAutorunHistoryBefore : string_
+        * Date filter for `overwriteAutorunHistory`
+    * :small_orange_diamond: overwriteAutorunHistorySince
+        * — _settings.channels[].overwriteAutorunHistorySince : string_
+        * Date filter for `overwriteAutorunHistory`
     * :small_orange_diamond: "sendFileToChannel"
         * — _settings.channels[].sendFileToChannel : string_
         * Forwards/crossposts/logs downloaded files to specified channel (or channels if used as `sendFileToChannels` below). By default will send as the actual file
