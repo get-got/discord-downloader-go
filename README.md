@@ -15,11 +15,11 @@
     <a href="https://github.com/get-got/discord-downloader-go/releases" alt="All Releases">
         <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/total?label=all-releases&logo=GitHub" />
     </a>
-    <a href="https://github.com/get-got/discord-downloader-go/releases/latest" alt="Latest Release">
-        <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub" />
-    </a>
     <a href="https://hub.docker.com/r/getgot/discord-downloader-go" alt="Docker Pulls">
         <img src="https://img.shields.io/docker/pulls/getgot/discord-downloader-go?label=docker-pulls&logo=Docker" />
+    </a>
+    <a href="https://github.com/get-got/discord-downloader-go/releases/latest" alt="Latest Release">
+        <img src="https://img.shields.io/github/downloads/get-got/discord-downloader-go/latest/total?label=latest-release&logo=GitHub" />
     </a>
     <br>
     <a href="https://discord.gg/6Z6FJZVaDV">
