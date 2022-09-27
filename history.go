@@ -303,7 +303,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		log.Println(logPrefixHistory, color.HiCyanString(logPrefix+"Finished history, %s files", formatNumber(d)))
 
 		// Delete Cache File
-		if historyCachePath != "" {
+		/*if historyCachePath != "" {
 			filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
 			if _, err := os.Stat(filepath); err == nil {
 				err = os.Remove(filepath)
@@ -313,7 +313,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					log.Println(logPrefixDebug, logPrefixHistory, color.YellowString(logPrefix+"Deleted cache file."))
 				}
 			}
-		}
+		}*/
 
 	}
 
