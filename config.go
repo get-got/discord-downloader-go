@@ -86,6 +86,7 @@ func defaultConfiguration() configuration {
 		AutorunHistoryBefore:           "",
 		AutorunHistorySince:            "",
 		AsynchronousHistory:            false,
+		ExitOnBadConnection:            false,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
@@ -122,6 +123,7 @@ type configuration struct {
 	AutorunHistoryBefore           string                      `json:"autorunHistoryBefore,omitempty"`           // optional
 	AutorunHistorySince            string                      `json:"autorunHistorySince,omitempty"`            // optional
 	AsynchronousHistory            bool                        `json:"asyncHistory,omitempty"`                   // optional, defaults
+	ExitOnBadConnection            bool                        `json:"exitOnBadConnection,omitempty"`            // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
 	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults

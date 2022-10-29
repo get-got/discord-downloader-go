@@ -384,11 +384,15 @@ func main() {
 					bot.CloseWithCode(1001)
 					bot = nil
 					log.Println(color.RedString("Discord connections closed!"))
-					log.Println(color.GreenString("Logging in..."))
-					botLogin()
-					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
-					// Log Status
-					logStatusMessage(logStatusReconnect)
+					if config.ExitOnBadConnection {
+						properExit()
+					} else {
+						log.Println(color.GreenString("Logging in..."))
+						botLogin()
+						log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
+						// Log Status
+						logStatusMessage(logStatusReconnect)
+					}
 				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 3*60 {
 					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 3 minutes, attempting to reconnect..."))
 					log.Println(color.YellowString("Closing Discord connections..."))
@@ -396,11 +400,15 @@ func main() {
 					bot.CloseWithCode(1001)
 					bot = nil
 					log.Println(color.RedString("Discord connections closed!"))
-					log.Println(color.GreenString("Logging in..."))
-					botLogin()
-					log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
-					// Log Status
-					logStatusMessage(logStatusReconnect)
+					if config.ExitOnBadConnection {
+						properExit()
+					} else {
+						log.Println(color.GreenString("Logging in..."))
+						botLogin()
+						log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
+						// Log Status
+						logStatusMessage(logStatusReconnect)
+					}
 				}
 			}
 		}

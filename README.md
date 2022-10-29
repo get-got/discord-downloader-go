@@ -663,6 +663,9 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.asyncHistory : boolean_
     * Runs history commands simultaneously rather than one after the other.
       * **WARNING!!! May result in Discord API Rate Limiting with many channels**, difficulty troubleshooting, exploding CPUs, melted RAM.
+* :small_orange_diamond: "exitOnBadConnection"
+    * — _settings.exitOnBadConnection : boolean_
+    * Exits the program upon detecting a connection issue rather than attempting to reconnect.
 * :small_blue_diamond: "downloadRetryMax"
     * — _settings.downloadRetryMax : number_
     * _Default:_ `3`
