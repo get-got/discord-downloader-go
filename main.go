@@ -394,7 +394,7 @@ func main() {
 						logStatusMessage(logStatusReconnect)
 					}
 				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 3*60 {
-					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 3 minutes, attempting to reconnect..."))
+					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 3 minutes..."))
 					log.Println(color.YellowString("Closing Discord connections..."))
 					bot.Client.CloseIdleConnections()
 					bot.CloseWithCode(1001)
