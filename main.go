@@ -448,9 +448,9 @@ func main() {
 	// Process autorun history
 	for _, arh := range autorunHistoryChannels {
 		if config.AsynchronousHistory {
-			go handleHistory(nil, arh.channel, arh.before, arh.since)
+			go handleHistory(nil, arh.channel, dateLocalToUTC(arh.before), dateLocalToUTC(arh.since))
 		} else {
-			handleHistory(nil, arh.channel, arh.before, arh.since)
+			handleHistory(nil, arh.channel, dateLocalToUTC(arh.before), dateLocalToUTC(arh.since))
 		}
 	}
 	if len(autorunHistoryChannels) > 0 {

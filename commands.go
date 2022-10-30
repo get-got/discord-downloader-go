@@ -220,7 +220,7 @@ func handleCommands() *exrouter.Route {
 			if strings.Contains(strings.ToLower(v), beforeKey) {
 				before = strings.ReplaceAll(strings.ToLower(v), beforeKey, "")
 				if isDate(before) {
-					beforeID = discordTimestampToSnowflake("2006-01-02", before)
+					beforeID = discordTimestampToSnowflake("2006-01-02", dateLocalToUTC(before))
 				} else if isNumeric(before) {
 					beforeID = before
 				}
@@ -230,7 +230,7 @@ func handleCommands() *exrouter.Route {
 			} else if strings.Contains(strings.ToLower(v), sinceKey) {
 				since = strings.ReplaceAll(strings.ToLower(v), sinceKey, "")
 				if isDate(since) {
-					sinceID = discordTimestampToSnowflake("2006-01-02", since)
+					sinceID = discordTimestampToSnowflake("2006-01-02", dateLocalToUTC(since))
 				} else if isNumeric(since) {
 					sinceID = since
 				}
