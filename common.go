@@ -235,9 +235,9 @@ func dateLocalToUTC(s string) string {
 	if s == "" || !isDate(s) {
 		return ""
 	}
-	localDate, _ := time.Parse("2006-01-02", s)
-	utcDate := time.Date(localDate.Year(), localDate.Month(), localDate.Day(), 0, 0, 0, 0, time.Local)
-	return fmt.Sprintf("%s-%s-%s", utcDate.In(time.UTC).Year(), utcDate.In(time.UTC).Month(), utcDate.In(time.UTC).Day())
+	rawDate, _ := time.Parse("2006-01-02", s)
+	localDate := time.Date(rawDate.Year(), rawDate.Month(), rawDate.Day(), 0, 0, 0, 0, time.Local)
+	return fmt.Sprintf("%s-%s-%s", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
 }
 
 //#endregion
