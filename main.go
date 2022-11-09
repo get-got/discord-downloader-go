@@ -148,152 +148,10 @@ func main() {
 		return
 	}
 
-	// Twitter API
-	if config.Credentials.TwitterAccessToken != "" &&
-		config.Credentials.TwitterAccessTokenSecret != "" &&
-		config.Credentials.TwitterConsumerKey != "" &&
-		config.Credentials.TwitterConsumerSecret != "" {
-
-		log.Println(logPrefixTwitter, color.MagentaString("Connecting to API..."))
-
-		twitterClient = anaconda.NewTwitterApiWithCredentials(
-			config.Credentials.TwitterAccessToken,
-			config.Credentials.TwitterAccessTokenSecret,
-			config.Credentials.TwitterConsumerKey,
-			config.Credentials.TwitterConsumerSecret,
-		)
-
-		twitterSelf, err := twitterClient.GetSelf(url.Values{})
-		if err != nil {
-			log.Println(logPrefixTwitter, color.HiRedString("API Login Error: %s", err.Error()))
-			log.Println(logPrefixTwitter, color.MagentaString("Error encountered while connecting to API, the bot won't use the Twitter API."))
-		} else {
-			log.Println(logPrefixTwitter, color.HiMagentaString("Connected to API @%s", twitterSelf.ScreenName))
-			twitterConnected = true
-		}
-	} else {
-		log.Println(logPrefixTwitter, color.MagentaString("API credentials missing, the bot won't use the Twitter API."))
-	}
-
-	// Google Drive Client
-	if config.Credentials.GoogleDriveCredentialsJSON != "" {
-		log.Println(logPrefixGoogleDrive, color.MagentaString("Connecting..."))
-		ctx := context.Background()
-		authJson, err := ioutil.ReadFile(config.Credentials.GoogleDriveCredentialsJSON)
-		if err != nil {
-			log.Println(logPrefixGoogleDrive, color.HiRedString("Error opening Google Credentials JSON:\t%s", err))
-		} else {
-			googleConfig, err := google.JWTConfigFromJSON(authJson, drive.DriveReadonlyScope)
-			if err != nil {
-				log.Println(logPrefixGoogleDrive, color.HiRedString("Error parsing Google Credentials JSON:\t%s", err))
-			} else {
-				client := googleConfig.Client(ctx)
-				googleDriveService, err = drive.New(client)
-				if err != nil {
-					log.Println(logPrefixGoogleDrive, color.HiRedString("Error setting up client:\t%s", err))
-				} else {
-					log.Println(logPrefixGoogleDrive, color.HiMagentaString("Connected!"))
-					googleDriveConnected = true
-				}
-			}
-		}
-	}
-
 	//#endregion
 
 	//#region Discord Initialization
 	botLogin()
-
-	// Event Handlers
-	dgr = handleCommands()
-	bot.AddHandler(messageCreate)
-	bot.AddHandler(messageUpdate)
-
-	// Source Validation
-	if config.DebugOutput {
-		log.Println(logPrefixDebugLabel("Validation"), color.HiYellowString("Validating configured channels/servers..."))
-	}
-	//-
-	if config.AdminChannels != nil {
-		for _, adminChannel := range config.AdminChannels {
-			if adminChannel.ChannelIDs != nil {
-				for _, subchannel := range *adminChannel.ChannelIDs {
-					_, err := bot.State.Channel(subchannel)
-					if err != nil {
-						invalidAdminChannels = append(invalidAdminChannels, subchannel)
-						log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access admin subchannel %s...\t%s", subchannel, err))
-					}
-				}
-
-			} else {
-				_, err := bot.State.Channel(adminChannel.ChannelID)
-				if err != nil {
-					invalidAdminChannels = append(invalidAdminChannels, adminChannel.ChannelID)
-					log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access admin channel %s...\t%s", adminChannel.ChannelID, err))
-				}
-			}
-		}
-	}
-	//-
-	for _, server := range config.Servers {
-		if server.ServerIDs != nil {
-			for _, subserver := range *server.ServerIDs {
-				_, err := bot.State.Guild(subserver)
-				if err != nil {
-					invalidServers = append(invalidServers, subserver)
-					log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access subserver %s...\t%s", subserver, err))
-				}
-			}
-		} else {
-			_, err := bot.State.Guild(server.ServerID)
-			if err != nil {
-				invalidServers = append(invalidServers, server.ServerID)
-				log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access server %s...\t%s", server.ServerID, err))
-			}
-		}
-	}
-	for _, channel := range config.Channels {
-		if channel.ChannelIDs != nil {
-			for _, subchannel := range *channel.ChannelIDs {
-				_, err := bot.State.Channel(subchannel)
-				if err != nil {
-					invalidChannels = append(invalidChannels, subchannel)
-					log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access subchannel %s...\t%s", subchannel, err))
-				}
-			}
-
-		} else {
-			_, err := bot.State.Channel(channel.ChannelID)
-			if err != nil {
-				invalidChannels = append(invalidChannels, channel.ChannelID)
-				log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access channel %s...\t%s", channel.ChannelID, err))
-			}
-		}
-	}
-	//-
-	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidServers)
-	if invalidSources > 0 {
-		log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Found %d invalid channels/servers in configuration...", invalidSources))
-		logMsg := fmt.Sprintf("Validation found %d invalid sources...\n", invalidSources)
-		if len(invalidAdminChannels) > 0 {
-			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s", len(invalidAdminChannels), strings.Join(invalidAdminChannels, ", "))
-		}
-		if len(invalidServers) > 0 {
-			logMsg += fmt.Sprintf("\n**- Download Servers: (%d)** - %s", len(invalidServers), strings.Join(invalidServers, ", "))
-		}
-		if len(invalidChannels) > 0 {
-			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s", len(invalidChannels), strings.Join(invalidChannels, ", "))
-		}
-		logErrorMessage(logMsg)
-	} else if config.DebugOutput {
-		log.Println(logPrefixDebugLabel("Validation"), color.HiGreenString("All channels/servers successfully validated!"))
-	}
-
-	// Start Presence
-	timeLastUpdated = time.Now()
-	updateDiscordPresence()
-
-	//#endregion
 
 	// Startup Done
 	if config.DebugOutput {
@@ -368,47 +226,37 @@ func main() {
 
 	// Tickers
 	ticker5m := time.NewTicker(5 * time.Minute)
-	ticker15s := time.NewTicker(15 * time.Second)
+	ticker1m := time.NewTicker(1 * time.Minute)
 	go func() {
 		for {
 			select {
 			case <-ticker5m.C:
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
 				updateDiscordPresence()
-			case <-ticker15s.C:
+			case <-ticker1m.C:
+				doReconnect := func() {
+					log.Println(color.YellowString("Closing Discord connections..."))
+					bot.Client.CloseIdleConnections()
+					bot.CloseWithCode(1001)
+					bot = nil
+					log.Println(color.RedString("Discord connections closed!"))
+					if config.ExitOnBadConnection {
+						properExit()
+					} else {
+						log.Println(color.GreenString("Logging in..."))
+						botLogin()
+						log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
+						// Log Status
+						logStatusMessage(logStatusReconnect)
+					}
+				}
 				gate, err := bot.Gateway()
 				if err != nil || gate == "" {
 					log.Println(color.HiYellowString("Bot encountered a gateway error: GATEWAY: %s,\tERR: %s", gate, err))
-					log.Println(color.YellowString("Closing Discord connections..."))
-					bot.Client.CloseIdleConnections()
-					bot.CloseWithCode(1001)
-					bot = nil
-					log.Println(color.RedString("Discord connections closed!"))
-					if config.ExitOnBadConnection {
-						properExit()
-					} else {
-						log.Println(color.GreenString("Logging in..."))
-						botLogin()
-						log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
-						// Log Status
-						logStatusMessage(logStatusReconnect)
-					}
-				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 3*60 {
-					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 3 minutes..."))
-					log.Println(color.YellowString("Closing Discord connections..."))
-					bot.Client.CloseIdleConnections()
-					bot.CloseWithCode(1001)
-					bot = nil
-					log.Println(color.RedString("Discord connections closed!"))
-					if config.ExitOnBadConnection {
-						properExit()
-					} else {
-						log.Println(color.GreenString("Logging in..."))
-						botLogin()
-						log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
-						// Log Status
-						logStatusMessage(logStatusReconnect)
-					}
+					doReconnect()
+				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 4*60 {
+					log.Println(color.HiYellowString("Bot has not received a heartbeat from Discord in 4 minutes..."))
+					doReconnect()
 				}
 			}
 		}
@@ -517,7 +365,59 @@ func main() {
 }
 
 func botLogin() {
+
 	var err error
+
+	// Twitter API
+	if config.Credentials.TwitterAccessToken != "" &&
+		config.Credentials.TwitterAccessTokenSecret != "" &&
+		config.Credentials.TwitterConsumerKey != "" &&
+		config.Credentials.TwitterConsumerSecret != "" {
+
+		log.Println(logPrefixTwitter, color.MagentaString("Connecting to API..."))
+
+		twitterClient = anaconda.NewTwitterApiWithCredentials(
+			config.Credentials.TwitterAccessToken,
+			config.Credentials.TwitterAccessTokenSecret,
+			config.Credentials.TwitterConsumerKey,
+			config.Credentials.TwitterConsumerSecret,
+		)
+
+		twitterSelf, err := twitterClient.GetSelf(url.Values{})
+		if err != nil {
+			log.Println(logPrefixTwitter, color.HiRedString("API Login Error: %s", err.Error()))
+			log.Println(logPrefixTwitter, color.MagentaString("Error encountered while connecting to API, the bot won't use the Twitter API."))
+		} else {
+			log.Println(logPrefixTwitter, color.HiMagentaString("Connected to API @%s", twitterSelf.ScreenName))
+			twitterConnected = true
+		}
+	} else {
+		log.Println(logPrefixTwitter, color.MagentaString("API credentials missing, the bot won't use the Twitter API."))
+	}
+
+	// Google Drive Client
+	if config.Credentials.GoogleDriveCredentialsJSON != "" {
+		log.Println(logPrefixGoogleDrive, color.MagentaString("Connecting..."))
+		ctx := context.Background()
+		authJson, err := ioutil.ReadFile(config.Credentials.GoogleDriveCredentialsJSON)
+		if err != nil {
+			log.Println(logPrefixGoogleDrive, color.HiRedString("Error opening Google Credentials JSON:\t%s", err))
+		} else {
+			googleConfig, err := google.JWTConfigFromJSON(authJson, drive.DriveReadonlyScope)
+			if err != nil {
+				log.Println(logPrefixGoogleDrive, color.HiRedString("Error parsing Google Credentials JSON:\t%s", err))
+			} else {
+				client := googleConfig.Client(ctx)
+				googleDriveService, err = drive.New(client)
+				if err != nil {
+					log.Println(logPrefixGoogleDrive, color.HiRedString("Error setting up client:\t%s", err))
+				} else {
+					log.Println(logPrefixGoogleDrive, color.HiMagentaString("Connected!"))
+					googleDriveConnected = true
+				}
+			}
+		}
+	}
 
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		log.Println(logPrefixDiscord, color.GreenString("Connecting to Discord via Token..."))
@@ -580,4 +480,93 @@ func botLogin() {
 	if bot.State.User != nil {
 		selfbot = bot.State.User.Email != ""
 	}
+
+	// Event Handlers
+	dgr = handleCommands()
+	bot.AddHandler(messageCreate)
+	bot.AddHandler(messageUpdate)
+
+	// Source Validation
+	if config.DebugOutput {
+		log.Println(logPrefixDebugLabel("Validation"), color.HiYellowString("Validating configured channels/servers..."))
+	}
+	//-
+	if config.AdminChannels != nil {
+		for _, adminChannel := range config.AdminChannels {
+			if adminChannel.ChannelIDs != nil {
+				for _, subchannel := range *adminChannel.ChannelIDs {
+					_, err := bot.State.Channel(subchannel)
+					if err != nil {
+						invalidAdminChannels = append(invalidAdminChannels, subchannel)
+						log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access admin subchannel %s...\t%s", subchannel, err))
+					}
+				}
+
+			} else {
+				_, err := bot.State.Channel(adminChannel.ChannelID)
+				if err != nil {
+					invalidAdminChannels = append(invalidAdminChannels, adminChannel.ChannelID)
+					log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access admin channel %s...\t%s", adminChannel.ChannelID, err))
+				}
+			}
+		}
+	}
+	//-
+	for _, server := range config.Servers {
+		if server.ServerIDs != nil {
+			for _, subserver := range *server.ServerIDs {
+				_, err := bot.State.Guild(subserver)
+				if err != nil {
+					invalidServers = append(invalidServers, subserver)
+					log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access subserver %s...\t%s", subserver, err))
+				}
+			}
+		} else {
+			_, err := bot.State.Guild(server.ServerID)
+			if err != nil {
+				invalidServers = append(invalidServers, server.ServerID)
+				log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access server %s...\t%s", server.ServerID, err))
+			}
+		}
+	}
+	for _, channel := range config.Channels {
+		if channel.ChannelIDs != nil {
+			for _, subchannel := range *channel.ChannelIDs {
+				_, err := bot.State.Channel(subchannel)
+				if err != nil {
+					invalidChannels = append(invalidChannels, subchannel)
+					log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access subchannel %s...\t%s", subchannel, err))
+				}
+			}
+
+		} else {
+			_, err := bot.State.Channel(channel.ChannelID)
+			if err != nil {
+				invalidChannels = append(invalidChannels, channel.ChannelID)
+				log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Bot cannot access channel %s...\t%s", channel.ChannelID, err))
+			}
+		}
+	}
+	//-
+	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidServers)
+	if invalidSources > 0 {
+		log.Println(logPrefixErrorLabel("Validation"), color.HiRedString("Found %d invalid channels/servers in configuration...", invalidSources))
+		logMsg := fmt.Sprintf("Validation found %d invalid sources...\n", invalidSources)
+		if len(invalidAdminChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s", len(invalidAdminChannels), strings.Join(invalidAdminChannels, ", "))
+		}
+		if len(invalidServers) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Servers: (%d)** - %s", len(invalidServers), strings.Join(invalidServers, ", "))
+		}
+		if len(invalidChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s", len(invalidChannels), strings.Join(invalidChannels, ", "))
+		}
+		logErrorMessage(logMsg)
+	} else if config.DebugOutput {
+		log.Println(logPrefixDebugLabel("Validation"), color.HiGreenString("All channels/servers successfully validated!"))
+	}
+
+	// Start Presence
+	timeLastUpdated = time.Now()
+	updateDiscordPresence()
 }
