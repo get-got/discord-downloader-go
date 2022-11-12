@@ -441,8 +441,9 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 	// Any kind of failure
 	if status.Status >= downloadFailed && !download.HistoryCmd && !download.EmojiCmd {
 		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		if isChannelRegistered(download.Message.ChannelID) {
-			channelConfig := getChannelConfig(download.Message.ChannelID)
+		ch := channelRegistered(download.Message)
+		if ch != "" {
+			channelConfig := getChannelConfig(ch)
 			if !download.HistoryCmd && *channelConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -478,8 +479,9 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 	}
 
 	// Log Links to File
-	if isChannelRegistered(download.Message.ChannelID) {
-		channelConfig := getChannelConfig(download.Message.ChannelID)
+	ch := channelRegistered(download.Message)
+	if ch != "" {
+		channelConfig := getChannelConfig(ch)
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
 				logPath := channelConfig.LogLinks.Destination
@@ -601,10 +603,11 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		logPrefix = logPrefixHistory + " "
 	}
 
-	if stringInSlice(download.Message.ChannelID, getAllChannels()) || download.EmojiCmd || download.ManualDownload {
+	ch := channelRegistered(download.Message)
+	if ch != "" || download.EmojiCmd || download.ManualDownload {
 		var channelConfig configurationChannel
-		if isChannelRegistered(download.Message.ChannelID) {
-			channelConfig = getChannelConfig(download.Message.ChannelID)
+		if ch != "" {
+			channelConfig = getChannelConfig(ch)
 		} else {
 			channelDefault(&channelConfig)
 		}

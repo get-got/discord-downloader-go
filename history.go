@@ -71,9 +71,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	var err error
 	var message *discordgo.Message = nil
-
-	if isChannelRegistered(subjectChannelID) {
-		channelConfig := getChannelConfig(subjectChannelID)
+	message.ChannelID = subjectChannelID
+	ch := channelRegistered(message)
+	if ch != "" {
+		channelConfig := getChannelConfig(ch)
 
 		// Open Cache File?
 		if historyCachePath != "" {

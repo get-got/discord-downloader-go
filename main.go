@@ -271,7 +271,7 @@ func main() {
 	// Compile list of channels to autorun history
 	type arh struct{ channel, before, since string }
 	var autorunHistoryChannels []arh
-	for _, channel := range getAllChannels() {
+	for _, channel := range getAllRegisteredChannels() {
 		channelConfig := getChannelConfig(channel)
 		if channelConfig.OverwriteAutorunHistory != nil {
 			if *channelConfig.OverwriteAutorunHistory {
@@ -462,6 +462,11 @@ func botLogin() {
 		dur, _ = time.ParseDuration("180s")
 	}
 	bot.Client.Timeout = dur
+	bot.State.MaxMessageCount = 100000
+	bot.State.TrackChannels = true
+	bot.State.TrackThreads = true
+	bot.State.TrackMembers = true
+	bot.State.TrackThreadMembers = true
 
 	// Fetch Bot's User Info
 	user, err = bot.User("@me")

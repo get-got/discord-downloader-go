@@ -128,8 +128,9 @@ func handleCommands() *exrouter.Route {
 					len(config.AdminChannels),
 					bot.HeartbeatLatency().Milliseconds(),
 				)
-				if isChannelRegistered(ctx.Msg.ChannelID) {
-					configJson, _ := json.MarshalIndent(getChannelConfig(ctx.Msg.ChannelID), "", "\t")
+				ch := channelRegistered(ctx.Msg)
+				if ch != "" {
+					configJson, _ := json.MarshalIndent(getChannelConfig(ch), "", "\t")
 					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
 				}
 				_, err := replyEmbed(ctx.Msg, "Command — Status", message)
@@ -147,8 +148,9 @@ func handleCommands() *exrouter.Route {
 	router.On("stats", func(ctx *exrouter.Context) {
 		logPrefixHere := color.CyanString("[dgrouter:stats]")
 		if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-			if isChannelRegistered(ctx.Msg.ChannelID) {
-				channelConfig := getChannelConfig(ctx.Msg.ChannelID)
+			ch := channelRegistered(ctx.Msg)
+			if ch != "" {
+				channelConfig := getChannelConfig(ch)
 				if *channelConfig.AllowCommands {
 					content := fmt.Sprintf("• **Total Downloads —** %s\n"+
 						"• **Downloads in this Channel —** %s",
@@ -266,7 +268,7 @@ func handleCommands() *exrouter.Route {
 							}
 						}
 					} else if strings.Contains(strings.ToLower(target), "all") {
-						channels = getAllChannels()
+						channels = getAllRegisteredChannels()
 					}
 				}
 			}

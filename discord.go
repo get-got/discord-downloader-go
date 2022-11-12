@@ -42,7 +42,7 @@ func discordSnowflakeToTimestamp(snowflake string, format string) string {
 	return t.Local().Format(format)
 }
 
-func getAllChannels() []string {
+func getAllRegisteredChannels() []string {
 	var channels []string
 	if config.All != nil { // ALL MODE
 		for _, guild := range bot.State.Guilds {
@@ -266,14 +266,16 @@ func getEmbedColor(channelID string) int {
 		}
 	}
 	// Overwrite with Defined Color for Channel
-	if isChannelRegistered(channelID) {
+	/*var msg *discordgo.Message
+	msg.ChannelID = channelID
+	if channelRegistered(msg) {
 		channelConfig := getChannelConfig(channelID)
 		if channelConfig.OverwriteEmbedColor != nil {
 			if *channelConfig.OverwriteEmbedColor != "" {
 				color = channelConfig.OverwriteEmbedColor
 			}
 		}
-	}
+	}*/
 
 	// Use Defined Color
 	if color != nil {
@@ -394,7 +396,7 @@ func logStatusMessage(status logStatusType) {
 				if config.All != nil {
 					message += "\n• **ALL MODE ENABLED -** Bot will use all available channels"
 				}
-				allChannels := getAllChannels()
+				allChannels := getAllRegisteredChannels()
 				message += fmt.Sprintf("\n• ***Listening to %s channel%s...***\n", formatNumber(int64(len(allChannels))), pluralS(len(allChannels)))
 				if twitterConnected {
 					message += "\n• Connected to Twitter API"

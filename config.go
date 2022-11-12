@@ -863,16 +863,26 @@ func adminChannelDefault(channel *configurationAdminChannel) {
 
 //#region Channel Checks/Returns
 
-func isChannelRegistered(ChannelID string) bool {
+func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bool {
+	_, err := bot.State.Message(targetChannel, subjectMessage.ChannelID)
+	return err == nil
+}
+
+func channelRegistered(m *discordgo.Message) string {
 	for _, item := range config.Channels {
 		// Single Channel Config
-		if ChannelID == item.ChannelID {
-			return true
+		if m.ChannelID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
+			return item.ChannelID
 		}
 		// Multi-Channel Config
 		if item.ChannelIDs != nil {
-			if stringInSlice(ChannelID, *item.ChannelIDs) {
-				return true
+			if stringInSlice(m.ChannelID, *item.ChannelIDs) {
+				return m.ChannelID
+			}
+			for _, channel := range *item.ChannelIDs {
+				if m.ChannelID == channel || isNestedMessage(m, channel) {
+					return channel
+				}
 			}
 		}
 	}
@@ -882,20 +892,20 @@ func isChannelRegistered(ChannelID string) bool {
 			guild, err := bot.State.Guild(item.ServerID)
 			if err == nil {
 				for _, channel := range guild.Channels {
-					if ChannelID == channel.ID {
+					if m.ChannelID == channel.ID || isNestedMessage(m, channel.ID) {
 						// Channel Blacklisting within Server
 						if item.ServerBlacklist != nil {
-							if stringInSlice(ChannelID, *item.ServerBlacklist) {
-								return false
+							if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
+								return ""
 							}
 							// Categories
 							if channel.ParentID != "" {
 								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-									return false
+									return ""
 								}
 							}
 						}
-						return true
+						return channel.ID
 					}
 				}
 			}
@@ -906,20 +916,20 @@ func isChannelRegistered(ChannelID string) bool {
 				guild, err := bot.State.Guild(subserver)
 				if err == nil {
 					for _, channel := range guild.Channels {
-						if ChannelID == channel.ID {
+						if m.ChannelID == channel.ID || isNestedMessage(m, channel.ID) {
 							// Channel Blacklisting within Servers
 							if item.ServerBlacklist != nil {
-								if stringInSlice(ChannelID, *item.ServerBlacklist) {
-									return false
+								if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
+									return ""
 								}
 								// Categories
 								if channel.ParentID != "" {
 									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-										return false
+										return ""
 									}
 								}
 							}
-							return true
+							return channel.ID
 						}
 					}
 				}
@@ -929,23 +939,23 @@ func isChannelRegistered(ChannelID string) bool {
 	// All
 	if config.All != nil {
 		if config.AllBlacklistChannels != nil {
-			if stringInSlice(ChannelID, *config.AllBlacklistChannels) {
-				return false
+			if stringInSlice(m.ChannelID, *config.AllBlacklistChannels) {
+				return ""
 			}
 		}
 		if config.AllBlacklistServers != nil {
-			guild, err := bot.State.Guild(ChannelID)
+			guild, err := bot.State.Guild(m.ChannelID)
 			if err == nil {
 				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
-					return false
+					return ""
 				}
 			} else {
 				log.Println(color.HiRedString("Error finding server info for channel:\t%s", err))
 			}
 		}
-		return true
+		return "1"
 	}
-	return false
+	return ""
 }
 
 func getChannelConfig(ChannelID string) configurationChannel {
@@ -1034,10 +1044,11 @@ func getAdminChannelConfig(ChannelID string) configurationAdminChannel {
 }
 
 func isCommandableChannel(m *discordgo.Message) bool {
+	ch := channelRegistered(m)
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if isChannelRegistered(m.ChannelID) {
-		channelConfig := getChannelConfig(m.ChannelID)
+	} else if ch != "" {
+		channelConfig := getChannelConfig(ch)
 		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
