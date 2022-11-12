@@ -730,6 +730,10 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.reactWhenDownloaded : boolean_
         * _Default:_ `true`
         * Confirmation reaction that file(s) successfully downloaded. Is overwritten by the channel/server equivelant of this setting.
+    * :small_blue_diamond: "reactWhenDownloadedHistory"
+        * — _settings.reactWhenDownloaded : boolean_
+        * _Default:_ `false`
+        * Confirmation reaction that file(s) successfully downloaded when processing history commands. Is overwritten by the channel/server equivelant of this setting.
 ---
 * :small_blue_diamond: "filenameFormat"
     * — _settings.filenameFormat : string_

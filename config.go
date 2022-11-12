@@ -58,11 +58,12 @@ var (
 	cdAllowGlobalCommands  bool   = true
 	cdGithubUpdateChecking bool   = true
 	// Appearance
-	cdPresenceEnabled     bool               = true
-	cdPresenceStatus      string             = string(discordgo.StatusIdle)
-	cdPresenceType        discordgo.GameType = discordgo.GameTypeGame
-	cdReactWhenDownloaded bool               = true
-	cdInflateCount        int64              = 0
+	cdPresenceEnabled            bool               = true
+	cdPresenceStatus             string             = string(discordgo.StatusIdle)
+	cdPresenceType               discordgo.GameType = discordgo.GameTypeGame
+	cdReactWhenDownloaded        bool               = true
+	cdReactWhenDownloadedHistory bool               = false
+	cdInflateCount               int64              = 0
 )
 
 func defaultConfiguration() configuration {
@@ -95,14 +96,15 @@ func defaultConfiguration() configuration {
 		FilterDuplicateImages:          false,
 		FilterDuplicateImagesThreshold: 0,
 		// Appearance
-		PresenceEnabled:      cdPresenceEnabled,
-		PresenceStatus:       cdPresenceStatus,
-		PresenceType:         cdPresenceType,
-		ReactWhenDownloaded:  cdReactWhenDownloaded,
-		FilenameDateFormat:   "2006-01-02_15-04-05",
-		FilenameFormat:       "{{date}} {{shortID}} {{file}}",
-		InflateCount:         &cdInflateCount,
-		NumberFormatEuropean: false,
+		PresenceEnabled:            cdPresenceEnabled,
+		PresenceStatus:             cdPresenceStatus,
+		PresenceType:               cdPresenceType,
+		ReactWhenDownloaded:        cdReactWhenDownloaded,
+		ReactWhenDownloadedHistory: cdReactWhenDownloadedHistory,
+		FilenameDateFormat:         "2006-01-02_15-04-05",
+		FilenameFormat:             "{{date}} {{shortID}} {{file}}",
+		InflateCount:               &cdInflateCount,
+		NumberFormatEuropean:       false,
 	}
 }
 
@@ -133,18 +135,19 @@ type configuration struct {
 	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
 	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	// Appearance
-	PresenceEnabled          bool               `json:"presenceEnabled"`                    // optional, defaults
-	PresenceStatus           string             `json:"presenceStatus"`                     // optional, defaults
-	PresenceType             discordgo.GameType `json:"presenceType,omitempty"`             // optional, defaults
-	PresenceOverwrite        *string            `json:"presenceOverwrite,omitempty"`        // optional, unused if undefined
-	PresenceOverwriteDetails *string            `json:"presenceOverwriteDetails,omitempty"` // optional, unused if undefined
-	PresenceOverwriteState   *string            `json:"presenceOverwriteState,omitempty"`   // optional, unused if undefined
-	ReactWhenDownloaded      bool               `json:"reactWhenDownloaded,omitempty"`      // optional, defaults
-	FilenameDateFormat       string             `json:"filenameDateFormat,omitempty"`       // optional, defaults
-	FilenameFormat           string             `json:"filenameFormat,omitempty"`           // optional, defaults
-	EmbedColor               *string            `json:"embedColor,omitempty"`               // optional, defaults to role if undefined, then defaults random if no role color
-	InflateCount             *int64             `json:"inflateCount,omitempty"`             // optional, defaults to 0 if undefined
-	NumberFormatEuropean     bool               `json:"numberFormatEuropean,omitempty"`     // optional, defaults
+	PresenceEnabled            bool               `json:"presenceEnabled"`                      // optional, defaults
+	PresenceStatus             string             `json:"presenceStatus"`                       // optional, defaults
+	PresenceType               discordgo.GameType `json:"presenceType,omitempty"`               // optional, defaults
+	PresenceOverwrite          *string            `json:"presenceOverwrite,omitempty"`          // optional, unused if undefined
+	PresenceOverwriteDetails   *string            `json:"presenceOverwriteDetails,omitempty"`   // optional, unused if undefined
+	PresenceOverwriteState     *string            `json:"presenceOverwriteState,omitempty"`     // optional, unused if undefined
+	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
+	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults
+	FilenameDateFormat         string             `json:"filenameDateFormat,omitempty"`         // optional, defaults
+	FilenameFormat             string             `json:"filenameFormat,omitempty"`             // optional, defaults
+	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
+	InflateCount               *int64             `json:"inflateCount,omitempty"`               // optional, defaults to 0 if undefined
+	NumberFormatEuropean       bool               `json:"numberFormatEuropean,omitempty"`       // optional, defaults
 	// Channels
 	All                  *configurationChannel  `json:"all,omitempty"`                  // optional, defaults
 	AllBlacklistChannels *[]string              `json:"allBlacklistChannels,omitempty"` // optional
@@ -181,6 +184,7 @@ var (
 	// Appearance
 	ccdUpdatePresence             bool     = true
 	ccdReactWhenDownloadedEmoji   string   = ""
+	ccdReactWhenDownloaded        bool     = false
 	ccdReactWhenDownloadedHistory bool     = false
 	ccdBlacklistReactEmojis       []string = []string{}
 	ccdTypeWhileProcessing        bool     = false

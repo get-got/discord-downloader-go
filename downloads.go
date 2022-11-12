@@ -1001,9 +1001,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if channelConfig.ReactWhenDownloaded != nil {
 			shouldReact = *channelConfig.ReactWhenDownloaded
 		}
-		if channelConfig.ReactWhenDownloadedHistory != nil {
-			if download.HistoryCmd && !*channelConfig.ReactWhenDownloadedHistory {
+		if download.HistoryCmd {
+			if !config.ReactWhenDownloadedHistory {
 				shouldReact = false
+			}
+			if channelConfig.ReactWhenDownloadedHistory != nil {
+				if *channelConfig.ReactWhenDownloadedHistory {
+					shouldReact = true
+				}
 			}
 		}
 		if download.Message.Author != nil && shouldReact {
