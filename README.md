@@ -672,6 +672,9 @@ This setup exempts many options so they will use default values _(see below)_. I
 * :small_blue_diamond: "downloadTimeout"
     * — _settings.downloadTimeout : number_
     * _Default:_ `60`
+* :small_blue_diamond: "discordTimeout"
+    * — _settings.discordTimeout : number_
+    * _Default:_ `180`
 * :small_blue_diamond: "githubUpdateChecking"
     * — _settings.githubUpdateChecking : boolean_
     * _Default:_ `true`

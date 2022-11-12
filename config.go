@@ -89,6 +89,7 @@ func defaultConfiguration() configuration {
 		ExitOnBadConnection:            false,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
+		DiscordTimeout:                 180,
 		GithubUpdateChecking:           cdGithubUpdateChecking,
 		DiscordLogLevel:                discordgo.LogError,
 		FilterDuplicateImages:          false,
@@ -126,6 +127,7 @@ type configuration struct {
 	ExitOnBadConnection            bool                        `json:"exitOnBadConnection,omitempty"`            // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
+	DiscordTimeout                 int                         `json:"discordTimeout,omitempty"`                 // optional, defaults
 	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults
 	DiscordLogLevel                int                         `json:"discordLogLevel,omitempty"`                // optional, defaults
 	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults

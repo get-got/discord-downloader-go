@@ -451,6 +451,11 @@ func botLogin() {
 	}
 	bot.LogLevel = config.DiscordLogLevel // reset
 	bot.ShouldReconnectOnError = true
+	dur, err := time.ParseDuration(string(config.DiscordTimeout) + "s")
+	if err != nil {
+		dur, _ = time.ParseDuration("180s")
+	}
+	bot.Client.Timeout = dur
 
 	// Fetch Bot's User Info
 	user, err = bot.User("@me")
