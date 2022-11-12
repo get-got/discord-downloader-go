@@ -21,4 +21,3 @@ deploy:
   on:
     repo: get-got/discord-downloader-go
     tags: true
-    all_branches: true
