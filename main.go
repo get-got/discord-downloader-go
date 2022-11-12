@@ -58,17 +58,6 @@ func init() {
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
 	log.Println(logPrefixVersion, color.CyanString("discord-go v%s using Discord API v%s", discordgo.VERSION, discordgo.APIVersion))
-}
-
-func main() {
-	var err error
-
-	// Config
-	loadConfig()
-	log.Println(logPrefixSettings, color.HiYellowString("Loaded - bound to %d channel%s and %d server%s",
-		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
-		getBoundServersCount(), pluralS(getBoundServersCount()),
-	))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
@@ -81,6 +70,17 @@ func main() {
 	}
 
 	log.Println(logPrefixInfo, color.HiCyanString("** Need help? Discord: https://discord.gg/6Z6FJZVaDV **"))
+}
+
+func main() {
+	var err error
+
+	// Config
+	loadConfig()
+	log.Println(logPrefixSettings, color.HiYellowString("Loaded - bound to %d channel%s and %d server%s",
+		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+		getBoundServersCount(), pluralS(getBoundServersCount()),
+	))
 
 	//#region Database/Cache Initialization
 
@@ -150,7 +150,8 @@ func main() {
 
 	//#endregion
 
-	//#region Discord Initialization
+	//#region Discord & API Initialization
+
 	botLogin()
 
 	// Startup Done
@@ -162,6 +163,8 @@ func main() {
 
 	// Log Status
 	logStatusMessage(logStatusStartup)
+
+	//#endregion
 
 	//#region Cache Constants
 	constants := make(map[string]string)
@@ -471,14 +474,14 @@ func botLogin() {
 	} else {
 		log.Println(logPrefixDiscord, color.HiGreenString("Logged into %s", getUserIdentifier(*user)))
 		if user.Bot {
-			log.Println(logPrefixDiscord, color.MagentaString("This is a Bot User"))
-			log.Println(logPrefixDiscord, color.MagentaString("- Status presence details are limited."))
-			log.Println(logPrefixDiscord, color.MagentaString("- Access is restricted to servers you have permission to add the bot to."))
+			log.Println(logPrefixDiscord, color.MagentaString("This is a genuine Discord Bot Application"))
+			log.Println(logPrefixDiscord, color.MagentaString("- Presence details & state are disabled, only status will work."))
+			log.Println(logPrefixDiscord, color.MagentaString("- The bot can only see servers you have added it to."))
 		} else {
 			log.Println(logPrefixDiscord, color.MagentaString("This is a User Account (Self-Bot)"))
 			log.Println(logPrefixDiscord, color.MagentaString("- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
 			log.Println(logPrefixDiscord, color.MagentaString("- See GitHub page for link to Discord's official statement."))
-			log.Println(logPrefixDiscord, color.MagentaString("- If you wish to avoid this, use a Bot account if possible."))
+			log.Println(logPrefixDiscord, color.MagentaString("- If you wish to avoid this, use a Bot Application if possible."))
 		}
 	}
 
