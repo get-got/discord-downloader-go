@@ -173,13 +173,20 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoID %s", err))
 		}
 
+		userID := ""
+		username := ""
+		if download.Message.Author != nil {
+			userID = download.Message.Author.ID
+			username = download.Message.Author.Username
+		}
+
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
 			{"{{fileType}}", download.FileExtension},
 			{"{{messageID}}", download.Message.ID},
-			{"{{userID}}", download.Message.Author.ID},
-			{"{{username}}", download.Message.Author.Username},
+			{"{{userID}}", userID},
+			{"{{username}}", username},
 			{"{{channelID}}", download.Message.ChannelID},
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{message}}", clearPath(download.Message.Content)},
