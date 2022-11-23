@@ -446,7 +446,7 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
 		if isChannelRegistered(download.Message.ChannelID) {
 			channelConfig := getChannelConfig(download.Message.ChannelID)
-			if !download.HistoryCmd && *channelConfig.ErrorMessages {
+			if !download.HistoryCmd && *channelConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
 					download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status))

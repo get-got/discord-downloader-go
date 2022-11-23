@@ -807,10 +807,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].allowCommands : boolean_
         * _Default:_ `true`
         * Allow use of commands like ping, help, etc.
-    * :small_blue_diamond: "errorMessages"
-        * — _settings.channels[].errorMessages : boolean_
-        * _Default:_ `true`
-        * Send response messages when downloads fail or other download-related errors are encountered.
     * :small_blue_diamond: "scanEdits"
         * — _settings.channels[].scanEdits : boolean_
         * _Default:_ `true`
@@ -828,6 +824,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_orange_diamond: overwriteAutorunHistorySince
         * — _settings.channels[].overwriteAutorunHistorySince : string_
         * Date filter for `overwriteAutorunHistory`
+    * :small_blue_diamond: "sendErrorMessages"
+        * — _settings.channels[].sendErrorMessages : boolean_
+        * _Default:_ `true`
+        * Send response messages when downloads fail or other download-related errors are encountered.
     * :small_orange_diamond: "sendFileToChannel"
         * — _settings.channels[].sendFileToChannel : string_
         * Forwards/crossposts/logs downloaded files to specified channel (or channels if used as `sendFileToChannels` below). By default will send as the actual file

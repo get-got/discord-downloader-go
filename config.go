@@ -174,13 +174,13 @@ type constStruct struct {
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
-	ccdEnabled          bool = true
-	ccdSave             bool = true
-	ccdAllowCommands    bool = true
-	ccdErrorMessages    bool = true
-	ccdScanEdits        bool = true
-	ccdIgnoreBots       bool = false
-	ccdSendFileDirectly bool = true
+	ccdEnabled           bool = true
+	ccdSave              bool = true
+	ccdAllowCommands     bool = true
+	ccdScanEdits         bool = true
+	ccdIgnoreBots        bool = false
+	ccdSendErrorMessages bool = true
+	ccdSendFileDirectly  bool = true
 	// Appearance
 	ccdUpdatePresence             bool     = true
 	ccdReactWhenDownloadedEmoji   string   = ""
@@ -214,12 +214,12 @@ type configurationChannel struct {
 	Enabled                       *bool     `json:"enabled,omitempty"`                       // optional, defaults
 	Save                          *bool     `json:"save,omitempty"`                          // optional, defaults
 	AllowCommands                 *bool     `json:"allowCommands,omitempty"`                 // optional, defaults
-	ErrorMessages                 *bool     `json:"errorMessages,omitempty"`                 // optional, defaults
 	ScanEdits                     *bool     `json:"scanEdits,omitempty"`                     // optional, defaults
 	IgnoreBots                    *bool     `json:"ignoreBots,omitempty"`                    // optional, defaults
 	OverwriteAutorunHistory       *bool     `json:"overwriteAutorunHistory,omitempty"`       // optional
 	OverwriteAutorunHistoryBefore *string   `json:"overwriteAutorunHistoryBefore,omitempty"` // optional
 	OverwriteAutorunHistorySince  *string   `json:"overwriteAutorunHistorySince,omitempty"`  // optional
+	SendErrorMessages             *bool     `json:"sendErrorMessages,omitempty"`             // optional, defaults
 	SendFileToChannel             *string   `json:"sendFileToChannel"`                       // optional, defaults
 	SendFileToChannels            *[]string `json:"sendFileToChannels"`                      // optional, defaults
 	SendFileDirectly              *bool     `json:"sendFileDirectly"`                        // optional, defaults
@@ -586,12 +586,12 @@ func createConfig() {
 			ChannelID:   enteredBaseChannel,
 			Destination: enteredBaseDestination,
 
-			Enabled:       &ccdEnabled,
-			Save:          &ccdSave,
-			AllowCommands: &ccdAllowCommands,
-			ErrorMessages: &ccdErrorMessages,
-			ScanEdits:     &ccdScanEdits,
-			IgnoreBots:    &ccdIgnoreBots,
+			Enabled:           &ccdEnabled,
+			Save:              &ccdSave,
+			AllowCommands:     &ccdAllowCommands,
+			SendErrorMessages: &ccdSendErrorMessages,
+			ScanEdits:         &ccdScanEdits,
+			IgnoreBots:        &ccdIgnoreBots,
 
 			UpdatePresence:             &ccdUpdatePresence,
 			ReactWhenDownloadedEmoji:   &ccdReactWhenDownloadedEmoji,
@@ -709,8 +709,8 @@ func channelDefault(channel *configurationChannel) {
 	if channel.AllowCommands == nil {
 		channel.AllowCommands = &ccdAllowCommands
 	}
-	if channel.ErrorMessages == nil {
-		channel.ErrorMessages = &ccdErrorMessages
+	if channel.SendErrorMessages == nil {
+		channel.SendErrorMessages = &ccdSendErrorMessages
 	}
 	if channel.ScanEdits == nil {
 		channel.ScanEdits = &ccdScanEdits
