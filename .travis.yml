@@ -4,6 +4,7 @@ go:
 
 before_install:
   - env GO111MODULE=on go mod download
+  - go get github.com/mitchellh/gox
   - go install github.com/mitchellh/gox
 
 script:
