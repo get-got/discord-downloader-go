@@ -20,4 +20,4 @@ deploy:
   skip_cleanup: true
   on:
     repo: get-got/discord-downloader-go
-    tags: true
+    tags: false
