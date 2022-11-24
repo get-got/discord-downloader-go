@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -57,7 +58,7 @@ func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
-	log.Println(logPrefixVersion, color.CyanString("discord-go v%s using Discord API v%s", discordgo.VERSION, discordgo.APIVersion))
+	log.Println(logPrefixVersion, color.CyanString("%s / discord-go v%s / Discord API v%s", runtime.Version(), discordgo.VERSION, discordgo.APIVersion))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
@@ -65,6 +66,8 @@ func init() {
 			log.Println(logPrefixVersion, color.HiCyanString("*** Update Available! ***"))
 			log.Println(logPrefixVersion, color.CyanString(projectReleaseURL))
 			log.Println(logPrefixVersion, color.HiCyanString("*** See changelog for information ***"))
+			log.Println(logPrefixVersion, color.HiCyanString("CHECK ALL CHANGELOGS SINCE YOUR LAST UPDATE"))
+			log.Println(logPrefixVersion, color.HiCyanString("SOME SETTINGS MAY NEED TO BE UPDATED"))
 			time.Sleep(5 * time.Second)
 		}
 	}
