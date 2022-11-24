@@ -18,7 +18,7 @@ deploy:
     - "bin/discord-downloader-go_windows-amd64.exe"
     - "bin/discord-downloader-go_linux-amd64"
     - "bin/discord-downloader-go_linux-arm"
-  skip_cleanup: true
+  cleanup: false
   on:
     repo: get-got/discord-downloader-go
-    tags: false
+    tags: true
