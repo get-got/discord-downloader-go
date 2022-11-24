@@ -433,7 +433,32 @@ func loadConfig() {
 
 		// Debug Output
 		if config.DebugOutput {
-			s, err := json.MarshalIndent(config, "", "\t")
+			dupeConfig := config
+			if dupeConfig.Credentials.Token != "" && dupeConfig.Credentials.Token != placeholderToken {
+				dupeConfig.Credentials.Token = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.Email != "" && dupeConfig.Credentials.Email != placeholderEmail {
+				dupeConfig.Credentials.Email = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.Password != "" && dupeConfig.Credentials.Password != placeholderPassword {
+				dupeConfig.Credentials.Password = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.TwitterAccessToken != "" {
+				dupeConfig.Credentials.TwitterAccessToken = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.TwitterAccessTokenSecret != "" {
+				dupeConfig.Credentials.TwitterAccessTokenSecret = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.TwitterConsumerKey != "" {
+				dupeConfig.Credentials.TwitterConsumerKey = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.TwitterConsumerSecret != "" {
+				dupeConfig.Credentials.TwitterConsumerSecret = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.FlickrApiKey != "" {
+				dupeConfig.Credentials.FlickrApiKey = "STRIPPED_FOR_OUTPUT"
+			}
+			s, err := json.MarshalIndent(dupeConfig, "", "\t")
 			if err != nil {
 				log.Println(logPrefixSettings, logPrefixDebug, color.HiRedString("Failed to output...\t%s", err))
 			} else {
