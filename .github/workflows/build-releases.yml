@@ -1,0 +1,48 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+
+  build-releases:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "izumin5210/action-go-crossbuild@v1.0.0"
+        with:
+          os: windows
+          arch: amd64
+          dest: bin
+          name: discord-downloader-go_windows.exe
+      - uses: "izumin5210/action-go-crossbuild@v1.0.0"
+        with:
+          os: darwin
+          arch: amd64
+          dest: bin
+          name: discord-downloader-go_macos.exe
+      - uses: "izumin5210/action-go-crossbuild@v1.0.0"
+        with:
+          os: linux
+          arch: amd64
+          dest: bin
+          name: discord-downloader-go_linux_amd64
+      - uses: "izumin5210/action-go-crossbuild@v1.0.0"
+        with:
+          os: linux
+          arch: arm
+          dest: bin
+          name: discord-downloader-go_linux_arm
+            
+  deploy:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        with:
+          repo_token: ${{ secrets.repo_token }}
+          automatic_release_tag: true
+          draft: true
+          prerelease: false
+          files: |
+            bin/*
+      
+---
