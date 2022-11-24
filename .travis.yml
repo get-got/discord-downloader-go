@@ -1,6 +1,6 @@
 language: go
 go:
-  - "1.15"
+  - "1.19"
 
 before_install:
   - env GO111MODULE=on go mod download
