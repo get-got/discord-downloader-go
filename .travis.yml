@@ -1,10 +1,10 @@
 language: go
 go:
-  - "1.18"
+  - "1.19"
 
 before_install:
   - env GO111MODULE=on go mod download
-  - go get github.com/mitchellh/gox
+  - go install github.com/mitchellh/gox
 
 script:
   - env GO111MODULE=on gox -output="bin/discord-downloader-go_{{.OS}}-{{.Arch}}" -osarch="windows/amd64 linux/amd64 linux/arm"
