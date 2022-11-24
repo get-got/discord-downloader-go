@@ -44,5 +44,3 @@ jobs:
           prerelease: false
           files: |
             bin/*
-      
----
