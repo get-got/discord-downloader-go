@@ -10,9 +10,9 @@ require (
 	github.com/Necroforger/dgrouter v0.0.0-20200517224846-e66453b957c1
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/aidarkhanov/nanoid/v2 v2.0.5
+	github.com/bwmarrin/discordgo v0.22.0
 	github.com/fatih/color v1.10.0
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/bwmarrin/discordgo v0.22.0
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
 	github.com/hashicorp/go-version v1.3.0
 	github.com/kennygrant/sanitize v1.2.4
@@ -37,7 +37,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
-	github.com/gorilla/websocket v1.4.0 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
@@ -54,4 +54,4 @@ require (
 
 replace github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.1
 
-replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.22.0-1
+replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.26.1-9

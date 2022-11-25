@@ -191,7 +191,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				}
 				// Go Back
 				beforeID = messages[len(messages)-1].ID
-				beforeTime, err = messages[len(messages)-1].Timestamp.Parse()
+				beforeTime = messages[len(messages)-1].Timestamp
 				if err != nil {
 					log.Println(logPrefixHistory, color.RedString(logPrefix+"Failed to fetch message timestamp:\t%s", err))
 				}

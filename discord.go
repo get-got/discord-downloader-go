@@ -156,13 +156,7 @@ func filenameKeyReplacement(channelConfig configurationChannel, download downloa
 				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
 			}
 		}
-		messageTime := time.Now()
-		if download.Message.Timestamp != "" {
-			messageTimestamp, err := download.Message.Timestamp.Parse()
-			if err == nil {
-				messageTime = messageTimestamp
-			}
-		}
+		messageTime := download.Message.Timestamp
 
 		shortID, err := shortid.Generate()
 		if err != nil && config.DebugOutput {
@@ -513,7 +507,7 @@ func isLocalAdmin(m *discordgo.Message) bool {
 	return botSelf || botAdmin || guildOwner || guildAdmin || localManageMessages
 }
 
-func hasPerms(channelID string, permission int) bool {
+func hasPerms(channelID string, permission int64) bool {
 	if !config.CheckPermissions {
 		return true
 	}

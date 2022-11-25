@@ -34,7 +34,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 }
 
 func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	if m.EditedTimestamp != discordgo.Timestamp("") {
+	if m.EditedTimestamp.IsZero() {
 		handleMessage(m.Message, true, false)
 	}
 }

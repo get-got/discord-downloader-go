@@ -387,10 +387,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 func getFileLinks(m *discordgo.Message) []*fileItem {
 	var fileItems []*fileItem
 
-	linkTime, err := m.Timestamp.Parse()
-	if err != nil {
-		linkTime = time.Now()
-	}
+	linkTime := m.Timestamp
 
 	rawLinks := getRawLinks(m)
 	for _, rawLink := range rawLinks {
