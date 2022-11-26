@@ -18,6 +18,9 @@ var (
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
+	if subjectChannelID == "" {
+		return 0
+	}
 	// Identifier
 	var commander string = "AUTORUN"
 	if commandingMessage != nil {
@@ -70,7 +73,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	var err error
-	var message *discordgo.Message = nil
+	var message *discordgo.Message = &discordgo.Message{}
+	message.ID = ""
 	message.ChannelID = subjectChannelID
 	ch := channelRegistered(message)
 	if ch != "" {

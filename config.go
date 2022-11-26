@@ -864,8 +864,11 @@ func adminChannelDefault(channel *configurationAdminChannel) {
 //#region Channel Checks/Returns
 
 func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bool {
-	_, err := bot.State.Message(targetChannel, subjectMessage.ChannelID)
-	return err == nil
+	if subjectMessage.ID != "" {
+		_, err := bot.State.Message(targetChannel, subjectMessage.ChannelID)
+		return err == nil
+	}
+	return false
 }
 
 func channelRegistered(m *discordgo.Message) string {
