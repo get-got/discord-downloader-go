@@ -13,35 +13,56 @@ import (
 	"github.com/hako/durafmt"
 )
 
+type historyStatus int
+
+const (
+	historyStatusWaiting historyStatus = iota
+	historyStatusDownloading
+	historyStatusAbortRequested
+	historyStatusAbortCompleted
+	historyStatusErrorRequesting
+	historyStatusCompletedNoMoreMessages
+	historyStatusCompletedToBeforeFilter
+	historyStatusCompletedToSinceFilter
+)
+
+type historyJob struct {
+	Status        historyStatus
+	OriginChannel string
+}
+
 var (
-	historyStatus map[string]string
+	historyJobs map[string]historyJob
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
-	if subjectChannelID == "" {
-		return 0
-	}
+	var i int64 = 0
+	var d int64 = 0
+	var batch int = 0
+
 	// Identifier
 	var commander string = "AUTORUN"
 	if commandingMessage != nil {
 		commander = getUserIdentifier(*commandingMessage.Author)
 	}
-
 	logPrefix := fmt.Sprintf("%s/%s: ", subjectChannelID, commander)
 
+	if subjectChannelID == "" {
+		return 0
+	}
 	// Check Read History perms
 	if !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
 		log.Println(logPrefixHistory, color.HiRedString(logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!"))
 		return 0
 	}
 
-	// Mark active
-	historyStatus[subjectChannelID] = "downloading"
+	// Update Status
+	if job, exists := historyJobs[subjectChannelID]; exists {
+		job.Status = historyStatusDownloading
+		historyJobs[subjectChannelID] = job
+	}
 
-	var i int64 = 0
-	var d int64 = 0
-	var batch int = 0
-
+	// Determine Range
 	var beforeID string
 	if before != "" {
 		beforeID = before
@@ -191,7 +212,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			if err == nil {
 				// No More Messages
 				if len(messages) <= 0 {
-					delete(historyStatus, subjectChannelID)
+					if job, exists := historyJobs[subjectChannelID]; exists {
+						job.Status = historyStatusCompletedNoMoreMessages
+						historyJobs[subjectChannelID] = job
+					}
 					break MessageRequestingLoop
 				}
 				// Go Back
@@ -210,8 +234,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				for _, message := range messages {
 
 					// Ordered to Cancel
-					if historyStatus[message.ChannelID] == "cancel" {
-						delete(historyStatus, message.ChannelID)
+					if historyJobs[subjectChannelID].Status == historyStatusAbortRequested {
+						if job, exists := historyJobs[subjectChannelID]; exists {
+							job.Status = historyStatusAbortCompleted
+							historyJobs[subjectChannelID] = job
+						}
 						break MessageRequestingLoop
 					}
 
@@ -223,13 +250,19 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					} else if before != "" {
 						before64, _ := strconv.ParseInt(before, 10, 64)
 						if message64 > before64 {
-							delete(historyStatus, message.ChannelID)
+							if job, exists := historyJobs[subjectChannelID]; exists {
+								job.Status = historyStatusCompletedToBeforeFilter
+								historyJobs[subjectChannelID] = job
+							}
 							break MessageRequestingLoop
 						}
 					} else if since != "" {
 						since64, _ := strconv.ParseInt(since, 10, 64)
 						if message64 < since64 {
-							delete(historyStatus, message.ChannelID)
+							if job, exists := historyJobs[subjectChannelID]; exists {
+								job.Status = historyStatusCompletedToSinceFilter
+								historyJobs[subjectChannelID] = job
+							}
 							break MessageRequestingLoop
 						}
 					}
@@ -254,7 +287,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 				}
 				log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Error requesting messages:\t%s", err))
-				delete(historyStatus, subjectChannelID)
+				if job, exists := historyJobs[subjectChannelID]; exists {
+					job.Status = historyStatusErrorRequesting
+					historyJobs[subjectChannelID] = job
+				}
 				break MessageRequestingLoop
 			}
 		}

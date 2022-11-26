@@ -17,7 +17,7 @@ import (
 )
 
 // Multiple use messages to save space and make cleaner.
-//TODO: Implement this for more?
+// TODO: Implement this for more?
 const (
 	cmderrLackingLocalAdminPerms = "You do not have permission to use this command.\n" +
 		"\nTo use this command you must:" +
@@ -287,8 +287,9 @@ func handleCommands() *exrouter.Route {
 				if isBotAdmin(ctx.Msg) {
 					// Run
 					if !stop {
-						_, historyCommandIsSet := historyStatus[channel]
-						if !historyCommandIsSet || historyStatus[channel] == "" {
+
+						if job, exists := historyJobs[channel]; !exists ||
+							(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
 							if config.AsynchronousHistory {
 								go handleHistory(ctx.Msg, channel, beforeID, sinceID)
 							} else {
@@ -297,8 +298,11 @@ func handleCommands() *exrouter.Route {
 						} else { // ALREADY RUNNING
 							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
 						}
-					} else if historyStatus[channel] == "downloading" {
-						historyStatus[channel] = "cancel"
+					} else if historyJobs[channel].Status == historyStatusDownloading { // stop while downloading
+						if entry, ok := historyJobs[channel]; ok {
+							entry.Status = historyStatusAbortRequested
+							historyJobs[channel] = entry
+						}
 						if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 							_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
 							if err != nil {
@@ -308,6 +312,8 @@ func handleCommands() *exrouter.Route {
 							log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
 						}
 						log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for \"%s\"", getUserIdentifier(*ctx.Msg.Author), channel))
+					} else { // tried to stop but is not downloading
+
 					}
 				} else { // DOES NOT HAVE PERMISSION
 					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {

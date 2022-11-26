@@ -53,7 +53,7 @@ var (
 func init() {
 	loop = make(chan os.Signal, 1)
 	startTime = time.Now()
-	historyStatus = make(map[string]string)
+	historyJobs = make(map[string]historyJob)
 
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
@@ -426,7 +426,6 @@ func botLogin() {
 	}
 
 	// Discord Login
-
 	connectBot := func() {
 		// Connect Bot
 		bot.LogLevel = -1 // to ignore dumb wsapi error
@@ -453,7 +452,6 @@ func botLogin() {
 			user = bot.State.User
 		}
 	}
-
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		// Login via Token (Bot or User)
 		log.Println(logPrefixDiscord, color.GreenString("Connecting to Discord via Token..."))
@@ -479,7 +477,6 @@ func botLogin() {
 		log.Println(logPrefixDiscord, color.HiRedString("Error logging in: %s", err))
 		properExit()
 	}
-
 	connectBot()
 
 	// Fetch Bot's User Info
@@ -506,8 +503,7 @@ func botLogin() {
 			log.Println(logPrefixDiscord, color.MagentaString("- If you wish to avoid this, use a Bot Application if possible."))
 		}
 	}
-
-	if bot.State.User != nil {
+	if bot.State.User != nil { // is selfbot
 		selfbot = bot.State.User.Email != ""
 	}
 
