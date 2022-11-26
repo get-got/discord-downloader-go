@@ -109,6 +109,10 @@ github.com/get-got/discordgo v0.26.1-8 h1:DGABQHN+4EpLAG6HTN+kmdvFiMTUPDM8/on6zK
 github.com/get-got/discordgo v0.26.1-8/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/get-got/discordgo v0.26.1-9 h1:tBrsEubZAuWAXBN4jPLtcUZ3U38yeA2Q3zzTY5uZP/k=
 github.com/get-got/discordgo v0.26.1-9/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/get-got/discordgo v0.26.1-10 h1:XGV79qArmUkN0zLzfpECcbnh5ExGPL0GLHJUme5t/X0=
+github.com/get-got/discordgo v0.26.1-10/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/get-got/discordgo v0.26.1-11 h1:En31Ft7S3WfAWhK7MsrqGCmmeu+cgr5IBnfuRzmyuoY=
+github.com/get-got/discordgo v0.26.1-11/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1 h1:QbL/5oDUmRBzO9/Z7Seo6zf912W/a6Sr4Eu0G/3Jho0=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
