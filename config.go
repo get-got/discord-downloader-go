@@ -31,7 +31,6 @@ type configurationCredentials struct {
 	Token    string `json:"token,omitempty"`    // required for bot token (this or login)
 	Email    string `json:"email,omitempty"`    // required for login (this or token)
 	Password string `json:"password,omitempty"` // required for login (this or token)
-	UserBot  bool   `json:"userBot,omitempty"`  // required
 	// APIs
 	TwitterAccessToken         string `json:"twitterAccessToken,omitempty"`         // optional
 	TwitterAccessTokenSecret   string `json:"twitterAccessTokenSecret,omitempty"`   // optional

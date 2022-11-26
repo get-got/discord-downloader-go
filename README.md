@@ -134,7 +134,7 @@ You can either create a `settings.json` following the examples & variables liste
 ### Bot Login Credentials...
 * If using a **Bot Application,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
 * If using a **User Account (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
-* If using a **User Account (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`. **You must also set `userBot` within the `credentials` section of the settings.json to `true`.**
+* If using a **User Account (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
 
 ### Bot Permissions in Discord...
 * In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
@@ -380,7 +380,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     },
     "credentials": {
         "token": "MY_TOKEN",
-        "userBot": true,
         "twitterAccessToken": "TWITTER_ACCESS_TOKEN",
         "twitterAccessTokenSecret": "TWITTER_ACCESS_TOKEN_SECRET",
         "twitterConsumerKey": "TWITTER_CONSUMER_KEY",
@@ -572,10 +571,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_red_triangle: **"password"**
         * — _settings.credentials.password : string_
         * _REQUIRED FOR USER LOGIN WITHOUT 2FA, don't include if using Bot Application Login._
-    * :small_blue_diamond: **"userBot"**
-        * — _settings.credentials.userBot : boolean_
-        * _Default:_ `false`
-        * _SET TO `true` FOR A USER LOGIN WITH 2FA, keep as `false` if using a Bot Application._
     ---
     * :small_orange_diamond: "twitterAccessToken"
         * — _settings.credentials.twitterAccessToken : string_

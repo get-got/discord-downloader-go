@@ -425,15 +425,50 @@ func botLogin() {
 		}
 	}
 
+	// Discord Login
+
+	connectBot := func() {
+		// Connect Bot
+		bot.LogLevel = -1 // to ignore dumb wsapi error
+		err = bot.Open()
+		if err != nil {
+			log.Println(logPrefixDiscord, color.HiRedString("Discord login failed:\t%s", err))
+			properExit()
+		}
+		bot.LogLevel = config.DiscordLogLevel // reset
+		bot.ShouldReconnectOnError = true
+		dur, err := time.ParseDuration(string(config.DiscordTimeout) + "s")
+		if err != nil {
+			dur, _ = time.ParseDuration("180s")
+		}
+		bot.Client.Timeout = dur
+		bot.State.MaxMessageCount = 100000
+		bot.State.TrackChannels = true
+		bot.State.TrackThreads = true
+		bot.State.TrackMembers = true
+		bot.State.TrackThreadMembers = true
+
+		user, err = bot.User("@me")
+		if err != nil {
+			user = bot.State.User
+		}
+	}
+
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
+		// Login via Token (Bot or User)
 		log.Println(logPrefixDiscord, color.GreenString("Connecting to Discord via Token..."))
-		if config.Credentials.UserBot {
-			bot, err = discordgo.New(config.Credentials.Token)
-		} else {
+		// attempt login without Bot prefix
+		bot, err = discordgo.New(config.Credentials.Token)
+		connectBot()
+		if user.Bot {
+			// is bot application, reconnect properly
+			log.Println(logPrefixDiscord, color.GreenString("Reconnecting as bot..."))
 			bot, err = discordgo.New("Bot " + config.Credentials.Token)
 		}
+
 	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
 		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
+		// Login via Email+Password (User Only obviously)
 		log.Println(logPrefixDiscord, color.GreenString("Connecting via Login..."))
 		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
 	} else {
@@ -441,32 +476,11 @@ func botLogin() {
 		properExit()
 	}
 	if err != nil {
-		// Newer discordgo throws this error for some reason with Email/Password login
-		if err.Error() != "Unable to fetch discord authentication token. <nil>" {
-			log.Println(logPrefixDiscord, color.HiRedString("Error logging in: %s", err))
-			properExit()
-		}
-	}
-
-	// Connect Bot
-	bot.LogLevel = -1 // to ignore dumb wsapi error
-	err = bot.Open()
-	if err != nil {
-		log.Println(logPrefixDiscord, color.HiRedString("Discord login failed:\t%s", err))
+		log.Println(logPrefixDiscord, color.HiRedString("Error logging in: %s", err))
 		properExit()
 	}
-	bot.LogLevel = config.DiscordLogLevel // reset
-	bot.ShouldReconnectOnError = true
-	dur, err := time.ParseDuration(string(config.DiscordTimeout) + "s")
-	if err != nil {
-		dur, _ = time.ParseDuration("180s")
-	}
-	bot.Client.Timeout = dur
-	bot.State.MaxMessageCount = 100000
-	bot.State.TrackChannels = true
-	bot.State.TrackThreads = true
-	bot.State.TrackMembers = true
-	bot.State.TrackThreadMembers = true
+
+	connectBot()
 
 	// Fetch Bot's User Info
 	user, err = bot.User("@me")
