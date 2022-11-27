@@ -25,6 +25,24 @@ import (
 	"google.golang.org/api/drive/v3"
 )
 
+/* v2.0.0 REWRITE TODO:
+* Logging System
+**> wrap internal log handler within log.Println, return formatted string to retain file+line in log
+*** Implement Log Leveling
+*** Truncate links to exact size?
+*** Table/Indentation output?
+*** Output Log to Channel(s)
+* Better Message/Embed Send+Error Handling
+*** Ensure USER Permission Check Compat
+* Audit Settings/Config structure
+*** Better Settings Insight / Corrective Suggestions
+* Ensure 100% nil checks
+* Fix Reddit
+* Fix Mastodon
+* Fix/Implement Instagram?
+* Command: Reboot System
+ */
+
 var (
 	// Bot
 	bot     *discordgo.Session
