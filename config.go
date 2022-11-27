@@ -85,7 +85,8 @@ func defaultConfiguration() configuration {
 		AutorunHistory:                 false,
 		AutorunHistoryBefore:           "",
 		AutorunHistorySince:            "",
-		AsynchronousHistory:            false,
+		SendHistoryStatus:              true,
+		SendAutorunHistoryStatus:       false,
 		ExitOnBadConnection:            false,
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
@@ -124,7 +125,8 @@ type configuration struct {
 	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults
 	AutorunHistoryBefore           string                      `json:"autorunHistoryBefore,omitempty"`           // optional
 	AutorunHistorySince            string                      `json:"autorunHistorySince,omitempty"`            // optional
-	AsynchronousHistory            bool                        `json:"asyncHistory,omitempty"`                   // optional, defaults
+	SendHistoryStatus              bool                        `json:"sendHistoryStatus,omitempty`               // optional, defaults
+	SendAutorunHistoryStatus       bool                        `json:"sendAutorunHistoryStatus,omitempty`        // optional, defaults
 	ExitOnBadConnection            bool                        `json:"exitOnBadConnection,omitempty"`            // optional, defaults
 	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
 	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
@@ -210,18 +212,20 @@ type configurationChannel struct {
 	ServerBlacklist *[]string `json:"serverBlacklist,omitempty"` // for server.ServerID & server.ServerIDs
 	Destination     string    `json:"destination"`               // required
 	// Setup
-	Enabled                       *bool     `json:"enabled,omitempty"`                       // optional, defaults
-	Save                          *bool     `json:"save,omitempty"`                          // optional, defaults
-	AllowCommands                 *bool     `json:"allowCommands,omitempty"`                 // optional, defaults
-	ScanEdits                     *bool     `json:"scanEdits,omitempty"`                     // optional, defaults
-	IgnoreBots                    *bool     `json:"ignoreBots,omitempty"`                    // optional, defaults
-	OverwriteAutorunHistory       *bool     `json:"overwriteAutorunHistory,omitempty"`       // optional
-	OverwriteAutorunHistoryBefore *string   `json:"overwriteAutorunHistoryBefore,omitempty"` // optional
-	OverwriteAutorunHistorySince  *string   `json:"overwriteAutorunHistorySince,omitempty"`  // optional
-	SendErrorMessages             *bool     `json:"sendErrorMessages,omitempty"`             // optional, defaults
-	SendFileToChannel             *string   `json:"sendFileToChannel"`                       // optional, defaults
-	SendFileToChannels            *[]string `json:"sendFileToChannels"`                      // optional, defaults
-	SendFileDirectly              *bool     `json:"sendFileDirectly"`                        // optional, defaults
+	Enabled                           *bool     `json:"enabled,omitempty"`                          // optional, defaults
+	Save                              *bool     `json:"save,omitempty"`                             // optional, defaults
+	AllowCommands                     *bool     `json:"allowCommands,omitempty"`                    // optional, defaults
+	ScanEdits                         *bool     `json:"scanEdits,omitempty"`                        // optional, defaults
+	IgnoreBots                        *bool     `json:"ignoreBots,omitempty"`                       // optional, defaults
+	OverwriteAutorunHistory           *bool     `json:"overwriteAutorunHistory,omitempty"`          // optional
+	OverwriteAutorunHistoryBefore     *string   `json:"overwriteAutorunHistoryBefore,omitempty"`    // optional
+	OverwriteAutorunHistorySince      *string   `json:"overwriteAutorunHistorySince,omitempty"`     // optional
+	OverwriteSendHistoryStatus        *bool     `json:"overwriteSendHistoryStatus,omitempty`        // optional, defaults
+	OverwriteSendAutorunHistoryStatus *bool     `json:"overwriteSendAutorunHistoryStatus,omitempty` // optional, defaults
+	SendErrorMessages                 *bool     `json:"sendErrorMessages,omitempty"`                // optional, defaults
+	SendFileToChannel                 *string   `json:"sendFileToChannel"`                          // optional, defaults
+	SendFileToChannels                *[]string `json:"sendFileToChannels"`                         // optional, defaults
+	SendFileDirectly                  *bool     `json:"sendFileDirectly"`                           // optional, defaults
 	// Appearance
 	UpdatePresence             *bool     `json:"updatePresence,omitempty"`             // optional, defaults
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults

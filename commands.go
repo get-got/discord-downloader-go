@@ -204,23 +204,23 @@ func handleCommands() *exrouter.Route {
 		logPrefixHere := color.CyanString("[dgrouter:history]")
 		// Vars
 		var channels []string
+
+		var shouldAbort bool = false
+		var shouldProcess bool = true
+
 		var before string
 		var beforeID string
 		var since string
 		var sinceID string
-		var stop bool
-		// Keys
-		beforeKey := "--before="
-		sinceKey := "--since="
-		// Parse Args
-		for k, v := range ctx.Args {
-			// Skip "history" segment
-			if k == 0 {
+
+		//#region Parse Args
+		for argKey, argValue := range ctx.Args {
+			if argKey == 0 { // skip head
 				continue
 			}
-			// Actually Parse Args
-			if strings.Contains(strings.ToLower(v), beforeKey) {
-				before = strings.ReplaceAll(strings.ToLower(v), beforeKey, "")
+
+			if strings.Contains(strings.ToLower(argValue), "--before=") { // before key
+				before = strings.ReplaceAll(strings.ToLower(argValue), "--before=", "")
 				if isDate(before) {
 					beforeID = discordTimestampToSnowflake("2006-01-02", dateLocalToUTC(before))
 				} else if isNumeric(before) {
@@ -229,8 +229,8 @@ func handleCommands() *exrouter.Route {
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, before %s", beforeID))
 				}
-			} else if strings.Contains(strings.ToLower(v), sinceKey) {
-				since = strings.ReplaceAll(strings.ToLower(v), sinceKey, "")
+			} else if strings.Contains(strings.ToLower(argValue), "--since=") { //  since key
+				since = strings.ReplaceAll(strings.ToLower(argValue), "--since=", "")
 				if isDate(since) {
 					sinceID = discordTimestampToSnowflake("2006-01-02", dateLocalToUTC(since))
 				} else if isNumeric(since) {
@@ -239,23 +239,58 @@ func handleCommands() *exrouter.Route {
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, since %s", sinceID))
 				}
-			} else if strings.Contains(strings.ToLower(v), "cancel") || strings.Contains(strings.ToLower(v), "stop") {
-				stop = true
+			} else if strings.Contains(strings.ToLower(argValue), "cancel") ||
+				strings.Contains(strings.ToLower(argValue), "stop") {
+				shouldAbort = true
+			} else if strings.Contains(strings.ToLower(argValue), "list") ||
+				strings.Contains(strings.ToLower(argValue), "status") ||
+				strings.Contains(strings.ToLower(argValue), "output") {
+				shouldProcess = false
+
+				output := "Running history jobs...\n"
+				for channelID, job := range historyJobs {
+					channelLabel := channelID
+					channelInfo, err := bot.State.Channel(channelID)
+					if err == nil {
+						channelLabel = "#" + channelInfo.Name
+					}
+					output += fmt.Sprintf("• _%s_ - (%s)`%s`, `%s`\n",
+						historyStatusLabel(job.Status), job.OriginUser, channelLabel, durafmt.ParseShort(time.Since(job.Updated)).String())
+					log.Println(logPrefixHere, color.HiCyanString("History Job: %s - (%s)%s, %s",
+						historyStatusLabel(job.Status), job.OriginUser, channelLabel, durafmt.ParseShort(time.Since(job.Updated)).String()))
+				}
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := ctx.Reply(output)
+					if err != nil {
+						log.Println(logPrefixHere,
+							color.HiRedString("Failed to send command embed message (requested by %s)...\t%s",
+								getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				}
+				log.Println(logPrefixHere,
+					color.CyanString("%s requested statuses of history jobs.",
+						getUserIdentifier(*ctx.Msg.Author)))
 			} else {
 				// Actual Source ID(s)
-				targets := strings.Split(ctx.Args.Get(k), ",")
+				targets := strings.Split(ctx.Args.Get(argKey), ",")
 				for _, target := range targets {
 					if isNumeric(target) {
 						// Test/Use if number is guild
 						guild, err := bot.State.Guild(target)
 						if err == nil {
 							if config.DebugOutput {
-								log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Specified target %s is a guild: \"%s\", adding all channels...", target, guild.Name))
+								log.Println(logPrefixHere, logPrefixDebug,
+									color.YellowString("Specified target %s is a guild: \"%s\", adding all channels...",
+										target, guild.Name))
 							}
 							for _, ch := range guild.Channels {
 								channels = append(channels, ch.ID)
 								if config.DebugOutput {
-									log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Added %s (#%s in \"%s\") to history queue", ch.ID, ch.Name, guild.Name))
+									log.Println(logPrefixHere, logPrefixDebug,
+										color.YellowString("Added %s (#%s in \"%s\") to history queue",
+											ch.ID, ch.Name, guild.Name))
 								}
 							}
 						} else { // Test/Use if number is channel
@@ -263,7 +298,9 @@ func handleCommands() *exrouter.Route {
 							if err == nil {
 								channels = append(channels, target)
 								if config.DebugOutput {
-									log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Added %s (#%s in %s) to history queue", ch.ID, ch.Name, ch.GuildID))
+									log.Println(logPrefixHere, logPrefixDebug,
+										color.YellowString("Added %s (#%s in %s) to history queue",
+											ch.ID, ch.Name, ch.GuildID))
 								}
 							}
 						}
@@ -273,63 +310,80 @@ func handleCommands() *exrouter.Route {
 				}
 			}
 		}
-		if len(channels) == 0 { // Local
-			channels = append(channels, ctx.Msg.ChannelID)
-		}
-		// Foreach Channel
-		for _, channel := range channels {
-			if config.DebugOutput {
-				log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Processing %s...", channel))
+		//#endregion
+
+		//#region Process Channels
+		if shouldProcess {
+			// Local
+			if len(channels) == 0 {
+				channels = append(channels, ctx.Msg.ChannelID)
 			}
-			// Registered check
-			if isCommandableChannel(ctx.Msg) {
-				// Permission check
-				if isBotAdmin(ctx.Msg) {
-					// Run
-					if !stop {
-
-						if job, exists := historyJobs[channel]; !exists ||
-							(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
-							if config.AsynchronousHistory {
-								go handleHistory(ctx.Msg, channel, beforeID, sinceID)
-							} else {
-								handleHistory(ctx.Msg, channel, beforeID, sinceID)
-							}
-						} else { // ALREADY RUNNING
-							log.Println(logPrefixHere, color.CyanString("%s tried using history command but history is already running for %s...", getUserIdentifier(*ctx.Msg.Author), channel))
-						}
-					} else if historyJobs[channel].Status == historyStatusDownloading { // stop while downloading
-						if entry, ok := historyJobs[channel]; ok {
-							entry.Status = historyStatusAbortRequested
-							historyJobs[channel] = entry
-						}
-						if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-							_, err := replyEmbed(ctx.Msg, "Command — History", cmderrHistoryCancelled)
-							if err != nil {
-								log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
-							}
-						} else {
+			// Foreach Channel
+			for _, channel := range channels {
+				if config.DebugOutput {
+					log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Processing history command for %s...", channel))
+				}
+				// Registered check
+				if !isCommandableChannel(ctx.Msg) {
+					log.Println(logPrefixHere,
+						color.CyanString("%s tried to catalog history for \"%s\" but channel is not registered...",
+							getUserIdentifier(*ctx.Msg.Author), channel))
+				} else { // Permission check
+					if !isBotAdmin(ctx.Msg) {
+						log.Println(logPrefixHere,
+							color.CyanString("%s tried to cache history for %s but lacked proper permission.",
+								getUserIdentifier(*ctx.Msg.Author), channel))
+						if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 							log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
-						}
-						log.Println(logPrefixHere, color.CyanString("%s cancelled history cataloging for \"%s\"", getUserIdentifier(*ctx.Msg.Author), channel))
-					} else { // tried to stop but is not downloading
-
-					}
-				} else { // DOES NOT HAVE PERMISSION
-					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-						_, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingLocalAdminPerms)
-						if err != nil {
-							log.Println(logPrefixHere, color.HiRedString("Failed to send command embed message (requested by %s)...\t%s", getUserIdentifier(*ctx.Msg.Author), err))
+						} else {
+							if _, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingLocalAdminPerms); err != nil {
+								log.Println(logPrefixHere,
+									color.HiRedString("Failed to send command embed message (requested by %s)...\t%s",
+										getUserIdentifier(*ctx.Msg.Author), err))
+							}
 						}
 					} else {
-						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+						// Run
+						if !shouldAbort {
+							if job, exists := historyJobs[channel]; !exists ||
+								(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
+								job.Status = historyStatusWaiting
+								job.OriginChannel = ctx.Msg.ChannelID
+								job.OriginUser = getUserIdentifier(*ctx.Msg.Author)
+								job.TargetCommandingMessage = ctx.Msg
+								job.TargetChannelID = channel
+								job.TargetBefore = beforeID
+								job.TargetSince = sinceID
+								job.Updated = time.Now()
+								historyJobs[channel] = job
+								//go handleHistory(ctx.Msg, channel, beforeID, sinceID)
+							} else { // ALREADY RUNNING
+								log.Println(logPrefixHere,
+									color.CyanString("%s tried using history command but history is already running for %s...",
+										getUserIdentifier(*ctx.Msg.Author), channel))
+							}
+						} else if historyJobs[channel].Status == historyStatusDownloading ||
+							historyJobs[channel].Status == historyStatusWaiting { // requested abort while downloading
+							if job, exists := historyJobs[channel]; exists {
+								job.Status = historyStatusAbortRequested
+								if historyJobs[channel].Status == historyStatusWaiting {
+									job.Status = historyStatusAbortCompleted
+								}
+								historyJobs[channel] = job
+							}
+							log.Println(logPrefixHere,
+								color.CyanString("%s cancelled history cataloging for \"%s\"",
+									getUserIdentifier(*ctx.Msg.Author), channel))
+						} else { // tried to stop but is not downloading
+							log.Println(logPrefixHere,
+								color.CyanString("%s tried to cancel history for \"%s\" but it's not running",
+									getUserIdentifier(*ctx.Msg.Author), channel))
+						}
 					}
-					log.Println(logPrefixHere, color.CyanString("%s tried to cache history for %s but lacked proper permission.", getUserIdentifier(*ctx.Msg.Author), channel))
 				}
-			} else { // CHANNEL NOT REGISTERED
-				log.Println(logPrefixHere, color.CyanString("%s tried to catalog history for \"%s\" but channel is not registered...", getUserIdentifier(*ctx.Msg.Author), channel))
 			}
 		}
+		//#endregion
 	}).Alias("catalog", "cache").Cat("Admin").Desc("Catalogs history for this channel")
 
 	router.On("exit", func(ctx *exrouter.Context) {

@@ -301,16 +301,50 @@ func main() {
 	}
 	// Process autorun history
 	for _, arh := range autorunHistoryChannels {
-		if config.AsynchronousHistory {
-			go handleHistory(nil, arh.channel, dateLocalToUTC(arh.before), dateLocalToUTC(arh.since))
-		} else {
-			handleHistory(nil, arh.channel, dateLocalToUTC(arh.before), dateLocalToUTC(arh.since))
+		if job, exists := historyJobs[arh.channel]; !exists ||
+			(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
+			job.Status = historyStatusWaiting
+			job.OriginChannel = "AUTORUN"
+			job.OriginUser = "AUTORUN"
+			job.TargetCommandingMessage = nil
+			job.TargetChannelID = arh.channel
+			job.TargetBefore = dateLocalToUTC(arh.before)
+			job.TargetSince = dateLocalToUTC(arh.since)
+			job.Updated = time.Now()
+			historyJobs[arh.channel] = job
+			//go handleHistory(nil, arh.channel, dateLocalToUTC(arh.before), dateLocalToUTC(arh.since))
 		}
 	}
 	if len(autorunHistoryChannels) > 0 {
 		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed (for %d channel%s)", len(autorunHistoryChannels), pluralS(len(autorunHistoryChannels))))
 		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
+
+	// Run History
+	go func() {
+	restartHistoryLoop:
+		for {
+			anyRunning := false
+			for _, job := range historyJobs {
+				if job.Status == historyStatusDownloading {
+					anyRunning = true
+				}
+			}
+			if !anyRunning {
+				var jobsToRun []*historyJob
+				for _, job := range historyJobs {
+					if job.Status == historyStatusWaiting {
+						jobsToRun = append(jobsToRun, &job)
+					}
+				}
+				for _, job := range jobsToRun {
+					handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+					time.Sleep(time.Second * 1)
+					goto restartHistoryLoop
+				}
+			}
+		}
+	}()
 
 	// Settings Watcher
 	watcher, err := fsnotify.NewWatcher()
