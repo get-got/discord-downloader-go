@@ -218,8 +218,58 @@ func handleCommands() *exrouter.Route {
 			if argKey == 0 { // skip head
 				continue
 			}
+			if strings.Contains(strings.ToLower(argValue), "cancel") ||
+				strings.Contains(strings.ToLower(argValue), "stop") {
+				shouldAbort = true
+			} else if strings.Contains(strings.ToLower(argValue), "help") ||
+				strings.Contains(strings.ToLower(argValue), "info") {
+				shouldProcess = false
 
-			if strings.Contains(strings.ToLower(argValue), "--before=") { // before key
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					content := fmt.Sprintf("aaa")
+					_, err := replyEmbed(ctx.Msg, "Command — History Help", content)
+					if err != nil {
+						log.Println(logPrefixHere,
+							color.HiRedString("Failed to send command embed message (requested by %s)...\t%s",
+								getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				}
+				log.Println(logPrefixHere, color.CyanString("%s requested history help.", getUserIdentifier(*ctx.Msg.Author)))
+			} else if strings.Contains(strings.ToLower(argValue), "list") ||
+				strings.Contains(strings.ToLower(argValue), "status") ||
+				strings.Contains(strings.ToLower(argValue), "output") {
+				shouldProcess = false
+
+				output := "Running history jobs...\n"
+				for channelID, job := range historyJobs {
+					channelLabel := channelID
+					channelInfo, err := bot.State.Channel(channelID)
+					if err == nil {
+						channelLabel = "#" + channelInfo.Name
+					}
+					output += fmt.Sprintf("• _%s_ - (%s)`%s`, `updated %s ago, added %s ago`\n",
+						historyStatusLabel(job.Status), job.OriginUser, channelLabel,
+						durafmt.ParseShort(time.Since(job.Updated)).String(), durafmt.ParseShort(time.Since(job.Added)).String())
+					log.Println(logPrefixHere, color.HiCyanString("History Job: %s - (%s)%s, updated %s ago, added %s ago",
+						historyStatusLabel(job.Status), job.OriginUser, channelLabel,
+						durafmt.ParseShort(time.Since(job.Updated)).String(), durafmt.ParseShort(time.Since(job.Added)).String()))
+				}
+				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+					_, err := ctx.Reply(output)
+					if err != nil {
+						log.Println(logPrefixHere,
+							color.HiRedString("Failed to send command embed message (requested by %s)...\t%s",
+								getUserIdentifier(*ctx.Msg.Author), err))
+					}
+				} else {
+					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				}
+				log.Println(logPrefixHere,
+					color.CyanString("%s requested statuses of history jobs.",
+						getUserIdentifier(*ctx.Msg.Author)))
+			} else if strings.Contains(strings.ToLower(argValue), "--before=") { // before key
 				before = strings.ReplaceAll(strings.ToLower(argValue), "--before=", "")
 				if isDate(before) {
 					beforeID = discordTimestampToSnowflake("2006-01-02", dateLocalToUTC(before))
@@ -239,39 +289,6 @@ func handleCommands() *exrouter.Route {
 				if config.DebugOutput {
 					log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, since %s", sinceID))
 				}
-			} else if strings.Contains(strings.ToLower(argValue), "cancel") ||
-				strings.Contains(strings.ToLower(argValue), "stop") {
-				shouldAbort = true
-			} else if strings.Contains(strings.ToLower(argValue), "list") ||
-				strings.Contains(strings.ToLower(argValue), "status") ||
-				strings.Contains(strings.ToLower(argValue), "output") {
-				shouldProcess = false
-
-				output := "Running history jobs...\n"
-				for channelID, job := range historyJobs {
-					channelLabel := channelID
-					channelInfo, err := bot.State.Channel(channelID)
-					if err == nil {
-						channelLabel = "#" + channelInfo.Name
-					}
-					output += fmt.Sprintf("• _%s_ - (%s)`%s`, `%s`\n",
-						historyStatusLabel(job.Status), job.OriginUser, channelLabel, durafmt.ParseShort(time.Since(job.Updated)).String())
-					log.Println(logPrefixHere, color.HiCyanString("History Job: %s - (%s)%s, %s",
-						historyStatusLabel(job.Status), job.OriginUser, channelLabel, durafmt.ParseShort(time.Since(job.Updated)).String()))
-				}
-				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					_, err := ctx.Reply(output)
-					if err != nil {
-						log.Println(logPrefixHere,
-							color.HiRedString("Failed to send command embed message (requested by %s)...\t%s",
-								getUserIdentifier(*ctx.Msg.Author), err))
-					}
-				} else {
-					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
-				}
-				log.Println(logPrefixHere,
-					color.CyanString("%s requested statuses of history jobs.",
-						getUserIdentifier(*ctx.Msg.Author)))
 			} else {
 				// Actual Source ID(s)
 				targets := strings.Split(ctx.Args.Get(argKey), ",")
@@ -355,8 +372,8 @@ func handleCommands() *exrouter.Route {
 								job.TargetBefore = beforeID
 								job.TargetSince = sinceID
 								job.Updated = time.Now()
+								job.Added = time.Now()
 								historyJobs[channel] = job
-								//go handleHistory(ctx.Msg, channel, beforeID, sinceID)
 							} else { // ALREADY RUNNING
 								log.Println(logPrefixHere,
 									color.CyanString("%s tried using history command but history is already running for %s...",

@@ -311,6 +311,7 @@ func main() {
 			job.TargetBefore = dateLocalToUTC(arh.before)
 			job.TargetSince = dateLocalToUTC(arh.since)
 			job.Updated = time.Now()
+			job.Added = time.Now()
 			historyJobs[arh.channel] = job
 			//go handleHistory(nil, arh.channel, dateLocalToUTC(arh.before), dateLocalToUTC(arh.since))
 		}
@@ -337,10 +338,11 @@ func main() {
 						jobsToRun = append(jobsToRun, &job)
 					}
 				}
+				// because of modifying the job while iterating historyJobs above
 				for _, job := range jobsToRun {
 					handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
 					time.Sleep(time.Second * 1)
-					goto restartHistoryLoop
+					goto restartHistoryLoop // to recache the list of jobs
 				}
 			}
 		}

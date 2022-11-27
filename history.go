@@ -20,6 +20,7 @@ const (
 	historyStatusDownloading
 	historyStatusAbortRequested
 	historyStatusAbortCompleted
+	historyStatusErrorReadMessageHistoryPerms
 	historyStatusErrorRequesting
 	historyStatusCompletedNoMoreMessages
 	historyStatusCompletedToBeforeFilter
@@ -31,19 +32,21 @@ func historyStatusLabel(status historyStatus) string {
 	case historyStatusWaiting:
 		return "Waiting..."
 	case historyStatusDownloading:
-		return "Downloading..."
+		return "Currently Downloading..."
 	case historyStatusAbortRequested:
 		return "Abort Requested..."
 	case historyStatusAbortCompleted:
 		return "Aborted..."
+	case historyStatusErrorReadMessageHistoryPerms:
+		return "ERROR: Cannot Read Message History"
 	case historyStatusErrorRequesting:
-		return "ERROR REQUESTING MESSAGES"
+		return "ERROR: Message Requests Failed"
 	case historyStatusCompletedNoMoreMessages:
-		return "Completed! No More Messages"
+		return "COMPLETE: No More Messages"
 	case historyStatusCompletedToBeforeFilter:
-		return "Completed! Exceeded Before Date Filter"
+		return "COMPLETE: Exceeded Before Date Filter"
 	case historyStatusCompletedToSinceFilter:
-		return "Completed! Exceeded Since Date Filter"
+		return "COMPLETE: Exceeded Since Date Filter"
 	default:
 		return "Unknown"
 	}
@@ -58,6 +61,7 @@ type historyJob struct {
 	TargetBefore            string
 	TargetSince             string
 	Updated                 time.Time
+	Added                   time.Time
 }
 
 var (
@@ -96,6 +100,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	// Check Read History perms
 	if !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
+		if job, exists := historyJobs[subjectChannelID]; exists {
+			job.Status = historyStatusDownloading
+			job.Updated = time.Now()
+			historyJobs[subjectChannelID] = job
+		}
 		log.Println(logPrefixHistory, color.HiRedString(logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!"))
 		return -1
 	}
@@ -110,6 +119,44 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		job.Updated = time.Now()
 		historyJobs[subjectChannelID] = job
 	}
+
+	//#region Cache Files
+	openHistoryCache := func(dirpath string, output *string) {
+		if f, err := ioutil.ReadFile(dirpath + string(os.PathSeparator) + subjectChannelID); err == nil {
+			*output = string(f)
+			if !autorun && config.DebugOutput {
+				log.Println(logPrefixDebug, color.YellowString(logPrefix+"Found a cache file, picking up where we left off before %s...",
+					string(f)))
+			}
+		}
+	}
+	writeHistoryCache := func(dirpath string, ID string) {
+		if err := os.MkdirAll(dirpath, 0755); err != nil {
+			log.Println(logPrefixHistory, color.HiRedString("Error while creating history cache folder \"%s\": %s", dirpath, err))
+		}
+		f, err := os.OpenFile(dirpath+string(os.PathSeparator)+subjectChannelID, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			log.Println(logPrefixHistory, color.RedString("Failed to open cache file:\t%s", err))
+		}
+		if _, err = f.WriteString(ID); err != nil {
+			log.Println(logPrefixHistory, color.RedString("Failed to write cache file:\t%s", err))
+		} else if !autorun && config.DebugOutput {
+			log.Println(logPrefixDebug, logPrefixHistory, color.YellowString(logPrefix+"Wrote to cache file."))
+		}
+		f.Close()
+	}
+	deleteHistoryCache := func(dirpath string) {
+		fp := dirpath + string(os.PathSeparator) + subjectChannelID
+		if _, err := os.Stat(fp); err == nil {
+			err = os.Remove(fp)
+			if err != nil {
+				log.Println(logPrefixHistory, color.HiRedString(logPrefix+"Encountered error deleting cache file:\t%s", err))
+			} else if commandingMessage != nil && config.DebugOutput {
+				log.Println(logPrefixDebug, logPrefixHistory, color.YellowString(logPrefix+"Deleted cache file."))
+			}
+		}
+	}
+	//#endregion
 
 	// Date Range Vars
 	var beforeID = before
@@ -154,14 +201,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 
 		// Open Cache File?
-		if historyCachePath != "" {
-			if f, err := ioutil.ReadFile(historyCachePath + string(os.PathSeparator) + subjectChannelID); err == nil {
-				beforeID = string(f)
-				if !autorun && config.DebugOutput {
-					log.Println(logPrefixDebug, color.YellowString(logPrefix+"Found a cache file, picking up where we left off...", subjectChannelID, commander))
-				}
-			}
-		}
+		openHistoryCache(historyCacheBefore, &beforeID)
+		openHistoryCache(historyCacheSince, &sinceID)
 
 		historyStartTime := time.Now()
 
@@ -181,28 +222,17 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 		log.Println(logPrefixHistory, color.CyanString(logPrefix+"Began checking history for %s...", subjectChannelID))
 
+		lastMessageID := ""
 	MessageRequestingLoop:
 		for {
 			// Next 100
 			if beforeTime != (time.Time{}) {
 				messageRequestCount++
-
-				// Write to cache file
-				if historyCachePath != "" {
-					if err := os.MkdirAll(historyCachePath, 0755); err != nil {
-						log.Println(logPrefixHistory, color.HiRedString("Error while creating history cache folder \"%s\": %s", historyCachePath, err))
-					}
-					filepath := historyCachePath + string(os.PathSeparator) + subjectChannelID
-					f, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-					if err != nil {
-						log.Println(logPrefixHistory, color.RedString("Failed to open cache file:\t%s", err))
-					}
-					if _, err = f.WriteString(beforeID); err != nil {
-						log.Println(logPrefixHistory, color.RedString("Failed to write cache file:\t%s", err))
-					} else if !autorun && config.DebugOutput {
-						log.Println(logPrefixDebug, logPrefixHistory, color.YellowString(logPrefix+"Wrote to cache file."))
-					}
-					f.Close()
+				if beforeID != "" {
+					writeHistoryCache(historyCacheBefore, beforeID)
+				}
+				if sinceID != "" {
+					writeHistoryCache(historyCacheSince, sinceID)
 				}
 
 				// Update Status
@@ -314,11 +344,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						break
 					}
 
+					lastMessageID = message.ID
+
 					// Check Message Range
 					message64, _ := strconv.ParseInt(message.ID, 10, 64)
-					if before != "" && since != "" {
-						//
-					} else if before != "" {
+					if before != "" {
 						before64, _ := strconv.ParseInt(before, 10, 64)
 						if message64 > before64 {
 							if job, exists := historyJobs[subjectChannelID]; exists {
@@ -328,7 +358,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							}
 							break MessageRequestingLoop
 						}
-					} else if since != "" {
+					}
+					if since != "" {
 						since64, _ := strconv.ParseInt(since, 10, 64)
 						if message64 < since64 {
 							if job, exists := historyJobs[subjectChannelID]; exists {
@@ -350,6 +381,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 		}
 
+		// Cache
+		if historyJobs[subjectChannelID].Status == historyStatusCompletedNoMoreMessages {
+			deleteHistoryCache(historyCacheBefore)
+			writeHistoryCache(historyCacheSince, lastMessageID)
+		}
+
 		// Final log
 		log.Println(logPrefixHistory, color.HiCyanString(logPrefix+"Finished history, %s files", formatNumber(totalDownloads)))
 		// Final status update
@@ -359,15 +396,16 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					"``%s total messages processed``\n\n"+
 					"`Server:` **%s**\n"+
 					"`Channel:` _#%s_\n\n"+
-					"**FINISHED!**\n"+
+					"**DONE!** - %s\n"+
 					"Ran ``%d`` message history requests\n\n"+
 					"%s_Duration was %s_",
 				durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
 				formatNumber(int64(totalMessages)),
 				getGuildName(getChannelGuildID(subjectChannelID)),
 				getChannelName(subjectChannelID),
-				messageRequestCount, rangeContent,
-				durafmt.Parse(time.Since(historyStartTime)).String(),
+				historyStatusLabel(historyJobs[subjectChannelID].Status),
+				messageRequestCount,
+				rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
 			)
 			if !hasPermsToRespond {
 				log.Println(logPrefixHistory, color.HiRedString(logPrefix+fmtBotSendPerm, responseMsg.ChannelID))
