@@ -1050,6 +1050,9 @@ func getAdminChannelConfig(ChannelID string) configurationAdminChannel {
 }
 
 func isCommandableChannel(m *discordgo.Message) bool {
+	if config.AllowGlobalCommands {
+		return true
+	}
 	ch := channelRegistered(m)
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
@@ -1058,13 +1061,6 @@ func isCommandableChannel(m *discordgo.Message) bool {
 		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
-	}
-	return false
-}
-
-func isGlobalCommandAllowed(m *discordgo.Message) bool {
-	if config.AllowGlobalCommands || isCommandableChannel(m) {
-		return true
 	}
 	return false
 }
