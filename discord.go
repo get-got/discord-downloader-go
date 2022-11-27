@@ -16,6 +16,74 @@ import (
 	"github.com/teris-io/shortid"
 )
 
+//#region Get
+
+//TODO: Clean below
+
+func getChannelState(channelID string) *discordgo.Channel {
+	sourceChannel, _ := bot.State.Channel(channelID)
+	if sourceChannel != nil {
+		return sourceChannel
+	}
+	return &discordgo.Channel{}
+}
+
+func getGuildState(guildID string) *discordgo.Guild {
+	sourceGuild, _ := bot.State.Guild(guildID)
+	if sourceGuild != nil {
+		return sourceGuild
+	}
+	return &discordgo.Guild{}
+}
+
+func getChannelGuildID(channelID string) string {
+	sourceChannel, _ := bot.State.Channel(channelID)
+	if sourceChannel != nil {
+		return sourceChannel.GuildID
+	}
+	return ""
+}
+
+func getGuildName(guildID string) string {
+	sourceGuildName := "UNKNOWN"
+	sourceGuild, _ := bot.State.Guild(guildID)
+	if sourceGuild != nil && sourceGuild.Name != "" {
+		sourceGuildName = sourceGuild.Name
+	}
+	return sourceGuildName
+}
+
+func getChannelName(channelID string) string {
+	sourceChannelName := "unknown"
+	sourceChannel, _ := bot.State.Channel(channelID)
+	if sourceChannel != nil {
+		if sourceChannel.Name != "" {
+			sourceChannelName = sourceChannel.Name
+		} else {
+			switch sourceChannel.Type {
+			case discordgo.ChannelTypeDM:
+				sourceChannelName = "dm"
+			case discordgo.ChannelTypeGroupDM:
+				sourceChannelName = "group-dm"
+			}
+		}
+	}
+	return sourceChannelName
+}
+
+func getSourceName(guildID string, channelID string) string {
+	guildName := getGuildName(guildID)
+	channelName := getChannelName(channelID)
+	if channelName == "dm" || channelName == "group-dm" {
+		return channelName
+	}
+	return fmt.Sprintf("\"%s\"#%s", guildName, channelName)
+}
+
+//#endregion
+
+//#region Time
+
 const (
 	discordEpoch = 1420070400000
 )
@@ -42,54 +110,57 @@ func discordSnowflakeToTimestamp(snowflake string, format string) string {
 	return t.Local().Format(format)
 }
 
-func getAllRegisteredChannels() []string {
-	var channels []string
-	if config.All != nil { // ALL MODE
-		for _, guild := range bot.State.Guilds {
-			for _, channel := range guild.Channels {
-				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-					channels = append(channels, channel.ID)
-				}
-			}
-		}
-	} else { // STANDARD MODE
-		// Compile all config channels
-		for _, channel := range config.Channels {
-			if channel.ChannelIDs != nil {
-				for _, subchannel := range *channel.ChannelIDs {
-					channels = append(channels, subchannel)
-				}
-			} else if isNumeric(channel.ChannelID) {
-				channels = append(channels, channel.ChannelID)
-			}
-		}
-		// Compile all channels sourced from config servers
-		for _, server := range config.Servers {
-			if server.ServerIDs != nil {
-				for _, subserver := range *server.ServerIDs {
-					guild, err := bot.State.Guild(subserver)
-					if err == nil {
-						for _, channel := range guild.Channels {
-							if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-								channels = append(channels, channel.ID)
-							}
+//#endregion
+
+//#region Messages
+
+// For command case-insensitivity
+func messageToLower(message *discordgo.Message) *discordgo.Message {
+	newMessage := *message
+	newMessage.Content = strings.ToLower(newMessage.Content)
+	return &newMessage
+}
+
+func fixMessage(m *discordgo.Message) *discordgo.Message {
+	// If message content is empty (likely due to userbot/selfbot)
+	ubIssue := "Message is corrupted due to endpoint restriction"
+	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
+		// Get message history
+		mCache, err := bot.ChannelMessages(m.ChannelID, 20, "", "", "")
+		if err == nil {
+			if len(mCache) > 0 {
+				for _, mCached := range mCache {
+					if mCached.ID == m.ID {
+						// Fix original message having empty Guild ID
+						guildID := m.GuildID
+						// Replace message
+						m = mCached
+						// ^^
+						if m.GuildID == "" && guildID != "" {
+							m.GuildID = guildID
 						}
+						// Parse commands
+						botCommands.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
+
+						break
 					}
 				}
-			} else if isNumeric(server.ServerID) {
-				guild, err := bot.State.Guild(server.ServerID)
-				if err == nil {
-					for _, channel := range guild.Channels {
-						if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-							channels = append(channels, channel.ID)
-						}
-					}
-				}
+			} else if config.DebugOutput {
+				log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", ubIssue))
 			}
+		} else if config.DebugOutput {
+			log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
 		}
 	}
-	return channels
+	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
+		if config.DebugOutput {
+			log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
+		}
+	}
+	return m
 }
+
+//#endregion
 
 //#region Presence
 
@@ -137,7 +208,7 @@ func dataKeyReplacement(input string) string {
 	return input
 }
 
-func filenameKeyReplacement(channelConfig configurationChannel, download downloadRequestStruct) string {
+func dynamicKeyReplacement(channelConfig configurationChannel, download downloadRequestStruct) string {
 	//TODO: same as dataKeyReplacement
 
 	ret := config.FilenameFormat
@@ -281,7 +352,7 @@ func getEmbedColor(channelID string) int {
 	if color != nil {
 		// Defined as Role, fetch role color
 		if *color == "role" || *color == "user" {
-			botColor := bot.State.UserColor(user.ID, channelID)
+			botColor := bot.State.UserColor(botUser.ID, channelID)
 			if botColor != 0 {
 				return botColor
 			}
@@ -312,8 +383,8 @@ func getEmbedColor(channelID string) int {
 	channelInfo, err = bot.State.Channel(channelID)
 	if err == nil {
 		if channelInfo.Type != discordgo.ChannelTypeDM && channelInfo.Type != discordgo.ChannelTypeGroupDM {
-			if bot.State.UserColor(user.ID, channelID) != 0 {
-				return bot.State.UserColor(user.ID, channelID)
+			if bot.State.UserColor(botUser.ID, channelID) != 0 {
+				return bot.State.UserColor(botUser.ID, channelID)
 			}
 		}
 	}
@@ -361,35 +432,40 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 	return nil, nil
 }
 
-type logStatusType int
+//#endregion
+
+//#region Send Status
+
+type sendStatusType int
 
 const (
-	logStatusStartup logStatusType = iota
-	logStatusReconnect
-	logStatusExit
+	sendStatusStartup sendStatusType = iota
+	sendStatusReconnect
+	sendStatusExit
 )
 
-func logStatusLabel(status logStatusType) string {
+func sendStatusLabel(status sendStatusType) string {
 	switch status {
-	case logStatusStartup:
+	case sendStatusStartup:
 		return "has launched"
-	case logStatusReconnect:
+	case sendStatusReconnect:
 		return "has reconnected"
-	case logStatusExit:
+	case sendStatusExit:
 		return "is exiting"
 	}
-	return "<<ERROR>>"
+	return "is confused"
 }
 
-func logStatusMessage(status logStatusType) {
+func sendStatusMessage(status sendStatusType) {
 	for _, adminChannel := range config.AdminChannels {
 		if *adminChannel.LogStatus {
 			var message string
 			var label string
 
-			if status == logStatusStartup || status == logStatusReconnect {
+			//TODO: CLEAN
+			if status == sendStatusStartup || status == sendStatusReconnect {
 				label = "startup"
-				message += fmt.Sprintf("%s %s and connected to %d server%s...\n", projectLabel, logStatusLabel(status), len(bot.State.Guilds), pluralS(len(bot.State.Guilds)))
+				message += fmt.Sprintf("%s %s and connected to %d server%s...\n", projectLabel, sendStatusLabel(status), len(bot.State.Guilds), pluralS(len(bot.State.Guilds)))
 				message += fmt.Sprintf("\n• Uptime is %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
 				message += fmt.Sprintf("\n• Bound to %d channel%s and %d server%s", getBoundChannelsCount(), pluralS(getBoundChannelsCount()), getBoundServersCount(), pluralS(getBoundServersCount()))
@@ -406,9 +482,9 @@ func logStatusMessage(status logStatusType) {
 				}
 				message += fmt.Sprintf("\n_%s-%s %s / discordgo v%s / Discord API v%s_",
 					runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
-			} else if status == logStatusExit {
+			} else if status == sendStatusExit {
 				label = "exit"
-				message += fmt.Sprintf("%s %s...\n", projectLabel, logStatusLabel(status))
+				message += fmt.Sprintf("%s %s...\n", projectLabel, sendStatusLabel(status))
 				message += fmt.Sprintf("\n• Uptime was %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
 				message += fmt.Sprintf("\n• Bound to %d channel%s and %d server%s", getBoundChannelsCount(), pluralS(getBoundChannelsCount()), getBoundServersCount(), pluralS(getBoundServersCount()))
@@ -428,7 +504,7 @@ func logStatusMessage(status logStatusType) {
 	}
 }
 
-func logErrorMessage(err string) {
+func sendErrorMessage(err string) {
 	for _, adminChannel := range config.AdminChannels {
 		if *adminChannel.LogErrors {
 			// Send
@@ -467,7 +543,7 @@ func isBotAdmin(m *discordgo.Message) bool {
 		}
 	}
 
-	return m.Author.ID == user.ID || stringInSlice(m.Author.ID, config.Admins)
+	return m.Author.ID == botUser.ID || stringInSlice(m.Author.ID, config.Admins)
 }
 
 // Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
@@ -500,7 +576,7 @@ func isLocalAdmin(m *discordgo.Message) bool {
 		return true
 	}
 
-	botSelf := m.Author.ID == user.ID
+	botSelf := m.Author.ID == botUser.ID
 	botAdmin := stringInSlice(m.Author.ID, config.Admins)
 	guildOwner := m.Author.ID == guild.OwnerID
 	guildAdmin := localPerms&discordgo.PermissionAdministrator > 0
@@ -522,7 +598,7 @@ func hasPerms(channelID string, permission int64) bool {
 		case discordgo.ChannelTypeGroupDM:
 			return true
 		case discordgo.ChannelTypeGuildText:
-			perms, err := bot.UserChannelPermissions(user.ID, channelID)
+			perms, err := bot.UserChannelPermissions(botUser.ID, channelID)
 			if err == nil {
 				return perms&permission == permission
 			}
@@ -540,112 +616,4 @@ func getUserIdentifier(usr discordgo.User) string {
 	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
 
-//TODO: Clean below
-
-func getChannelState(channelID string) *discordgo.Channel {
-	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil {
-		return sourceChannel
-	}
-	return &discordgo.Channel{}
-}
-
-func getGuildState(guildID string) *discordgo.Guild {
-	sourceGuild, _ := bot.State.Guild(guildID)
-	if sourceGuild != nil {
-		return sourceGuild
-	}
-	return &discordgo.Guild{}
-}
-
-func getChannelGuildID(channelID string) string {
-	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil {
-		return sourceChannel.GuildID
-	}
-	return ""
-}
-
-func getGuildName(guildID string) string {
-	sourceGuildName := "UNKNOWN"
-	sourceGuild, _ := bot.State.Guild(guildID)
-	if sourceGuild != nil && sourceGuild.Name != "" {
-		sourceGuildName = sourceGuild.Name
-	}
-	return sourceGuildName
-}
-
-func getChannelName(channelID string) string {
-	sourceChannelName := "unknown"
-	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil {
-		if sourceChannel.Name != "" {
-			sourceChannelName = sourceChannel.Name
-		} else {
-			switch sourceChannel.Type {
-			case discordgo.ChannelTypeDM:
-				sourceChannelName = "dm"
-			case discordgo.ChannelTypeGroupDM:
-				sourceChannelName = "group-dm"
-			}
-		}
-	}
-	return sourceChannelName
-}
-
-func getSourceName(guildID string, channelID string) string {
-	guildName := getGuildName(guildID)
-	channelName := getChannelName(channelID)
-	if channelName == "dm" || channelName == "group-dm" {
-		return channelName
-	}
-	return fmt.Sprintf("\"%s\"#%s", guildName, channelName)
-}
-
 //#endregion
-
-// For command case-insensitivity
-func messageToLower(message *discordgo.Message) *discordgo.Message {
-	newMessage := *message
-	newMessage.Content = strings.ToLower(newMessage.Content)
-	return &newMessage
-}
-
-func fixMessage(m *discordgo.Message) *discordgo.Message {
-	// If message content is empty (likely due to userbot/selfbot)
-	ubIssue := "Message is corrupted due to endpoint restriction"
-	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
-		// Get message history
-		mCache, err := bot.ChannelMessages(m.ChannelID, 20, "", "", "")
-		if err == nil {
-			if len(mCache) > 0 {
-				for _, mCached := range mCache {
-					if mCached.ID == m.ID {
-						// Fix original message having empty Guild ID
-						guildID := m.GuildID
-						// Replace message
-						m = mCached
-						// ^^
-						if m.GuildID == "" && guildID != "" {
-							m.GuildID = guildID
-						}
-						// Parse commands
-						dgr.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
-
-						break
-					}
-				}
-			} else if config.DebugOutput {
-				log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", ubIssue))
-			}
-		} else if config.DebugOutput {
-			log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
-		}
-	}
-	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
-		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
-		}
-	}
-	return m
-}

@@ -41,7 +41,7 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 
 func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 	// Ignore own messages unless told not to
-	if m.Author.ID == user.ID && !config.ScanOwnMessages {
+	if m.Author.ID == botUser.ID && !config.ScanOwnMessages {
 		return -1
 	}
 

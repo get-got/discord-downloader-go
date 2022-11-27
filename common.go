@@ -17,17 +17,7 @@ import (
 	"github.com/hashicorp/go-version"
 )
 
-var (
-	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
-)
-
-func clearPath(p string) string {
-	r := p
-	for _, key := range pathBlacklist {
-		r = strings.ReplaceAll(r, key, "")
-	}
-	return r
-}
+//#region Instance
 
 func uptime() time.Duration {
 	return time.Since(startTime)
@@ -41,6 +31,40 @@ func properExit() {
 	os.Exit(1)
 }
 
+//#endregion
+
+//#region Files
+
+var (
+	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
+)
+
+func clearPath(p string) string {
+	r := p
+	for _, key := range pathBlacklist {
+		r = strings.ReplaceAll(r, key, "")
+	}
+	return r
+}
+
+func filenameFromURL(inputURL string) string {
+	base := path.Base(inputURL)
+	parts := strings.Split(base, "?")
+	return path.Clean(parts[0])
+}
+
+func filepathExtension(filepath string) string {
+	if strings.Contains(filepath, "?") {
+		filepath = strings.Split(filepath, "?")[0]
+	}
+	filepath = path.Ext(filepath)
+	return filepath
+}
+
+//#endregion
+
+//#region Text Formatting & Querying
+
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if strings.ToLower(b) == strings.ToLower(a) {
@@ -49,8 +73,6 @@ func stringInSlice(a string, list []string) bool {
 	}
 	return false
 }
-
-//#region Formatting
 
 func formatNumber(n int64) string {
 	var numberSeparator byte = ','
@@ -139,9 +161,28 @@ func stripSymbols(i string) string {
 	return re.ReplaceAllString(i, " ")
 }
 
+func isNumeric(s string) bool {
+	_, err := strconv.ParseFloat(s, 64)
+	return err == nil
+}
+
+func isDate(s string) bool {
+	_, err := time.Parse("2006-01-02", s)
+	return err == nil
+}
+
+func dateLocalToUTC(s string) string {
+	if s == "" || !isDate(s) {
+		return ""
+	}
+	rawDate, _ := time.Parse("2006-01-02", s)
+	localDate := time.Date(rawDate.Year(), rawDate.Month(), rawDate.Day(), 0, 0, 0, 0, time.Local)
+	return fmt.Sprintf("%s-%s-%s", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
+}
+
 //#endregion
 
-//#region Requests
+//#region Github Release Checking
 
 type githubReleaseApiObject struct {
 	TagName string `json:"tag_name"`
@@ -176,6 +217,10 @@ func isLatestGithubRelease() bool {
 	return true
 }
 
+//#endregion
+
+//#region Requests
+
 func getJSON(url string, target interface{}) error {
 	r, err := http.Get(url)
 	if err != nil {
@@ -205,39 +250,130 @@ func getJSONwithHeaders(url string, target interface{}, headers map[string]strin
 
 //#endregion
 
-//#region Parsing
+//#region Log
 
-func filenameFromURL(inputURL string) string {
-	base := path.Base(inputURL)
-	parts := strings.Split(base, "?")
-	return path.Clean(parts[0])
-}
+const (
+	logLevelOff = iota
+	logLevelFatal
+	logLevelError
+	logLevelWarning
+	logLevelInfo
+	logLevelDebug
+	logLevelVerbose
+	logLevelAll
+)
 
-func filepathExtension(filepath string) string {
-	if strings.Contains(filepath, "?") {
-		filepath = strings.Split(filepath, "?")[0]
+func lg(group string, subgroup string, colorFunc func(string, ...interface{}) string, line string, p ...interface{}) string {
+	colorPrefix := group
+	switch strings.ToLower(group) {
+
+	case "main":
+		if subgroup == "" {
+			colorPrefix = color.CyanString("[~]")
+		} else {
+			colorPrefix = color.CyanString("[~:%s]", subgroup)
+		}
+	case "debug":
+		if subgroup == "" {
+			colorPrefix = color.HiYellowString("<DEBUG>")
+		} else {
+			colorPrefix = color.HiYellowString("<DEBUG:%s>", subgroup)
+		}
+	case "test":
+		if subgroup == "" {
+			colorPrefix = color.HiYellowString("<TEST>")
+		} else {
+			colorPrefix = color.HiYellowString("<TEST:%s>", subgroup)
+		}
+	case "info":
+		if subgroup == "" {
+			colorPrefix = color.CyanString("[Info]")
+		} else {
+			colorPrefix = color.CyanString("[Info:%s]", subgroup)
+		}
+	case "version":
+		colorPrefix = color.HiMagentaString("[Version]")
+
+	case "settings":
+		colorPrefix = color.GreenString("[Settings]")
+
+	case "database":
+		colorPrefix = color.BlueString("[Database]")
+
+	case "setup":
+		colorPrefix = color.HiGreenString("[Setup]")
+
+	case "discord":
+		colorPrefix = color.HiBlueString("[Discord]")
+
+	case "history":
+		if subgroup == "" {
+			colorPrefix = color.HiCyanString("[History]")
+		} else {
+			colorPrefix = color.HiCyanString("[History:%s]", subgroup)
+		}
+
+	case "command":
+		if subgroup == "" {
+			colorPrefix = color.HiGreenString("[Commands]")
+		} else {
+			colorPrefix = color.HiGreenString("[Command:%s]", subgroup)
+		}
+
+	case "download":
+		if subgroup == "" {
+			colorPrefix = color.GreenString("[Downloads]")
+		} else {
+			colorPrefix = color.GreenString("[Download:%s]", subgroup)
+		}
+
+	case "message":
+		if subgroup == "" {
+			colorPrefix = color.CyanString("[Messages]")
+		} else {
+			colorPrefix = color.CyanString("[Message:%s]", subgroup)
+		}
+
+	case "regex":
+		if subgroup == "" {
+			colorPrefix = color.YellowString("[Regex]")
+		} else {
+			colorPrefix = color.YellowString("[Regex:%s]", subgroup)
+		}
+
+	case "api":
+		if subgroup == "" {
+			colorPrefix = color.HiMagentaString("[APIs]")
+		} else {
+			colorPrefix = color.HiMagentaString("[API:%s]", subgroup)
+		}
 	}
-	filepath = path.Ext(filepath)
-	return filepath
-}
 
-func isNumeric(s string) bool {
-	_, err := strconv.ParseFloat(s, 64)
-	return err == nil
-}
+	/*if bot != nil && botReady {
+		for _, channelConfig := range config.OutputChannels {
+			if channelConfig.OutputProgram {
+				outputToChannel := func(channel string) {
+					if channel != "" {
+						if !hasPerms(channel, discordgo.PermissionSendMessages) {
+							dubLog("Log", logLevelError, color.HiRedString, fmtBotSendPerm, channel)
+						} else {
+							if _, err := bot.ChannelMessageSend(channel, fmt.Sprintf("```%s | [%s] %s```", time.Now().Format(time.RFC3339), group, fmt.Sprintf(line, p...))); err != nil {
+								dubLog("Log", logLevelError, color.HiRedString, "Failed to send message...\t%s", err)
+							}
+						}
+					}
+				}
+				outputToChannel(channelConfig.Channel)
+				if channelConfig.Channels != nil {
+					for _, ch := range *channelConfig.Channels {
+						outputToChannel(ch)
+					}
+				}
+			}
+		}
+	}*/
 
-func isDate(s string) bool {
-	_, err := time.Parse("2006-01-02", s)
-	return err == nil
-}
-
-func dateLocalToUTC(s string) string {
-	if s == "" || !isDate(s) {
-		return ""
-	}
-	rawDate, _ := time.Parse("2006-01-02", s)
-	localDate := time.Date(rawDate.Year(), rawDate.Month(), rawDate.Day(), 0, 0, 0, 0, time.Local)
-	return fmt.Sprintf("%s-%s-%s", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
+	return colorPrefix + " " + colorFunc(line, p...)
 }
 
 //#endregion

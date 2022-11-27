@@ -175,7 +175,7 @@ func handleCommands() *exrouter.Route {
 					"• **This Server ID —** `%s`\n\n"+
 					"• **Versions —`%s, discordgo v%s, Discord API v%s`"+
 					"\n\nRemember to remove any spaces when copying to settings.",
-					ctx.Msg.Author.ID, user.ID, ctx.Msg.ChannelID, ctx.Msg.GuildID, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
+					ctx.Msg.Author.ID, botUser.ID, ctx.Msg.ChannelID, ctx.Msg.GuildID, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
 				if _, err := replyEmbed(ctx.Msg, "Command — Info", content); err != nil {
 					log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 				}

@@ -75,6 +75,7 @@ func defaultConfiguration() configuration {
 		},
 		// Setup
 		Admins:                         []string{},
+		LogLevel:                       logLevelInfo,
 		DebugOutput:                    cdDebugOutput,
 		MessageOutput:                  cdMessageOutput,
 		CommandPrefix:                  cdCommandPrefix,
@@ -115,6 +116,7 @@ type configuration struct {
 	// Setup
 	Admins                         []string                    `json:"admins"`                                   // optional
 	AdminChannels                  []configurationAdminChannel `json:"adminChannels"`                            // optional
+	LogLevel                       int                         `json:"logLevel,omitempty"`                       // optional, defaults
 	DebugOutput                    bool                        `json:"debugOutput"`                              // optional, defaults
 	MessageOutput                  bool                        `json:"messageOutput"`                            // optional, defaults
 	CommandPrefix                  string                      `json:"commandPrefix"`                            // optional, defaults
@@ -1111,6 +1113,55 @@ func getBoundChannels() []string {
 
 func getBoundChannelsCount() int {
 	return len(getBoundChannels())
+}
+
+func getAllRegisteredChannels() []string {
+	var channels []string
+	if config.All != nil { // ALL MODE
+		for _, guild := range bot.State.Guilds {
+			for _, channel := range guild.Channels {
+				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+					channels = append(channels, channel.ID)
+				}
+			}
+		}
+	} else { // STANDARD MODE
+		// Compile all config channels
+		for _, channel := range config.Channels {
+			if channel.ChannelIDs != nil {
+				for _, subchannel := range *channel.ChannelIDs {
+					channels = append(channels, subchannel)
+				}
+			} else if isNumeric(channel.ChannelID) {
+				channels = append(channels, channel.ChannelID)
+			}
+		}
+		// Compile all channels sourced from config servers
+		for _, server := range config.Servers {
+			if server.ServerIDs != nil {
+				for _, subserver := range *server.ServerIDs {
+					guild, err := bot.State.Guild(subserver)
+					if err == nil {
+						for _, channel := range guild.Channels {
+							if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+								channels = append(channels, channel.ID)
+							}
+						}
+					}
+				}
+			} else if isNumeric(server.ServerID) {
+				guild, err := bot.State.Guild(server.ServerID)
+				if err == nil {
+					for _, channel := range guild.Channels {
+						if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+							channels = append(channels, channel.ID)
+						}
+					}
+				}
+			}
+		}
+	}
+	return channels
 }
 
 //#endregion

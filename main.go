@@ -55,10 +55,11 @@ import (
 var (
 	err error
 	// Bot
-	bot     *discordgo.Session
-	user    *discordgo.User
-	dgr     *exrouter.Route
-	selfbot bool = false
+	bot         *discordgo.Session
+	botUser     *discordgo.User
+	botCommands *exrouter.Route
+	selfbot     bool = false
+	botReady    bool = false
 	// Storage
 	myDB     *db.DB
 	imgStore *duplo.Store
@@ -86,32 +87,34 @@ func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
-	log.Println(logPrefixVersion, color.CyanString("%s / discord-go v%s / Discord API v%s", runtime.Version(), discordgo.VERSION, discordgo.APIVersion))
+	log.Println(lg("Version", "", color.CyanString,
+		"%s / discord-go v%s / Discord API v%s", runtime.Version(), discordgo.VERSION, discordgo.APIVersion))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
-			log.Println(logPrefixVersion, color.HiCyanString("*** Update Available! ***"))
-			log.Println(logPrefixVersion, color.CyanString(projectReleaseURL))
-			log.Println(logPrefixVersion, color.HiCyanString("*** See changelog for information ***"))
-			log.Println(logPrefixVersion, color.HiCyanString("CHECK ALL CHANGELOGS SINCE YOUR LAST UPDATE"))
-			log.Println(logPrefixVersion, color.HiCyanString("SOME SETTINGS MAY NEED TO BE UPDATED"))
+			log.Println(lg("Version", "UPDATE", color.HiCyanString, "*** Update Available! ***"))
+			log.Println(lg("Version", "UPDATE", color.CyanString, projectReleaseURL))
+			log.Println(lg("Version", "UPDATE", color.HiCyanString, "*** See changelog for information ***"))
+			log.Println(lg("Version", "UPDATE", color.HiCyanString, "CHECK ALL CHANGELOGS SINCE YOUR LAST UPDATE"))
+			log.Println(lg("Version", "UPDATE", color.HiCyanString, "SOME SETTINGS MAY NEED TO BE UPDATED"))
 			time.Sleep(5 * time.Second)
 		}
 	}
 
-	log.Println(logPrefixInfo, color.HiCyanString("** Need help? Discord: https://discord.gg/6Z6FJZVaDV **"))
+	log.Println(lg("Info", "", color.HiCyanString, "** Need help? Discord: https://discord.gg/6Z6FJZVaDV **"))
 }
 
 func main() {
-	// Config
+	//#region Config
 	loadConfig()
 	log.Println(logPrefixSettings, color.HiYellowString("Loaded - bound to %d channel%s and %d server%s",
 		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
 		getBoundServersCount(), pluralS(getBoundServersCount()),
 	))
+	//#endregion
 
-	//#region Database/Cache Initialization
+	//#region Database Initialization
 
 	// Database
 	log.Println(logPrefixDatabase, color.YellowString("Opening database..."))
@@ -146,7 +149,7 @@ func main() {
 	cachedDownloadID = dbDownloadCount()
 	log.Println(logPrefixDatabase, color.HiYellowString("Database opened, contains %d entries...", cachedDownloadID))
 
-	// Image Store
+	//#region Duplicate Filter Storage
 	if config.FilterDuplicateImages {
 		imgStore = duplo.New()
 		if _, err := os.Stat(imgStorePath); err == nil {
@@ -165,25 +168,30 @@ func main() {
 			}
 		}
 	}
+	//#endregion
 
 	//#endregion
 
 	//#region Component Initialization
 
 	// Regex
-	err = compileRegex()
-	if err != nil {
+	if err = compileRegex(); err != nil {
 		log.Println(logPrefixRegex, color.HiRedString("Error initializing:\t%s", err))
 		return
 	}
 
+	botLoadAPIs()
+
 	//#endregion
 
-	//#region Discord & API Initialization
+	//#region Discord Initialization
 
-	botLogin()
+	botLoadDiscord()
 
-	// Startup Done
+	//#endregion
+
+	//#region MAIN STARTUP COMPLETE
+
 	if config.DebugOutput {
 		log.Println(color.YellowString("Startup finished, took %s...", uptime()))
 	}
@@ -191,7 +199,7 @@ func main() {
 	log.Println(color.RedString("CTRL+C to exit..."))
 
 	// Log Status
-	logStatusMessage(logStatusStartup)
+	sendStatusMessage(sendStatusStartup)
 
 	//#endregion
 
@@ -254,9 +262,9 @@ func main() {
 	}
 	//#endregion
 
-	//#region Background Tasks
+	//#region BG Tasks
 
-	// Tickers
+	//#region BG Tasks - Tickers
 	ticker5m := time.NewTicker(5 * time.Minute)
 	ticker1m := time.NewTicker(1 * time.Minute)
 	go func() {
@@ -276,10 +284,10 @@ func main() {
 						properExit()
 					} else {
 						log.Println(color.GreenString("Logging in..."))
-						botLogin()
+						botLoad()
 						log.Println(color.HiGreenString("Reconnected! The bot *should* resume working..."))
 						// Log Status
-						logStatusMessage(logStatusReconnect)
+						sendStatusMessage(sendStatusReconnect)
 					}
 				}
 				gate, err := bot.Gateway()
@@ -293,10 +301,12 @@ func main() {
 			}
 		}
 	}()
+	//#endregion
 
-	// Compile list of channels to autorun history
+	//#region BG Tasks - Autorun History
 	type arh struct{ channel, before, since string }
 	var autorunHistoryChannels []arh
+	// Compile list of channels to autorun history
 	for _, channel := range getAllRegisteredChannels() {
 		channelConfig := getChannelConfig(channel)
 		if channelConfig.OverwriteAutorunHistory != nil {
@@ -346,8 +356,9 @@ func main() {
 		log.Println(logPrefixHistory, color.HiYellowString("History Autoruns completed (for %d channel%s)", len(autorunHistoryChannels), pluralS(len(autorunHistoryChannels))))
 		log.Println(color.CyanString("Waiting for something else to do..."))
 	}
+	//#endregion
 
-	// Run History
+	//#region BG Tasks - History Job Processing
 	go func() {
 	restartHistoryLoop:
 		for {
@@ -373,8 +384,9 @@ func main() {
 			}
 		}
 	}()
+	//#endregion
 
-	// Settings Watcher
+	//#region BG Tasks - Settings Watcher
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Println(color.HiRedString("[Watchers] Error creating NewWatcher:\t%s", err))
@@ -414,28 +426,34 @@ func main() {
 			}
 		}
 	}()
+	//#endregion
 
 	//#endregion
 
-	// Infinite loop until interrupted
+	// ~~~ RUNNING
+
+	//#region Exit...
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
 	<-loop
 
-	logStatusMessage(logStatusExit)
+	sendStatusMessage(sendStatusExit)
 
-	log.Println(logPrefixDiscord, color.GreenString("Logging out of discord..."))
+	log.Println(lg("Discord", "", color.GreenString, "Logging out of discord..."))
 	bot.Close()
 
-	log.Println(logPrefixDatabase, color.YellowString("Closing database..."))
+	log.Println(lg("Database", "", color.YellowString, "Closing database..."))
 	myDB.Close()
 
-	log.Println(color.HiRedString("Exiting... "))
+	log.Println(lg("Main", "", color.HiRedString, "Exiting... "))
+	//#endregion
 }
 
-func botLogin() {
+func botLoad() {
+	botLoadAPIs()
+	botLoadDiscord()
+}
 
-	var err error
-
+func botLoadAPIs() {
 	// Twitter API
 	if config.Credentials.TwitterAccessToken != "" &&
 		config.Credentials.TwitterAccessTokenSecret != "" &&
@@ -486,6 +504,10 @@ func botLogin() {
 			}
 		}
 	}
+}
+
+func botLoadDiscord() {
+	var err error
 
 	// Discord Login
 	connectBot := func() {
@@ -509,9 +531,9 @@ func botLogin() {
 		bot.State.TrackMembers = true
 		bot.State.TrackThreadMembers = true
 
-		user, err = bot.User("@me")
+		botUser, err = bot.User("@me")
 		if err != nil {
-			user = bot.State.User
+			botUser = bot.State.User
 		}
 	}
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
@@ -520,7 +542,7 @@ func botLogin() {
 		// attempt login without Bot prefix
 		bot, err = discordgo.New(config.Credentials.Token)
 		connectBot()
-		if user.Bot {
+		if botUser.Bot {
 			// is bot application, reconnect properly
 			log.Println(logPrefixDiscord, color.GreenString("Reconnecting as bot..."))
 			bot, err = discordgo.New("Bot " + config.Credentials.Token)
@@ -542,19 +564,20 @@ func botLogin() {
 	connectBot()
 
 	// Fetch Bot's User Info
-	user, err = bot.User("@me")
+	botUser, err = bot.User("@me")
 	if err != nil {
-		user = bot.State.User
-		if user == nil {
+		botUser = bot.State.User
+		if botUser == nil {
 			log.Println(logPrefixDiscord, color.HiRedString("Error obtaining user details: %s", err))
 			loop <- syscall.SIGINT
 		}
-	} else if user == nil {
+	} else if botUser == nil {
 		log.Println(logPrefixDiscord, color.HiRedString("No error encountered obtaining user details, but it's empty..."))
 		loop <- syscall.SIGINT
 	} else {
-		log.Println(logPrefixDiscord, color.HiGreenString("Logged into %s", getUserIdentifier(*user)))
-		if user.Bot {
+		botReady = true
+		log.Println(logPrefixDiscord, color.HiGreenString("Logged into %s", getUserIdentifier(*botUser)))
+		if botUser.Bot {
 			log.Println(logPrefixDiscord, color.MagentaString("This is a genuine Discord Bot Application"))
 			log.Println(logPrefixDiscord, color.MagentaString("- Presence details & state are disabled, only status will work."))
 			log.Println(logPrefixDiscord, color.MagentaString("- The bot can only see servers you have added it to."))
@@ -570,7 +593,7 @@ func botLogin() {
 	}
 
 	// Event Handlers
-	dgr = handleCommands()
+	botCommands = handleCommands()
 	bot.AddHandler(messageCreate)
 	bot.AddHandler(messageUpdate)
 
@@ -649,7 +672,7 @@ func botLogin() {
 		if len(invalidChannels) > 0 {
 			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s", len(invalidChannels), strings.Join(invalidChannels, ", "))
 		}
-		logErrorMessage(logMsg)
+		sendErrorMessage(logMsg)
 	} else if config.DebugOutput {
 		log.Println(logPrefixDebugLabel("Validation"), color.HiGreenString("All channels/servers successfully validated!"))
 	}

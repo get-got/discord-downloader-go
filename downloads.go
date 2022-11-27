@@ -473,7 +473,7 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 				}
 			}
 			if status.Error != nil {
-				logErrorMessage(fmt.Sprintf("**%s**\n\n%s", getDownloadStatusString(status.Status), status.Error))
+				sendErrorMessage(fmt.Sprintf("**%s**\n\n%s", getDownloadStatusString(status.Status), status.Error))
 			}
 		}
 	}
@@ -933,7 +933,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Format Filename
-		completePath := download.Path + subfolder + filenameKeyReplacement(channelConfig, download)
+		completePath := download.Path + subfolder + dynamicKeyReplacement(channelConfig, download)
 
 		// Check if filepath exists
 		if _, err := os.Stat(completePath); err == nil {
@@ -978,7 +978,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			log.Println(logPrefix + color.HiGreenString("Did not save %s sent in %s#%s --- file saving disabled...", contentTypeFound, sourceName, sourceChannelName))
 		}
 
-		userID := user.ID
+		userID := botUser.ID
 		if download.Message.Author != nil {
 			userID = download.Message.Author.ID
 		}
