@@ -376,7 +376,6 @@ func handleCommands() *exrouter.Route {
 
 	router.On("exit", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:exit]")
 			if isBotAdmin(ctx.Msg) {
 				if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 					log.Println(lg("Command", "Exit", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
@@ -407,7 +406,6 @@ func handleCommands() *exrouter.Route {
 
 	router.On("emojis", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:emojis]")
 			if isBotAdmin(ctx.Msg) {
 				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 					// Determine which guild(s)

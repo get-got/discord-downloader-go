@@ -28,11 +28,9 @@ import (
 /* v2.0.0 REWRITE TODO:
 
 * Logging System
-**> wrap internal log handler within log.Println, return formatted string to retain file+line in log
 *** Implement Log Leveling
 *** Truncate links to exact size?
 *** Table/Indentation output?
-*** Output Log to Channel(s)
 
 * Better Message/Embed Send+Error Handling
 *** Ensure USER Permission Check Compat

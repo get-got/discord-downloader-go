@@ -350,6 +350,10 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 	}
 
 	if bot != nil && botReady {
+		simplePrefix := group
+		if subgroup != "" {
+			simplePrefix += ":" + subgroup
+		}
 		for _, adminChannel := range config.AdminChannels {
 			if *adminChannel.LogProgram {
 				outputToChannel := func(channel string) {
@@ -357,7 +361,7 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 						if hasPerms(channel, discordgo.PermissionSendMessages) {
 							if _, err := bot.ChannelMessageSend(channel,
 								fmt.Sprintf("```%s | [%s] %s```",
-									time.Now().Format(time.RFC3339), group, fmt.Sprintf(line, p...)),
+									time.Now().Format(time.RFC3339), simplePrefix, fmt.Sprintf(line, p...)),
 							); err != nil {
 								log.Println(color.HiRedString("Failed to send message...\t%s", err))
 							}

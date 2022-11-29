@@ -593,10 +593,9 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 	cachedDownloadID++
 	thisDownloadID := cachedDownloadID
 
-	logPrefixErrorHere := color.HiRedString("[tryDownload]")
 	logPrefix := ""
 	if download.HistoryCmd {
-		logPrefix = logPrefixHistory + " "
+		logPrefix = "HISTORY "
 	}
 
 	ch := channelRegistered(download.Message)
