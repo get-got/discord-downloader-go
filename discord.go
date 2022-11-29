@@ -91,13 +91,12 @@ const (
 //TODO: Clean these two
 
 func discordTimestampToSnowflake(format string, timestamp string) string {
-	t, err := time.Parse(format, timestamp)
-	if err == nil {
+	if t, err := time.Parse(format, timestamp); err == nil {
 		return fmt.Sprint(((t.Local().UnixNano() / int64(time.Millisecond)) - discordEpoch) << 22)
 	}
-	log.Println(color.HiRedString("Failed to convert timestamp to discord snowflake... Format: '%s', Timestamp: '%s' - Error:\t%s",
-		format, timestamp, err),
-	)
+	log.Println(lg("Main", "", color.HiRedString,
+		"Failed to convert timestamp to discord snowflake... Format: '%s', Timestamp: '%s' - Error:\t%s",
+		format, timestamp, err))
 	return ""
 }
 
@@ -146,15 +145,19 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 					}
 				}
 			} else if config.DebugOutput {
-				log.Println(logPrefixDebug, color.RedString("%s, and an attempt to get channel messages found nothing...", ubIssue))
+				log.Println(lg("Debug", "fixMessage",
+					color.RedString, "%s, and an attempt to get channel messages found nothing...",
+					ubIssue))
 			}
 		} else if config.DebugOutput {
-			log.Println(logPrefixDebug, color.HiRedString("%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
+			log.Println(lg("Debug", "fixMessage",
+				color.HiRedString, "%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
 		}
 	}
 	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("%s, and attempts to fix seem to have failed...", ubIssue))
+			log.Println(lg("Debug", "fixMessage",
+				color.YellowString, "%s, and attempts to fix seem to have failed...", ubIssue))
 		}
 	}
 	return m
@@ -231,12 +234,12 @@ func dynamicKeyReplacement(channelConfig configurationChannel, download download
 
 		shortID, err := shortid.Generate()
 		if err != nil && config.DebugOutput {
-			log.Println(logPrefixDebug, color.HiCyanString("Error when generating a shortID %s", err))
+			log.Println(lg("Debug", "dynamicKeyReplacement", color.HiCyanString, "Error when generating a shortID %s", err))
 		}
 
 		nanoID, err := nanoid.New()
 		if err != nil && config.DebugOutput {
-			log.Println(logPrefixDebug, color.HiCyanString("Error when creating a nanoID %s", err))
+			log.Println(lg("Debug", "dynamicKeyReplacement", color.HiCyanString, "Error when creating a nanoID %s", err))
 		}
 
 		userID := ""
@@ -427,7 +430,7 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 				)
 			}
 		}
-		log.Println(color.HiRedString(fmtBotSendPerm, m.ChannelID))
+		log.Println(lg("Discord", "replyEmbed", color.HiRedString, fmtBotSendPerm, m.ChannelID))
 	}
 	return nil, nil
 }
@@ -491,14 +494,17 @@ func sendStatusMessage(status sendStatusType) {
 			}
 			// Send
 			if config.DebugOutput {
-				log.Println(logPrefixDebug, color.HiCyanString("Sending log for %s to admin channel %s", label, adminChannel.ChannelID))
+				log.Println(lg("Debug", "sendStatusMessage", color.HiCyanString, "Sending log for %s to admin channel %s",
+					label, adminChannel.ChannelID))
 			}
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot {
-				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Status", message))
+				bot.ChannelMessageSendEmbed(adminChannel.ChannelID,
+					buildEmbed(adminChannel.ChannelID, "Log — Status", message))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
 			} else {
-				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending status log to %s", adminChannel.ChannelID))
+				log.Println(lg("Debug", "sendStatusMessage", color.HiRedString, "Perms checks failed for sending status log to %s",
+					adminChannel.ChannelID))
 			}
 		}
 	}
@@ -510,16 +516,19 @@ func sendErrorMessage(err string) {
 			// Send
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot { // not confident this is the right permission
 				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiCyanString("Sending embed log for error to %s", adminChannel.ChannelID))
+					log.Println(lg("Debug", "sendErrorMessage", color.HiCyanString, "Sending embed log for error to %s",
+						adminChannel.ChannelID))
 				}
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Error", err))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiCyanString("Sending message log for error to %s", adminChannel.ChannelID))
+					log.Println(lg("Debug", "sendErrorMessage", color.HiCyanString, "Sending embed log for error to %s",
+						adminChannel.ChannelID))
 				}
 				bot.ChannelMessageSend(adminChannel.ChannelID, err)
 			} else {
-				log.Println(logPrefixDebug, color.HiRedString("Perms checks failed for sending error log to %s", adminChannel.ChannelID))
+				log.Println(lg("Debug", "sendErrorMessage", color.HiRedString, "Perms checks failed for sending error log to %s",
+					adminChannel.ChannelID))
 			}
 		}
 	}
@@ -550,19 +559,21 @@ func isBotAdmin(m *discordgo.Message) bool {
 func isLocalAdmin(m *discordgo.Message) bool {
 	if m == nil {
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to empty message"))
+			log.Println(lg("Debug", "isLocalAdmin", color.YellowString, "check failed due to empty message"))
 		}
 		return true
 	}
 	sourceChannel, err := bot.State.Channel(m.ChannelID)
 	if err != nil || sourceChannel == nil {
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to an error or received empty channel info for message:\t%s", err))
+			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
+				"check failed due to an error or received empty channel info for message:\t%s", err))
 		}
 		return true
 	} else if sourceChannel.Name == "" || sourceChannel.GuildID == "" {
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to incomplete channel info"))
+			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
+				"check failed due to incomplete channel info"))
 		}
 		return true
 	}
@@ -571,7 +582,8 @@ func isLocalAdmin(m *discordgo.Message) bool {
 	localPerms, err := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
 	if err != nil {
 		if config.DebugOutput {
-			log.Println(logPrefixDebug, color.YellowString("isLocalAdmin check failed due to error when checking permissions:\t%s", err))
+			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
+				"check failed due to error when checking permissions:\t%s", err))
 		}
 		return true
 	}
@@ -602,7 +614,8 @@ func hasPerms(channelID string, permission int64) bool {
 			if err == nil {
 				return perms&permission == permission
 			}
-			log.Println(color.HiRedString("Failed to check permissions (%d) for %s:\t%s", permission, channelID, err))
+			log.Println(lg("Debug", "hasPerms", color.HiRedString,
+				"Failed to check permissions (%d) for %s:\t%s", permission, channelID, err))
 		}
 	}
 	return false

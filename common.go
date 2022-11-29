@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
 	"github.com/hashicorp/go-version"
@@ -25,7 +26,7 @@ func uptime() time.Duration {
 
 func properExit() {
 	// Not formatting string because I only want the exit message to be red.
-	log.Println(color.HiRedString("[EXIT IN 15 SECONDS]"), " Uptime was", durafmt.Parse(time.Since(startTime)).String(), "...")
+	log.Println(lg("Main", "", color.HiRedString, "[EXIT IN 15 SECONDS] Uptime was %s...", durafmt.Parse(time.Since(startTime)).String()))
 	log.Println(color.HiCyanString("--------------------------------------------------------------------------------"))
 	time.Sleep(15 * time.Second)
 	os.Exit(1)
@@ -189,24 +190,22 @@ type githubReleaseApiObject struct {
 }
 
 func isLatestGithubRelease() bool {
-	prefixHere := color.HiMagentaString("[Github Update Check]")
-
 	githubReleaseApiObject := new(githubReleaseApiObject)
 	err := getJSON(projectReleaseApiURL, githubReleaseApiObject)
 	if err != nil {
-		log.Println(prefixHere, color.RedString("Error fetching current Release JSON: %s", err))
+		log.Println(lg("API", "Github", color.RedString, "Error fetching current Release JSON: %s", err))
 		return true
 	}
 
 	thisVersion, err := version.NewVersion(projectVersion)
 	if err != nil {
-		log.Println(prefixHere, color.RedString("Error parsing current version: %s", err))
+		log.Println(lg("API", "Github", color.RedString, "Error parsing current version: %s", err))
 		return true
 	}
 
 	latestVersion, err := version.NewVersion(githubReleaseApiObject.TagName)
 	if err != nil {
-		log.Println(prefixHere, color.RedString("Error parsing latest version: %s", err))
+		log.Println(lg("API", "Github", color.RedString, "Error parsing latest version: %s", err))
 		return true
 	}
 
@@ -253,7 +252,8 @@ func getJSONwithHeaders(url string, target interface{}, headers map[string]strin
 //#region Log
 
 const (
-	logLevelOff = iota
+	logLevelOff       = -1
+	logLevelEssential = iota
 	logLevelFatal
 	logLevelError
 	logLevelWarning
@@ -349,29 +349,30 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		}
 	}
 
-	/*if bot != nil && botReady {
-		for _, channelConfig := range config.OutputChannels {
-			if channelConfig.OutputProgram {
+	if bot != nil && botReady {
+		for _, adminChannel := range config.AdminChannels {
+			if *adminChannel.LogProgram {
 				outputToChannel := func(channel string) {
 					if channel != "" {
-						if !hasPerms(channel, discordgo.PermissionSendMessages) {
-							dubLog("Log", logLevelError, color.HiRedString, fmtBotSendPerm, channel)
-						} else {
-							if _, err := bot.ChannelMessageSend(channel, fmt.Sprintf("```%s | [%s] %s```", time.Now().Format(time.RFC3339), group, fmt.Sprintf(line, p...))); err != nil {
-								dubLog("Log", logLevelError, color.HiRedString, "Failed to send message...\t%s", err)
+						if hasPerms(channel, discordgo.PermissionSendMessages) {
+							if _, err := bot.ChannelMessageSend(channel,
+								fmt.Sprintf("```%s | [%s] %s```",
+									time.Now().Format(time.RFC3339), group, fmt.Sprintf(line, p...)),
+							); err != nil {
+								log.Println(color.HiRedString("Failed to send message...\t%s", err))
 							}
 						}
 					}
 				}
-				outputToChannel(channelConfig.Channel)
-				if channelConfig.Channels != nil {
-					for _, ch := range *channelConfig.Channels {
+				outputToChannel(adminChannel.ChannelID)
+				if adminChannel.ChannelIDs != nil {
+					for _, ch := range *adminChannel.ChannelIDs {
 						outputToChannel(ch)
 					}
 				}
 			}
 		}
-	}*/
+	}
 
 	return colorPrefix + " " + colorFunc(line, p...)
 }

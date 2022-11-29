@@ -31,14 +31,13 @@ func handleCommands() *exrouter.Route {
 
 	router.On("ping", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:ping]")
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-				log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				log.Println(lg("Command", "Ping", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
 				beforePong := time.Now()
 				pong, err := ctx.Reply("Pong!")
 				if err != nil {
-					log.Println(logPrefixHere, color.HiRedString("Error sending pong message:\t%s", err))
+					log.Println(lg("Command", "Ping", color.HiRedString, "Error sending pong message:\t%s", err))
 				} else {
 					afterPong := time.Now()
 					latency := bot.HeartbeatLatency().Milliseconds()
@@ -61,7 +60,7 @@ func handleCommands() *exrouter.Route {
 						}
 					}
 					// Log
-					log.Println(logPrefixHere, color.HiCyanString("%s pinged bot - Latency: %dms, Roundtrip: %dms",
+					log.Println(lg("Command", "Ping", color.HiCyanString, "%s pinged bot - Latency: %dms, Roundtrip: %dms",
 						getUserIdentifier(*ctx.Msg.Author),
 						latency,
 						roundtrip),
@@ -73,9 +72,8 @@ func handleCommands() *exrouter.Route {
 
 	router.On("help", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:help]")
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-				log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				log.Println(lg("Command", "Help", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
 				content := ""
 				for _, cmd := range router.Routes {
@@ -93,9 +91,9 @@ func handleCommands() *exrouter.Route {
 				if _, err := replyEmbed(ctx.Msg, "Command — Help",
 					fmt.Sprintf("Use commands as ``\"%s<command> <arguments?>\"``\n```%s```\n%s",
 						config.CommandPrefix, content, projectRepoURL)); err != nil {
-					log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+					log.Println(lg("Command", "Help", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s asked for help", getUserIdentifier(*ctx.Msg.Author)))
+				log.Println(lg("Command", "Help", color.HiCyanString, "%s asked for help", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
 	}).Cat("Utility").Alias("commands").Desc("Outputs this help menu")
@@ -106,9 +104,8 @@ func handleCommands() *exrouter.Route {
 
 	router.On("status", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:status]")
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-				log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				log.Println(lg("Command", "Status", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
 				message := fmt.Sprintf("• **Uptime —** %s\n"+
 					"• **Started at —** %s\n"+
@@ -130,18 +127,17 @@ func handleCommands() *exrouter.Route {
 					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
 				}
 				if _, err := replyEmbed(ctx.Msg, "Command — Status", message); err != nil {
-					log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+					log.Println(lg("Command", "Status", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s requested status report", getUserIdentifier(*ctx.Msg.Author)))
+				log.Println(lg("Command", "Status", color.HiCyanString, "%s requested status report", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
 	}).Cat("Info").Desc("Displays info regarding the current status of the bot")
 
 	router.On("stats", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:stats]")
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-				log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				log.Println(lg("Command", "Stats", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
 				if ch := channelRegistered(ctx.Msg); ch != "" {
 					channelConfig := getChannelConfig(ch)
@@ -153,9 +149,9 @@ func handleCommands() *exrouter.Route {
 						)
 						//TODO: Count in channel by users
 						if _, err := replyEmbed(ctx.Msg, "Command — Stats", content); err != nil {
-							log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+							log.Println(lg("Command", "Stats", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 						}
-						log.Println(logPrefixHere, color.HiCyanString("%s requested stats", getUserIdentifier(*ctx.Msg.Author)))
+						log.Println(lg("Command", "Stats", color.HiCyanString, "%s requested stats", getUserIdentifier(*ctx.Msg.Author)))
 					}
 				}
 			}
@@ -164,9 +160,8 @@ func handleCommands() *exrouter.Route {
 
 	router.On("info", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:info]")
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-				log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+				log.Println(lg("Command", "Info", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
 				content := fmt.Sprintf("Here is some useful info...\n\n"+
 					"• **Your User ID —** `%s`\n"+
@@ -177,9 +172,9 @@ func handleCommands() *exrouter.Route {
 					"\n\nRemember to remove any spaces when copying to settings.",
 					ctx.Msg.Author.ID, botUser.ID, ctx.Msg.ChannelID, ctx.Msg.GuildID, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
 				if _, err := replyEmbed(ctx.Msg, "Command — Info", content); err != nil {
-					log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+					log.Println(lg("Command", "Info", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s requested info", getUserIdentifier(*ctx.Msg.Author)))
+				log.Println(lg("Command", "Info", color.HiCyanString, "%s requested info", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
 	}).Cat("Info").Alias("debug").Desc("Displays info regarding Discord IDs")
@@ -190,7 +185,6 @@ func handleCommands() *exrouter.Route {
 
 	router.On("history", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
-			logPrefixHere := color.CyanString("[dgrouter:history]")
 			// Vars
 			var channels []string
 
@@ -218,14 +212,13 @@ func handleCommands() *exrouter.Route {
 						content := fmt.Sprintf("TODO: this")
 						_, err := replyEmbed(ctx.Msg, "Command — History Help", content)
 						if err != nil {
-							log.Println(logPrefixHere,
-								color.HiRedString(cmderrSendFailure,
-									getUserIdentifier(*ctx.Msg.Author), err))
+							log.Println(lg("Command", "History",
+								color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 						}
 					} else {
-						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+						log.Println(lg("Command", "History", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 					}
-					log.Println(logPrefixHere, color.CyanString("%s requested history help.", getUserIdentifier(*ctx.Msg.Author)))
+					log.Println(lg("Command", "History", color.CyanString, "%s requested history help.", getUserIdentifier(*ctx.Msg.Author)))
 				} else if strings.Contains(strings.ToLower(argValue), "list") ||
 					strings.Contains(strings.ToLower(argValue), "status") ||
 					strings.Contains(strings.ToLower(argValue), "output") {
@@ -241,23 +234,20 @@ func handleCommands() *exrouter.Route {
 						output += fmt.Sprintf("• _%s_ - (%s)`%s`, `updated %s ago, added %s ago`\n",
 							historyStatusLabel(job.Status), job.OriginUser, channelLabel,
 							durafmt.ParseShort(time.Since(job.Updated)).String(), durafmt.ParseShort(time.Since(job.Added)).String())
-						log.Println(logPrefixHere, color.HiCyanString("History Job: %s - (%s)%s, updated %s ago, added %s ago",
+						log.Println(lg("Command", "History", color.HiCyanString, "History Job: %s - (%s)%s, updated %s ago, added %s ago",
 							historyStatusLabel(job.Status), job.OriginUser, channelLabel,
 							durafmt.ParseShort(time.Since(job.Updated)).String(), durafmt.ParseShort(time.Since(job.Added)).String()))
 					}
 					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 						_, err := ctx.Reply(output)
 						if err != nil {
-							log.Println(logPrefixHere,
-								color.HiRedString(cmderrSendFailure,
-									getUserIdentifier(*ctx.Msg.Author), err))
+							log.Println(lg("Command", "History", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 						}
 					} else {
-						log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+						log.Println(lg("Command", "History", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 					}
-					log.Println(logPrefixHere,
-						color.CyanString("%s requested statuses of history jobs.",
-							getUserIdentifier(*ctx.Msg.Author)))
+					log.Println(lg("Command", "History", color.HiRedString, "%s requested statuses of history jobs.",
+						getUserIdentifier(*ctx.Msg.Author)))
 				} else if strings.Contains(strings.ToLower(argValue), "--before=") { // before key
 					before = strings.ReplaceAll(strings.ToLower(argValue), "--before=", "")
 					if isDate(before) {
@@ -266,7 +256,7 @@ func handleCommands() *exrouter.Route {
 						beforeID = before
 					}
 					if config.DebugOutput {
-						log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, before %s", beforeID))
+						log.Println(lg("Command", "History", color.CyanString, "Date range applied, before %s", beforeID))
 					}
 				} else if strings.Contains(strings.ToLower(argValue), "--since=") { //  since key
 					since = strings.ReplaceAll(strings.ToLower(argValue), "--since=", "")
@@ -276,7 +266,7 @@ func handleCommands() *exrouter.Route {
 						sinceID = since
 					}
 					if config.DebugOutput {
-						log.Println(logPrefixDebug, logPrefixHere, color.CyanString("Date range applied, since %s", sinceID))
+						log.Println(lg("Command", "History", color.CyanString, "Date range applied, since %s", sinceID))
 					}
 				} else {
 					// Actual Source ID(s)
@@ -287,16 +277,16 @@ func handleCommands() *exrouter.Route {
 							guild, err := bot.State.Guild(target)
 							if err == nil {
 								if config.DebugOutput {
-									log.Println(logPrefixHere, logPrefixDebug,
-										color.YellowString("Specified target %s is a guild: \"%s\", adding all channels...",
-											target, guild.Name))
+									log.Println(lg("Command", "History", color.YellowString,
+										"Specified target %s is a guild: \"%s\", adding all channels...",
+										target, guild.Name))
 								}
 								for _, ch := range guild.Channels {
 									channels = append(channels, ch.ID)
 									if config.DebugOutput {
-										log.Println(logPrefixHere, logPrefixDebug,
-											color.YellowString("Added %s (#%s in \"%s\") to history queue",
-												ch.ID, ch.Name, guild.Name))
+										log.Println(lg("Command", "History", color.YellowString,
+											"Added %s (#%s in \"%s\") to history queue",
+											ch.ID, ch.Name, guild.Name))
 									}
 								}
 							} else { // Test/Use if number is channel
@@ -304,9 +294,8 @@ func handleCommands() *exrouter.Route {
 								if err == nil {
 									channels = append(channels, target)
 									if config.DebugOutput {
-										log.Println(logPrefixHere, logPrefixDebug,
-											color.YellowString("Added %s (#%s in %s) to history queue",
-												ch.ID, ch.Name, ch.GuildID))
+										log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
+											ch.ID, ch.Name, ch.GuildID))
 									}
 								}
 							}
@@ -327,19 +316,18 @@ func handleCommands() *exrouter.Route {
 				// Foreach Channel
 				for _, channel := range channels {
 					if config.DebugOutput {
-						log.Println(logPrefixHere, logPrefixDebug, color.YellowString("Processing history command for %s...", channel))
+						log.Println(lg("Command", "History", color.YellowString, "Processing history command for %s...", channel))
 					}
 					if !isBotAdmin(ctx.Msg) {
-						log.Println(logPrefixHere,
-							color.CyanString("%s tried to cache history for %s but lacked proper permission.",
-								getUserIdentifier(*ctx.Msg.Author), channel))
+						log.Println(lg("Command", "History", color.CyanString,
+							"%s tried to cache history for %s but lacked proper permission.",
+							getUserIdentifier(*ctx.Msg.Author), channel))
 						if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-							log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, channel))
+							log.Println(lg("Command", "History", color.HiRedString, fmtBotSendPerm, channel))
 						} else {
 							if _, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms); err != nil {
-								log.Println(logPrefixHere,
-									color.HiRedString(cmderrSendFailure,
-										getUserIdentifier(*ctx.Msg.Author), err))
+								log.Println(lg("Command", "History", color.HiRedString, cmderrSendFailure,
+									getUserIdentifier(*ctx.Msg.Author), err))
 							}
 						}
 					} else {
@@ -358,9 +346,9 @@ func handleCommands() *exrouter.Route {
 								job.Added = time.Now()
 								historyJobs[channel] = job
 							} else { // ALREADY RUNNING
-								log.Println(logPrefixHere,
-									color.CyanString("%s tried using history command but history is already running for %s...",
-										getUserIdentifier(*ctx.Msg.Author), channel))
+								log.Println(lg("Command", "History", color.CyanString,
+									"%s tried using history command but history is already running for %s...",
+									getUserIdentifier(*ctx.Msg.Author), channel))
 							}
 						} else if historyJobs[channel].Status == historyStatusDownloading ||
 							historyJobs[channel].Status == historyStatusWaiting { // requested abort while downloading
@@ -371,13 +359,13 @@ func handleCommands() *exrouter.Route {
 								}
 								historyJobs[channel] = job
 							}
-							log.Println(logPrefixHere,
-								color.CyanString("%s cancelled history cataloging for \"%s\"",
-									getUserIdentifier(*ctx.Msg.Author), channel))
+							log.Println(lg("Command", "History", color.CyanString,
+								"%s cancelled history cataloging for \"%s\"",
+								getUserIdentifier(*ctx.Msg.Author), channel))
 						} else { // tried to stop but is not downloading
-							log.Println(logPrefixHere,
-								color.CyanString("%s tried to cancel history for \"%s\" but it's not running",
-									getUserIdentifier(*ctx.Msg.Author), channel))
+							log.Println(lg("Command", "History", color.CyanString,
+								"%s tried to cancel history for \"%s\" but it's not running",
+								getUserIdentifier(*ctx.Msg.Author), channel))
 						}
 					}
 				}
@@ -391,27 +379,28 @@ func handleCommands() *exrouter.Route {
 			logPrefixHere := color.CyanString("[dgrouter:exit]")
 			if isBotAdmin(ctx.Msg) {
 				if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+					log.Println(lg("Command", "Exit", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 				} else {
 					if _, err := replyEmbed(ctx.Msg, "Command — Exit", "Exiting program..."); err != nil {
-						log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure,
-							getUserIdentifier(*ctx.Msg.Author), err))
+						log.Println(lg("Command", "Exit", color.HiRedString,
+							cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 					}
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s (bot admin) requested exit, goodbye...",
+				log.Println(lg("Command", "Exit", color.HiCyanString,
+					"%s (bot admin) requested exit, goodbye...",
 					getUserIdentifier(*ctx.Msg.Author)))
 				properExit()
 			} else {
 				if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+					log.Println(lg("Command", "Exit", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 				} else {
 					if _, err := replyEmbed(ctx.Msg, "Command — Exit", cmderrLackingBotAdminPerms); err != nil {
-						log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure,
-							getUserIdentifier(*ctx.Msg.Author), err))
+						log.Println(lg("Command", "Exit", color.HiRedString,
+							cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 					}
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s tried to exit but lacked bot admin perms.",
-					getUserIdentifier(*ctx.Msg.Author)))
+				log.Println(lg("Command", "Exit", color.HiCyanString,
+					"%s tried to exit but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
 	}).Cat("Admin").Alias("reload", "kill").Desc("Kills the bot")
@@ -446,10 +435,12 @@ func handleCommands() *exrouter.Route {
 
 						destination := "emojis" + string(os.PathSeparator) + guildName + string(os.PathSeparator)
 						if err = os.MkdirAll(destination, 0755); err != nil {
-							log.Println(logPrefixHere, color.HiRedString("Error while creating destination folder \"%s\": %s", destination, err))
+							log.Println(lg("Command", "Emojis", color.HiRedString, "Error while creating destination folder \"%s\": %s", destination, err))
 						} else {
 							emojis, err := bot.GuildEmojis(guild)
-							if err == nil {
+							if err != nil {
+								log.Println(lg("Command", "Emojis", color.HiRedString, "Failed to get server emojis:\t%s", err))
+							} else {
 								for _, emoji := range emojis {
 									var message discordgo.Message
 									message.ChannelID = ctx.Msg.ChannelID
@@ -470,7 +461,9 @@ func handleCommands() *exrouter.Route {
 										i++
 									} else {
 										s++
-										log.Println(logPrefixHere, color.HiRedString("Failed to download emoji \"%s\": \t[%d - %s] %v", url, status.Status, getDownloadStatusString(status.Status), status.Error))
+										log.Println(lg("Command", "Emojis", color.HiRedString,
+											"Failed to download emoji \"%s\": \t[%d - %s] %v",
+											url, status.Status, getDownloadStatusString(status.Status), status.Error))
 									}
 								}
 								destinationOut := destination
@@ -484,23 +477,23 @@ func handleCommands() *exrouter.Route {
 									),
 								)
 								if err != nil {
-									log.Println(logPrefixHere, color.HiRedString("Failed to send status message for emoji downloads:\t%s", err))
+									log.Println(lg("Command", "Emojis", color.HiRedString,
+										"Failed to send status message for emoji downloads:\t%s", err))
 								}
-							} else {
-								log.Println(err)
 							}
 						}
 					}
 				}
 			} else {
 				if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					log.Println(logPrefixHere, color.HiRedString(fmtBotSendPerm, ctx.Msg.ChannelID))
+					log.Println(lg("Command", "Emojis", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 				} else {
 					if _, err := replyEmbed(ctx.Msg, "Command — Emojis", cmderrLackingBotAdminPerms); err != nil {
-						log.Println(logPrefixHere, color.HiRedString(cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+						log.Println(lg("Command", "Emojis", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
 					}
 				}
-				log.Println(logPrefixHere, color.HiCyanString("%s tried to download emojis but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
+				log.Println(lg("Command", "Emojis", color.HiCyanString,
+					"%s tried to download emojis but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
 			}
 		}
 	}).Cat("Admin").Desc("Saves all server emojis to download destination")

@@ -14,6 +14,7 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/Jeffail/gabs"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/fatih/color"
 	"golang.org/x/net/html"
 	"google.golang.org/api/googleapi"
 )
@@ -139,12 +140,12 @@ ParseLoop:
 							content = content[:len(content)-1]
 							jsonParsed, err := gabs.ParseJSON([]byte(content))
 							if err != nil {
-								log.Println("Error parsing instagram json:", err)
+								log.Println(lg("API", "Instagram", color.HiRedString, "Error parsing instagram json:", err))
 								continue ParseLoop
 							}
 							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
 							if err != nil {
-								log.Println("Unable to find entries children:", err)
+								log.Println(lg("API", "Instagram", color.HiRedString, "Unable to find entries children:", err))
 								continue ParseLoop
 							}
 							for _, entryChild := range entryChildren {
@@ -226,7 +227,7 @@ ParseLoop:
 							content = content[:len(content)-1]
 							jsonParsed, err := gabs.ParseJSON([]byte(content))
 							if err != nil {
-								log.Println("Error parsing instagram json: ", err)
+								log.Println(lg("API", "Instagram", color.HiRedString, "Error parsing instagram json:", err))
 								continue ParseLoop
 							}
 							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
@@ -508,9 +509,9 @@ func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
 	driveFields := "nextPageToken, files(id)"
 	result, err := googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
 	if err != nil {
-		log.Println("driveQuery:", driveQuery)
-		log.Println("driveFields:", driveFields)
-		log.Println("err:", err)
+		log.Println(lg("API", "Google", color.HiRedString, "driveQuery:", driveQuery))
+		log.Println(lg("API", "Google", color.HiRedString, "driveFields:", driveFields))
+		log.Println(lg("API", "Google", color.HiRedString, "err:", err))
 		return nil, err
 	}
 	for _, file := range result.Files {

@@ -27,7 +27,7 @@ func trimDownloadedLinks(linkList map[string]string, channelID string) map[strin
 		if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
 			newList[link] = filename
 		} else if config.DebugOutput {
-			log.Println(logPrefixFileSkip, color.GreenString("Found URL has already been downloaded for this channel: %s", link))
+			log.Println(lg("Download", "SKIP", color.GreenString, "Found URL has already been downloaded for this channel: %s", link))
 		}
 	}
 	return newList
@@ -49,7 +49,7 @@ func dbFindDownloadByID(id int) *downloadItem {
 	downloads := myDB.Use("Downloads")
 	readBack, err := downloads.Read(id)
 	if err != nil {
-		log.Println(color.HiRedString("Failed to read database:\t%s", err))
+		log.Println(lg("Database", "Downloads", color.HiRedString, "Failed to read database:\t%s", err))
 	}
 	timeT, _ := time.Parse("2006-01-02 15:04:05.999999999 -0700 MST", readBack["Time"].(string))
 	return &downloadItem{

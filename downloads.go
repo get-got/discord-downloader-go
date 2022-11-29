@@ -196,8 +196,6 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 }
 
 func getDownloadLinks(inputURL string, channelID string) map[string]string {
-	logPrefixErrorHere := color.HiRedString("[getDownloadLinks]")
-
 	/* TODO: Download Support...
 	- TikTok: Tried, once the connection is closed the cdn URL is rendered invalid
 	- Facebook Photos: Tried, it doesn't preload image data, it's loaded in after. Would have to keep connection open, find alternative way to grab, or use api.
@@ -213,7 +211,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		links, err := getTwitterUrls(inputURL)
 		if err != nil {
 			if !strings.Contains(err.Error(), "suspended") {
-				log.Println(logPrefixErrorHere, color.RedString("Twitter Media fetch failed for %s -- %s", inputURL, err))
+				log.Println(lg("Download", "", color.RedString, "Twitter Media fetch failed for %s -- %s", inputURL, err))
 			}
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
@@ -223,7 +221,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		links, err := getTwitterStatusUrls(inputURL, channelID)
 		if err != nil {
 			if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
-				log.Println(logPrefixErrorHere, color.RedString("Twitter Status fetch failed for %s -- %s", inputURL, err))
+				log.Println(lg("Download", "", color.RedString, "Twitter Status fetch failed for %s -- %s", inputURL, err))
 			}
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
@@ -233,7 +231,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlInstagram.MatchString(inputURL) {
 		links, err := getInstagramUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Instagram fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Instagram fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -242,7 +240,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlImgurSingle.MatchString(inputURL) {
 		links, err := getImgurSingleUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Imgur Media fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Imgur Media fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -250,7 +248,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlImgurAlbum.MatchString(inputURL) {
 		links, err := getImgurAlbumUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Imgur Album fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Imgur Album fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -259,7 +257,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlStreamable.MatchString(inputURL) {
 		links, err := getStreamableUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Streamable fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Streamable fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -268,7 +266,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlGfycat.MatchString(inputURL) {
 		links, err := getGfycatUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Gfycat fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Gfycat fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -277,7 +275,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlFlickrPhoto.MatchString(inputURL) {
 		links, err := getFlickrPhotoUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Flickr Photo fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Flickr Photo fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -285,7 +283,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlFlickrAlbum.MatchString(inputURL) {
 		links, err := getFlickrAlbumUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Flickr Album fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Flickr Album fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -293,7 +291,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlFlickrAlbumShort.MatchString(inputURL) {
 		links, err := getFlickrAlbumShortUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Flickr Album (short) fetch failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Flickr Album (short) fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -303,7 +301,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if regexUrlGoogleDrive.MatchString(inputURL) {
 			links, err := getGoogleDriveUrls(inputURL)
 			if err != nil {
-				log.Println(logPrefixErrorHere, color.RedString("Google Drive Album URL for %s -- %s", inputURL, err))
+				log.Println(lg("Download", "", color.RedString, "Google Drive Album URL for %s -- %s", inputURL, err))
 			} else if len(links) > 0 {
 				return trimDownloadedLinks(links, channelID)
 			}
@@ -311,7 +309,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if regexUrlGoogleDriveFolder.MatchString(inputURL) {
 			links, err := getGoogleDriveFolderUrls(inputURL)
 			if err != nil {
-				log.Println(logPrefixErrorHere, color.RedString("Google Drive Folder URL for %s -- %s", inputURL, err))
+				log.Println(lg("Download", "", color.RedString, "Google Drive Folder URL for %s -- %s", inputURL, err))
 			} else if len(links) > 0 {
 				return trimDownloadedLinks(links, channelID)
 			}
@@ -321,7 +319,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlTistory.MatchString(inputURL) {
 		links, err := getTistoryUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Tistory URL failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Tistory URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -329,7 +327,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlTistoryLegacy.MatchString(inputURL) {
 		links, err := getLegacyTistoryUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Legacy Tistory URL failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Legacy Tistory URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -338,7 +336,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlRedditPost.MatchString(inputURL) {
 		links, err := getRedditPostUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Reddit Post URL failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Reddit Post URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -347,7 +345,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlMastodonPost1.MatchString(inputURL) || regexUrlMastodonPost2.MatchString(inputURL) {
 		links, err := getMastodonPostUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Mastodon Post URL failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Mastodon Post URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -357,7 +355,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 	if regexUrlPossibleTistorySite.MatchString(inputURL) {
 		links, err := getPossibleTistorySiteUrls(inputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Checking for Tistory site failed for %s -- %s", inputURL, err))
+			log.Println(lg("Download", "", color.RedString, "Checking for Tistory site failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
 			return trimDownloadedLinks(links, channelID)
 		}
@@ -427,8 +425,6 @@ type downloadRequestStruct struct {
 
 func startDownload(download downloadRequestStruct) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
-	logPrefixErrorHere := color.HiRedString("[startDownload]")
-
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status = tryDownload(download)
 		if status.Status < downloadFailed || status.Status == downloadFailed404 { // Success or Skip
@@ -440,7 +436,7 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 
 	// Any kind of failure
 	if status.Status >= downloadFailed && !download.HistoryCmd && !download.EmojiCmd {
-		log.Println(logPrefixErrorHere, color.RedString("Gave up on downloading %s after %d failed attempts...\t%s", download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
+		log.Println(lg("Download", "", color.RedString, "Gave up on downloading %s after %d failed attempts...\t%s", download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
 		ch := channelRegistered(download.Message)
 		if ch != "" {
 			channelConfig := getChannelConfig(ch)
@@ -456,7 +452,7 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 					if selfbot {
 						_, err := bot.ChannelMessageSend(download.Message.ChannelID, fmt.Sprintf("%s **Download Failure**\n\n%s", download.Message.Author.Mention(), content))
 						if err != nil {
-							log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+							log.Println(lg("Download", "", color.HiRedString, "Failed to send failure message to %s: %s", download.Message.ChannelID, err))
 						}
 					} else {
 						_, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
@@ -465,11 +461,11 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 								Embed:   buildEmbed(download.Message.ChannelID, "Download Failure", content),
 							})
 						if err != nil {
-							log.Println(logPrefixErrorHere, color.HiRedString("Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+							log.Println(lg("Download", "", color.HiRedString, "Failed to send failure message to %s: %s", download.Message.ChannelID, err))
 						}
 					}
 				} else {
-					log.Println(logPrefixErrorHere, color.HiRedString(fmtBotSendPerm, download.Message.ChannelID))
+					log.Println(lg("Download", "", color.HiRedString, fmtBotSendPerm, download.Message.ChannelID))
 				}
 			}
 			if status.Error != nil {
@@ -539,7 +535,7 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 				// Writer
 				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 				if err != nil {
-					log.Println(color.RedString("[channelConfig.LogLinks] Failed to open log file:\t%s", err))
+					log.Println(lg("Download", "", color.RedString, "[channelConfig.LogLinks] Failed to open log file:\t%s", err))
 					f.Close()
 				}
 				defer f.Close()
@@ -583,7 +579,7 @@ func startDownload(download downloadRequestStruct) downloadStatusStruct {
 					newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
 
 					if _, err = f.WriteString(newLine); err != nil {
-						log.Println(color.RedString("[channelConfig.LogLinks] Failed to append file:\t%s", err))
+						log.Println(lg("Download", "", color.RedString, "[channelConfig.LogLinks] Failed to append file:\t%s", err))
 					}
 				}
 			}
@@ -622,7 +618,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 		// Clean/fix path
 		if download.Path == "" || download.Path == string(os.PathSeparator) {
-			log.Println(logPrefixErrorHere, color.HiRedString("Destination cannot be empty path..."))
+			log.Println(lg("Download", "", color.HiRedString, "Destination cannot be empty path..."))
 			return mDownloadStatus(downloadFailedInvalidPath, err)
 		}
 		if !strings.HasSuffix(download.Path, string(os.PathSeparator)) {
@@ -632,7 +628,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		// Create folder
 		err = os.MkdirAll(download.Path, 0755)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while creating destination folder \"%s\": %s", download.Path, err))
+			log.Println(lg("Download", "", color.HiRedString, "Error while creating destination folder \"%s\": %s", download.Path, err))
 			return mDownloadStatus(downloadFailedCreatingFolder, err)
 		}
 
@@ -644,14 +640,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		request, err := http.NewRequest("GET", download.InputURL, nil)
 		request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36")
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error while requesting \"%s\": %s", download.InputURL, err))
+			log.Println(lg("Download", "", color.HiRedString, "Error while requesting \"%s\": %s", download.InputURL, err))
 			return mDownloadStatus(downloadFailedRequesting, err)
 		}
 		request.Header.Add("Accept-Encoding", "identity")
 		response, err := client.Do(request)
 		if err != nil {
 			if !strings.Contains(err.Error(), "no such host") && !strings.Contains(err.Error(), "connection refused") {
-				log.Println(logPrefixErrorHere, color.HiRedString("Error while receiving response from \"%s\": %s", download.InputURL, err))
+				log.Println(lg("Download", "", color.HiRedString, "Error while receiving response from \"%s\": %s", download.InputURL, err))
 			}
 			return mDownloadStatus(downloadFailedDownloadingResponse, err)
 		}
@@ -660,13 +656,13 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		// Read
 		bodyOfResp, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Could not read response from \"%s\": %s", download.InputURL, err))
+			log.Println(lg("Download", "", color.HiRedString, "Could not read response from \"%s\": %s", download.InputURL, err))
 			return mDownloadStatus(downloadFailedReadResponse, err)
 		}
 
 		// 404
 		if response.StatusCode == http.StatusNotFound {
-			log.Println(logPrefixErrorHere, color.HiRedString("FILE IS 404: %s", download.InputURL))
+			log.Println(lg("Download", "", color.HiRedString, "FILE IS 404: %s", download.InputURL))
 			return mDownloadStatus(downloadFailed404, err)
 		}
 
@@ -702,7 +698,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 		parsedURL, err := url.Parse(download.InputURL)
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.RedString("Error while parsing url:\t%s", err))
+			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
 		}
 
 		// Check extension
@@ -726,7 +722,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Abort
 			if shouldAbort {
 				if !download.HistoryCmd {
-					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted extension (%s) found at %s", extension, download.InputURL))
+					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted extension (%s) found at %s", extension, download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedExtension)
 			}
@@ -775,7 +771,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Abort
 			if shouldAbort {
 				if !download.HistoryCmd {
-					log.Println(logPrefixFileSkip, color.GreenString("Unpermitted domain (%s) found at %s", parsedURL.Hostname(), download.InputURL))
+					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted domain (%s) found at %s", parsedURL.Hostname(), download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedDomain)
 			}
@@ -788,7 +784,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			(*channelConfig.SaveTextFiles && contentTypeFound == "text") ||
 			(*channelConfig.SaveOtherFiles && contentTypeFound == "application")) {
 			if !download.HistoryCmd {
-				log.Println(logPrefixFileSkip, color.GreenString("Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
+				log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
 			}
 			return mDownloadStatus(downloadSkippedUnpermittedType)
 		}
@@ -797,14 +793,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if config.FilterDuplicateImages && contentTypeFound == "image" && extension != ".gif" && extension != ".webp" {
 			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
 			if err != nil {
-				log.Println(color.HiRedString("[FilterDuplicateImages] Error converting buffer to image for hashing:\t%s", err))
+				log.Println(lg("Download", "", color.HiRedString, "[FilterDuplicateImages] Error converting buffer to image for hashing:\t%s", err))
 			} else {
 				hash, _ := duplo.CreateHash(img)
 				matches := imgStore.Query(hash)
 				sort.Sort(matches)
 				for _, match := range matches {
 					if match.Score < config.FilterDuplicateImagesThreshold {
-						log.Println(logPrefixFileSkip, color.GreenString("Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
+						log.Println(lg("Download", "Skip", color.GreenString, "Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
 						return mDownloadStatus(downloadSkippedDetectedDuplicate)
 					}
 				}
@@ -862,7 +858,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					// Create folder.
 					err := os.MkdirAll(download.Path+subfolder, 0755)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating server subfolder \"%s\": %s", download.Path, err))
+						log.Println(lg("Download", "", color.HiRedString, "Error while creating server subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -880,7 +876,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					// Create folder.
 					err := os.MkdirAll(download.Path+subfolder, 0755)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating channel subfolder \"%s\": %s", download.Path, err))
+						log.Println(lg("Download", "", color.HiRedString, "Error while creating channel subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -899,7 +895,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					// Create folder.
 					err := os.MkdirAll(download.Path+subfolder, 0755)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.HiRedString("Error while creating user subfolder \"%s\": %s", download.Path, err))
+						log.Println(lg("Download", "", color.HiRedString, "Error while creating user subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -926,7 +922,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				// Create folder.
 				err := os.MkdirAll(download.Path+subfolder, 0755)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.HiRedString("Error while creating type subfolder \"%s\": %s", download.Path+subfolder, err))
+					log.Println(lg("Download", "", color.HiRedString, "Error while creating type subfolder \"%s\": %s", download.Path+subfolder, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
@@ -950,11 +946,11 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					i = i + 1
 				}
 				if !download.HistoryCmd {
-					log.Println(color.GreenString("Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead", tmpPath, completePath))
+					log.Println(lg("Download", "Skip", color.GreenString, "Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead", tmpPath, completePath))
 				}
 			} else {
 				if !download.HistoryCmd {
-					log.Println(logPrefixFileSkip, color.GreenString("Matching filenames, possible duplicate..."))
+					log.Println(lg("Download", "Skip", color.GreenString, "Matching filenames, possible duplicate..."))
 				}
 				return mDownloadStatus(downloadSkippedDuplicate)
 			}
@@ -964,18 +960,18 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if *channelConfig.Save {
 			err = ioutil.WriteFile(completePath, bodyOfResp, 0644)
 			if err != nil {
-				log.Println(logPrefixErrorHere, color.HiRedString("Error while writing file to disk \"%s\": %s", download.InputURL, err))
+				log.Println(lg("Download", "", color.HiRedString, "Error while writing file to disk \"%s\": %s", download.InputURL, err))
 				return mDownloadStatus(downloadFailedWritingFile, err)
 			}
 
 			// Change file time
 			err = os.Chtimes(completePath, download.FileTime, download.FileTime)
 			if err != nil {
-				log.Println(logPrefixErrorHere, color.RedString("Error while changing metadata date \"%s\": %s", download.InputURL, err))
+				log.Println(lg("Download", "", color.RedString, logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
 			}
-			log.Println(logPrefix + color.HiGreenString("SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
+			log.Println(lg("Download", "", color.HiGreenString, logPrefix+"SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 		} else {
-			log.Println(logPrefix + color.HiGreenString("Did not save %s sent in %s#%s --- file saving disabled...", contentTypeFound, sourceName, sourceChannelName))
+			log.Println(lg("Download", "", color.HiGreenString, logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...", contentTypeFound, sourceName, sourceChannelName))
 		}
 
 		userID := botUser.ID
@@ -992,7 +988,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			UserID:      userID,
 		})
 		if err != nil {
-			log.Println(logPrefixErrorHere, color.HiRedString("Error writing to database: %s", err))
+			log.Println(lg("Download", "", color.HiRedString, "Error writing to database: %s", err))
 			return mDownloadStatus(downloadFailedWritingDatabase, err)
 		}
 
@@ -1017,7 +1013,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if download.Message.GuildID != "" {
 					guild, err := bot.State.Guild(download.Message.GuildID)
 					if err != nil {
-						log.Println(logPrefixErrorHere, color.RedString("Error fetching guild state for emojis from %s: %s", download.Message.GuildID, err))
+						log.Println(lg("Download", "", color.RedString, "Error fetching guild state for emojis from %s: %s", download.Message.GuildID, err))
 					} else {
 						emojis := guild.Emojis
 						if len(emojis) > 1 {
@@ -1044,10 +1040,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
 				err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction)
 				if err != nil {
-					log.Println(logPrefixErrorHere, color.RedString("Error adding reaction to message: %s", err))
+					log.Println(lg("Download", "", color.RedString, "Error adding reaction to message: %s", err))
 				}
 			} else {
-				log.Println(logPrefixErrorHere, color.RedString("Bot does not have permission to add reactions in %s", download.Message.ChannelID))
+				log.Println(lg("Download", "", color.RedString, "Bot does not have permission to add reactions in %s", download.Message.ChannelID))
 			}
 		}
 
@@ -1078,7 +1074,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 							},
 						)
 						if err != nil {
-							log.Println(logPrefixErrorHere, color.HiRedString("File log message failed to send:\t%s", err))
+							log.Println(lg("Download", "", color.HiRedString, "File log message failed to send:\t%s", err))
 						}
 					} else { // Embed
 						embed := &discordgo.MessageEmbed{
@@ -1100,7 +1096,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 							&discordgo.MessageSend{Embed: embed},
 						)
 						if err != nil {
-							log.Println(logPrefixErrorHere, color.HiRedString("File log message failed to send:\t%s", err))
+							log.Println(lg("Download", "", color.HiRedString, "File log message failed to send:\t%s", err))
 						}
 					}
 				}
@@ -1120,19 +1116,19 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if config.FilterDuplicateImages {
 				encodedStore, err := imgStore.GobEncode()
 				if err != nil {
-					log.Println(color.HiRedString("Failed to encode imgStore:\t%s"))
+					log.Println(lg("Download", "", color.HiRedString, "Failed to encode imgStore:\t%s"))
 				} else {
 					f, err := os.OpenFile(imgStorePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 					if err != nil {
-						log.Println(color.HiRedString("Failed to open imgStore file:\t%s"))
+						log.Println(lg("Download", "", color.HiRedString, "Failed to open imgStore file:\t%s"))
 					}
 					_, err = f.Write(encodedStore)
 					if err != nil {
-						log.Println(color.HiRedString("Failed to update imgStore file:\t%s"))
+						log.Println(lg("Download", "", color.HiRedString, "Failed to update imgStore file:\t%s"))
 					}
 					err = f.Close()
 					if err != nil {
-						log.Println(color.HiRedString("Failed to close imgStore file:\t%s"))
+						log.Println(lg("Download", "", color.HiRedString, "Failed to close imgStore file:\t%s"))
 					}
 				}
 			}

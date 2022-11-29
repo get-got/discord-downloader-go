@@ -603,6 +603,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_red_triangle: **"channels"** _`[USE THIS OR "channel"]`_
         * — _settings.adminChannel.channels : list of strings_
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
+    * :small_blue_diamond: "logProgram"
+        * — _settings.adminChannel.logProgram : boolean_
+        * _Default:_ `false`
+        * _Sends all program output to admin channel(s)._
     * :small_blue_diamond: "logStatus"
         * — _settings.adminChannel.logStatus : boolean_
         * _Default:_ `true`
