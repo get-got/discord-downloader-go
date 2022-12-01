@@ -423,7 +423,7 @@ type downloadRequestStruct struct {
 	ManualDownload bool
 }
 
-func startDownload(download downloadRequestStruct) downloadStatusStruct {
+func startDownloadRequest(download downloadRequestStruct) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status = tryDownload(download)

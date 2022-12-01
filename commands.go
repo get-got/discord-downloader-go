@@ -444,7 +444,7 @@ func handleCommands() *exrouter.Route {
 									message.ChannelID = ctx.Msg.ChannelID
 									url := "https://cdn.discordapp.com/emojis/" + emoji.ID
 
-									status := startDownload(
+									status := startDownloadRequest(
 										downloadRequestStruct{
 											InputURL:   url,
 											Filename:   emoji.ID,
