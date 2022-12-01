@@ -211,7 +211,7 @@ func dataKeyReplacement(input string) string {
 	return input
 }
 
-func dynamicKeyReplacement(channelConfig configurationChannel, download downloadRequestStruct) string {
+func dynamicKeyReplacement(channelConfig configurationSource, download downloadRequestStruct) string {
 	//TODO: same as dataKeyReplacement
 
 	ret := config.FilenameFormat

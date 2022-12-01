@@ -152,11 +152,11 @@ type configuration struct {
 	InflateCount               *int64             `json:"inflateCount,omitempty"`               // optional, defaults to 0 if undefined
 	NumberFormatEuropean       bool               `json:"numberFormatEuropean,omitempty"`       // optional, defaults
 	// Channels
-	All                  *configurationChannel  `json:"all,omitempty"`                  // optional, defaults
-	AllBlacklistChannels *[]string              `json:"allBlacklistChannels,omitempty"` // optional
-	AllBlacklistServers  *[]string              `json:"allBlacklistServers,omitempty"`  // optional
-	Servers              []configurationChannel `json:"servers"`                        // required
-	Channels             []configurationChannel `json:"channels"`                       // required
+	All                  *configurationSource  `json:"all,omitempty"`                  // optional, defaults
+	AllBlacklistChannels *[]string             `json:"allBlacklistChannels,omitempty"` // optional
+	AllBlacklistServers  *[]string             `json:"allBlacklistServers,omitempty"`  // optional
+	Servers              []configurationSource `json:"servers"`                        // required
+	Channels             []configurationSource `json:"channels"`                       // required
 
 	/* IDEAS / TODO:
 
@@ -205,7 +205,7 @@ var (
 	ccdSavePossibleDuplicates bool = false
 )
 
-type configurationChannel struct {
+type configurationSource struct {
 	// Main
 	ChannelID       string    `json:"channel,omitempty"`         // used for config.Channels
 	ChannelIDs      *[]string `json:"channels,omitempty"`        // ---> alternative to ChannelID
@@ -253,9 +253,9 @@ type configurationChannel struct {
 	SaveOtherFiles         *bool `json:"saveOtherFiles,omitempty"`         // optional, defaults
 	SavePossibleDuplicates *bool `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	// Misc Rules
-	Filters     *configurationChannelFilters `json:"filters,omitempty"`     // optional
-	LogLinks    *configurationChannelLog     `json:"logLinks,omitempty"`    // optional
-	LogMessages *configurationChannelLog     `json:"logMessages,omitempty"` // optional
+	Filters     *configurationSourceFilters `json:"filters,omitempty"`     // optional
+	LogLinks    *configurationSourceLog     `json:"logLinks,omitempty"`    // optional
+	LogMessages *configurationSourceLog     `json:"logMessages,omitempty"` // optional
 }
 
 var (
@@ -279,7 +279,7 @@ var (
 	}
 )
 
-type configurationChannelFilters struct {
+type configurationSourceFilters struct {
 	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"` // optional
 	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"` // optional
 
@@ -306,7 +306,7 @@ var (
 	ccldLogFailures         bool = true
 )
 
-type configurationChannelLog struct {
+type configurationSourceLog struct {
 	Destination         string  `json:"destination"`                   // required
 	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty"` // optional, defaults
 	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty"`  // optional, defaults
@@ -568,7 +568,7 @@ func createConfig() {
 			}
 			ChannelWhitelist := cfg.Section("channels").KeysHash()
 			for key, value := range ChannelWhitelist {
-				newChannel := configurationChannel{
+				newChannel := configurationSource{
 					ChannelID:   key,
 					Destination: value,
 				}
@@ -579,7 +579,7 @@ func createConfig() {
 		log.Println(lg("Settings", "createConfig", color.HiGreenString,
 			"Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
 	} else {
-		baseChannel := configurationChannel{
+		baseChannel := configurationSource{
 			ChannelID:   enteredBaseChannel,
 			Destination: enteredBaseDestination,
 
@@ -698,7 +698,7 @@ func createConfig() {
 	}
 }
 
-func channelDefault(channel *configurationChannel) {
+func channelDefault(channel *configurationSource) {
 	// These have to use the default variables since literal values and consts can't be set to the pointers
 
 	// Setup
@@ -775,7 +775,7 @@ func channelDefault(channel *configurationChannel) {
 	}
 
 	if channel.Filters == nil {
-		channel.Filters = &configurationChannelFilters{}
+		channel.Filters = &configurationSourceFilters{}
 	}
 	if channel.Filters.BlockedExtensions == nil {
 		channel.Filters.BlockedExtensions = &ccfdBlockedExtensions
@@ -785,7 +785,7 @@ func channelDefault(channel *configurationChannel) {
 	}
 
 	if channel.LogLinks == nil {
-		channel.LogLinks = &configurationChannelLog{}
+		channel.LogLinks = &configurationSourceLog{}
 	}
 	if channel.LogLinks.DestinationIsFolder == nil {
 		channel.LogLinks.DestinationIsFolder = &ccldDestinationIsFolder
@@ -810,7 +810,7 @@ func channelDefault(channel *configurationChannel) {
 	}
 
 	if channel.LogMessages == nil {
-		channel.LogMessages = &configurationChannelLog{}
+		channel.LogMessages = &configurationSourceLog{}
 	}
 	if channel.LogMessages.DestinationIsFolder == nil {
 		channel.LogMessages.DestinationIsFolder = &ccldDestinationIsFolder
@@ -941,7 +941,7 @@ func channelRegistered(m *discordgo.Message) string {
 	return ""
 }
 
-func getChannelConfig(ChannelID string) configurationChannel {
+func getChannelConfig(ChannelID string) configurationSource {
 	for _, item := range config.Channels {
 		// Single Channel Config
 		if ChannelID == item.ChannelID {
@@ -985,7 +985,7 @@ func getChannelConfig(ChannelID string) configurationChannel {
 	if config.All != nil {
 		return *config.All
 	}
-	return configurationChannel{}
+	return configurationSource{}
 }
 
 func isAdminChannelRegistered(ChannelID string) bool {

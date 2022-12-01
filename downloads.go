@@ -605,7 +605,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 	if ch := channelRegistered(download.Message); ch != "" ||
 		download.EmojiCmd || download.ManualDownload {
-		var channelConfig configurationChannel
+		var channelConfig configurationSource
 		channelDefault(&channelConfig)
 		if ch != "" {
 			channelConfig = getChannelConfig(ch)
