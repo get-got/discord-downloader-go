@@ -335,7 +335,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			if config.DebugOutput {
 				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link))
 			}
-			status := startDownloadRequest(
+			status := handleDownload(
 				downloadRequestStruct{
 					InputURL:   file.Link,
 					Filename:   file.Filename,

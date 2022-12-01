@@ -423,7 +423,7 @@ type downloadRequestStruct struct {
 	ManualDownload bool
 }
 
-func startDownloadRequest(download downloadRequestStruct) downloadStatusStruct {
+func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status = tryDownload(download)
@@ -434,12 +434,15 @@ func startDownloadRequest(download downloadRequestStruct) downloadStatusStruct {
 		}
 	}
 
+	channel := channelRegistered(download.Message)
+
 	// Any kind of failure
 	if status.Status >= downloadFailed && !download.HistoryCmd && !download.EmojiCmd {
-		log.Println(lg("Download", "", color.RedString, "Gave up on downloading %s after %d failed attempts...\t%s", download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		ch := channelRegistered(download.Message)
-		if ch != "" {
-			channelConfig := getChannelConfig(ch)
+		log.Println(lg("Download", "", color.RedString,
+			"Gave up on downloading %s after %d failed attempts...\t%s",
+			download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
+		if channel != "" {
+			channelConfig := getChannelConfig(channel)
 			if !download.HistoryCmd && *channelConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -448,24 +451,25 @@ func startDownloadRequest(download downloadRequestStruct) downloadStatusStruct {
 					content += fmt.Sprintf("\n```ERROR: %s```", status.Error)
 				}
 				// Failure Notice
-				if hasPerms(download.Message.ChannelID, discordgo.PermissionSendMessages) {
+				if !hasPerms(download.Message.ChannelID, discordgo.PermissionSendMessages) {
+					log.Println(lg("Download", "", color.HiRedString, fmtBotSendPerm, download.Message.ChannelID))
+				} else {
 					if selfbot {
 						_, err := bot.ChannelMessageSend(download.Message.ChannelID, fmt.Sprintf("%s **Download Failure**\n\n%s", download.Message.Author.Mention(), content))
 						if err != nil {
 							log.Println(lg("Download", "", color.HiRedString, "Failed to send failure message to %s: %s", download.Message.ChannelID, err))
 						}
 					} else {
-						_, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
+						if _, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
 							&discordgo.MessageSend{
 								Content: fmt.Sprintf("<@!%s>", download.Message.Author.ID),
 								Embed:   buildEmbed(download.Message.ChannelID, "Download Failure", content),
-							})
-						if err != nil {
-							log.Println(lg("Download", "", color.HiRedString, "Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+							}); err != nil {
+							log.Println(lg("Download", "", color.HiRedString,
+								"Failed to send failure message to %s: %s",
+								download.Message.ChannelID, err))
 						}
 					}
-				} else {
-					log.Println(lg("Download", "", color.HiRedString, fmtBotSendPerm, download.Message.ChannelID))
 				}
 			}
 			if status.Error != nil {
@@ -475,9 +479,8 @@ func startDownloadRequest(download downloadRequestStruct) downloadStatusStruct {
 	}
 
 	// Log Links to File
-	ch := channelRegistered(download.Message)
-	if ch != "" {
-		channelConfig := getChannelConfig(ch)
+	if channel != "" {
+		channelConfig := getChannelConfig(channel)
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
 				logPath := channelConfig.LogLinks.Destination
@@ -590,6 +593,8 @@ func startDownloadRequest(download downloadRequestStruct) downloadStatusStruct {
 }
 
 func tryDownload(download downloadRequestStruct) downloadStatusStruct {
+	var err error
+
 	cachedDownloadID++
 	thisDownloadID := cachedDownloadID
 
@@ -598,20 +603,16 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		logPrefix = "HISTORY "
 	}
 
-	ch := channelRegistered(download.Message)
-	if ch != "" || download.EmojiCmd || download.ManualDownload {
+	if ch := channelRegistered(download.Message); ch != "" ||
+		download.EmojiCmd || download.ManualDownload {
 		var channelConfig configurationChannel
+		channelDefault(&channelConfig)
 		if ch != "" {
 			channelConfig = getChannelConfig(ch)
-		} else {
-			channelDefault(&channelConfig)
 		}
 
-		var err error
-
 		// Source validation
-		_, err = url.ParseRequestURI(download.InputURL)
-		if err != nil {
+		if _, err = url.ParseRequestURI(download.InputURL); err != nil {
 			return mDownloadStatus(downloadFailedInvalidSource, err)
 		}
 
@@ -625,9 +626,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Create folder
-		err = os.MkdirAll(download.Path, 0755)
-		if err != nil {
-			log.Println(lg("Download", "", color.HiRedString, "Error while creating destination folder \"%s\": %s", download.Path, err))
+		if err = os.MkdirAll(download.Path, 0755); err != nil {
+			log.Println(lg("Download", "", color.HiRedString,
+				"Error while creating destination folder \"%s\": %s",
+				download.Path, err))
 			return mDownloadStatus(downloadFailedCreatingFolder, err)
 		}
 
@@ -646,7 +648,9 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		response, err := client.Do(request)
 		if err != nil {
 			if !strings.Contains(err.Error(), "no such host") && !strings.Contains(err.Error(), "connection refused") {
-				log.Println(lg("Download", "", color.HiRedString, "Error while receiving response from \"%s\": %s", download.InputURL, err))
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while receiving response from \"%s\": %s",
+					download.InputURL, err))
 			}
 			return mDownloadStatus(downloadFailedDownloadingResponse, err)
 		}
@@ -655,7 +659,9 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		// Read
 		bodyOfResp, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			log.Println(lg("Download", "", color.HiRedString, "Could not read response from \"%s\": %s", download.InputURL, err))
+			log.Println(lg("Download", "", color.HiRedString,
+				"Could not read response from \"%s\": %s",
+				download.InputURL, err))
 			return mDownloadStatus(downloadFailedReadResponse, err)
 		}
 
@@ -670,8 +676,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			download.Filename = filenameFromURL(response.Request.URL.String())
 			for key, iHeader := range response.Header {
 				if key == "Content-Disposition" {
-					_, params, err := mime.ParseMediaType(iHeader[0])
-					if err == nil {
+					if _, params, err := mime.ParseMediaType(iHeader[0]); err == nil {
 						newFilename, err := url.QueryUnescape(params["filename"])
 						if err != nil {
 							newFilename = params["filename"]
@@ -742,8 +747,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 		// Filename extension fix
 		if filepath.Ext(download.Filename) == "" {
-			possibleExtension, _ := mime.ExtensionsByType(contentType)
-			if len(possibleExtension) > 0 {
+			if possibleExtension, _ := mime.ExtensionsByType(contentType); len(possibleExtension) > 0 {
 				download.Filename += possibleExtension[0]
 				download.FileExtension = possibleExtension[0]
 			}
@@ -783,7 +787,8 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			(*channelConfig.SaveTextFiles && contentTypeFound == "text") ||
 			(*channelConfig.SaveOtherFiles && contentTypeFound == "application")) {
 			if !download.HistoryCmd {
-				log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
+				log.Println(lg("Download", "Skip", color.GreenString,
+					"Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
 			}
 			return mDownloadStatus(downloadSkippedUnpermittedType)
 		}
@@ -792,14 +797,16 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if config.FilterDuplicateImages && contentTypeFound == "image" && extension != ".gif" && extension != ".webp" {
 			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
 			if err != nil {
-				log.Println(lg("Download", "", color.HiRedString, "[FilterDuplicateImages] Error converting buffer to image for hashing:\t%s", err))
+				log.Println(lg("Download", "", color.HiRedString,
+					"[FilterDuplicateImages] Error converting buffer to image for hashing:\t%s", err))
 			} else {
 				hash, _ := duplo.CreateHash(img)
 				matches := imgStore.Query(hash)
 				sort.Sort(matches)
 				for _, match := range matches {
 					if match.Score < config.FilterDuplicateImagesThreshold {
-						log.Println(lg("Download", "Skip", color.GreenString, "Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
+						log.Println(lg("Download", "Skip", color.GreenString,
+							"Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
 						return mDownloadStatus(downloadSkippedDetectedDuplicate)
 					}
 				}
@@ -846,18 +853,16 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Subfolder Division - Server Nesting
 			if *channelConfig.DivideFoldersByServer {
 				subfolderSuffix := download.Message.GuildID
-				if !*channelConfig.DivideFoldersUseID {
-					if sourceName != "" && sourceName != "UNKNOWN" {
-						subfolderSuffix = clearPath(sourceName)
-					}
+				if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
+					subfolderSuffix = clearPath(sourceName)
 				}
 				if subfolderSuffix != "" {
 					subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
 					subfolder = subfolder + subfolderSuffix
-					// Create folder.
-					err := os.MkdirAll(download.Path+subfolder, 0755)
-					if err != nil {
-						log.Println(lg("Download", "", color.HiRedString, "Error while creating server subfolder \"%s\": %s", download.Path, err))
+					// Create folder
+					if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+						log.Println(lg("Download", "", color.HiRedString,
+							"Error while creating server subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -865,17 +870,15 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Subfolder Division - Channel Nesting
 			if *channelConfig.DivideFoldersByChannel {
 				subfolderSuffix := download.Message.ChannelID
-				if !*channelConfig.DivideFoldersUseID {
-					if sourceChannelName != "" {
-						subfolderSuffix = clearPath(sourceChannelName)
-					}
+				if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
+					subfolderSuffix = clearPath(sourceChannelName)
 				}
 				if subfolderSuffix != "" {
 					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
-					// Create folder.
-					err := os.MkdirAll(download.Path+subfolder, 0755)
-					if err != nil {
-						log.Println(lg("Download", "", color.HiRedString, "Error while creating channel subfolder \"%s\": %s", download.Path, err))
+					// Create folder
+					if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+						log.Println(lg("Download", "", color.HiRedString,
+							"Error while creating channel subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -884,17 +887,16 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Subfolder Division - User Nesting
 			if *channelConfig.DivideFoldersByUser {
 				subfolderSuffix := download.Message.Author.ID
-				if !*channelConfig.DivideFoldersUseID {
-					if download.Message.Author.Username != "" {
-						subfolderSuffix = clearPath(download.Message.Author.Username + "#" + download.Message.Author.Discriminator)
-					}
+				if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
+					subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
+						download.Message.Author.Discriminator)
 				}
 				if subfolderSuffix != "" {
 					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
-					// Create folder.
-					err := os.MkdirAll(download.Path+subfolder, 0755)
-					if err != nil {
-						log.Println(lg("Download", "", color.HiRedString, "Error while creating user subfolder \"%s\": %s", download.Path, err))
+					// Create folder
+					if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+						log.Println(lg("Download", "", color.HiRedString,
+							"Error while creating user subfolder \"%s\": %s", download.Path, err))
 						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 					}
 				}
@@ -903,25 +905,21 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 		// Subfolder Division - Content Type
 		if *channelConfig.DivideFoldersByType && download.Message.Author != nil {
-			subfolderSuffix := ""
+			subfolderSuffix := contentTypeFound
 			switch contentTypeFound {
 			case "image":
 				subfolderSuffix = "images"
 			case "video":
 				subfolderSuffix = "videos"
-			case "audio":
-				subfolderSuffix = "audio"
-			case "text":
-				subfolderSuffix = "text"
 			case "application":
 				subfolderSuffix = "applications"
 			}
 			if subfolderSuffix != "" {
 				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
 				// Create folder.
-				err := os.MkdirAll(download.Path+subfolder, 0755)
-				if err != nil {
-					log.Println(lg("Download", "", color.HiRedString, "Error while creating type subfolder \"%s\": %s", download.Path+subfolder, err))
+				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+					log.Println(lg("Download", "", color.HiRedString,
+						"Error while creating type subfolder \"%s\": %s", download.Path+subfolder, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
@@ -945,11 +943,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					i = i + 1
 				}
 				if !download.HistoryCmd {
-					log.Println(lg("Download", "Skip", color.GreenString, "Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead", tmpPath, completePath))
+					log.Println(lg("Download", "Skip", color.GreenString,
+						"Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead",
+						tmpPath, completePath))
 				}
 			} else {
 				if !download.HistoryCmd {
-					log.Println(lg("Download", "Skip", color.GreenString, "Matching filenames, possible duplicate..."))
+					log.Println(lg("Download", "Skip", color.GreenString,
+						"Matching filenames, possible duplicate..."))
 				}
 				return mDownloadStatus(downloadSkippedDuplicate)
 			}
@@ -957,20 +958,24 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 		// Write
 		if *channelConfig.Save {
-			err = ioutil.WriteFile(completePath, bodyOfResp, 0644)
-			if err != nil {
-				log.Println(lg("Download", "", color.HiRedString, "Error while writing file to disk \"%s\": %s", download.InputURL, err))
+			if err = ioutil.WriteFile(completePath, bodyOfResp, 0644); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while writing file to disk \"%s\": %s", download.InputURL, err))
 				return mDownloadStatus(downloadFailedWritingFile, err)
 			}
 
 			// Change file time
-			err = os.Chtimes(completePath, download.FileTime, download.FileTime)
-			if err != nil {
-				log.Println(lg("Download", "", color.RedString, logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
+			if err = os.Chtimes(completePath, download.FileTime, download.FileTime); err != nil {
+				log.Println(lg("Download", "", color.RedString,
+					logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
 			}
-			log.Println(lg("Download", "", color.HiGreenString, logPrefix+"SAVED %s sent in %s#%s to \"%s\"", strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
+			log.Println(lg("Download", "", color.HiGreenString,
+				logPrefix+"SAVED %s sent in %s#%s to \"%s\"",
+				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
 		} else {
-			log.Println(lg("Download", "", color.HiGreenString, logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...", contentTypeFound, sourceName, sourceChannelName))
+			log.Println(lg("Download", "", color.HiGreenString,
+				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
+				contentTypeFound, sourceName, sourceChannelName))
 		}
 
 		userID := botUser.ID
@@ -1012,7 +1017,9 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if download.Message.GuildID != "" {
 					guild, err := bot.State.Guild(download.Message.GuildID)
 					if err != nil {
-						log.Println(lg("Download", "", color.RedString, "Error fetching guild state for emojis from %s: %s", download.Message.GuildID, err))
+						log.Println(lg("Download", "", color.RedString,
+							"Error fetching guild state for emojis from %s: %s",
+							download.Message.GuildID, err))
 					} else {
 						emojis := guild.Emojis
 						if len(emojis) > 1 {
@@ -1020,7 +1027,8 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 								rand.Seed(time.Now().UnixNano())
 								chosenEmoji := emojis[rand.Intn(len(emojis))]
 								formattedEmoji := chosenEmoji.APIName()
-								if !chosenEmoji.Animated && !stringInSlice(formattedEmoji, *channelConfig.BlacklistReactEmojis) {
+								if !chosenEmoji.Animated && !stringInSlice(formattedEmoji,
+									*channelConfig.BlacklistReactEmojis) {
 									reaction = formattedEmoji
 									break
 								}
@@ -1039,63 +1047,70 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
 				err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction)
 				if err != nil {
-					log.Println(lg("Download", "", color.RedString, "Error adding reaction to message: %s", err))
+					log.Println(lg("Download", "", color.RedString,
+						"Error adding reaction to message: %s", err))
 				}
 			} else {
-				log.Println(lg("Download", "", color.RedString, "Bot does not have permission to add reactions in %s", download.Message.ChannelID))
+				log.Println(lg("Download", "", color.RedString,
+					"Bot does not have permission to add reactions in %s", download.Message.ChannelID))
 			}
 		}
 
 		// Log Media To Channel(s)
-		var logMediaChannels []string
-		if channelConfig.SendFileToChannel != nil {
-			if *channelConfig.SendFileToChannel != "" {
-				logMediaChannels = append(logMediaChannels, *channelConfig.SendFileToChannel)
+		{
+			var logMediaChannels []string
+			if channelConfig.SendFileToChannel != nil {
+				if *channelConfig.SendFileToChannel != "" {
+					logMediaChannels = append(logMediaChannels, *channelConfig.SendFileToChannel)
+				}
 			}
-		}
-		if channelConfig.SendFileToChannels != nil {
-			for _, logChannel := range *channelConfig.SendFileToChannels {
-				logMediaChannels = append(logMediaChannels, logChannel)
+			if channelConfig.SendFileToChannels != nil {
+				for _, logChannel := range *channelConfig.SendFileToChannels {
+					logMediaChannels = append(logMediaChannels, logChannel)
+				}
 			}
-		}
-		for _, logChannel := range logMediaChannels {
-			if logChannel != "" {
-				if hasPerms(logChannel, discordgo.PermissionSendMessages) {
-					actualFile := false
-					if channelConfig.SendFileDirectly != nil {
-						actualFile = *channelConfig.SendFileDirectly
-					}
-					// File
-					if actualFile {
-						_, err := bot.ChannelMessageSendComplex(logChannel,
-							&discordgo.MessageSend{
-								File: &discordgo.File{Name: download.Filename, Reader: bytes.NewReader(bodyOfResp)},
-							},
-						)
-						if err != nil {
-							log.Println(lg("Download", "", color.HiRedString, "File log message failed to send:\t%s", err))
+			for _, logChannel := range logMediaChannels {
+				if logChannel != "" {
+					if hasPerms(logChannel, discordgo.PermissionSendMessages) {
+						actualFile := false
+						if channelConfig.SendFileDirectly != nil {
+							actualFile = *channelConfig.SendFileDirectly
 						}
-					} else { // Embed
-						embed := &discordgo.MessageEmbed{
-							Title: fmt.Sprintf("Downloaded: %s", download.Filename),
-							Color: getEmbedColor(logChannel),
-							Footer: &discordgo.MessageEmbedFooter{
-								IconURL: projectIcon,
-								Text:    fmt.Sprintf("%s v%s", projectName, projectVersion),
-							},
-						}
-						if contentTypeFound == "image" {
-							embed.Image = &discordgo.MessageEmbedImage{URL: download.InputURL}
-						} else if contentTypeFound == "video" {
-							embed.Video = &discordgo.MessageEmbedVideo{URL: download.InputURL}
-						} else {
-							embed.Description = fmt.Sprintf("Unsupported filetype: %s\n%s", contentTypeFound, download.InputURL)
-						}
-						_, err := bot.ChannelMessageSendComplex(logChannel,
-							&discordgo.MessageSend{Embed: embed},
-						)
-						if err != nil {
-							log.Println(lg("Download", "", color.HiRedString, "File log message failed to send:\t%s", err))
+						// File
+						if actualFile {
+							_, err := bot.ChannelMessageSendComplex(logChannel,
+								&discordgo.MessageSend{
+									File: &discordgo.File{Name: download.Filename, Reader: bytes.NewReader(bodyOfResp)},
+								},
+							)
+							if err != nil {
+								log.Println(lg("Download", "", color.HiRedString,
+									"File log message failed to send:\t%s", err))
+							}
+						} else { // Embed
+							embed := &discordgo.MessageEmbed{
+								Title: fmt.Sprintf("Downloaded: %s", download.Filename),
+								Color: getEmbedColor(logChannel),
+								Footer: &discordgo.MessageEmbedFooter{
+									IconURL: projectIcon,
+									Text:    fmt.Sprintf("%s v%s", projectName, projectVersion),
+								},
+							}
+							if contentTypeFound == "image" {
+								embed.Image = &discordgo.MessageEmbedImage{URL: download.InputURL}
+							} else if contentTypeFound == "video" {
+								embed.Video = &discordgo.MessageEmbedVideo{URL: download.InputURL}
+							} else {
+								embed.Description = fmt.Sprintf("Unsupported filetype: %s\n%s",
+									contentTypeFound, download.InputURL)
+							}
+							_, err := bot.ChannelMessageSendComplex(logChannel,
+								&discordgo.MessageSend{Embed: embed},
+							)
+							if err != nil {
+								log.Println(lg("Download", "", color.HiRedString,
+									"File log message failed to send:\t%s", err))
+							}
 						}
 					}
 				}
@@ -1110,25 +1125,23 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 		}
 
-		if thisDownloadID > 0 {
-			// Filter Duplicate Images
-			if config.FilterDuplicateImages {
-				encodedStore, err := imgStore.GobEncode()
+		// Filter Duplicate Images
+		if config.FilterDuplicateImages && thisDownloadID > 0 {
+			encodedStore, err := imgStore.GobEncode()
+			if err != nil {
+				log.Println(lg("Download", "", color.HiRedString, "Failed to encode imgStore:\t%s"))
+			} else {
+				f, err := os.OpenFile(imgStorePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 				if err != nil {
-					log.Println(lg("Download", "", color.HiRedString, "Failed to encode imgStore:\t%s"))
-				} else {
-					f, err := os.OpenFile(imgStorePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-					if err != nil {
-						log.Println(lg("Download", "", color.HiRedString, "Failed to open imgStore file:\t%s"))
-					}
-					_, err = f.Write(encodedStore)
-					if err != nil {
-						log.Println(lg("Download", "", color.HiRedString, "Failed to update imgStore file:\t%s"))
-					}
-					err = f.Close()
-					if err != nil {
-						log.Println(lg("Download", "", color.HiRedString, "Failed to close imgStore file:\t%s"))
-					}
+					log.Println(lg("Download", "", color.HiRedString, "Failed to open imgStore file:\t%s"))
+				}
+				_, err = f.Write(encodedStore)
+				if err != nil {
+					log.Println(lg("Download", "", color.HiRedString, "Failed to update imgStore file:\t%s"))
+				}
+				err = f.Close()
+				if err != nil {
+					log.Println(lg("Download", "", color.HiRedString, "Failed to close imgStore file:\t%s"))
 				}
 			}
 		}
