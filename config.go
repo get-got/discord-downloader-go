@@ -44,25 +44,25 @@ type configurationCredentials struct {
 
 //#region Configuration
 
-// cd = Config Default
+// defConfig_ = Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
-	cdDebugOutput          bool   = false
-	cdMessageOutput        bool   = true
-	cdCommandPrefix        string = "ddg "
-	cdAllowSkipping        bool   = true
-	cdScanOwnMessages      bool   = false
-	cdCheckPermissions     bool   = true
-	cdAllowGlobalCommands  bool   = true
-	cdGithubUpdateChecking bool   = true
+	defConfig_DebugOutput          bool   = false
+	defConfig_MessageOutput        bool   = true
+	defConfig_CommandPrefix        string = "ddg "
+	defConfig_AllowSkipping        bool   = true
+	defConfig_ScanOwnMessages      bool   = false
+	defConfig_CheckPermissions     bool   = true
+	defConfig_AllowGlobalCommands  bool   = true
+	defConfig_GithubUpdateChecking bool   = true
 	// Appearance
-	cdPresenceEnabled            bool               = true
-	cdPresenceStatus             string             = string(discordgo.StatusIdle)
-	cdPresenceType               discordgo.GameType = discordgo.GameTypeGame
-	cdReactWhenDownloaded        bool               = true
-	cdReactWhenDownloadedHistory bool               = false
-	cdInflateCount               int64              = 0
+	defConfig_PresenceEnabled            bool               = true
+	defConfig_PresenceStatus             string             = string(discordgo.StatusIdle)
+	defConfig_PresenceType               discordgo.GameType = discordgo.GameTypeGame
+	defConfig_ReactWhenDownloaded        bool               = true
+	defConfig_ReactWhenDownloadedHistory bool               = false
+	defConfig_InflateCount               int64              = 0
 )
 
 func defaultConfiguration() configuration {
@@ -76,13 +76,13 @@ func defaultConfiguration() configuration {
 		// Setup
 		Admins: []string{},
 		//LogLevel:                       logLevelInfo,
-		DebugOutput:                    cdDebugOutput,
-		MessageOutput:                  cdMessageOutput,
-		CommandPrefix:                  cdCommandPrefix,
-		AllowSkipping:                  cdAllowSkipping,
-		ScanOwnMessages:                cdScanOwnMessages,
-		CheckPermissions:               cdCheckPermissions,
-		AllowGlobalCommands:            cdAllowGlobalCommands,
+		DebugOutput:                    defConfig_DebugOutput,
+		MessageOutput:                  defConfig_MessageOutput,
+		CommandPrefix:                  defConfig_CommandPrefix,
+		AllowSkipping:                  defConfig_AllowSkipping,
+		ScanOwnMessages:                defConfig_ScanOwnMessages,
+		CheckPermissions:               defConfig_CheckPermissions,
+		AllowGlobalCommands:            defConfig_AllowGlobalCommands,
 		AutorunHistory:                 false,
 		AutorunHistoryBefore:           "",
 		AutorunHistorySince:            "",
@@ -92,19 +92,19 @@ func defaultConfiguration() configuration {
 		DownloadRetryMax:               3,
 		DownloadTimeout:                60,
 		DiscordTimeout:                 180,
-		GithubUpdateChecking:           cdGithubUpdateChecking,
+		GithubUpdateChecking:           defConfig_GithubUpdateChecking,
 		DiscordLogLevel:                discordgo.LogError,
 		FilterDuplicateImages:          false,
 		FilterDuplicateImagesThreshold: 0,
 		// Appearance
-		PresenceEnabled:            cdPresenceEnabled,
-		PresenceStatus:             cdPresenceStatus,
-		PresenceType:               cdPresenceType,
-		ReactWhenDownloaded:        cdReactWhenDownloaded,
-		ReactWhenDownloadedHistory: cdReactWhenDownloadedHistory,
+		PresenceEnabled:            defConfig_PresenceEnabled,
+		PresenceStatus:             defConfig_PresenceStatus,
+		PresenceType:               defConfig_PresenceType,
+		ReactWhenDownloaded:        defConfig_ReactWhenDownloaded,
+		ReactWhenDownloadedHistory: defConfig_ReactWhenDownloadedHistory,
 		FilenameDateFormat:         "2006-01-02_15-04-05",
 		FilenameFormat:             "{{date}} {{shortID}} {{file}}",
-		InflateCount:               &cdInflateCount,
+		InflateCount:               &defConfig_InflateCount,
 		NumberFormatEuropean:       false,
 	}
 }
@@ -173,36 +173,36 @@ type constStruct struct {
 
 //#region Channels
 
-// ccd = Channel Config Default
+// defSource_ = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
-	ccdEnabled           bool = true
-	ccdSave              bool = true
-	ccdAllowCommands     bool = true
-	ccdScanEdits         bool = true
-	ccdIgnoreBots        bool = false
-	ccdSendErrorMessages bool = true
-	ccdSendFileDirectly  bool = true
+	defSource_Enabled           bool = true
+	defSource_Save              bool = true
+	defSource_AllowCommands     bool = true
+	defSource_ScanEdits         bool = true
+	defSource_IgnoreBots        bool = false
+	defSource_SendErrorMessages bool = true
+	defSource_SendFileDirectly  bool = true
 	// Appearance
-	ccdUpdatePresence             bool     = true
-	ccdReactWhenDownloadedEmoji   string   = ""
-	ccdReactWhenDownloaded        bool     = false
-	ccdReactWhenDownloadedHistory bool     = false
-	ccdBlacklistReactEmojis       []string = []string{}
-	ccdTypeWhileProcessing        bool     = false
+	defSource_UpdatePresence             bool     = true
+	defSource_ReactWhenDownloadedEmoji   string   = ""
+	defSource_ReactWhenDownloaded        bool     = false
+	defSource_ReactWhenDownloadedHistory bool     = false
+	defSource_BlacklistReactEmojis       []string = []string{}
+	defSource_TypeWhileProcessing        bool     = false
 	// Rules for Saving
-	ccdDivideFoldersByServer  bool = false
-	ccdDivideFoldersByChannel bool = false
-	ccdDivideFoldersByUser    bool = false
-	ccdDivideFoldersByType    bool = true
-	ccdDivideFoldersUseID     bool = false
-	ccdSaveImages             bool = true
-	ccdSaveVideos             bool = true
-	ccdSaveAudioFiles         bool = false
-	ccdSaveTextFiles          bool = false
-	ccdSaveOtherFiles         bool = false
-	ccdSavePossibleDuplicates bool = false
+	defSource_DivideFoldersByServer  bool = false
+	defSource_DivideFoldersByChannel bool = false
+	defSource_DivideFoldersByUser    bool = false
+	defSource_DivideFoldersByType    bool = true
+	defSource_DivideFoldersUseID     bool = false
+	defSource_SaveImages             bool = true
+	defSource_SaveVideos             bool = true
+	defSource_SaveAudioFiles         bool = false
+	defSource_SaveTextFiles          bool = false
+	defSource_SaveOtherFiles         bool = false
+	defSource_SavePossibleDuplicates bool = false
 )
 
 type configurationSource struct {
@@ -297,13 +297,13 @@ type configurationSourceFilters struct {
 }
 
 var (
-	ccldDestinationIsFolder bool = false
-	ccldDivideLogsByServer  bool = true
-	ccldDivideLogsByChannel bool = true
-	ccldDivideLogsByUser    bool = false
-	ccldDivideLogsByStatus  bool = false
-	ccldLogDownloads        bool = true
-	ccldLogFailures         bool = true
+	defSourceLog_DestinationIsFolder bool = false
+	defSourceLog_DivideLogsByServer  bool = true
+	defSourceLog_DivideLogsByChannel bool = true
+	defSourceLog_DivideLogsByUser    bool = false
+	defSourceLog_DivideLogsByStatus  bool = false
+	defSourceLog_LogDownloads        bool = true
+	defSourceLog_LogFailures         bool = true
 )
 
 type configurationSourceLog struct {
@@ -326,10 +326,10 @@ type configurationSourceLog struct {
 //#region Admin Channels
 
 var (
-	acdLogProgram     bool = false
-	acdLogStatus      bool = true
-	acdLogErrors      bool = true
-	acdUnlockCommands bool = false
+	adefConfig_LogProgram     bool = false
+	adefConfig_LogStatus      bool = true
+	adefConfig_LogErrors      bool = true
+	adefConfig_UnlockCommands bool = false
 )
 
 type configurationAdminChannel struct {
@@ -493,17 +493,17 @@ func createConfig() {
 			Password: placeholderPassword,
 		},
 		Admins:          []string{"REPLACE_WITH_YOUR_DISCORD_USER_ID"},
-		CommandPrefix:   cdCommandPrefix,
-		AllowSkipping:   cdAllowSkipping,
-		ScanOwnMessages: cdScanOwnMessages,
+		CommandPrefix:   defConfig_CommandPrefix,
+		AllowSkipping:   defConfig_AllowSkipping,
+		ScanOwnMessages: defConfig_ScanOwnMessages,
 
-		PresenceEnabled:     cdPresenceEnabled,
-		PresenceStatus:      cdPresenceStatus,
-		PresenceType:        cdPresenceType,
-		ReactWhenDownloaded: cdReactWhenDownloaded,
+		PresenceEnabled:     defConfig_PresenceEnabled,
+		PresenceStatus:      defConfig_PresenceStatus,
+		PresenceType:        defConfig_PresenceType,
+		ReactWhenDownloaded: defConfig_ReactWhenDownloaded,
 
-		GithubUpdateChecking: cdGithubUpdateChecking,
-		DebugOutput:          cdDebugOutput,
+		GithubUpdateChecking: defConfig_GithubUpdateChecking,
+		DebugOutput:          defConfig_DebugOutput,
 	}
 
 	// Import old config
@@ -583,20 +583,20 @@ func createConfig() {
 			ChannelID:   enteredBaseChannel,
 			Destination: enteredBaseDestination,
 
-			Enabled:           &ccdEnabled,
-			Save:              &ccdSave,
-			AllowCommands:     &ccdAllowCommands,
-			SendErrorMessages: &ccdSendErrorMessages,
-			ScanEdits:         &ccdScanEdits,
-			IgnoreBots:        &ccdIgnoreBots,
+			Enabled:           &defSource_Enabled,
+			Save:              &defSource_Save,
+			AllowCommands:     &defSource_AllowCommands,
+			SendErrorMessages: &defSource_SendErrorMessages,
+			ScanEdits:         &defSource_ScanEdits,
+			IgnoreBots:        &defSource_IgnoreBots,
 
-			UpdatePresence:             &ccdUpdatePresence,
-			ReactWhenDownloadedEmoji:   &ccdReactWhenDownloadedEmoji,
-			ReactWhenDownloadedHistory: &ccdReactWhenDownloadedHistory,
+			UpdatePresence:             &defSource_UpdatePresence,
+			ReactWhenDownloadedEmoji:   &defSource_ReactWhenDownloadedEmoji,
+			ReactWhenDownloadedHistory: &defSource_ReactWhenDownloadedHistory,
 
-			DivideFoldersByType: &ccdDivideFoldersByType,
-			SaveImages:          &ccdSaveImages,
-			SaveVideos:          &ccdSaveVideos,
+			DivideFoldersByType: &defSource_DivideFoldersByType,
+			SaveImages:          &defSource_SaveImages,
+			SaveVideos:          &defSource_SaveVideos,
 		}
 		defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
 
@@ -703,75 +703,75 @@ func channelDefault(channel *configurationSource) {
 
 	// Setup
 	if channel.Enabled == nil {
-		channel.Enabled = &ccdEnabled
+		channel.Enabled = &defSource_Enabled
 	}
 	if channel.Save == nil {
-		channel.Save = &ccdSave
+		channel.Save = &defSource_Save
 	}
 	if channel.AllowCommands == nil {
-		channel.AllowCommands = &ccdAllowCommands
+		channel.AllowCommands = &defSource_AllowCommands
 	}
 	if channel.SendErrorMessages == nil {
-		channel.SendErrorMessages = &ccdSendErrorMessages
+		channel.SendErrorMessages = &defSource_SendErrorMessages
 	}
 	if channel.ScanEdits == nil {
-		channel.ScanEdits = &ccdScanEdits
+		channel.ScanEdits = &defSource_ScanEdits
 	}
 	if channel.IgnoreBots == nil {
-		channel.IgnoreBots = &ccdIgnoreBots
+		channel.IgnoreBots = &defSource_IgnoreBots
 	}
 	if channel.SendFileDirectly == nil {
-		channel.SendFileDirectly = &ccdSendFileDirectly
+		channel.SendFileDirectly = &defSource_SendFileDirectly
 	}
 	// Appearance
 	if channel.UpdatePresence == nil {
-		channel.UpdatePresence = &ccdUpdatePresence
+		channel.UpdatePresence = &defSource_UpdatePresence
 	}
 	if channel.ReactWhenDownloadedEmoji == nil {
-		channel.ReactWhenDownloadedEmoji = &ccdReactWhenDownloadedEmoji
+		channel.ReactWhenDownloadedEmoji = &defSource_ReactWhenDownloadedEmoji
 	}
 	if channel.ReactWhenDownloadedHistory == nil {
-		channel.ReactWhenDownloadedHistory = &ccdReactWhenDownloadedHistory
+		channel.ReactWhenDownloadedHistory = &defSource_ReactWhenDownloadedHistory
 	}
 	if channel.BlacklistReactEmojis == nil {
-		channel.BlacklistReactEmojis = &ccdBlacklistReactEmojis
+		channel.BlacklistReactEmojis = &defSource_BlacklistReactEmojis
 	}
 	if channel.TypeWhileProcessing == nil {
-		channel.TypeWhileProcessing = &ccdTypeWhileProcessing
+		channel.TypeWhileProcessing = &defSource_TypeWhileProcessing
 	}
 	// Rules for Saving
 	if channel.DivideFoldersByServer == nil {
-		channel.DivideFoldersByServer = &ccdDivideFoldersByServer
+		channel.DivideFoldersByServer = &defSource_DivideFoldersByServer
 	}
 	if channel.DivideFoldersByChannel == nil {
-		channel.DivideFoldersByChannel = &ccdDivideFoldersByChannel
+		channel.DivideFoldersByChannel = &defSource_DivideFoldersByChannel
 	}
 	if channel.DivideFoldersByUser == nil {
-		channel.DivideFoldersByUser = &ccdDivideFoldersByUser
+		channel.DivideFoldersByUser = &defSource_DivideFoldersByUser
 	}
 	if channel.DivideFoldersByType == nil {
-		channel.DivideFoldersByType = &ccdDivideFoldersByType
+		channel.DivideFoldersByType = &defSource_DivideFoldersByType
 	}
 	if channel.DivideFoldersUseID == nil {
-		channel.DivideFoldersUseID = &ccdDivideFoldersUseID
+		channel.DivideFoldersUseID = &defSource_DivideFoldersUseID
 	}
 	if channel.SaveImages == nil {
-		channel.SaveImages = &ccdSaveImages
+		channel.SaveImages = &defSource_SaveImages
 	}
 	if channel.SaveVideos == nil {
-		channel.SaveVideos = &ccdSaveVideos
+		channel.SaveVideos = &defSource_SaveVideos
 	}
 	if channel.SaveAudioFiles == nil {
-		channel.SaveAudioFiles = &ccdSaveAudioFiles
+		channel.SaveAudioFiles = &defSource_SaveAudioFiles
 	}
 	if channel.SaveTextFiles == nil {
-		channel.SaveTextFiles = &ccdSaveTextFiles
+		channel.SaveTextFiles = &defSource_SaveTextFiles
 	}
 	if channel.SaveOtherFiles == nil {
-		channel.SaveOtherFiles = &ccdSaveOtherFiles
+		channel.SaveOtherFiles = &defSource_SaveOtherFiles
 	}
 	if channel.SavePossibleDuplicates == nil {
-		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
+		channel.SavePossibleDuplicates = &defSource_SavePossibleDuplicates
 	}
 
 	if channel.Filters == nil {
@@ -788,56 +788,56 @@ func channelDefault(channel *configurationSource) {
 		channel.LogLinks = &configurationSourceLog{}
 	}
 	if channel.LogLinks.DestinationIsFolder == nil {
-		channel.LogLinks.DestinationIsFolder = &ccldDestinationIsFolder
+		channel.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
 	}
 	if channel.LogLinks.DivideLogsByServer == nil {
-		channel.LogLinks.DivideLogsByServer = &ccldDivideLogsByServer
+		channel.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
 	}
 	if channel.LogLinks.DivideLogsByChannel == nil {
-		channel.LogLinks.DivideLogsByChannel = &ccldDivideLogsByChannel
+		channel.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
 	}
 	if channel.LogLinks.DivideLogsByUser == nil {
-		channel.LogLinks.DivideLogsByUser = &ccldDivideLogsByUser
+		channel.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
 	}
 	if channel.LogLinks.DivideLogsByStatus == nil {
-		channel.LogLinks.DivideLogsByStatus = &ccldDivideLogsByStatus
+		channel.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
 	}
 	if channel.LogLinks.LogDownloads == nil {
-		channel.LogLinks.LogDownloads = &ccldLogDownloads
+		channel.LogLinks.LogDownloads = &defSourceLog_LogDownloads
 	}
 	if channel.LogLinks.LogFailures == nil {
-		channel.LogLinks.LogFailures = &ccldLogFailures
+		channel.LogLinks.LogFailures = &defSourceLog_LogFailures
 	}
 
 	if channel.LogMessages == nil {
 		channel.LogMessages = &configurationSourceLog{}
 	}
 	if channel.LogMessages.DestinationIsFolder == nil {
-		channel.LogMessages.DestinationIsFolder = &ccldDestinationIsFolder
+		channel.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
 	}
 	if channel.LogMessages.DivideLogsByServer == nil {
-		channel.LogMessages.DivideLogsByServer = &ccldDivideLogsByServer
+		channel.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
 	}
 	if channel.LogMessages.DivideLogsByChannel == nil {
-		channel.LogMessages.DivideLogsByChannel = &ccldDivideLogsByChannel
+		channel.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
 	}
 	if channel.LogMessages.DivideLogsByUser == nil {
-		channel.LogMessages.DivideLogsByUser = &ccldDivideLogsByUser
+		channel.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
 	}
 }
 
 func adminChannelDefault(channel *configurationAdminChannel) {
 	if channel.LogProgram == nil {
-		channel.LogProgram = &acdLogProgram
+		channel.LogProgram = &adefConfig_LogProgram
 	}
 	if channel.LogStatus == nil {
-		channel.LogStatus = &acdLogStatus
+		channel.LogStatus = &adefConfig_LogStatus
 	}
 	if channel.LogErrors == nil {
-		channel.LogErrors = &acdLogErrors
+		channel.LogErrors = &adefConfig_LogErrors
 	}
 	if channel.UnlockCommands == nil {
-		channel.UnlockCommands = &acdUnlockCommands
+		channel.UnlockCommands = &adefConfig_UnlockCommands
 	}
 }
 
