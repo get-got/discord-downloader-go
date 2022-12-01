@@ -483,7 +483,7 @@ func sendStatusMessage(status sendStatusType) {
 				if googleDriveConnected {
 					message += "\n• Connected to Google Drive"
 				}
-				message += fmt.Sprintf("\n_%s-%s %s / discordgo v%s / Discord API v%s_",
+				message += fmt.Sprintf("\n_%s-%s %s / discordgo v%s (modified) / Discord API v%s_",
 					runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
 			} else if status == sendStatusExit {
 				label = "exit"
