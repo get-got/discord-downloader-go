@@ -74,8 +74,7 @@ func defaultConfiguration() configuration {
 			Password: placeholderPassword,
 		},
 		// Setup
-		Admins: []string{},
-		//LogLevel:                       logLevelInfo,
+		Admins:                         []string{},
 		DebugOutput:                    defConfig_DebugOutput,
 		MessageOutput:                  defConfig_MessageOutput,
 		CommandPrefix:                  defConfig_CommandPrefix,
@@ -116,7 +115,7 @@ type configuration struct {
 	// Setup
 	Admins        []string                    `json:"admins"`        // optional
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
-	//LogLevel                       int                         `json:"logLevel,omitempty"`                       // optional, defaults
+	// Main
 	DebugOutput                    bool    `json:"debugOutput"`                              // optional, defaults
 	MessageOutput                  bool    `json:"messageOutput"`                            // optional, defaults
 	CommandPrefix                  string  `json:"commandPrefix"`                            // optional, defaults
@@ -151,18 +150,12 @@ type configuration struct {
 	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
 	InflateCount               *int64             `json:"inflateCount,omitempty"`               // optional, defaults to 0 if undefined
 	NumberFormatEuropean       bool               `json:"numberFormatEuropean,omitempty"`       // optional, defaults
-	// Channels
+	// Sources
 	All                  *configurationSource  `json:"all,omitempty"`                  // optional, defaults
 	AllBlacklistChannels *[]string             `json:"allBlacklistChannels,omitempty"` // optional
 	AllBlacklistServers  *[]string             `json:"allBlacklistServers,omitempty"`  // optional
 	Servers              []configurationSource `json:"servers"`                        // required
 	Channels             []configurationSource `json:"channels"`                       // required
-
-	/* IDEAS / TODO:
-
-	*
-
-	 */
 }
 
 type constStruct struct {
