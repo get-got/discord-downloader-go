@@ -181,6 +181,16 @@ func dateLocalToUTC(s string) string {
 	return fmt.Sprintf("%s-%s-%s", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
 }
 
+func condenseString(input string, length int) string {
+	filler := "....."
+	ret := input
+	if len(input) > length+len(filler) {
+		half := int((length / 2) - len(filler))
+		ret = input[0:half] + filler + input[len(input)-half:]
+	}
+	return ret
+}
+
 //#endregion
 
 //#region Github Release Checking
@@ -298,7 +308,7 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		colorPrefix = color.GreenString("[Settings]")
 
 	case "database":
-		colorPrefix = color.BlueString("[Database]")
+		colorPrefix = color.HiYellowString("[Database]")
 
 	case "setup":
 		colorPrefix = color.HiGreenString("[Setup]")

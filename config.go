@@ -252,7 +252,7 @@ type configurationSource struct {
 }
 
 var (
-	ccfdBlockedExtensions = []string{
+	defSourceFilter_BlockedExtensions = []string{
 		".htm",
 		".html",
 		".php",
@@ -264,7 +264,7 @@ var (
 		".py",
 		".jar",
 	}
-	ccfdBlockedPhrases = []string{
+	defSourceFilter_BlockedPhrases = []string{
 		"skip",
 		"ignore",
 		"don't save",
@@ -771,10 +771,10 @@ func channelDefault(channel *configurationSource) {
 		channel.Filters = &configurationSourceFilters{}
 	}
 	if channel.Filters.BlockedExtensions == nil {
-		channel.Filters.BlockedExtensions = &ccfdBlockedExtensions
+		channel.Filters.BlockedExtensions = &defSourceFilter_BlockedExtensions
 	}
 	if channel.Filters.BlockedPhrases == nil {
-		channel.Filters.BlockedPhrases = &ccfdBlockedPhrases
+		channel.Filters.BlockedPhrases = &defSourceFilter_BlockedPhrases
 	}
 
 	if channel.LogLinks == nil {

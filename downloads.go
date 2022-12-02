@@ -455,9 +455,11 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 					log.Println(lg("Download", "", color.HiRedString, fmtBotSendPerm, download.Message.ChannelID))
 				} else {
 					if selfbot {
-						_, err := bot.ChannelMessageSend(download.Message.ChannelID, fmt.Sprintf("%s **Download Failure**\n\n%s", download.Message.Author.Mention(), content))
+						_, err := bot.ChannelMessageSend(download.Message.ChannelID,
+							fmt.Sprintf("%s **Download Failure**\n\n%s", download.Message.Author.Mention(), content))
 						if err != nil {
-							log.Println(lg("Download", "", color.HiRedString, "Failed to send failure message to %s: %s", download.Message.ChannelID, err))
+							log.Println(lg("Download", "", color.HiRedString,
+								"Failed to send failure message to %s: %s", download.Message.ChannelID, err))
 						}
 					} else {
 						if _, err := bot.ChannelMessageSendComplex(download.Message.ChannelID,
@@ -538,7 +540,8 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 				// Writer
 				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 				if err != nil {
-					log.Println(lg("Download", "", color.RedString, "[channelConfig.LogLinks] Failed to open log file:\t%s", err))
+					log.Println(lg("Download", "", color.RedString,
+						"[channelConfig.LogLinks] Failed to open log file:\t%s", err))
 					f.Close()
 				}
 				defer f.Close()
@@ -570,7 +573,10 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 					additionalInfo := ""
 					if channelConfig.LogLinks.UserData != nil {
 						if *channelConfig.LogLinks.UserData == true {
-							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ", download.Message.GuildID, download.Message.ChannelID, download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID, download.Message.Timestamp)
+							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
+								download.Message.GuildID, download.Message.ChannelID,
+								download.Message.Author.Username, download.Message.Author.Discriminator,
+								download.Message.Author.ID, download.Message.Timestamp)
 						}
 					}
 					// Append
@@ -582,7 +588,8 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 					newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
 
 					if _, err = f.WriteString(newLine); err != nil {
-						log.Println(lg("Download", "", color.RedString, "[channelConfig.LogLinks] Failed to append file:\t%s", err))
+						log.Println(lg("Download", "", color.RedString,
+							"[channelConfig.LogLinks] Failed to append file:\t%s", err))
 					}
 				}
 			}
@@ -774,7 +781,8 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			// Abort
 			if shouldAbort {
 				if !download.HistoryCmd {
-					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted domain (%s) found at %s", parsedURL.Hostname(), download.InputURL))
+					log.Println(lg("Download", "Skip", color.GreenString,
+						"Unpermitted domain (%s) found at %s", parsedURL.Hostname(), download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedDomain)
 			}
@@ -969,9 +977,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				log.Println(lg("Download", "", color.RedString,
 					logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
 			}
+
 			log.Println(lg("Download", "", color.HiGreenString,
 				logPrefix+"SAVED %s sent in %s#%s to \"%s\"",
-				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, completePath))
+				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, condenseString(download.InputURL, 75)))
 		} else {
 			log.Println(lg("Download", "", color.HiGreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
@@ -1045,8 +1054,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 			// Add Reaction
 			if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
-				err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction)
-				if err != nil {
+				if err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction); err != nil {
 					log.Println(lg("Download", "", color.RedString,
 						"Error adding reaction to message: %s", err))
 				}

@@ -28,7 +28,7 @@ import (
 /* v2.0.0 REWRITE TODO:
 
 * Logging System
-*** Implement Log Leveling
+*** Implement Log Leveling?
 *** Truncate links to exact size?
 *** Table/Indentation output?
 
