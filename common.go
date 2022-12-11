@@ -178,7 +178,7 @@ func dateLocalToUTC(s string) string {
 	}
 	rawDate, _ := time.Parse("2006-01-02", s)
 	localDate := time.Date(rawDate.Year(), rawDate.Month(), rawDate.Day(), 0, 0, 0, 0, time.Local)
-	return fmt.Sprintf("%s-%s-%s", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
+	return fmt.Sprintf("%d-%d-%d", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
 }
 
 func condenseString(input string, length int) string {
