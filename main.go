@@ -20,6 +20,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
+	"github.com/hako/durafmt"
 	"github.com/rivo/duplo"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
@@ -69,6 +70,8 @@ var (
 	loop                 chan os.Signal
 	startTime            time.Time
 	timeLastUpdated      time.Time
+	timeLastDownload     time.Time
+	timeLastMessage      time.Time
 	cachedDownloadID     int
 	configReloadLastTime time.Time
 	// Validation
@@ -270,15 +273,32 @@ func main() {
 	//#region BG Tasks
 
 	//#region BG Tasks - Tickers
-	ticker5m := time.NewTicker(5 * time.Minute)
-	ticker1m := time.NewTicker(1 * time.Minute)
+	tickerCheckup := time.NewTicker(time.Duration(config.CheckupRate) * time.Minute)
+	tickerPresence := time.NewTicker(time.Duration(config.PresenceRefreshRate) * time.Minute)
+	tickerConnection := time.NewTicker(time.Duration(config.ConnectionCheckRate) * time.Minute)
 	go func() {
 		for {
 			select {
-			case <-ticker5m.C:
+
+			case <-tickerCheckup.C:
+				if config.DebugOutput {
+					str := fmt.Sprintf("Routine Checkup ... %dms latency, last discord heartbeat %s ago, %s uptime",
+						bot.HeartbeatLatency().Milliseconds(),
+						durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)), durafmt.ParseShort(time.Since(startTime)))
+					if !timeLastMessage.IsZero() {
+						str += fmt.Sprintf(", last message %s ago", durafmt.ParseShort(time.Since(timeLastMessage)))
+					}
+					if !timeLastDownload.IsZero() {
+						str += fmt.Sprintf(", last download %s ago", durafmt.ParseShort(time.Since(timeLastDownload)))
+					}
+					log.Println(lg("Debug", "Checkup", color.HiGreenString, str))
+				}
+
+			case <-tickerPresence.C:
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
 				updateDiscordPresence()
-			case <-ticker1m.C:
+
+			case <-tickerConnection.C:
 				doReconnect := func() {
 					log.Println(lg("Discord", "", color.YellowString, "Closing Discord connections..."))
 					bot.Client.CloseIdleConnections()
@@ -306,6 +326,7 @@ func main() {
 						"Bot has not received a heartbeat from Discord in 4 minutes..."))
 					doReconnect()
 				}
+
 			}
 		}
 	}()

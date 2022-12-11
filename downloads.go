@@ -1154,6 +1154,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 		}
 
+		timeLastDownload = time.Now()
 		return mDownloadStatus(downloadSuccess)
 	}
 

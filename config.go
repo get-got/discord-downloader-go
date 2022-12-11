@@ -74,25 +74,33 @@ func defaultConfiguration() configuration {
 			Password: placeholderPassword,
 		},
 		// Setup
-		Admins:                         []string{},
-		DebugOutput:                    defConfig_DebugOutput,
-		MessageOutput:                  defConfig_MessageOutput,
-		CommandPrefix:                  defConfig_CommandPrefix,
-		AllowSkipping:                  defConfig_AllowSkipping,
-		ScanOwnMessages:                defConfig_ScanOwnMessages,
-		CheckPermissions:               defConfig_CheckPermissions,
-		AllowGlobalCommands:            defConfig_AllowGlobalCommands,
-		AutorunHistory:                 false,
-		AutorunHistoryBefore:           "",
-		AutorunHistorySince:            "",
-		SendHistoryStatus:              true,
-		SendAutorunHistoryStatus:       false,
-		ExitOnBadConnection:            false,
-		DownloadRetryMax:               3,
-		DownloadTimeout:                60,
-		DiscordTimeout:                 180,
+		Admins: []string{},
+
+		DiscordLogLevel:     discordgo.LogError,
+		DebugOutput:         defConfig_DebugOutput,
+		MessageOutput:       defConfig_MessageOutput,
+		CheckupRate:         30,
+		ConnectionCheckRate: 5,
+		PresenceRefreshRate: 3,
+
+		CommandPrefix:       defConfig_CommandPrefix,
+		AllowSkipping:       defConfig_AllowSkipping,
+		ScanOwnMessages:     defConfig_ScanOwnMessages,
+		CheckPermissions:    defConfig_CheckPermissions,
+		AllowGlobalCommands: defConfig_AllowGlobalCommands,
+
+		AutorunHistory:           false,
+		AutorunHistoryBefore:     "",
+		AutorunHistorySince:      "",
+		SendHistoryStatus:        true,
+		SendAutorunHistoryStatus: false,
+
+		ExitOnBadConnection: false,
+		DownloadRetryMax:    3,
+		DownloadTimeout:     60,
+		DiscordTimeout:      180,
+
 		GithubUpdateChecking:           defConfig_GithubUpdateChecking,
-		DiscordLogLevel:                discordgo.LogError,
 		FilterDuplicateImages:          false,
 		FilterDuplicateImagesThreshold: 0,
 		// Appearance
@@ -116,24 +124,33 @@ type configuration struct {
 	Admins        []string                    `json:"admins"`        // optional
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 	// Main
-	DebugOutput                    bool    `json:"debugOutput"`                              // optional, defaults
-	MessageOutput                  bool    `json:"messageOutput"`                            // optional, defaults
-	CommandPrefix                  string  `json:"commandPrefix"`                            // optional, defaults
-	AllowSkipping                  bool    `json:"allowSkipping"`                            // optional, defaults
-	ScanOwnMessages                bool    `json:"scanOwnMessages"`                          // optional, defaults
-	CheckPermissions               bool    `json:"checkPermissions,omitempty"`               // optional, defaults
-	AllowGlobalCommands            bool    `json:"allowGlobalCommmands,omitempty"`           // optional, defaults
-	AutorunHistory                 bool    `json:"autorunHistory,omitempty"`                 // optional, defaults
-	AutorunHistoryBefore           string  `json:"autorunHistoryBefore,omitempty"`           // optional
-	AutorunHistorySince            string  `json:"autorunHistorySince,omitempty"`            // optional
-	SendHistoryStatus              bool    `json:"sendHistoryStatus,omitempty`               // optional, defaults
-	SendAutorunHistoryStatus       bool    `json:"sendAutorunHistoryStatus,omitempty`        // optional, defaults
-	ExitOnBadConnection            bool    `json:"exitOnBadConnection,omitempty"`            // optional, defaults
-	DownloadRetryMax               int     `json:"downloadRetryMax,omitempty"`               // optional, defaults
-	DownloadTimeout                int     `json:"downloadTimeout,omitempty"`                // optional, defaults
-	DiscordTimeout                 int     `json:"discordTimeout,omitempty"`                 // optional, defaults
-	GithubUpdateChecking           bool    `json:"githubUpdateChecking"`                     // optional, defaults
-	DiscordLogLevel                int     `json:"discordLogLevel,omitempty"`                // optional, defaults
+	DiscordLogLevel     int  `json:"discordLogLevel,omitempty"`    // optional, defaults
+	DebugOutput         bool `json:"debugOutput"`                  // optional, defaults
+	MessageOutput       bool `json:"messageOutput"`                // optional, defaults
+	CheckupRate         int  `json:"checkupRate,omitempty`         // optional, defaults
+	ConnectionCheckRate int  `json:"connectionCheckRate,omitempty` // optional, defaults
+	PresenceRefreshRate int  `json:"presenceRefreshRate,omitempty` // optional, defaults
+
+	CommandPrefix       string `json:"commandPrefix"`                  // optional, defaults
+	AllowSkipping       bool   `json:"allowSkipping"`                  // optional, defaults
+	ScanOwnMessages     bool   `json:"scanOwnMessages"`                // optional, defaults
+	AllowGlobalCommands bool   `json:"allowGlobalCommmands,omitempty"` // optional, defaults
+	CheckPermissions    bool   `json:"checkPermissions,omitempty"`     // optional, defaults
+
+	AutorunHistory           bool   `json:"autorunHistory,omitempty"`          // optional, defaults
+	AutorunHistoryBefore     string `json:"autorunHistoryBefore,omitempty"`    // optional
+	AutorunHistorySince      string `json:"autorunHistorySince,omitempty"`     // optional
+	SendAutorunHistoryStatus bool   `json:"sendAutorunHistoryStatus,omitempty` // optional, defaults
+	SendHistoryStatus        bool   `json:"sendHistoryStatus,omitempty`        // optional, defaults
+
+	DiscordTimeout      int  `json:"discordTimeout,omitempty"`      // optional, defaults
+	ExitOnBadConnection bool `json:"exitOnBadConnection,omitempty"` // optional, defaults
+
+	DownloadTimeout  int `json:"downloadTimeout,omitempty"`  // optional, defaults
+	DownloadRetryMax int `json:"downloadRetryMax,omitempty"` // optional, defaults
+
+	GithubUpdateChecking bool `json:"githubUpdateChecking"` // optional, defaults
+
 	FilterDuplicateImages          bool    `json:"filterDuplicateImages,omitempty"`          // optional, defaults
 	FilterDuplicateImagesThreshold float64 `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	// Appearance

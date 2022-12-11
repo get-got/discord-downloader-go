@@ -45,6 +45,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		return -1
 	}
 
+	if !history && !edited {
+		timeLastMessage = time.Now()
+	}
+
 	// Admin Channel
 	if isAdminChannelRegistered(m.ChannelID) {
 		m = fixMessage(m)
