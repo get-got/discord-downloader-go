@@ -529,7 +529,7 @@ func botLoadDiscord() {
 		// Connect Bot
 		bot.LogLevel = -1 // to ignore dumb wsapi error
 		err = bot.Open()
-		if err != nil {
+		if err != nil && err.Error() != "web socket already opened" {
 			log.Println(lg("Discord", "", color.HiRedString, "Discord login failed:\t%s", err))
 			properExit()
 		}
@@ -551,6 +551,7 @@ func botLoadDiscord() {
 			botUser = bot.State.User
 		}
 	}
+
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		// Login via Token (Bot or User)
 		log.Println(lg("Discord", "", color.GreenString, "Connecting to Discord via Token..."))
@@ -561,6 +562,7 @@ func botLoadDiscord() {
 			// is bot application, reconnect properly
 			log.Println(lg("Discord", "", color.GreenString, "Reconnecting as bot..."))
 			bot, err = discordgo.New("Bot " + config.Credentials.Token)
+			connectBot()
 		}
 
 	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
