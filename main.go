@@ -85,6 +85,10 @@ func init() {
 	startTime = time.Now()
 	historyJobs = make(map[string]historyJob)
 
+	if len(os.Args) > 1 {
+		configFileBase = os.Args[1]
+	}
+
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))

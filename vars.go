@@ -15,7 +15,6 @@ const (
 	projectReleaseURL    = projectRepoURL + "/releases/latest"
 	projectReleaseApiURL = "https://api.github.com/repos/" + projectRepo + "/releases/latest"
 
-	configFileBase     = "settings"
 	databasePath       = "database"
 	cachePath          = "cache"
 	historyCachePath   = cachePath + string(os.PathSeparator) + "history"
@@ -28,8 +27,9 @@ const (
 )
 
 var (
-	configFile  string
-	configFileC bool
+	configFileBase = "settings"
+	configFile     string
+	configFileC    bool
 )
 
 const (
