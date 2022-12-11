@@ -65,7 +65,8 @@ type historyJob struct {
 }
 
 var (
-	historyJobs map[string]historyJob
+	historyJobs      map[string]historyJob
+	shouldRunHistory bool = true
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {

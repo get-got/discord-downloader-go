@@ -357,6 +357,7 @@ func main() {
 			job.Updated = time.Now()
 			job.Added = time.Now()
 			historyJobs[arh.channel] = job
+			shouldRunHistory = true
 		}
 	}
 	if len(autorunHistoryChannels) > 0 {
@@ -370,26 +371,26 @@ func main() {
 
 	//#region BG Tasks - History Job Processing
 	go func() {
-	restartHistoryLoop:
 		for {
-			anyRunning := false
-			for _, job := range historyJobs {
-				if job.Status == historyStatusDownloading {
-					anyRunning = true
-				}
-			}
-			if !anyRunning {
-				var jobsToRun []*historyJob
+			if shouldRunHistory {
+				anyRunning := false
 				for _, job := range historyJobs {
-					if job.Status == historyStatusWaiting {
-						jobsToRun = append(jobsToRun, &job)
+					if job.Status == historyStatusDownloading {
+						anyRunning = true
 					}
 				}
-				// because of modifying the job while iterating historyJobs above
-				for _, job := range jobsToRun {
-					handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
-					time.Sleep(time.Second * 1)
-					goto restartHistoryLoop // to recache the list of jobs
+				if !anyRunning {
+					var jobsToRun []historyJob
+					for _, job := range historyJobs {
+						if job.Status == historyStatusWaiting {
+							jobsToRun = append(jobsToRun, job)
+						}
+					}
+					// because of modifying the job while iterating historyJobs above
+					for _, job := range jobsToRun {
+						handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+					}
+					shouldRunHistory = false
 				}
 			}
 		}

@@ -345,6 +345,7 @@ func handleCommands() *exrouter.Route {
 								job.Updated = time.Now()
 								job.Added = time.Now()
 								historyJobs[channel] = job
+								shouldRunHistory = true
 							} else { // ALREADY RUNNING
 								log.Println(lg("Command", "History", color.CyanString,
 									"%s tried using history command but history is already running for %s...",
@@ -358,6 +359,7 @@ func handleCommands() *exrouter.Route {
 									job.Status = historyStatusAbortCompleted
 								}
 								historyJobs[channel] = job
+								shouldRunHistory = true
 							}
 							log.Println(lg("Command", "History", color.CyanString,
 								"%s cancelled history cataloging for \"%s\"",
