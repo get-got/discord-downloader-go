@@ -530,7 +530,7 @@ func botLoadDiscord() {
 		// Connect Bot
 		bot.LogLevel = -1 // to ignore dumb wsapi error
 		err = bot.Open()
-		if err != nil && err.Error() != "web socket already opened" {
+		if err != nil && !strings.Contains(strings.ToLower(err.Error()), "web socket already opened") {
 			log.Println(lg("Discord", "", color.HiRedString, "Discord login failed:\t%s", err))
 			properExit()
 		}
