@@ -29,7 +29,7 @@ func handleCommands() *exrouter.Route {
 
 	//#region Utility Commands
 
-	router.On("ping", func(ctx *exrouter.Context) {
+	go router.On("ping", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Ping", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
@@ -70,7 +70,7 @@ func handleCommands() *exrouter.Route {
 		}
 	}).Cat("Utility").Alias("test").Desc("Pings the bot")
 
-	router.On("help", func(ctx *exrouter.Context) {
+	go router.On("help", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Help", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
@@ -102,7 +102,7 @@ func handleCommands() *exrouter.Route {
 
 	//#region Info Commands
 
-	router.On("status", func(ctx *exrouter.Context) {
+	go router.On("status", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Status", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
@@ -134,7 +134,7 @@ func handleCommands() *exrouter.Route {
 		}
 	}).Cat("Info").Desc("Displays info regarding the current status of the bot")
 
-	router.On("stats", func(ctx *exrouter.Context) {
+	go router.On("stats", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Stats", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
@@ -158,7 +158,7 @@ func handleCommands() *exrouter.Route {
 		}
 	}).Cat("Info").Desc("Outputs statistics regarding this channel")
 
-	router.On("info", func(ctx *exrouter.Context) {
+	go router.On("info", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Info", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
@@ -183,7 +183,7 @@ func handleCommands() *exrouter.Route {
 
 	//#region Admin Commands
 
-	router.On("history", func(ctx *exrouter.Context) {
+	go router.On("history", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			// Vars
 			var channels []string
@@ -374,7 +374,7 @@ func handleCommands() *exrouter.Route {
 		}
 	}).Cat("Admin").Alias("catalog", "cache").Desc("Catalogs history for this channel")
 
-	router.On("exit", func(ctx *exrouter.Context) {
+	go router.On("exit", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if isBotAdmin(ctx.Msg) {
 				if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
@@ -404,7 +404,7 @@ func handleCommands() *exrouter.Route {
 		}
 	}).Cat("Admin").Alias("reload", "kill").Desc("Kills the bot")
 
-	router.On("emojis", func(ctx *exrouter.Context) {
+	go router.On("emojis", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			if isBotAdmin(ctx.Msg) {
 				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
@@ -499,7 +499,7 @@ func handleCommands() *exrouter.Route {
 	//#endregion
 
 	// Handler for Command Router
-	bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+	go bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
 		//NOTE: This setup makes it case-insensitive but message content will be lowercase, currently case sensitivity is not necessary.
 		router.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m.Message))
 	})
