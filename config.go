@@ -169,8 +169,8 @@ type configuration struct {
 	NumberFormatEuropean       bool               `json:"numberFormatEuropean,omitempty"`       // optional, defaults
 	// Sources
 	All                  *configurationSource  `json:"all,omitempty"`                  // optional, defaults
-	AllBlacklistChannels *[]string             `json:"allBlacklistChannels,omitempty"` // optional
 	AllBlacklistServers  *[]string             `json:"allBlacklistServers,omitempty"`  // optional
+	AllBlacklistChannels *[]string             `json:"allBlacklistChannels,omitempty"` // optional
 	Servers              []configurationSource `json:"servers"`                        // required
 	Channels             []configurationSource `json:"channels"`                       // required
 }

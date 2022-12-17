@@ -36,7 +36,7 @@
     </a>
 </h3>
 
-This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels in real-time as well as old messages. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization. _See [Features](#Features) below for full list!_
+This is a program that connects to a Discord Bot or User Account to locally download files posted in Discord channels in real-time as well as old messages. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports **extensive** global, server-specific, and channel-specific configuration and customization. _See [Features](#Features) below for the full list!_
 
 <h3 align="center">
     <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
@@ -67,15 +67,16 @@ This is a program that connects to a Discord Bot or User to locally download fil
 * Discord File Attachments
 * Direct Links to Files
 * Twitter _(requires API key, see config section)_
-* Instagram
-* Reddit
+* Instagram [BROKEN, WORKING ON IT]
+* Reddit [BROKEN, WORKING ON IT]
 * Imgur _(Single Posts & Albums)_
-* Flickr _(requires API key, see config section)_
-* Google Drive _(requires API Credentials, see config section)_
-* Mastodon
-* Tistory
 * Streamable
 * Gfycat
+* Tistory
+* Mastodon [BROKEN, WORKING ON IT]
+* Flickr _(requires API key, see config section)_
+* Google Drive _(requires API Credentials, see config section)_
+* _I'll always welcome requests but some sources can be tricky to parse..._
   
 ### Commands
 Commands are used as `ddg <command> <?arguments?>` _(unless you've changed the prefix)_
@@ -111,6 +112,7 @@ _Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step
 
 Depending on your purpose for this program, there are various ways you can run it.
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
+- [Run the executable file via command prompt. _(`discord-downloader-go.exe settings2` or similar to run multiple instances sharing a database with separate settings files)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
   - Mount your settings.json to ``/root/settings.json``
   - Mount a folder named "database" to ``/root/database``
@@ -713,33 +715,31 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.presenceOverwrite : string_
     * _Unused by Default_
     * Replace counter status with custom string.
-    * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
+    * [see Key Placeholders for customization...](#key-placeholders-for-settings)
 * :small_orange_diamond: "presenceOverwriteDetails"
     * — _settings.presenceOverwriteDetails : string_
     * _Unused by Default_
     * Replace counter status details with custom string (only works for User, not Bot).
-    * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
+    * [see Key Placeholders for customization...](#key-placeholders-for-settings)
 * :small_orange_diamond: "presenceOverwriteState"
     * — _settings.presenceOverwriteState : string_
     * _Unused by Default_
     * Replace counter status state with custom string (only works for User, not Bot).
-    * [see Presence Placeholders for customization...](#presence-placeholders-for-settings)
+    * [see Key Placeholders for customization...](#key-placeholders-for-settings)
 ---
-    * :small_blue_diamond: "reactWhenDownloaded"
-        * — _settings.reactWhenDownloaded : boolean_
-        * _Default:_ `true`
-        * Confirmation reaction that file(s) successfully downloaded. Is overwritten by the channel/server equivelant of this setting.
-    * :small_blue_diamond: "reactWhenDownloadedHistory"
-        * — _settings.reactWhenDownloaded : boolean_
-        * _Default:_ `false`
-        * Confirmation reaction that file(s) successfully downloaded when processing history commands. Is overwritten by the channel/server equivelant of this setting.
+* :small_blue_diamond: "reactWhenDownloaded"
+    * — _settings.reactWhenDownloaded : boolean_
+    * _Default:_ `true`
+    * Confirmation reaction that file(s) successfully downloaded. Is overwritten by the channel/server equivelant of this setting.
+* :small_blue_diamond: "reactWhenDownloadedHistory"
+    * — _settings.reactWhenDownloaded : boolean_
+    * _Default:_ `false`
+    * Confirmation reaction that file(s) successfully downloaded when processing history commands. Is overwritten by the channel/server equivelant of this setting.
 ---
 * :small_blue_diamond: "filenameFormat"
     * — _settings.filenameFormat : string_
     * _Default:_ `"{{date}} {{file}}"`
-    * `"{{date}}"`, `"{{file}}"`, `"{{messageID}}"`, `"{{userID}}"`, `"{{username}}"`, `"{{channelID}}"`, `"{{serverID}}"`, `"{{message}}"`, `"{{fileType}}"`, `"{{nanoID}}"`, `"{{shortID}}"`
-    * `"{{nanoID}}"` is a 21 character unique string, eg: i25_rX9zwDdDn7Sg-ZoaH
-    * `"{{shortID}}"` is a short unique string, eg: NVovc6-QQy
+    * [see Key Placeholders for customization...](#key-placeholders-for-settings)
 * :small_blue_diamond: "filenameDateFormat"
     * — _settings.filenameDateFormat : string_
     * _Default:_ `"2006-01-02_15-04-05 "`
@@ -757,6 +757,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
 ---
+### _Sources_
 * :small_orange_diamond: **"all"**
     * — _settings.all : list of setting:value options_
     * **Follow `channels` below for variables, except channel & server ID(s) are not used.**
@@ -769,7 +770,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.allBlacklistChannels : list of strings_
     * _Unused by Default_
     * Blacklists channels (by ID) from `all`.
----
+
+
 * :small_red_triangle: **"servers"** _`[USE THIS OR "channels"]`_
     * — _settings.servers : list of setting:value groups_
     * :small_red_triangle: **"server"** _`[USE THIS OR "servers"]`_
@@ -791,6 +793,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].channels : list of strings_
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
     ---
+    #### _Source - Setup_
     * :small_red_triangle: **"destination"**
         * — _settings.channels[].destination : string_
         * Folder path for saving files, can be full path or local subfolder.
@@ -823,6 +826,12 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_orange_diamond: overwriteAutorunHistorySince
         * — _settings.channels[].overwriteAutorunHistorySince : string_
         * Date filter for `overwriteAutorunHistory`
+    * :small_orange_diamond: overwriteSendHistoryStatus
+        * — _settings.channels[].overwriteSendHistoryStatus : boolean_
+        * Overwrite global setting for whether or not to send history status messages.
+    * :small_orange_diamond: overwriteSendAutorunHistoryStatus
+        * — _settings.channels[].overwriteSendAutorunHistoryStatus : boolean_
+        * Overwrite global setting for whether or not to send Autorun history status messages.
     * :small_blue_diamond: "sendErrorMessages"
         * — _settings.channels[].sendErrorMessages : boolean_
         * _Default:_ `true`
@@ -837,7 +846,11 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].sendFileDirectly : boolean_
         * _Default:_ `true`
         * Sends raw file to channel(s) rather than embedded download link.
+    * :small_orange_diamond: "sendFileCaption"
+        * — _settings.channels[].sendFileCaption : string_
+        * Caption to accompany forwarded files, keys to replace follow [Key Placeholders for customization,](#key-placeholders-for-settings) in addition to `{{channelID}}, {{serverID}}, {{channelName}}`.
     ---
+    #### _Source - Appearance_
     * :small_blue_diamond: "updatePresence"
         * — _settings.channels[].updatePresence : boolean_
         * _Default:_ `true`
@@ -862,6 +875,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].typeWhileProcessing : boolean_
         * _Default:_ `false`
         * Shows _"<name> is typing..."_ while processing things that aren't processed instantly, like history cataloging.
+    ---
+    #### _Source - Overwrite Globals_
     * :small_orange_diamond: "overwriteFilenameDateFormat"
         * — _settings.channels[].overwriteFilenameDateFormat : string_
         * _Unused by Default_
@@ -877,6 +892,7 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Unused by Default_
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
     ---
+    #### _Source - Saving Rules_
     * :small_blue_diamond: "divideFoldersByServer"
         * — _settings.channels[].divideFoldersByServer : boolean_
         * _Default:_ `false`
@@ -916,7 +932,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].savePossibleDuplicates : boolean_
         * _Default:_ `false`
         * Save file even if exact filename already exists or exact URL is already recorded in database.
-    ---
+
+
     * :small_orange_diamond: "filters"
         * — _settings.channels[].filters : setting:value group_
         * _Filter prioritizes Users before Roles before Phrases._
@@ -955,6 +972,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             * — _settings.channels[].filters.allowedDomains : list of strings_
             * Will ONLY process files if they were sent from any of the following domains (websites).
     ---
+    #### _Source - Misc_
     * :small_orange_diamond: "logLinks"
         * — _settings.channels[].logLinks : setting:value group_
         * :small_red_triangle: "destination"
@@ -1016,8 +1034,8 @@ This setup exempts many options so they will use default values _(see below)_. I
 
 ---
 
-### Presence Placeholders for Settings
-_For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`_
+### Key Placeholders for Settings
+_For `presenceOverwrite`, `presenceOverwriteDetails`, `presenceOverwriteState`, `filenameFormat`, `sendFileCaption`_
 <details>
 <summary><b><i>(COLLAPSABLE SECTION)</i></b></summary>
 
@@ -1051,6 +1069,40 @@ Key | Description
 `{{timeNowMid24}}`          | Current time formatted as `15:04 MST 2/1/2006`
 `{{timeNowLong24}}`         | Current time formatted as `15:04:05 MST - 2 January, 2006`
 `{{uptime}}`                | Shortened duration of bot uptime
+
+</details>
+
+
+_For `filenameFormat`_
+<details>
+<summary><b><i>(COLLAPSABLE SECTION)</i></b></summary>
+
+Key | Description
+--- | ---
+`{{date}}`      | Timestamp
+`{{file}}`      | Filename
+`{{fileType}}`  | File type
+`{{messageID}}` | Source Message ID
+`{{userID}}`    | Source Author User ID
+`{{username}}`  | Source Author Username
+`{{channelID}}` | Source Channel ID
+`{{serverID}}`  | Source Server ID
+`{{message}}`   | Source Message Content (with path symbols stripped)
+`{{nanoID}}`    | 21 character unique string, eg: i25_rX9zwDdDn7Sg-ZoaH
+`{{shortID}}`   | Short unique string, eg: NVovc6-QQy
+
+</details>
+
+
+_For `sendFileCaption`_
+<details>
+<summary><b><i>(COLLAPSABLE SECTION)</i></b></summary>
+
+Key | Description
+--- | ---
+`{{channelID}}`     | Source Channel ID
+`{{serverID}}`      | Source Server ID
+`{{channelName}}`   | Source Channel Name
 
 </details>
 
