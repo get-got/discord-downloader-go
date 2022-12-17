@@ -65,11 +65,13 @@ type historyJob struct {
 }
 
 var (
-	historyJobs      map[string]historyJob
-	shouldRunHistory bool = true
+	historyJobs       map[string]historyJob
+	historyProcessing bool
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
+	historyProcessing = true
+	defer func() { historyProcessing = false }()
 	if job, exists := historyJobs[subjectChannelID]; exists && job.Status != historyStatusWaiting {
 		log.Println(lg("History", "", color.RedString, "History job skipped, Status: %s", historyStatusLabel(job.Status)))
 		return -1
