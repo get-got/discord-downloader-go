@@ -211,6 +211,25 @@ func dataKeyReplacement(input string) string {
 	return input
 }
 
+func channelKeyReplacement(input string, srcchannel string) string {
+	ret := input
+	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
+		if channel, err := bot.State.Channel(srcchannel); err == nil {
+			keys := [][]string{
+				{"{{channelID}}", channel.ID},
+				{"{{serverID}}", channel.GuildID},
+				{"{{channelName}}", channel.Name},
+			}
+			for _, key := range keys {
+				if strings.Contains(ret, key[0]) {
+					ret = strings.ReplaceAll(ret, key[0], key[1])
+				}
+			}
+		}
+	}
+	return dataKeyReplacement(ret)
+}
+
 func dynamicKeyReplacement(channelConfig configurationSource, download downloadRequestStruct) string {
 	//TODO: same as dataKeyReplacement
 

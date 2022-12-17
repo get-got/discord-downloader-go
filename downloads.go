@@ -1084,11 +1084,17 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 						if channelConfig.SendFileDirectly != nil {
 							actualFile = *channelConfig.SendFileDirectly
 						}
+						msg := ""
+						if channelConfig.SendFileCaption != nil {
+							msg = *channelConfig.SendFileCaption
+							msg = channelKeyReplacement(msg, download.Message.ChannelID)
+						}
 						// File
 						if actualFile {
 							_, err := bot.ChannelMessageSendComplex(logChannel,
 								&discordgo.MessageSend{
-									File: &discordgo.File{Name: download.Filename, Reader: bytes.NewReader(bodyOfResp)},
+									Content: msg,
+									File:    &discordgo.File{Name: download.Filename, Reader: bytes.NewReader(bodyOfResp)},
 								},
 							)
 							if err != nil {
@@ -1113,7 +1119,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 									contentTypeFound, download.InputURL)
 							}
 							_, err := bot.ChannelMessageSendComplex(logChannel,
-								&discordgo.MessageSend{Embed: embed},
+								&discordgo.MessageSend{
+									Content: msg,
+									Embed:   embed,
+								},
 							)
 							if err != nil {
 								log.Println(lg("Download", "", color.HiRedString,

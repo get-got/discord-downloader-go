@@ -235,9 +235,10 @@ type configurationSource struct {
 	OverwriteSendHistoryStatus        *bool     `json:"overwriteSendHistoryStatus,omitempty`        // optional, defaults
 	OverwriteSendAutorunHistoryStatus *bool     `json:"overwriteSendAutorunHistoryStatus,omitempty` // optional, defaults
 	SendErrorMessages                 *bool     `json:"sendErrorMessages,omitempty"`                // optional, defaults
-	SendFileToChannel                 *string   `json:"sendFileToChannel"`                          // optional, defaults
-	SendFileToChannels                *[]string `json:"sendFileToChannels"`                         // optional, defaults
-	SendFileDirectly                  *bool     `json:"sendFileDirectly"`                           // optional, defaults
+	SendFileToChannel                 *string   `json:"sendFileToChannel,omitempty"`                // optional, defaults
+	SendFileToChannels                *[]string `json:"sendFileToChannels,omitempty"`               // optional, defaults
+	SendFileDirectly                  *bool     `json:"sendFileDirectly,omitempty"`                 // optional, defaults
+	SendFileCaption                   *string   `json:"sendFileCaption,omitempty"`                  // optional
 	// Appearance
 	UpdatePresence             *bool     `json:"updatePresence,omitempty"`             // optional, defaults
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
