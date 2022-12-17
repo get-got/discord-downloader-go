@@ -403,7 +403,7 @@ func main() {
 						anyRunning = true
 					}
 				}
-				if !anyRunning {
+				if !anyRunning && len(historyJobs) > 0 {
 					var job historyJob
 					for _, _job := range historyJobs {
 						if _job.Status == historyStatusWaiting {
