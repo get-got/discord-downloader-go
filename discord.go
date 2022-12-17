@@ -287,7 +287,7 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			}
 		}
 	}
-	return ret
+	return dataKeyReplacement(ret)
 }
 
 func updateDiscordPresence() {
