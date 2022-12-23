@@ -257,6 +257,14 @@ This setup exempts many options so they will use default values _(see below)_. I
     },
     "scanOwnMessages": true,
     "presenceEnabled": false,
+    "allowGlobalCommands": false,
+    "admins": [ "MY_USER_ID" ],
+    "adminChannels": [
+        {
+            "channel": "DISCORD_CHANNEL_ID_FOR_COMMANDS",
+            "logErrors": true
+        }
+    ]
     "channels": [
         {
             "channel": "DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM",
