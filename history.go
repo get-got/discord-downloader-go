@@ -168,24 +168,26 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	//#endregion
 
 	// Date Range Vars
-	var beforeID = before
 	var sinceID = since
+	var beforeID = before
 	var beforeTime time.Time
 
 	//#region Date Range Output
 	rangeContent := ""
-	if since != "" {
-		if isDate(since) {
-			rangeContent += fmt.Sprintf("**Since:** `%s`\n", discordSnowflakeToTimestamp(since, "2006-01-02"))
-		} else if isNumeric(since) {
-			rangeContent += fmt.Sprintf("**Since:** `%s`\n", since)
+	if sinceID != "" {
+		if isDate(sinceID) {
+			sinceID = discordSnowflakeToTimestamp(sinceID, "2006-01-02")
+		}
+		if isNumeric(sinceID) {
+			rangeContent += fmt.Sprintf("**Since:** `%s`\n", sinceID)
 		}
 	}
-	if before != "" {
-		if isDate(before) {
-			rangeContent += fmt.Sprintf("**Before:** `%s`", discordSnowflakeToTimestamp(before, "2006-01-02"))
-		} else if isNumeric(before) {
-			rangeContent += fmt.Sprintf("**Before:** `%s`\n", before)
+	if beforeID != "" {
+		if isDate(beforeID) {
+			beforeID = discordSnowflakeToTimestamp(beforeID, "2006-01-02")
+		}
+		if isNumeric(beforeID) {
+			rangeContent += fmt.Sprintf("**Before:** `%s`\n", beforeID)
 		}
 	}
 	if rangeContent != "" {
