@@ -47,7 +47,8 @@ const (
 	downloadSkippedDetectedDuplicate
 
 	downloadFailed
-	downloadFailed404
+	downloadFailedCode
+	downloadFailedCode404
 	downloadFailedInvalidSource
 	downloadFailedInvalidPath
 	downloadFailedCreatingFolder
@@ -100,7 +101,9 @@ func getDownloadStatusString(status downloadStatus) string {
 	//
 	case downloadFailed:
 		return "Download Failed"
-	case downloadFailed404:
+	case downloadFailedCode:
+		return "Download Failed - BAD CONNECTION"
+	case downloadFailedCode404:
 		return "Download Failed - 404 NOT FOUND"
 	case downloadFailedInvalidSource:
 		return "Download Failed - Invalid Source"
@@ -427,7 +430,7 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 	status := mDownloadStatus(downloadFailed)
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status = tryDownload(download)
-		if status.Status < downloadFailed || status.Status == downloadFailed404 { // Success or Skip
+		if status.Status < downloadFailed || status.Status == downloadFailedCode404 { // Success or Skip
 			break
 		} else {
 			time.Sleep(5 * time.Second)
@@ -672,10 +675,15 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			return mDownloadStatus(downloadFailedReadResponse, err)
 		}
 
-		// 404
-		if response.StatusCode == http.StatusNotFound {
-			log.Println(lg("Download", "", color.HiRedString, "FILE IS 404: %s", download.InputURL))
-			return mDownloadStatus(downloadFailed404, err)
+		// Errors
+		if response.StatusCode >= 400 {
+			log.Println(lg("Download", "", color.HiRedString, logPrefix+"DOWNLOAD FAILED, %d %s: %s",
+				response.StatusCode, http.StatusText(response.StatusCode), download.InputURL))
+			if response.StatusCode == 404 {
+				return mDownloadStatus(downloadFailedCode404, err)
+			} else {
+				return mDownloadStatus(downloadFailedCode, err)
+			}
 		}
 
 		// Filename
