@@ -1030,8 +1030,8 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	if config.AllowGlobalCommands {
 		return true
 	}
-	if isAdminChannelRegistered(m.ChannelID) {
 	ch := getMessageConfigChannel(m)
+	if isAdminChannelRegistered(m.ChannelID) {
 		return true
 	} else if ch != "" {
 		channelConfig := getChannelConfig(ch)
