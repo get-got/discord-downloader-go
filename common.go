@@ -261,7 +261,7 @@ func getJSONwithHeaders(url string, target interface{}, headers map[string]strin
 
 //#region Log
 
-const (
+/*const (
 	logLevelOff       = -1
 	logLevelEssential = iota
 	logLevelFatal
@@ -271,7 +271,7 @@ const (
 	logLevelDebug
 	logLevelVerbose
 	logLevelAll
-)
+)*/
 
 func lg(group string, subgroup string, colorFunc func(string, ...interface{}) string, line string, p ...interface{}) string {
 	colorPrefix := group
@@ -388,7 +388,12 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		}
 	}
 
-	return colorPrefix + " " + colorFunc(line, p...)
+	pp := "> " // prefix prefix :)
+	if strings.ToLower(group) == "debug" || strings.ToLower(subgroup) == "debug" {
+		pp = "? "
+	}
+
+	return pp + colorPrefix + " " + colorFunc(line, p...)
 }
 
 //#endregion

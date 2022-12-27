@@ -978,11 +978,15 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
 			}
 
-			log.Println(lg("Download", "", color.HiGreenString,
-				logPrefix+"SAVED %s sent in %s#%s to \"%s\"",
-				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, condenseString(download.InputURL, 75)))
+			dlColor := color.HiGreenString
+			if download.HistoryCmd {
+				dlColor = color.HiCyanString
+			}
+			log.Println(lg("Download", "", dlColor,
+				logPrefix+"SAVED %s sent in %s#%s from \"%s\"",
+				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, condenseString(download.InputURL, 50)))
 		} else {
-			log.Println(lg("Download", "", color.HiGreenString,
+			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
 				contentTypeFound, sourceName, sourceChannelName))
 		}
