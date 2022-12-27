@@ -61,7 +61,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 	}
 
 	// Registered Channel
-	ch := channelRegistered(m)
+	ch := getMessageConfigChannel(m)
 	if ch != "" {
 		channelConfig := getChannelConfig(ch)
 		// Ignore bots if told to do so

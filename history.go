@@ -195,7 +195,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 	//#endregion
 
-	ch := channelRegistered(responseMsg)
+	ch := getMessageConfigChannel(responseMsg)
 	if ch != "" {
 		channelConfig := getChannelConfig(ch)
 

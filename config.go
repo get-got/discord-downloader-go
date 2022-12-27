@@ -51,7 +51,6 @@ var (
 	defConfig_DebugOutput          bool   = false
 	defConfig_MessageOutput        bool   = true
 	defConfig_CommandPrefix        string = "ddg "
-	defConfig_AllowSkipping        bool   = true
 	defConfig_ScanOwnMessages      bool   = false
 	defConfig_CheckPermissions     bool   = true
 	defConfig_AllowGlobalCommands  bool   = true
@@ -84,7 +83,6 @@ func defaultConfiguration() configuration {
 		PresenceRefreshRate: 3,
 
 		CommandPrefix:       defConfig_CommandPrefix,
-		AllowSkipping:       defConfig_AllowSkipping,
 		ScanOwnMessages:     defConfig_ScanOwnMessages,
 		CheckPermissions:    defConfig_CheckPermissions,
 		AllowGlobalCommands: defConfig_AllowGlobalCommands,
@@ -132,7 +130,6 @@ type configuration struct {
 	PresenceRefreshRate int  `json:"presenceRefreshRate,omitempty` // optional, defaults
 
 	CommandPrefix       string `json:"commandPrefix"`                  // optional, defaults
-	AllowSkipping       bool   `json:"allowSkipping"`                  // optional, defaults
 	ScanOwnMessages     bool   `json:"scanOwnMessages"`                // optional, defaults
 	AllowGlobalCommands bool   `json:"allowGlobalCommmands,omitempty"` // optional, defaults
 	CheckPermissions    bool   `json:"checkPermissions,omitempty"`     // optional, defaults
@@ -181,9 +178,8 @@ type constStruct struct {
 
 //#endregion
 
-//#region Channels
+//#region Sources
 
-// defSource_ = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
 	// Setup
@@ -249,7 +245,6 @@ type configurationSource struct {
 	// Overwrite Global Settings
 	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
 	OverwriteFilenameFormat     *string `json:"overwriteFilenameFormat,omitempty"`     // optional
-	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
 	// Rules for Saving
 	DivideFoldersByServer  *bool `json:"divideFoldersByServer,omitempty"`  // optional, defaults
@@ -500,7 +495,6 @@ func createConfig() {
 		},
 		Admins:          []string{"REPLACE_WITH_YOUR_DISCORD_USER_ID"},
 		CommandPrefix:   defConfig_CommandPrefix,
-		AllowSkipping:   defConfig_AllowSkipping,
 		ScanOwnMessages: defConfig_ScanOwnMessages,
 
 		PresenceEnabled:     defConfig_PresenceEnabled,
@@ -857,7 +851,7 @@ func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bo
 	return false
 }
 
-func channelRegistered(m *discordgo.Message) string {
+func getMessageConfigChannel(m *discordgo.Message) string {
 	for _, item := range config.Channels {
 		// Single Channel Config
 		if m.ChannelID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
@@ -939,7 +933,7 @@ func channelRegistered(m *discordgo.Message) string {
 					return ""
 				}
 			} else {
-				log.Println(lg("Settings", "channelRegistered", color.HiRedString, "Error finding server info for channel:\t%s", err))
+				log.Println(lg("Settings", "getMessageConfigChannel", color.HiRedString, "Error finding server info for channel:\t%s", err))
 			}
 		}
 		return "1"
@@ -1036,8 +1030,8 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	if config.AllowGlobalCommands {
 		return true
 	}
-	ch := channelRegistered(m)
 	if isAdminChannelRegistered(m.ChannelID) {
+	ch := getMessageConfigChannel(m)
 		return true
 	} else if ch != "" {
 		channelConfig := getChannelConfig(ch)

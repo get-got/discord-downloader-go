@@ -437,7 +437,7 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 	}
 
-	channel := channelRegistered(download.Message)
+	channel := getMessageConfigChannel(download.Message)
 
 	// Any kind of failure
 	if status.Status >= downloadFailed && !download.HistoryCmd && !download.EmojiCmd {
@@ -613,7 +613,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		logPrefix = "HISTORY "
 	}
 
-	if ch := channelRegistered(download.Message); ch != "" ||
+	if ch := getMessageConfigChannel(download.Message); ch != "" ||
 		download.EmojiCmd || download.ManualDownload {
 		var channelConfig configurationSource
 		channelDefault(&channelConfig)
