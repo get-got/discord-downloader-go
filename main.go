@@ -341,9 +341,7 @@ func main() {
 	var autorunHistoryChannels []arh
 	// Compile list of channels to autorun history
 	for _, channel := range getAllRegisteredChannels() {
-		var fakeMessage *discordgo.Message
-		fakeMessage.ChannelID = channel
-		channelConfig := getSource(fakeMessage)
+		channelConfig := getSource(&discordgo.Message{ChannelID: channel})
 		if channelConfig.OverwriteAutorunHistory != nil {
 			if *channelConfig.OverwriteAutorunHistory {
 				var autorunHistoryChannel arh
