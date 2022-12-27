@@ -829,7 +829,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if sourceChannel != nil {
 			// Channel Naming
 			if sourceChannel.Name != "" {
-				sourceChannelName = sourceChannel.Name
+				sourceChannelName = "\"" + sourceChannel.Name + "\""
 			}
 			switch sourceChannel.Type {
 			case discordgo.ChannelTypeGuildText:
@@ -845,7 +845,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
 					if sourceParent != nil {
 						if sourceParent.Name != "" {
-							sourceChannelName = sourceParent.Name + " - " + sourceChannelName
+							sourceChannelName = "\"" + sourceParent.Name + "\" - " + sourceChannelName
 						}
 					}
 				}
@@ -983,8 +983,8 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				dlColor = color.HiCyanString
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent in %s#%s from \"%s\"",
-				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, condenseString(download.InputURL, 50)))
+				logPrefix+"SAVED %s sent in %s#%s from \"%s\" to %s",
+				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, condenseString(download.InputURL, 50), download.Path+subfolder))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
