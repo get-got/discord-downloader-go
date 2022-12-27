@@ -295,7 +295,7 @@ func main() {
 					if !timeLastDownload.IsZero() {
 						str += fmt.Sprintf(", last download %s ago", durafmt.ParseShort(time.Since(timeLastDownload)))
 					}
-					log.Println(lg("Main", "Checkup", color.CyanString, str))
+					log.Println(lg("Checkup", "", color.CyanString, str))
 				}
 
 			case <-tickerPresence.C:

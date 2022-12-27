@@ -278,21 +278,21 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		}
 	case "debug":
 		if subgroup == "" {
-			colorPrefix = color.HiYellowString("<DEBUG>")
+			colorPrefix = color.HiYellowString("[DEBUG]")
 		} else {
-			colorPrefix = color.HiYellowString("<DEBUG:%s>", subgroup)
+			colorPrefix = color.HiYellowString("[DEBUG | %s]", subgroup)
 		}
 	case "test":
 		if subgroup == "" {
-			colorPrefix = color.HiYellowString("<TEST>")
+			colorPrefix = color.HiYellowString("[TEST]")
 		} else {
-			colorPrefix = color.HiYellowString("<TEST:%s>", subgroup)
+			colorPrefix = color.HiYellowString("[TEST | %s]", subgroup)
 		}
 	case "info":
 		if subgroup == "" {
 			colorPrefix = color.CyanString("[Info]")
 		} else {
-			colorPrefix = color.CyanString("[Info:%s]", subgroup)
+			colorPrefix = color.CyanString("[Info | %s]", subgroup)
 		}
 	case "version":
 		colorPrefix = color.HiMagentaString("[Version]")
@@ -306,6 +306,9 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 	case "setup":
 		colorPrefix = color.HiGreenString("[Setup]")
 
+	case "checkup":
+		colorPrefix = color.HiGreenString("[Checkup]")
+
 	case "discord":
 		colorPrefix = color.HiBlueString("[Discord]")
 
@@ -313,42 +316,42 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		if subgroup == "" {
 			colorPrefix = color.HiCyanString("[History]")
 		} else {
-			colorPrefix = color.HiCyanString("[History:%s]", subgroup)
+			colorPrefix = color.HiCyanString("[History | %s]", subgroup)
 		}
 
 	case "command":
 		if subgroup == "" {
 			colorPrefix = color.HiGreenString("[Commands]")
 		} else {
-			colorPrefix = color.HiGreenString("[Command:%s]", subgroup)
+			colorPrefix = color.HiGreenString("[Command : %s]", subgroup)
 		}
 
 	case "download":
 		if subgroup == "" {
 			colorPrefix = color.GreenString("[Downloads]")
 		} else {
-			colorPrefix = color.GreenString("[Download:%s]", subgroup)
+			colorPrefix = color.GreenString("[Downloads | %s]", subgroup)
 		}
 
 	case "message":
 		if subgroup == "" {
 			colorPrefix = color.CyanString("[Messages]")
 		} else {
-			colorPrefix = color.CyanString("[Message:%s]", subgroup)
+			colorPrefix = color.CyanString("[Messages | %s]", subgroup)
 		}
 
 	case "regex":
 		if subgroup == "" {
 			colorPrefix = color.YellowString("[Regex]")
 		} else {
-			colorPrefix = color.YellowString("[Regex:%s]", subgroup)
+			colorPrefix = color.YellowString("[Regex | %s]", subgroup)
 		}
 
 	case "api":
 		if subgroup == "" {
 			colorPrefix = color.HiMagentaString("[APIs]")
 		} else {
-			colorPrefix = color.HiMagentaString("[API:%s]", subgroup)
+			colorPrefix = color.HiMagentaString("[API | %s]", subgroup)
 		}
 	}
 
@@ -383,7 +386,7 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 
 	pp := "> " // prefix prefix :)
 	if strings.ToLower(group) == "debug" || strings.ToLower(subgroup) == "debug" {
-		pp = "? "
+		pp = color.YellowString("? ")
 	}
 
 	return pp + colorPrefix + " " + colorFunc(line, p...)
