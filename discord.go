@@ -362,7 +362,7 @@ func getEmbedColor(channelID string) int {
 	/*var msg *discordgo.Message
 	msg.ChannelID = channelID
 	if channelRegistered(msg) {
-		channelConfig := getChannelConfig(channelID)
+		channelConfig := getSource(channelID)
 		if channelConfig.OverwriteEmbedColor != nil {
 			if *channelConfig.OverwriteEmbedColor != "" {
 				color = channelConfig.OverwriteEmbedColor

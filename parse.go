@@ -14,6 +14,7 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/Jeffail/gabs"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"golang.org/x/net/html"
 	"google.golang.org/api/googleapi"
@@ -38,7 +39,7 @@ func getTwitterUrls(inputURL string) (map[string]string, error) {
 	return map[string]string{"https:" + parts[1] + ":orig": filenameFromURL(parts[1])}, nil
 }
 
-func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string, error) {
+func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]string, error) {
 	if twitterClient == nil {
 		return nil, errors.New("invalid Twitter API Keys Set")
 	}
@@ -67,14 +68,14 @@ func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string,
 				links[lastVideoVariant.Url] = ""
 			}
 		} else {
-			foundUrls := getDownloadLinks(tweetMedia.Media_url_https, channelID)
+			foundUrls := getDownloadLinks(tweetMedia.Media_url_https, m)
 			for foundUrlKey, foundUrlValue := range foundUrls {
 				links[foundUrlKey] = foundUrlValue
 			}
 		}
 	}
 	for _, tweetUrl := range tweet.Entities.Urls {
-		foundUrls := getDownloadLinks(tweetUrl.Expanded_url, channelID)
+		foundUrls := getDownloadLinks(tweetUrl.Expanded_url, m)
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}

@@ -122,8 +122,8 @@ func handleCommands() *exrouter.Route {
 					len(config.AdminChannels),
 					bot.HeartbeatLatency().Milliseconds(),
 				)
-				if ch := getMessageConfigChannel(ctx.Msg); ch != "" {
-					configJson, _ := json.MarshalIndent(getChannelConfig(ch), "", "\t")
+				if sourceConfig := getSource(ctx.Msg); sourceConfig != emptyConfig {
+					configJson, _ := json.MarshalIndent(sourceConfig, "", "\t")
 					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
 				}
 				if _, err := replyEmbed(ctx.Msg, "Command — Status", message); err != nil {
@@ -139,9 +139,8 @@ func handleCommands() *exrouter.Route {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Stats", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
-				if ch := getMessageConfigChannel(ctx.Msg); ch != "" {
-					channelConfig := getChannelConfig(ch)
-					if *channelConfig.AllowCommands {
+				if sourceConfig := getSource(ctx.Msg); sourceConfig != emptyConfig {
+					if *sourceConfig.AllowCommands {
 						content := fmt.Sprintf("• **Total Downloads —** %s\n"+
 							"• **Downloads in this Channel —** %s",
 							formatNumber(int64(dbDownloadCount())),
@@ -149,9 +148,11 @@ func handleCommands() *exrouter.Route {
 						)
 						//TODO: Count in channel by users
 						if _, err := replyEmbed(ctx.Msg, "Command — Stats", content); err != nil {
-							log.Println(lg("Command", "Stats", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+							log.Println(lg("Command", "Stats", color.HiRedString, cmderrSendFailure,
+								getUserIdentifier(*ctx.Msg.Author), err))
 						}
-						log.Println(lg("Command", "Stats", color.HiCyanString, "%s requested stats", getUserIdentifier(*ctx.Msg.Author)))
+						log.Println(lg("Command", "Stats", color.HiCyanString, "%s requested stats",
+							getUserIdentifier(*ctx.Msg.Author)))
 					}
 				}
 			}

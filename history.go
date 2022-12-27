@@ -195,9 +195,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 	//#endregion
 
-	ch := getMessageConfigChannel(responseMsg)
-	if ch != "" {
-		channelConfig := getChannelConfig(ch)
+	if channelConfig := getSource(responseMsg); channelConfig != emptyConfig {
 
 		// Overwrite Send Status
 		if channelConfig.OverwriteSendAutorunHistoryStatus != nil {

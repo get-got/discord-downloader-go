@@ -122,23 +122,23 @@ type configuration struct {
 	Admins        []string                    `json:"admins"`        // optional
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 	// Main
-	DiscordLogLevel     int  `json:"discordLogLevel,omitempty"`    // optional, defaults
-	DebugOutput         bool `json:"debugOutput"`                  // optional, defaults
-	MessageOutput       bool `json:"messageOutput"`                // optional, defaults
-	CheckupRate         int  `json:"checkupRate,omitempty`         // optional, defaults
-	ConnectionCheckRate int  `json:"connectionCheckRate,omitempty` // optional, defaults
-	PresenceRefreshRate int  `json:"presenceRefreshRate,omitempty` // optional, defaults
+	DiscordLogLevel     int  `json:"discordLogLevel,omitempty"`     // optional, defaults
+	DebugOutput         bool `json:"debugOutput"`                   // optional, defaults
+	MessageOutput       bool `json:"messageOutput"`                 // optional, defaults
+	CheckupRate         int  `json:"checkupRate,omitempty"`         // optional, defaults
+	ConnectionCheckRate int  `json:"connectionCheckRate,omitempty"` // optional, defaults
+	PresenceRefreshRate int  `json:"presenceRefreshRate,omitempty"` // optional, defaults
 
 	CommandPrefix       string `json:"commandPrefix"`                  // optional, defaults
 	ScanOwnMessages     bool   `json:"scanOwnMessages"`                // optional, defaults
 	AllowGlobalCommands bool   `json:"allowGlobalCommmands,omitempty"` // optional, defaults
 	CheckPermissions    bool   `json:"checkPermissions,omitempty"`     // optional, defaults
 
-	AutorunHistory           bool   `json:"autorunHistory,omitempty"`          // optional, defaults
-	AutorunHistoryBefore     string `json:"autorunHistoryBefore,omitempty"`    // optional
-	AutorunHistorySince      string `json:"autorunHistorySince,omitempty"`     // optional
-	SendAutorunHistoryStatus bool   `json:"sendAutorunHistoryStatus,omitempty` // optional, defaults
-	SendHistoryStatus        bool   `json:"sendHistoryStatus,omitempty`        // optional, defaults
+	AutorunHistory           bool   `json:"autorunHistory,omitempty"`           // optional, defaults
+	AutorunHistoryBefore     string `json:"autorunHistoryBefore,omitempty"`     // optional
+	AutorunHistorySince      string `json:"autorunHistorySince,omitempty"`      // optional
+	SendAutorunHistoryStatus bool   `json:"sendAutorunHistoryStatus,omitempty"` // optional, defaults
+	SendHistoryStatus        bool   `json:"sendHistoryStatus,omitempty"`        // optional, defaults
 
 	DiscordTimeout      int  `json:"discordTimeout,omitempty"`      // optional, defaults
 	ExitOnBadConnection bool `json:"exitOnBadConnection,omitempty"` // optional, defaults
@@ -168,7 +168,9 @@ type configuration struct {
 	All                  *configurationSource  `json:"all,omitempty"`                  // optional, defaults
 	AllBlacklistServers  *[]string             `json:"allBlacklistServers,omitempty"`  // optional
 	AllBlacklistChannels *[]string             `json:"allBlacklistChannels,omitempty"` // optional
+	Users                []configurationSource `json:"users"`                          // required
 	Servers              []configurationSource `json:"servers"`                        // required
+	Categories           []configurationSource `json:"categories"`                     // required
 	Channels             []configurationSource `json:"channels"`                       // required
 }
 
@@ -212,29 +214,34 @@ var (
 )
 
 type configurationSource struct {
-	// Main
-	ChannelID       string    `json:"channel,omitempty"`         // used for config.Channels
-	ChannelIDs      *[]string `json:"channels,omitempty"`        // ---> alternative to ChannelID
-	ServerID        string    `json:"server,omitempty"`          // used for config.Servers
-	ServerIDs       *[]string `json:"servers,omitempty"`         // ---> alternative to ServerID
-	ServerBlacklist *[]string `json:"serverBlacklist,omitempty"` // for server.ServerID & server.ServerIDs
-	Destination     string    `json:"destination"`               // required
+	// ~
+	UserID            string    `json:"user,omitempty"`              // used for config.Users
+	UserIDs           *[]string `json:"users,omitempty"`             // ---> alternative to UserID
+	ServerID          string    `json:"server,omitempty"`            // used for config.Servers
+	ServerIDs         *[]string `json:"servers,omitempty"`           // ---> alternative to ServerID
+	ServerBlacklist   *[]string `json:"serverBlacklist,omitempty"`   // for server.ServerID & server.ServerIDs
+	CategoryID        string    `json:"category,omitempty"`          // used for config.Categories
+	CategoryIDs       *[]string `json:"categories,omitempty"`        // ---> alternative to CategoryID
+	CategoryBlacklist *[]string `json:"categoryBlacklist,omitempty"` // for server.CategoryID & server.CategoryIDs
+	ChannelID         string    `json:"channel,omitempty"`           // used for config.Channels
+	ChannelIDs        *[]string `json:"channels,omitempty"`          // ---> alternative to ChannelID
+	Destination       string    `json:"destination"`                 // required
 	// Setup
-	Enabled                           *bool     `json:"enabled,omitempty"`                          // optional, defaults
-	Save                              *bool     `json:"save,omitempty"`                             // optional, defaults
-	AllowCommands                     *bool     `json:"allowCommands,omitempty"`                    // optional, defaults
-	ScanEdits                         *bool     `json:"scanEdits,omitempty"`                        // optional, defaults
-	IgnoreBots                        *bool     `json:"ignoreBots,omitempty"`                       // optional, defaults
-	OverwriteAutorunHistory           *bool     `json:"overwriteAutorunHistory,omitempty"`          // optional
-	OverwriteAutorunHistoryBefore     *string   `json:"overwriteAutorunHistoryBefore,omitempty"`    // optional
-	OverwriteAutorunHistorySince      *string   `json:"overwriteAutorunHistorySince,omitempty"`     // optional
-	OverwriteSendHistoryStatus        *bool     `json:"overwriteSendHistoryStatus,omitempty`        // optional, defaults
-	OverwriteSendAutorunHistoryStatus *bool     `json:"overwriteSendAutorunHistoryStatus,omitempty` // optional, defaults
-	SendErrorMessages                 *bool     `json:"sendErrorMessages,omitempty"`                // optional, defaults
-	SendFileToChannel                 *string   `json:"sendFileToChannel,omitempty"`                // optional, defaults
-	SendFileToChannels                *[]string `json:"sendFileToChannels,omitempty"`               // optional, defaults
-	SendFileDirectly                  *bool     `json:"sendFileDirectly,omitempty"`                 // optional, defaults
-	SendFileCaption                   *string   `json:"sendFileCaption,omitempty"`                  // optional
+	Enabled                           *bool     `json:"enabled"`                                     // optional, defaults
+	Save                              *bool     `json:"save"`                                        // optional, defaults
+	AllowCommands                     *bool     `json:"allowCommands,omitempty"`                     // optional, defaults
+	ScanEdits                         *bool     `json:"scanEdits,omitempty"`                         // optional, defaults
+	IgnoreBots                        *bool     `json:"ignoreBots,omitempty"`                        // optional, defaults
+	OverwriteAutorunHistory           *bool     `json:"overwriteAutorunHistory,omitempty"`           // optional
+	OverwriteAutorunHistoryBefore     *string   `json:"overwriteAutorunHistoryBefore,omitempty"`     // optional
+	OverwriteAutorunHistorySince      *string   `json:"overwriteAutorunHistorySince,omitempty"`      // optional
+	OverwriteSendHistoryStatus        *bool     `json:"overwriteSendHistoryStatus,omitempty"`        // optional, defaults
+	OverwriteSendAutorunHistoryStatus *bool     `json:"overwriteSendAutorunHistoryStatus,omitempty"` // optional, defaults
+	SendErrorMessages                 *bool     `json:"sendErrorMessages,omitempty"`                 // optional, defaults
+	SendFileToChannel                 *string   `json:"sendFileToChannel,omitempty"`                 // optional, defaults
+	SendFileToChannels                *[]string `json:"sendFileToChannels,omitempty"`                // optional, defaults
+	SendFileDirectly                  *bool     `json:"sendFileDirectly,omitempty"`                  // optional, defaults
+	SendFileCaption                   *string   `json:"sendFileCaption,omitempty"`                   // optional
 	// Appearance
 	UpdatePresence             *bool     `json:"updatePresence,omitempty"`             // optional, defaults
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
@@ -418,11 +425,17 @@ func loadConfig() {
 
 		// Channel Config Defaults
 		// this is dumb but don't see a better way to initialize defaults
+		for i := 0; i < len(config.Channels); i++ {
+			channelDefault(&config.Channels[i])
+		}
+		for i := 0; i < len(config.Categories); i++ {
+			channelDefault(&config.Categories[i])
+		}
 		for i := 0; i < len(config.Servers); i++ {
 			channelDefault(&config.Servers[i])
 		}
-		for i := 0; i < len(config.Channels); i++ {
-			channelDefault(&config.Channels[i])
+		for i := 0; i < len(config.Users); i++ {
+			channelDefault(&config.Users[i])
 		}
 		if config.All != nil {
 			channelDefault(config.All)
@@ -851,25 +864,55 @@ func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bo
 	return false
 }
 
-func getMessageConfigChannel(m *discordgo.Message) string {
+var emptyConfig configurationSource = configurationSource{}
+
+func getSource(m *discordgo.Message) configurationSource {
+
+	// Channel
 	for _, item := range config.Channels {
 		// Single Channel Config
 		if m.ChannelID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
-			return item.ChannelID
+			return item
 		}
 		// Multi-Channel Config
 		if item.ChannelIDs != nil {
-			if stringInSlice(m.ChannelID, *item.ChannelIDs) {
-				return m.ChannelID
-			}
-			for _, channel := range *item.ChannelIDs {
-				if m.ChannelID == channel || isNestedMessage(m, channel) {
-					return channel
+			for _, subchannel := range *item.ChannelIDs {
+				if m.ChannelID == subchannel || isNestedMessage(m, subchannel) {
+					return item
 				}
 			}
 		}
 	}
-	// Server Config
+
+	// Category Config
+	for _, item := range config.Categories {
+		if item.CategoryID != "" {
+			channel, err := bot.State.Channel(m.ChannelID)
+			if err == nil {
+				if channel.ParentID == item.CategoryID {
+					return item
+				}
+			}
+		}
+		// Multi-Category Config
+		if item.CategoryIDs != nil {
+			for _, subcategory := range *item.CategoryIDs {
+				channel, err := bot.State.Channel(m.ChannelID)
+				if err == nil {
+					if channel.ParentID == subcategory {
+						if item.CategoryBlacklist != nil {
+							if stringInSlice(channel.ParentID, *item.CategoryBlacklist) {
+								return emptyConfig
+							}
+						}
+						return item
+					}
+				}
+			}
+		}
+	}
+
+	// Server
 	for _, item := range config.Servers {
 		if item.ServerID != "" {
 			guild, err := bot.State.Guild(item.ServerID)
@@ -879,16 +922,16 @@ func getMessageConfigChannel(m *discordgo.Message) string {
 						// Channel Blacklisting within Server
 						if item.ServerBlacklist != nil {
 							if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
-								return ""
+								return emptyConfig
 							}
 							// Categories
 							if channel.ParentID != "" {
 								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-									return ""
+									return emptyConfig
 								}
 							}
 						}
-						return channel.ID
+						return item
 					}
 				}
 			}
@@ -903,78 +946,15 @@ func getMessageConfigChannel(m *discordgo.Message) string {
 							// Channel Blacklisting within Servers
 							if item.ServerBlacklist != nil {
 								if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
-									return ""
+									return emptyConfig
 								}
 								// Categories
 								if channel.ParentID != "" {
 									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-										return ""
+										return emptyConfig
 									}
 								}
 							}
-							return channel.ID
-						}
-					}
-				}
-			}
-		}
-	}
-	// All
-	if config.All != nil {
-		if config.AllBlacklistChannels != nil {
-			if stringInSlice(m.ChannelID, *config.AllBlacklistChannels) {
-				return ""
-			}
-		}
-		if config.AllBlacklistServers != nil {
-			guild, err := bot.State.Guild(m.ChannelID)
-			if err == nil {
-				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
-					return ""
-				}
-			} else {
-				log.Println(lg("Settings", "getMessageConfigChannel", color.HiRedString, "Error finding server info for channel:\t%s", err))
-			}
-		}
-		return "1"
-	}
-	return ""
-}
-
-func getChannelConfig(ChannelID string) configurationSource {
-	for _, item := range config.Channels {
-		// Single Channel Config
-		if ChannelID == item.ChannelID {
-			return item
-		}
-		// Multi-Channel Config
-		if item.ChannelIDs != nil {
-			for _, subchannel := range *item.ChannelIDs {
-				if ChannelID == subchannel {
-					return item
-				}
-			}
-		}
-	}
-	// Server Config
-	for _, item := range config.Servers {
-		if item.ServerID != "" {
-			guild, err := bot.State.Guild(item.ServerID)
-			if err == nil {
-				for _, channel := range guild.Channels {
-					if ChannelID == channel.ID {
-						return item
-					}
-				}
-			}
-		}
-		// Multi-Server Config
-		if item.ServerIDs != nil {
-			for _, subserver := range *item.ServerIDs {
-				guild, err := bot.State.Guild(subserver)
-				if err == nil {
-					for _, channel := range guild.Channels {
-						if ChannelID == channel.ID {
 							return item
 						}
 					}
@@ -982,10 +962,44 @@ func getChannelConfig(ChannelID string) configurationSource {
 			}
 		}
 	}
-	if config.All != nil {
-		return *config.All
+
+	// User Config
+	for _, item := range config.Users {
+		if item.UserID != "" {
+			if m.Author.ID == item.UserID {
+				return item
+			}
+		}
+		// Multi-User Config
+		if item.UserIDs != nil {
+			for _, subuser := range *item.UserIDs {
+				if m.Author.ID == subuser {
+					return item
+				}
+			}
+		}
 	}
-	return configurationSource{}
+
+	// All
+	if config.All != nil {
+		if config.AllBlacklistChannels != nil {
+			if stringInSlice(m.ChannelID, *config.AllBlacklistChannels) {
+				return emptyConfig
+			}
+		}
+		if config.AllBlacklistServers != nil {
+			guild, err := bot.State.Guild(m.ChannelID)
+			if err == nil {
+				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
+					return emptyConfig
+				}
+			} else {
+				log.Println(lg("Settings", "getSource", color.HiRedString, "Error finding server info for channel:\t%s", err))
+			}
+		}
+	}
+
+	return emptyConfig
 }
 
 func isAdminChannelRegistered(ChannelID string) bool {
@@ -1030,11 +1044,9 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	if config.AllowGlobalCommands {
 		return true
 	}
-	ch := getMessageConfigChannel(m)
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if ch != "" {
-		channelConfig := getChannelConfig(ch)
+	} else if channelConfig := getSource(m); channelConfig != emptyConfig {
 		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}

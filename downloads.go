@@ -198,7 +198,7 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 	return links
 }
 
-func getDownloadLinks(inputURL string, channelID string) map[string]string {
+func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 	/* TODO: Download Support...
 	- TikTok: Tried, once the connection is closed the cdn URL is rendered invalid
 	- Facebook Photos: Tried, it doesn't preload image data, it's loaded in after. Would have to keep connection open, find alternative way to grab, or use api.
@@ -217,17 +217,17 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 				log.Println(lg("Download", "", color.RedString, "Twitter Media fetch failed for %s -- %s", inputURL, err))
 			}
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 	if regexUrlTwitterStatus.MatchString(inputURL) {
-		links, err := getTwitterStatusUrls(inputURL, channelID)
+		links, err := getTwitterStatusUrls(inputURL, m)
 		if err != nil {
 			if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
 				log.Println(lg("Download", "", color.RedString, "Twitter Status fetch failed for %s -- %s", inputURL, err))
 			}
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -236,7 +236,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Instagram fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -245,7 +245,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Imgur Media fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 	if regexUrlImgurAlbum.MatchString(inputURL) {
@@ -253,7 +253,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Imgur Album fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -262,7 +262,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Streamable fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -271,7 +271,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Gfycat fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -280,7 +280,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Flickr Photo fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 	if regexUrlFlickrAlbum.MatchString(inputURL) {
@@ -288,7 +288,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Flickr Album fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 	if regexUrlFlickrAlbumShort.MatchString(inputURL) {
@@ -296,7 +296,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Flickr Album (short) fetch failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -306,7 +306,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			if err != nil {
 				log.Println(lg("Download", "", color.RedString, "Google Drive Album URL for %s -- %s", inputURL, err))
 			} else if len(links) > 0 {
-				return trimDownloadedLinks(links, channelID)
+				return trimDownloadedLinks(links, m)
 			}
 		}
 		if regexUrlGoogleDriveFolder.MatchString(inputURL) {
@@ -314,7 +314,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 			if err != nil {
 				log.Println(lg("Download", "", color.RedString, "Google Drive Folder URL for %s -- %s", inputURL, err))
 			} else if len(links) > 0 {
-				return trimDownloadedLinks(links, channelID)
+				return trimDownloadedLinks(links, m)
 			}
 		}
 	}
@@ -324,7 +324,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Tistory URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 	if regexUrlTistoryLegacy.MatchString(inputURL) {
@@ -332,7 +332,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Legacy Tistory URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -341,7 +341,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Reddit Post URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -350,7 +350,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Mastodon Post URL failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -360,7 +360,7 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Checking for Tistory site failed for %s -- %s", inputURL, err))
 		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, channelID)
+			return trimDownloadedLinks(links, m)
 		}
 	}
 
@@ -378,11 +378,11 @@ func getDownloadLinks(inputURL string, channelID string) map[string]string {
 		}
 		inputURLWithoutQueries := parsedURL.String()
 		if inputURLWithoutQueries != inputURL {
-			return trimDownloadedLinks(getDownloadLinks(inputURLWithoutQueries, channelID), channelID)
+			return trimDownloadedLinks(getDownloadLinks(inputURLWithoutQueries, m), m)
 		}
 	}
 
-	return trimDownloadedLinks(map[string]string{inputURL: ""}, channelID)
+	return trimDownloadedLinks(map[string]string{inputURL: ""}, m)
 }
 
 func getFileLinks(m *discordgo.Message) []*fileItem {
@@ -392,10 +392,7 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 
 	rawLinks := getRawLinks(m)
 	for _, rawLink := range rawLinks {
-		downloadLinks := getDownloadLinks(
-			rawLink.Link,
-			m.ChannelID,
-		)
+		downloadLinks := getDownloadLinks(rawLink.Link, m)
 		for link, filename := range downloadLinks {
 			if rawLink.Filename != "" {
 				filename = rawLink.Filename
@@ -437,15 +434,12 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 	}
 
-	channel := getMessageConfigChannel(download.Message)
-
 	// Any kind of failure
 	if status.Status >= downloadFailed && !download.HistoryCmd && !download.EmojiCmd {
 		log.Println(lg("Download", "", color.RedString,
 			"Gave up on downloading %s after %d failed attempts...\t%s",
 			download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		if channel != "" {
-			channelConfig := getChannelConfig(channel)
+		if channelConfig := getSource(download.Message); channelConfig != emptyConfig {
 			if !download.HistoryCmd && *channelConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -484,8 +478,7 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 	}
 
 	// Log Links to File
-	if channel != "" {
-		channelConfig := getChannelConfig(channel)
+	if channelConfig := getSource(download.Message); channelConfig != emptyConfig {
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
 				logPath := channelConfig.LogLinks.Destination
@@ -613,13 +606,13 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		logPrefix = "HISTORY "
 	}
 
-	if ch := getMessageConfigChannel(download.Message); ch != "" ||
-		download.EmojiCmd || download.ManualDownload {
-		var channelConfig configurationSource
-		channelDefault(&channelConfig)
-		if ch != "" {
-			channelConfig = getChannelConfig(ch)
-		}
+	var channelConfig configurationSource
+	channelDefault(&channelConfig)
+	_channelConfig := getSource(download.Message)
+	if _channelConfig != emptyConfig {
+		channelConfig = _channelConfig
+	}
+	if _channelConfig != emptyConfig || download.EmojiCmd || download.ManualDownload {
 
 		// Source validation
 		if _, err = url.ParseRequestURI(download.InputURL); err != nil {

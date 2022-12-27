@@ -770,7 +770,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     * Blacklists channels (by ID) from `all`.
 
 
-* :small_red_triangle: **"servers"** _`[USE THIS OR "channels"]`_
+* :small_red_triangle: **"servers"** _
     * — _settings.servers : list of setting:value groups_
     * :small_red_triangle: **"server"** _`[USE THIS OR "servers"]`_
         * — _settings.servers[].server : string_
@@ -782,6 +782,33 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.servers[].serverBlacklist : list of strings_
         * Blacklist specific channels from the encompassing server(s).
     * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
+
+
+* :small_red_triangle: **"categories"**
+    * — _settings.categories : list of setting:value groups_
+    * :small_red_triangle: **"category"** _`[USE THIS OR "categories"]`_
+        * — _settings.categories[].category : string_
+        * Category ID to monitor.
+    * :small_red_triangle: **"categories"** _`[USE THIS OR "category"]`_
+        * — _settings.categories[].categories : list of strings_
+        * Category IDs to monitor, for if you want the same configuration for multiple categories.
+    * :small_orange_diamond: "categoryBlacklist"
+        * — _settings.sercategoriesvers[].categoryBlacklist : list of strings_
+        * Blacklist specific channels from the encompassing categories.
+    * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
+
+
+* :small_red_triangle: **"users"**
+    * — _settings.users : list of setting:value groups_
+    * :small_red_triangle: **"user"** _`[USE THIS OR "users"]`_
+        * — _settings.users[].user : string_
+        * User ID to monitor.
+    * :small_red_triangle: **"users"** _`[USE THIS OR "user"]`_
+        * — _settings.users[].users : list of strings_
+        * User IDs to monitor, for if you want the same configuration for multiple users.
+    * **ALL OTHER VARIABLES ARE SAME AS "channels" BELOW**
+
+
 * :small_red_triangle: **"channels"** _`[USE THIS OR "servers"]`_
     * — _settings.channels : list of setting:value groups_
     * :small_red_triangle: **"channel"** _`[USE THIS OR "channels"]`_
@@ -790,6 +817,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     * :small_red_triangle: **"channels"** _`[USE THIS OR "channel"]`_
         * — _settings.channels[].channels : list of strings_
         * Channel IDs to monitor, for if you want the same configuration for multiple channels.
+
+
     ---
     #### _Source - Setup_
     * :small_red_triangle: **"destination"**

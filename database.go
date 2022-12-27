@@ -7,19 +7,20 @@ import (
 	"time"
 
 	"github.com/HouzuoGuo/tiedot/db"
+	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 )
 
 // Trim files already downloaded and stored in database
-func trimDownloadedLinks(linkList map[string]string, channelID string) map[string]string {
-	channelConfig := getChannelConfig(channelID)
+func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[string]string {
+	channelConfig := getSource(m)
 
 	newList := make(map[string]string, 0)
 	for link, filename := range linkList {
 		downloadedFiles := dbFindDownloadByURL(link)
 		alreadyDownloaded := false
 		for _, downloadedFile := range downloadedFiles {
-			if downloadedFile.ChannelID == channelID {
+			if downloadedFile.ChannelID == m.ChannelID {
 				alreadyDownloaded = true
 			}
 		}
