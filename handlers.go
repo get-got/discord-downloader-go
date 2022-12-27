@@ -18,15 +18,6 @@ type fileItem struct {
 	Time     time.Time
 }
 
-var (
-	skipCommands = []string{
-		"skip",
-		"ignore",
-		"don't save",
-		"no save",
-	}
-)
-
 //#region Events
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -313,21 +304,6 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 						color.HiMagentaString("(FILTER)")))
 				}
 				return -1
-			}
-		}
-
-		// Skipping
-		canSkip := config.AllowSkipping
-		if channelConfig.OverwriteAllowSkipping != nil {
-			canSkip = *channelConfig.OverwriteAllowSkipping
-		}
-		if canSkip {
-			for _, cmd := range skipCommands {
-				if m.Content == cmd {
-					log.Println(lg("Message", "", color.HiYellowString,
-						"Message handling skipped due to use of skip command."))
-					return -1
-				}
 			}
 		}
 

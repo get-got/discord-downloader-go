@@ -299,7 +299,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     ],
     "debugOutput": true,
     "commandPrefix": "downloader_",
-    "allowSkipping": true,
     "allowGlobalCommands": true,
     "asyncHistory": false,
     "downloadRetryMax": 5,
@@ -320,7 +319,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
             "destination": "media",
-            "overwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
@@ -408,7 +406,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     ],
     "debugOutput": true,
     "commandPrefix": "d_",
-    "allowSkipping": true,
     "scanOwnMessages": true,
     "checkPermissions": false,
     "allowGlobalCommands": false,
@@ -502,7 +499,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         {
             "channel": "CHANNEL_MAIN_SPAM",
             "destination": "DOWNLOAD_FOLDER/Spam",
-            "overwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
@@ -512,7 +508,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         {
             "channel": "CHANNEL_BOBS_SPAM",
             "destination": "DOWNLOAD_FOLDER/Spam - Bob",
-            "overwriteAllowSkipping": false,
             "saveImages": true,
             "saveVideos": true,
             "saveAudioFiles": true,
@@ -641,11 +636,6 @@ This setup exempts many options so they will use default values _(see below)_. I
 * :small_blue_diamond: "commandPrefix"
     * — _settings.commandPrefix : string_
     * _Default:_ `"ddg "`
-* :small_blue_diamond: "allowSkipping"
-    * — _settings.allowSkipping : boolean_
-    * _Default:_ `true`
-    * Allow scanning for keywords to skip content downloading.
-    * `"skip", "ignore", "don't save", "no save"`
 * :small_blue_diamond: "scanOwnMessages"
     * — _settings.scanOwnMessages : boolean_
     * _Default:_ `false`
@@ -890,11 +880,6 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Unused by Default_
         * Overwrites the global setting `filenameDateFormat` _(see above)_
         * [see this Stack Overflow post regarding Golang date formatting.](https://stackoverflow.com/questions/20234104/how-to-format-current-time-using-a-yyyymmddhhmmss-format)
-    * :small_orange_diamond: "overwriteAllowSkipping"
-        * — _settings.channels[].overwriteAllowSkipping : boolean_
-        * _Unused by Default_
-        * Allow scanning for keywords to skip content downloading.
-        * `"skip", "ignore", "don't save", "no save"`
     * :small_orange_diamond: "overwriteEmbedColor"
         * — _settings.channels[].overwriteEmbedColor : string_
         * _Unused by Default_
@@ -949,7 +934,6 @@ This setup exempts many options so they will use default values _(see below)_. I
             * — _settings.channels[].filters.blockedPhrases : list of strings_
             * List of phrases to make the bot ignore this message.
             * Will ignore any message containing a blocked phrase UNLESS it also has an allowed phrase. Messages will be processed by default.
-            * _Default:_ `[ "skip", "ignore", "don't save", "no save" ]`
         * :small_orange_diamond: "allowedPhrases"
             * — _settings.channels[].filters.allowedPhrases : list of strings_
             * List of phrases to allow the bot to process the message.

@@ -282,12 +282,7 @@ var (
 		".py",
 		".jar",
 	}
-	defSourceFilter_BlockedPhrases = []string{
-		"skip",
-		"ignore",
-		"don't save",
-		"no save",
-	}
+	defSourceFilter_BlockedPhrases = []string{}
 )
 
 type configurationSourceFilters struct {
