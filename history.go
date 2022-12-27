@@ -362,7 +362,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							historyJobs[subjectChannelID] = job
 						}
 						break MessageRequestingLoop
-						break
 					}
 
 					lastMessageID = message.ID

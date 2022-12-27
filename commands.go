@@ -209,8 +209,8 @@ func handleCommands() *exrouter.Route {
 					shouldProcess = false
 
 					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-						content := fmt.Sprintf("TODO: this")
-						_, err := replyEmbed(ctx.Msg, "Command — History Help", content)
+						//content := fmt.Sprintf("")
+						_, err := replyEmbed(ctx.Msg, "Command — History Help", "TODO: this")
 						if err != nil {
 							log.Println(lg("Command", "History",
 								color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))

@@ -68,7 +68,7 @@ func filepathExtension(filepath string) string {
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
-		if strings.ToLower(b) == strings.ToLower(a) {
+		if strings.EqualFold(a, b) {
 			return true
 		}
 	}
@@ -123,13 +123,6 @@ func formatNumberShort(x int64) string {
 		return output
 	}
 	return fmt.Sprint(x)
-}
-
-func boolS(val bool) string {
-	if val {
-		return "ON"
-	}
-	return "OFF"
 }
 
 func pluralS(num int) string {

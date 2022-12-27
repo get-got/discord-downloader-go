@@ -168,7 +168,7 @@ func main() {
 					log.Println(lg("Database", "", color.HiRedString, "Error decoding imgStore:\t%s", err))
 				}
 				if imgStore != nil {
-					log.Println(lg("Database", "", color.HiYellowString, "filterDuplicateImages database opened", imgStore.Size()))
+					log.Println(lg("Database", "", color.HiYellowString, "filterDuplicateImages database opened %d", imgStore.Size()))
 				}
 			}
 		}
@@ -439,7 +439,7 @@ func main() {
 				}
 				if event.Op&fsnotify.Write == fsnotify.Write {
 					// It double-fires the event without time check, might depend on OS but this works anyways
-					if time.Now().Sub(configReloadLastTime).Milliseconds() > 1 {
+					if time.Since(configReloadLastTime).Milliseconds() > 1 {
 						time.Sleep(1 * time.Second)
 						log.Println(lg("Settings", "Watcher", color.YellowString,
 							"Detected changes in \"%s\", reloading...", configFile))
@@ -559,7 +559,7 @@ func botLoadDiscord() {
 		}
 		bot.LogLevel = config.DiscordLogLevel // reset
 		bot.ShouldReconnectOnError = true
-		dur, err := time.ParseDuration(string(config.DiscordTimeout) + "s")
+		dur, err := time.ParseDuration(fmt.Sprint(config.DiscordTimeout) + "s")
 		if err != nil {
 			dur, _ = time.ParseDuration("180s")
 		}
@@ -701,7 +701,7 @@ func botLoadDiscord() {
 			if err != nil {
 				invalidChannels = append(invalidChannels, channel.ChannelID)
 				log.Println(lg("Discord", "Validation", color.HiRedString,
-					"Bot cannot access channel %s...\t%s", channel, err))
+					"Bot cannot access channel %s...\t%s", channel.ChannelID, err))
 			}
 		}
 	}

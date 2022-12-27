@@ -33,14 +33,14 @@ var (
 func getTwitterUrls(inputURL string) (map[string]string, error) {
 	parts := strings.Split(inputURL, ":")
 	if len(parts) < 2 {
-		return nil, errors.New("Unable to parse Twitter URL")
+		return nil, errors.New("unable to parse Twitter URL")
 	}
 	return map[string]string{"https:" + parts[1] + ":orig": filenameFromURL(parts[1])}, nil
 }
 
 func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string, error) {
 	if twitterClient == nil {
-		return nil, errors.New("Invalid Twitter API Keys Set")
+		return nil, errors.New("invalid Twitter API Keys Set")
 	}
 
 	matches := regexUrlTwitterStatus.FindStringSubmatch(inputURL)
@@ -140,12 +140,12 @@ ParseLoop:
 							content = content[:len(content)-1]
 							jsonParsed, err := gabs.ParseJSON([]byte(content))
 							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "Error parsing instagram json:", err))
+								log.Println(lg("API", "Instagram", color.HiRedString, "error parsing instagram json:", err))
 								continue ParseLoop
 							}
 							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
 							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "Unable to find entries children:", err))
+								log.Println(lg("API", "Instagram", color.HiRedString, "unable to find entries children:", err))
 								continue ParseLoop
 							}
 							for _, entryChild := range entryChildren {
@@ -227,7 +227,7 @@ ParseLoop:
 							content = content[:len(content)-1]
 							jsonParsed, err := gabs.ParseJSON([]byte(content))
 							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "Error parsing instagram json:", err))
+								log.Println(lg("API", "Instagram", color.HiRedString, "error parsing instagram json:\t%s", err))
 								continue ParseLoop
 							}
 							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
@@ -324,13 +324,13 @@ func getStreamableUrls(url string) (map[string]string, error) {
 	matches := regexUrlStreamable.FindStringSubmatch(url)
 	shortcode := matches[3]
 	if shortcode == "" {
-		return nil, errors.New("Unable to get shortcode from URL")
+		return nil, errors.New("unable to get shortcode from URL")
 	}
 	reqUrl := fmt.Sprintf("https://api.streamable.com/videos/%s", shortcode)
 	streamable := new(streamableObject)
 	getJSON(reqUrl, streamable)
 	if streamable.Status != 2 || streamable.Files.Mp4.URL == "" {
-		return nil, errors.New("Streamable object has no download candidate")
+		return nil, errors.New("streamable object has no download candidate")
 	}
 	link := streamable.Files.Mp4.URL
 	if !strings.HasPrefix(link, "http") {
@@ -354,14 +354,14 @@ type gfycatObject struct {
 func getGfycatUrls(url string) (map[string]string, error) {
 	parts := strings.Split(url, "/")
 	if len(parts) < 3 {
-		return nil, errors.New("Unable to parse Gfycat URL")
+		return nil, errors.New("unable to parse Gfycat URL")
 	}
 	gfycatId := parts[len(parts)-1]
 	gfycatObject := new(gfycatObject)
 	getJSON("https://api.gfycat.com/v1/gfycats/"+gfycatId, gfycatObject)
 	gfycatUrl := gfycatObject.GfyItem.Mp4URL
 	if url == "" {
-		return nil, errors.New("Failed to read response from Gfycat")
+		return nil, errors.New("failed to read response from Gfycat")
 	}
 	return map[string]string{gfycatUrl: ""}, nil
 }
@@ -372,8 +372,8 @@ func getGfycatUrls(url string) (map[string]string, error) {
 
 type flickrPhotoSizeObject struct {
 	Label  string `json:"label"`
-	Width  int    `json:"width,int,string"`
-	Height int    `json:"height,int,string"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 	Source string `json:"source"`
 	URL    string `json:"url"`
 	Media  string `json:"media"`
@@ -409,12 +409,12 @@ func getFlickrUrlFromPhotoId(photoId string) string {
 
 func getFlickrPhotoUrls(url string) (map[string]string, error) {
 	if config.Credentials.FlickrApiKey == "" {
-		return nil, errors.New("Invalid Flickr API Key Set")
+		return nil, errors.New("invalid Flickr API Key Set")
 	}
 	matches := regexUrlFlickrPhoto.FindStringSubmatch(url)
 	photoId := matches[5]
 	if photoId == "" {
-		return nil, errors.New("Unable to get Photo ID from URL")
+		return nil, errors.New("unable to get Photo ID from URL")
 	}
 	return map[string]string{getFlickrUrlFromPhotoId(photoId): ""}, nil
 }
@@ -448,15 +448,15 @@ type flickrAlbumObject struct {
 
 func getFlickrAlbumUrls(url string) (map[string]string, error) {
 	if config.Credentials.FlickrApiKey == "" {
-		return nil, errors.New("Invalid Flickr API Key Set")
+		return nil, errors.New("invalid Flickr API Key Set")
 	}
 	matches := regexUrlFlickrAlbum.FindStringSubmatch(url)
 	if len(matches) < 10 || matches[9] == "" {
-		return nil, errors.New("Unable to find Flickr Album ID in URL")
+		return nil, errors.New("unable to find Flickr Album ID in URL")
 	}
 	albumId := matches[9]
 	if albumId == "" {
-		return nil, errors.New("Unable to get Album ID from URL")
+		return nil, errors.New("unable to get Album ID from URL")
 	}
 	reqUrl := fmt.Sprintf("https://www.flickr.com/services/rest/?format=json&nojsoncallback=1&method=%s&api_key=%s&photoset_id=%s&per_page=500",
 		"flickr.photosets.getPhotos", config.Credentials.FlickrApiKey, albumId)
@@ -477,7 +477,7 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 	if regexUrlFlickrAlbum.MatchString(result.Request.URL.String()) {
 		return getFlickrAlbumUrls(result.Request.URL.String())
 	}
-	return nil, errors.New("Encountered invalid URL while trying to get long URL from short Flickr Album URL")
+	return nil, errors.New("encountered invalid URL while trying to get long URL from short Flickr Album URL")
 }
 
 //#endregion
@@ -509,9 +509,9 @@ func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
 	driveFields := "nextPageToken, files(id)"
 	result, err := googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
 	if err != nil {
-		log.Println(lg("API", "Google", color.HiRedString, "driveQuery:", driveQuery))
-		log.Println(lg("API", "Google", color.HiRedString, "driveFields:", driveFields))
-		log.Println(lg("API", "Google", color.HiRedString, "err:", err))
+		log.Println(lg("API", "Google", color.HiRedString, "driveQuery:\t%s", driveQuery))
+		log.Println(lg("API", "Google", color.HiRedString, "driveFields:\t%s", driveFields))
+		log.Println(lg("API", "Google", color.HiRedString, "err:\t%s", err))
 		return nil, err
 	}
 	for _, file := range result.Files {
@@ -609,9 +609,7 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 	doc.Find(".article img, #content img, div[role=main] img, .section_blogview img").Each(func(i int, s *goquery.Selection) {
 		foundUrl, exists := s.Attr("src")
 		if exists {
-			isTistoryCdnUrl := regexUrlTistoryLegacyWithCDN.MatchString(foundUrl)
-			isTistoryUrl := regexUrlTistoryLegacy.MatchString(foundUrl)
-			if isTistoryCdnUrl == true {
+			if regexUrlTistoryLegacyWithCDN.MatchString(foundUrl) {
 				finalTistoryUrls, _ := getTistoryWithCDNUrls(foundUrl)
 				if len(finalTistoryUrls) > 0 {
 					for finalTistoryUrl := range finalTistoryUrls {
@@ -619,7 +617,7 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 						links[finalTistoryUrl] = foundFilename
 					}
 				}
-			} else if isTistoryUrl == true {
+			} else if regexUrlTistoryLegacy.MatchString(foundUrl) {
 				finalTistoryUrls, _ := getLegacyTistoryUrls(foundUrl)
 				if len(finalTistoryUrls) > 0 {
 					for finalTistoryUrl := range finalTistoryUrls {
@@ -656,7 +654,7 @@ func getRedditPostUrls(link string) (map[string]string, error) {
 	headers["User-Agent"] = sneakyUserAgent
 	err := getJSONwithHeaders(link+".json", redditThread, headers)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to parse json from reddit post:\t%s", err)
+		return nil, fmt.Errorf("failed to parse json from reddit post:\t%s", err)
 	}
 
 	redditPost := (*redditThread)[0].Data.Children.([]interface{})[0].(map[string]interface{})
@@ -677,11 +675,11 @@ func getMastodonPostUrls(link string) (map[string]string, error) {
 	var post map[string]interface{}
 	err := getJSON(link+".json", &post)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to parse json from mastodon post:\t%s", err)
+		return nil, fmt.Errorf("failed to parse json from mastodon post:\t%s", err)
 	}
 	// Check for returned error
 	if errmsg, exists := post["error"]; exists {
-		return nil, fmt.Errorf("Mastodon JSON returned an error:\t%s", errmsg)
+		return nil, fmt.Errorf("mastodon JSON returned an error:\t%s", errmsg)
 	}
 
 	// Check validity
