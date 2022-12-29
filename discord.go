@@ -617,7 +617,7 @@ func isLocalAdmin(m *discordgo.Message) bool {
 }
 
 func hasPerms(channelID string, permission int64) bool {
-	if !config.CheckPermissions {
+	if selfbot {
 		return true
 	}
 

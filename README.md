@@ -407,7 +407,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     "debugOutput": true,
     "commandPrefix": "d_",
     "scanOwnMessages": true,
-    "checkPermissions": false,
     "allowGlobalCommands": false,
     "autorunHistory": true,
     "autorunHistoryBefore": "2022-02-05",
@@ -640,10 +639,6 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.scanOwnMessages : boolean_
     * _Default:_ `false`
     * Scans the bots own messages for content to download, only useful if using as a selfbot.
-* :small_blue_diamond: "checkPermissions"
-    * — _settings.checkPermissions : boolean_
-    * _Default:_ `true`
-    * Checks Discord permissions before attempting requests/actions.
 * :small_blue_diamond: "allowGlobalCommands"
     * — _settings.allowGlobalCommands : boolean_
     * _Default:_ `true`

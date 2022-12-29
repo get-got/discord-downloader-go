@@ -52,7 +52,6 @@ var (
 	defConfig_MessageOutput        bool   = true
 	defConfig_CommandPrefix        string = "ddg "
 	defConfig_ScanOwnMessages      bool   = false
-	defConfig_CheckPermissions     bool   = true
 	defConfig_AllowGlobalCommands  bool   = true
 	defConfig_GithubUpdateChecking bool   = true
 	// Appearance
@@ -84,7 +83,6 @@ func defaultConfiguration() configuration {
 
 		CommandPrefix:       defConfig_CommandPrefix,
 		ScanOwnMessages:     defConfig_ScanOwnMessages,
-		CheckPermissions:    defConfig_CheckPermissions,
 		AllowGlobalCommands: defConfig_AllowGlobalCommands,
 
 		AutorunHistory:           false,
@@ -132,7 +130,6 @@ type configuration struct {
 	CommandPrefix       string `json:"commandPrefix"`                  // optional, defaults
 	ScanOwnMessages     bool   `json:"scanOwnMessages"`                // optional, defaults
 	AllowGlobalCommands bool   `json:"allowGlobalCommmands,omitempty"` // optional, defaults
-	CheckPermissions    bool   `json:"checkPermissions,omitempty"`     // optional, defaults
 
 	AutorunHistory           bool   `json:"autorunHistory,omitempty"`           // optional, defaults
 	AutorunHistoryBefore     string `json:"autorunHistoryBefore,omitempty"`     // optional
