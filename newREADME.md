@@ -67,6 +67,8 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
+Now that that's out of the way...
+
 ---
 
 ## 🤖 Features
