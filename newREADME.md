@@ -36,19 +36,19 @@
     </a>
 </h3>
 
-This is a program that connects to a Discord Bot or User Account to locally download files posted in Discord channels in real-time as well as old messages. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports **extensive** global, server-specific, and channel-specific configuration and customization. _See [Features](#Features) below for the full list!_
+This project is a cross-platform command-line program to interact with a Discord Bot (genuine bot application or user account) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _(see list below)._ It also supports **very extensive** global, server-specific, category-specific, channel-specific, and user-specific settings configuration and customization. Tailor the bot to your exact needs. See the [Features](#Features) list below for the full list. Any operating system supported by the latest version of Golang is compatible.
 
 <h3 align="center">
     <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
 </h3>
 <h4 align="center">
-    For list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
+    The original project was abandoned, for a list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
 </h4>
 
 ---
 
-### Sections
-* [**List of Features**](#features)
+### Table of Contents
+* [**List of Features**](#Features)
 * [**Getting Started**](#getting-started)
 * [**Guide: Downloading History _(Old Messages)_**](#guide-downloading-history-old-messages)
 * [**Guide: Settings / Configuration**](#guide-settings--configuration)
