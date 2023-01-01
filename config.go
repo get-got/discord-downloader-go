@@ -985,15 +985,11 @@ func getSource(m *discordgo.Message) configurationSource {
 			}
 		}
 		if config.AllBlacklistServers != nil {
-			guild, err := bot.State.Guild(m.ChannelID)
-			if err == nil {
-				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
-					return emptyConfig
-				}
-			} else {
-				log.Println(lg("Settings", "getSource", color.HiRedString, "Error finding server info for channel:\t%s", err))
+			if stringInSlice(m.GuildID, *config.AllBlacklistServers) {
+				return emptyConfig
 			}
 		}
+		return *config.All
 	}
 
 	return emptyConfig

@@ -317,7 +317,12 @@ func handleCommands() *exrouter.Route {
 				// Foreach Channel
 				for _, channel := range channels {
 					if config.DebugOutput {
-						log.Println(lg("Command", "History", color.YellowString, "Processing history command for %s...", channel))
+						label := channel
+						if chinfo, err := bot.State.Channel(channel); err == nil {
+							label = chinfo.GuildID + "#" + chinfo.Name
+						}
+						log.Println(lg("Command", "History", color.GreenString,
+							"Queueing history job for %s...", label))
 					}
 					if !isBotAdmin(ctx.Msg) {
 						log.Println(lg("Command", "History", color.CyanString,

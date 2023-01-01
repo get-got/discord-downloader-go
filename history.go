@@ -86,6 +86,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	var responseMsg *discordgo.Message = &discordgo.Message{}
 	responseMsg.ID = ""
 	responseMsg.ChannelID = subjectChannelID
+	responseMsg.GuildID = ""
 
 	var commander string = "AUTORUN"
 	var autorun bool = true

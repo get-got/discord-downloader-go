@@ -287,6 +287,9 @@ func main() {
 					if !timeLastDownload.IsZero() {
 						str += fmt.Sprintf(", last download %s ago", durafmt.ParseShort(time.Since(timeLastDownload)))
 					}
+					if len(historyJobs) > 0 {
+						str += fmt.Sprintf(", %d history jobs", len(historyJobs))
+					}
 					log.Println(lg("Checkup", "", color.CyanString, str))
 				}
 
