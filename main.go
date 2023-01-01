@@ -222,10 +222,6 @@ func main() {
 		serverKey = strings.ToUpper(serverKey)
 		if constants[serverKey] == "" {
 			constants[serverKey] = server.ID
-		} else if config.DebugOutput {
-			log.Println(lg("Constants", "Debug", color.HiYellowString,
-				"%s already cached (processing %s, has %s stored)",
-				serverKey, server.ID, constants[serverKey]))
 		}
 		for _, channel := range server.Channels {
 			if channel.Type != discordgo.ChannelTypeGuildCategory {
@@ -245,10 +241,6 @@ func main() {
 				channelKey = strings.ToUpper(channelKey)
 				if constants[channelKey] == "" {
 					constants[channelKey] = channel.ID
-				} else if config.DebugOutput {
-					log.Println(lg("Constants", "Debug", color.HiYellowString,
-						"%s already cached (processing %s/%s, has %s stored)",
-						channelKey, server.ID, channel.ID, constants[channelKey]))
 				}
 			}
 		}
