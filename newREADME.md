@@ -49,18 +49,18 @@ This project is a cross-platform command-line program to interact with a Discord
 
 <h3 align="center">
     Table of Contents<br><br>
-    <a href="#Features"><b>- List of Features -</b></a><br><br>
-    <a href="#getting-started"><b>- Getting Started -</b></a><br><br>
-    <a href="#guide-downloading-history-old-messages"><b>- Guide: Downloading History <i>(Old Messages)</i> -</b></a><br><br>
-    <a href="#guide-settings--configuration"><b>- Guide: Settings / Configuration -</b></a><br><br>
-    <a href="#list-of-settings"><b>- List of Settings -</b></a><br><br>
-    <a href="#faq"><b>- FAQ (Frequently Asked Questions) -</b></a><br><br>
-    <a href="#development"><b>- Development, Credits, Dependencies -</b></a><br><br>
+    <a href="#Features"><b>- 🤖 List of Features -</b></a><br><br>
+    <a href="#getting-started"><b>- ✔️ Getting Started -</b></a><br><br>
+    <a href="#guide-downloading-history-old-messages"><b>- 📚 Guide: Downloading History <i>(Old Messages)</i> -</b></a><br><br>
+    <a href="#guide-settings--configuration"><b>- 🔨 Guide: Settings / Configuration -</b></a><br><br>
+    <a href="#list-of-settings"><b>- 🛠 List of Settings -</b></a><br><br>
+    <a href="#faq"><b>- ❔ FAQ (Frequently Asked Questions) -</b></a><br><br>
+    <a href="#development"><b>- ⚙️ Development, Credits, Dependencies -</b></a><br><br>
 </h3>
 
 ---
 
-## Features
+## 🤖 Features
 
 <details>
 <summary><b><i>(COLLAPSABLE SECTION)</i> LIST OF FEATURES & COMMANDS</b></summary>
@@ -106,7 +106,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 
 ---
 
-## Getting Started
+## ✔️ Getting Started
 <details>
 <summary><b><i>(COLLAPSABLE SECTION)</i> GETTING STARTED, HOW-TO, OTHER INFO...</b></summary>
 
@@ -178,7 +178,7 @@ You can either create a `settings.json` following the examples & variables liste
 
 ---
 
-## Guide: Downloading History (Old Messages)
+## 📚 Guide: Downloading History (Old Messages)
 <details>
 <summary><b><i>(COLLAPSABLE SECTION)</i> HISTORY GUIDE</b></summary>
 
@@ -217,7 +217,7 @@ Argument / Flag         | Details
 
 ---
 
-## Guide: Settings / Configuration
+## 🔨 Guide: Settings / Configuration
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` manually. All JSON settings follow camelCase format.
@@ -226,7 +226,13 @@ When initially launching the bot it will create a default settings file if you d
 
 ---
 
-## FAQ
+## 🛠 List of Settings
+
+aaa
+
+---
+
+## ❔ FAQ
 * ***Q: How do I install?***
 * **A: [SEE #getting-started](#getting-started)** 
 ---
@@ -235,7 +241,7 @@ When initially launching the bot it will create a default settings file if you d
 
 ---
 
-## Development
+## ⚙️ Development
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
 * Versioning is `[MAJOR].[MINOR].[PATCH]`
 
