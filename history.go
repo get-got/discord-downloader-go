@@ -232,7 +232,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					logPrefix+fmtBotSendPerm, commandingMessage.ChannelID))
 			}
 		}
-		log.Println(lg("History", "", color.HiRedString,
+		log.Println(lg("History", "", color.HiCyanString,
 			logPrefix+"Began checking history for %s...", subjectChannelID))
 
 		lastMessageID := ""
@@ -308,7 +308,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 
 			// Request More Messages
+			msg_rq_cnt := 0
+		request_messages:
 			if messages, err := bot.ChannelMessages(subjectChannelID, 100, beforeID, sinceID, ""); err != nil {
+				msg_rq_cnt++
 				// Error requesting messages
 				if sendStatus {
 					if !hasPermsToRespond {
@@ -332,12 +335,16 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			} else {
 				// No More Messages
 				if len(messages) <= 0 {
-					if job, exists := historyJobs[subjectChannelID]; exists {
-						job.Status = historyStatusCompletedNoMoreMessages
-						job.Updated = time.Now()
-						historyJobs[subjectChannelID] = job
+					if msg_rq_cnt > 3 {
+						if job, exists := historyJobs[subjectChannelID]; exists {
+							job.Status = historyStatusCompletedNoMoreMessages
+							job.Updated = time.Now()
+							historyJobs[subjectChannelID] = job
+						}
+						break MessageRequestingLoop
+					} else {
+						goto request_messages
 					}
-					break MessageRequestingLoop
 				}
 
 				// Set New Range

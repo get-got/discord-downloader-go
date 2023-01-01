@@ -935,7 +935,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Format Filename
-		completePath := download.Path + subfolder + dynamicKeyReplacement(channelConfig, download)
+		completePath := filepath.Clean(download.Path + subfolder + dynamicKeyReplacement(channelConfig, download))
 
 		// Check if filepath exists
 		if _, err := os.Stat(completePath); err == nil {
