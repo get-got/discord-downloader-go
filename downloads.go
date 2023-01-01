@@ -824,7 +824,6 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Names
-
 		sourceChannelName := download.Message.ChannelID
 		sourceName := "UNKNOWN"
 		sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
@@ -859,62 +858,89 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		subfolder := ""
-		if download.Message.Author != nil {
-			// Subfolder Division - Server Nesting
-			if *channelConfig.DivideFoldersByServer {
-				subfolderSuffix := download.Message.GuildID
-				if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
-					subfolderSuffix = clearPath(sourceName)
-				}
-				if subfolderSuffix != "" {
-					subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
-					subfolder = subfolder + subfolderSuffix
-					// Create folder
-					if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
-						log.Println(lg("Download", "", color.HiRedString,
-							"Error while creating server subfolder \"%s\": %s", download.Path, err))
-						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
-					}
+		// Subfolder Division - Year Nesting
+		if *channelConfig.DivideFoldersByYear {
+			year := fmt.Sprint(time.Now().Year())
+			if download.Message.Author != nil {
+				year = fmt.Sprint(download.Message.Timestamp.Year())
+			}
+			subfolderSuffix := year + string(os.PathSeparator)
+			subfolder = subfolder + subfolderSuffix
+			// Create folder
+			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while creating server subfolder \"%s\": %s", download.Path, err))
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+			}
+		}
+		// Subfolder Division - Month Nesting
+		if *channelConfig.DivideFoldersByMonth {
+			year := fmt.Sprintf("%02d", time.Now().Month())
+			if download.Message.Author != nil {
+				year = fmt.Sprintf("%02d", download.Message.Timestamp.Month())
+			}
+			subfolderSuffix := year + string(os.PathSeparator)
+			subfolder = subfolder + subfolderSuffix
+			// Create folder
+			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while creating server subfolder \"%s\": %s", download.Path, err))
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+			}
+		}
+		// Subfolder Division - Server Nesting
+		if *channelConfig.DivideFoldersByServer {
+			subfolderSuffix := download.Message.GuildID
+			if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
+				subfolderSuffix = clearPath(sourceName)
+			}
+			if subfolderSuffix != "" {
+				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
+				subfolder = subfolder + subfolderSuffix
+				// Create folder
+				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+					log.Println(lg("Download", "", color.HiRedString,
+						"Error while creating server subfolder \"%s\": %s", download.Path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
-			// Subfolder Division - Channel Nesting
-			if *channelConfig.DivideFoldersByChannel {
-				subfolderSuffix := download.Message.ChannelID
-				if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
-					subfolderSuffix = clearPath(sourceChannelName)
-				}
-				if subfolderSuffix != "" {
-					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
-					// Create folder
-					if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
-						log.Println(lg("Download", "", color.HiRedString,
-							"Error while creating channel subfolder \"%s\": %s", download.Path, err))
-						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
-					}
+		}
+		// Subfolder Division - Channel Nesting
+		if *channelConfig.DivideFoldersByChannel {
+			subfolderSuffix := download.Message.ChannelID
+			if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
+				subfolderSuffix = clearPath(sourceChannelName)
+			}
+			if subfolderSuffix != "" {
+				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
+				// Create folder
+				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+					log.Println(lg("Download", "", color.HiRedString,
+						"Error while creating channel subfolder \"%s\": %s", download.Path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
-
-			// Subfolder Division - User Nesting
-			if *channelConfig.DivideFoldersByUser {
-				subfolderSuffix := download.Message.Author.ID
-				if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
-					subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
-						download.Message.Author.Discriminator)
-				}
-				if subfolderSuffix != "" {
-					subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
-					// Create folder
-					if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
-						log.Println(lg("Download", "", color.HiRedString,
-							"Error while creating user subfolder \"%s\": %s", download.Path, err))
-						return mDownloadStatus(downloadFailedCreatingSubfolder, err)
-					}
+		}
+		// Subfolder Division - User Nesting
+		if *channelConfig.DivideFoldersByUser && download.Message.Author != nil {
+			subfolderSuffix := download.Message.Author.ID
+			if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
+				subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
+					download.Message.Author.Discriminator)
+			}
+			if subfolderSuffix != "" {
+				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
+				// Create folder
+				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+					log.Println(lg("Download", "", color.HiRedString,
+						"Error while creating user subfolder \"%s\": %s", download.Path, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
 				}
 			}
 		}
 
 		// Subfolder Division - Content Type
-		if *channelConfig.DivideFoldersByType && download.Message.Author != nil {
+		if *channelConfig.DivideFoldersByType {
 			subfolderSuffix := contentTypeFound
 			switch contentTypeFound {
 			case "image":

@@ -197,6 +197,8 @@ var (
 	defSource_BlacklistReactEmojis       []string = []string{}
 	defSource_TypeWhileProcessing        bool     = false
 	// Rules for Saving
+	defSource_DivideFoldersByYear    bool = false
+	defSource_DivideFoldersByMonth   bool = false
 	defSource_DivideFoldersByServer  bool = false
 	defSource_DivideFoldersByChannel bool = false
 	defSource_DivideFoldersByUser    bool = false
@@ -251,6 +253,8 @@ type configurationSource struct {
 	OverwriteFilenameFormat     *string `json:"overwriteFilenameFormat,omitempty"`     // optional
 	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
 	// Rules for Saving
+	DivideFoldersByYear    *bool `json:"divideFoldersByYear,omitempty"`    // optional, defaults
+	DivideFoldersByMonth   *bool `json:"divideFoldersByMonth,omitempty"`   // optional, defaults
 	DivideFoldersByServer  *bool `json:"divideFoldersByServer,omitempty"`  // optional, defaults
 	DivideFoldersByChannel *bool `json:"divideFoldersByChannel,omitempty"` // optional, defaults
 	DivideFoldersByUser    *bool `json:"divideFoldersByUser,omitempty"`    // optional, defaults
@@ -750,6 +754,12 @@ func channelDefault(channel *configurationSource) {
 		channel.TypeWhileProcessing = &defSource_TypeWhileProcessing
 	}
 	// Rules for Saving
+	if channel.DivideFoldersByYear == nil {
+		channel.DivideFoldersByYear = &defSource_DivideFoldersByYear
+	}
+	if channel.DivideFoldersByMonth == nil {
+		channel.DivideFoldersByMonth = &defSource_DivideFoldersByMonth
+	}
 	if channel.DivideFoldersByServer == nil {
 		channel.DivideFoldersByServer = &defSource_DivideFoldersByServer
 	}
