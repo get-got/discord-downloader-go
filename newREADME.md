@@ -237,10 +237,10 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE BRACKETS.
 
-Setting Key         | Type                  | Default       | Description
----                 | ---                   | ---           | ---
-credentials         | `group`               |               | See `credentials group` below.
-admins              | array of strings      | None          | Discord IDs of users to use admin commands.
+Setting Key         | Type                  | Default       | Description                                   | Example
+---                 | ---                   | ---           | ---                                           | ---
+credentials         | `group`               |               | See `credentials group` below.                |
+admins              | array of strings      | None          | Discord IDs of users to use admin commands.   | `"admins": [ "111", "222" ],`
 
 ---
 
