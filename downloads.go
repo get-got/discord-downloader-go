@@ -1012,11 +1012,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			msgTimestamp := ""
 			if download.HistoryCmd {
 				dlColor = color.HiCyanString
-				msgTimestamp = durafmt.ParseShort(time.Since(download.Message.Timestamp)).String() + "ago on " +
-					download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
+				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent %sin \"%s / %s\" from \"%s\" to %s (took %s)",
+				logPrefix+"SAVED %s sent %sin \"%s / %s\" from \"%s\" to %s (%s)",
 				strings.ToUpper(contentTypeFound), msgTimestamp, sourceName, sourceChannelName,
 				condenseString(download.InputURL, 50), download.Path+subfolder,
 				durafmt.ParseShort(time.Since(download.StartTime)).String()))
