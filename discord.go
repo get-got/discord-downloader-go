@@ -155,7 +155,7 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 		}
 	}
 	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
-		if config.DebugOutput {
+		if config.DebugOutput && selfbot {
 			log.Println(lg("Debug", "fixMessage",
 				color.YellowString, "%s, and attempts to fix seem to have failed...", ubIssue))
 		}
