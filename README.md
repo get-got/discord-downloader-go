@@ -1093,25 +1093,27 @@ _For `filenameFormat`_
 <details>
 <summary><b><i>(COLLAPSABLE SECTION)</i></b></summary>
 
-Key                 | Description
----                 | ---
-`{{date}}`          | Timestamp
-`{{file}}`          | Filename
-`{{fileType}}`      | File type
-`{{messageID}}`     | Source Message ID
-`{{userID}}`        | Source Author User ID
-`{{username}}`      | Source Author Username
-`{{channelID}}`     | Source Channel ID
-`{{channelName}}`   | Source Channel Name
-`{{categoryID}}`    | Source Category ID
-`{{categoryName}}`  | Source Category Name
-`{{serverID}}`      | Source Server ID
-`{{serverName}}`    | Source Server Name
-`{{message}}`       | Source Message Content (with path symbols stripped)
-`{{url}}`           | Download Full URL
-`{{domain}}`        | Download URL Domain
-`{{nanoID}}`        | 21 character unique string, eg: i25_rX9zwDdDn7Sg-ZoaH
-`{{shortID}}`       | Short unique string, eg: NVovc6-QQy
+Key                     | Description
+---                     | ---
+`{{date}}`              | Timestamp
+`{{file}}`              | Filename
+`{{fileType}}`          | File type
+`{{messageID}}`         | Source Message ID
+`{{userID}}`            | Source Author User ID
+`{{username}}`          | Source Author Username
+`{{channelID}}`         | Source Channel ID
+`{{channelName}}`       | Source Channel Name
+`{{categoryID}}`        | Source Category ID
+`{{categoryName}}`      | Source Category Name
+`{{serverID}}`          | Source Server ID
+`{{serverName}}`        | Source Server Name
+`{{message}}`           | Source Message Content (with path symbols stripped)
+`{{downloadTime}}`      | Time elapsed to download
+`{{downloadTimeLong}}`  | Time elapsed to download long version
+`{{url}}`               | Download Full URL
+`{{domain}}`            | Download URL Domain
+`{{nanoID}}`            | 21 character unique string, eg: i25_rX9zwDdDn7Sg-ZoaH
+`{{shortID}}`           | Short unique string, eg: NVovc6-QQy
 
 </details>
 

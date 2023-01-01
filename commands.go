@@ -459,6 +459,7 @@ func handleCommands() *exrouter.Route {
 											FileTime:   time.Now(),
 											HistoryCmd: false,
 											EmojiCmd:   true,
+											StartTime:  time.Now(),
 										})
 
 									if status.Status == downloadSuccess {

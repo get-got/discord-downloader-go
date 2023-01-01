@@ -19,6 +19,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
+	"github.com/hako/durafmt"
 	"github.com/rivo/duplo"
 	"mvdan.cc/xurls/v2"
 )
@@ -421,6 +422,7 @@ type downloadRequestStruct struct {
 	HistoryCmd     bool
 	EmojiCmd       bool
 	ManualDownload bool
+	StartTime      time.Time
 }
 
 func handleDownload(download downloadRequestStruct) downloadStatusStruct {
@@ -1010,11 +1012,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			msgTimestamp := ""
 			if download.HistoryCmd {
 				dlColor = color.HiCyanString
-				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
+				msgTimestamp = durafmt.ParseShort(time.Since(download.Message.Timestamp)).String() + "ago on " +
+					download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent %sin \"%s / %s\" from \"%s\" to %s",
-				strings.ToUpper(contentTypeFound), msgTimestamp, sourceName, sourceChannelName, condenseString(download.InputURL, 50), download.Path+subfolder))
+				logPrefix+"SAVED %s sent %sin \"%s / %s\" from \"%s\" to %s (took %s)",
+				strings.ToUpper(contentTypeFound), msgTimestamp, sourceName, sourceChannelName,
+				condenseString(download.InputURL, 50), download.Path+subfolder,
+				durafmt.ParseShort(time.Since(download.StartTime)).String()))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
@@ -1040,61 +1045,63 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// React
-		shouldReact := config.ReactWhenDownloaded
-		if channelConfig.ReactWhenDownloaded != nil {
-			shouldReact = *channelConfig.ReactWhenDownloaded
-		}
-		if download.HistoryCmd {
-			if !config.ReactWhenDownloadedHistory {
-				shouldReact = false
+		{
+			shouldReact := config.ReactWhenDownloaded
+			if channelConfig.ReactWhenDownloaded != nil {
+				shouldReact = *channelConfig.ReactWhenDownloaded
 			}
-			if channelConfig.ReactWhenDownloadedHistory != nil {
-				if *channelConfig.ReactWhenDownloadedHistory {
-					shouldReact = true
+			if download.HistoryCmd {
+				if !config.ReactWhenDownloadedHistory {
+					shouldReact = false
+				}
+				if channelConfig.ReactWhenDownloadedHistory != nil {
+					if *channelConfig.ReactWhenDownloadedHistory {
+						shouldReact = true
+					}
 				}
 			}
-		}
-		if download.Message.Author != nil && shouldReact {
-			reaction := ""
-			if *channelConfig.ReactWhenDownloadedEmoji == "" {
-				if download.Message.GuildID != "" {
-					guild, err := bot.State.Guild(download.Message.GuildID)
-					if err != nil {
-						log.Println(lg("Download", "", color.RedString,
-							"Error fetching guild state for emojis from %s: %s",
-							download.Message.GuildID, err))
-					} else {
-						emojis := guild.Emojis
-						if len(emojis) > 1 {
-							for {
-								rand.Seed(time.Now().UnixNano())
-								chosenEmoji := emojis[rand.Intn(len(emojis))]
-								formattedEmoji := chosenEmoji.APIName()
-								if !chosenEmoji.Animated && !stringInSlice(formattedEmoji,
-									*channelConfig.BlacklistReactEmojis) {
-									reaction = formattedEmoji
-									break
-								}
-							}
+			if download.Message.Author != nil && shouldReact {
+				reaction := ""
+				if *channelConfig.ReactWhenDownloadedEmoji == "" {
+					if download.Message.GuildID != "" {
+						guild, err := bot.State.Guild(download.Message.GuildID)
+						if err != nil {
+							log.Println(lg("Download", "", color.RedString,
+								"Error fetching guild state for emojis from %s: %s",
+								download.Message.GuildID, err))
 						} else {
-							reaction = defaultReact
+							emojis := guild.Emojis
+							if len(emojis) > 1 {
+								for {
+									rand.Seed(time.Now().UnixNano())
+									chosenEmoji := emojis[rand.Intn(len(emojis))]
+									formattedEmoji := chosenEmoji.APIName()
+									if !chosenEmoji.Animated && !stringInSlice(formattedEmoji,
+										*channelConfig.BlacklistReactEmojis) {
+										reaction = formattedEmoji
+										break
+									}
+								}
+							} else {
+								reaction = defaultReact
+							}
 						}
+					} else {
+						reaction = defaultReact
 					}
 				} else {
-					reaction = defaultReact
+					reaction = *channelConfig.ReactWhenDownloadedEmoji
 				}
-			} else {
-				reaction = *channelConfig.ReactWhenDownloadedEmoji
-			}
-			// Add Reaction
-			if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
-				if err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction); err != nil {
+				// Add Reaction
+				if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
+					if err = bot.MessageReactionAdd(download.Message.ChannelID, download.Message.ID, reaction); err != nil {
+						log.Println(lg("Download", "", color.RedString,
+							"Error adding reaction to message: %s", err))
+					}
+				} else {
 					log.Println(lg("Download", "", color.RedString,
-						"Error adding reaction to message: %s", err))
+						"Bot does not have permission to add reactions in %s", download.Message.ChannelID))
 				}
-			} else {
-				log.Println(lg("Download", "", color.RedString,
-					"Bot does not have permission to add reactions in %s", download.Message.ChannelID))
 			}
 		}
 

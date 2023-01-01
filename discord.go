@@ -303,6 +303,8 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{serverName}}", guildName},
 			{"{{message}}", clearPath(download.Message.Content)},
+			{"{{downloadTime}}", durafmt.ParseShort(time.Since(download.StartTime)).String()},
+			{"{{downloadTimeLong}}", durafmt.Parse(time.Since(download.StartTime)).String()},
 			{"{{url}}", clearPath(download.InputURL)},
 			{"{{domain}}", domain},
 			{"{{nanoID}}", nanoID},
