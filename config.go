@@ -1099,7 +1099,17 @@ func getAllRegisteredChannels() []string {
 	var channels []string
 	if config.All != nil { // ALL MODE
 		for _, guild := range bot.State.Guilds {
+			if config.AllBlacklistServers != nil {
+				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
+					continue
+				}
+			}
 			for _, channel := range guild.Channels {
+				if config.AllBlacklistChannels != nil {
+					if stringInSlice(channel.ID, *config.AllBlacklistChannels) {
+						continue
+					}
+				}
 				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
 					channels = append(channels, channel.ID)
 				}
