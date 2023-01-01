@@ -56,6 +56,20 @@ func getGuildName(guildID string) string {
 	return sourceGuildName
 }
 
+func getChannelCategoryName(channelID string) string {
+	sourceChannelName := "unknown"
+	sourceChannel, _ := bot.State.Channel(channelID)
+	if sourceChannel != nil {
+		sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
+		if sourceParent != nil {
+			if sourceChannel.Name != "" {
+				sourceChannelName = sourceParent.Name
+			}
+		}
+	}
+	return sourceChannelName
+}
+
 func getChannelName(channelID string) string {
 	sourceChannelName := "unknown"
 	sourceChannel, _ := bot.State.Channel(channelID)

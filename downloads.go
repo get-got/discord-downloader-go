@@ -1014,8 +1014,15 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 			fileinfo, err := os.Stat(completePath)
 			filesize := "unknown"
+			speed := 0.0
+			speedlabel := "kB/s"
 			if err == nil {
 				filesize = humanize.Bytes(uint64(fileinfo.Size()))
+				speed = float64(fileinfo.Size() / humanize.KByte)
+				if fileinfo.Size() >= humanize.MByte {
+					speed = float64(fileinfo.Size() / humanize.MByte)
+					speedlabel = "MB/s"
+				}
 			}
 
 			dlColor := color.HiGreenString
@@ -1026,9 +1033,11 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 			log.Println(lg("Download", "", dlColor,
 				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t%s",
-				strings.ToUpper(contentTypeFound), msgTimestamp, color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
-				color.GreenString("from %s to \"%s%s\" (%s, %s, %0.1f MB/s)", parsedURL.Hostname(), download.Path, download.Filename,
-					durafmt.ParseShort(time.Since(download.StartTime)).String(), filesize, float64(fileinfo.Size()/1000000)/time.Since(download.StartTime).Seconds())))
+				strings.ToUpper(contentTypeFound), msgTimestamp,
+				color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
+				color.GreenString("from %s to \"%s%s\"\t\t%s", parsedURL.Hostname(), download.Path, download.Filename,
+					color.WhiteString("(%s, %s, %0.1f %s)",
+						filesize, durafmt.ParseShort(time.Since(download.StartTime)).String(), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",

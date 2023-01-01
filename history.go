@@ -216,14 +216,21 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 		historyStartTime := time.Now()
 
+		guildName := getGuildName(getChannelGuildID(subjectChannelID))
+		categoryName := getChannelCategoryName(subjectChannelID)
+		channelName := getChannelName(subjectChannelID)
+		sourceName := fmt.Sprintf("%s / %s", guildName, channelName)
+		msgSourceDisplay := fmt.Sprintf("`Server:` **%s**\n`Channel:` _#%s_", guildName, channelName)
+		if categoryName != "unknown" {
+			sourceName = fmt.Sprintf("%s / %s / %s", guildName, categoryName, channelName)
+			msgSourceDisplay = fmt.Sprintf("`Server:` **%s**\n`Category:` %s\n`Channel:` _#%s_",
+				guildName, categoryName, channelName)
+		}
+
 		// Initial Status Message
 		if sendStatus {
 			if hasPermsToRespond {
-				responseMsg, err = replyEmbed(commandingMessage, "Command — History",
-					fmt.Sprintf("Starting to save history, please wait...\n\n`Server:` **%s**\n`Channel:` _#%s_\n\n",
-						getGuildName(getChannelGuildID(subjectChannelID)),
-						getChannelName(subjectChannelID),
-					))
+				responseMsg, err = replyEmbed(commandingMessage, "Command — History", msgSourceDisplay)
 				if err != nil {
 					log.Println(lg("History", "", color.HiRedString,
 						logPrefix+"Failed to send command embed message:\t%s", err))
@@ -233,9 +240,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					logPrefix+fmtBotSendPerm, commandingMessage.ChannelID))
 			}
 		}
-		log.Println(lg("History", "", color.HiCyanString,
-			logPrefix+"Began checking history for %s #%s...",
-			getGuildName(getChannelGuildID(subjectChannelID)), getChannelName(subjectChannelID)))
+		log.Println(lg("History", "", color.HiCyanString, logPrefix+"Began checking history for \"%s\"...", sourceName))
 
 		lastMessageID := ""
 	MessageRequestingLoop:
@@ -258,14 +263,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					status := fmt.Sprintf(
 						"``%s:`` **%s files downloaded**\n``"+
 							"%s messages processed``\n\n"+
-							"`Server:` **%s**\n"+
-							"`Channel:` _#%s_\n\n"+
+							"%s\n"+
 							"%s`(%d)` _Processing more messages, please wait..._",
 						durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(totalDownloads),
 						formatNumber(totalMessages),
-						getGuildName(getChannelGuildID(subjectChannelID)),
-						getChannelName(subjectChannelID),
-						rangeContent, messageRequestCount)
+						msgSourceDisplay, rangeContent, messageRequestCount)
 					if responseMsg == nil {
 						log.Println(lg("History", "", color.RedString,
 							logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
@@ -320,7 +322,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						log.Println(lg("History", "", color.HiRedString,
 							logPrefix+fmtBotSendPerm, responseMsg.ChannelID))
 					} else {
-						_, err = replyEmbed(responseMsg, "Command — History", fmt.Sprintf("Encountered an error requesting messages for %s: %s", subjectChannelID, err.Error()))
+						_, err = replyEmbed(responseMsg, "Command — History",
+							fmt.Sprintf("Encountered an error requesting messages for %s: %s", subjectChannelID, err.Error()))
 						if err != nil {
 							log.Println(lg("History", "", color.HiRedString,
 								logPrefix+"Failed to send error message:\t%s", err))
@@ -416,21 +419,21 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 
 		// Final log
-		log.Println(lg("History", "", color.HiCyanString, logPrefix+"Finished history, %s files", formatNumber(totalDownloads)))
+		log.Println(lg("History", "", color.HiGreenString, logPrefix+"Finished history for \"%s\", %s files",
+			sourceName,
+			formatNumber(totalDownloads)))
 		// Final status update
 		if sendStatus {
 			status := fmt.Sprintf(
 				"``%s:`` **%s total files downloaded!**\n"+
 					"``%s total messages processed``\n\n"+
-					"`Server:` **%s**\n"+
-					"`Channel:` _#%s_\n\n"+
+					"%s\n"+ // msgSourceDisplay^
 					"**DONE!** - %s\n"+
 					"Ran ``%d`` message history requests\n\n"+
 					"%s_Duration was %s_",
 				durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
 				formatNumber(int64(totalMessages)),
-				getGuildName(getChannelGuildID(subjectChannelID)),
-				getChannelName(subjectChannelID),
+				msgSourceDisplay,
 				historyStatusLabel(historyJobs[subjectChannelID].Status),
 				messageRequestCount,
 				rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
@@ -439,9 +442,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				log.Println(lg("History", "", color.HiRedString, logPrefix+fmtBotSendPerm, responseMsg.ChannelID))
 			} else {
 				if responseMsg == nil {
-					log.Println(lg("History", "", color.RedString, logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
+					log.Println(lg("History", "", color.RedString,
+						logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
 					if _, err = replyEmbed(responseMsg, "Command — History", status); err != nil { // Failed to Edit Status, Send New Message
-						log.Println(lg("History", "", color.HiRedString, logPrefix+"Failed to send replacement status message:\t%s", err))
+						log.Println(lg("History", "", color.HiRedString,
+							logPrefix+"Failed to send replacement status message:\t%s", err))
 					}
 				} else {
 					if selfbot {
@@ -456,9 +461,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 					// Edit failure
 					if err != nil {
-						log.Println(lg("History", "", color.RedString, logPrefix+"Failed to edit status message, sending new one:\t%s", err))
+						log.Println(lg("History", "", color.RedString,
+							logPrefix+"Failed to edit status message, sending new one:\t%s", err))
 						if _, err = replyEmbed(responseMsg, "Command — History", status); err != nil {
-							log.Println(lg("History", "", color.HiRedString, logPrefix+"Failed to send replacement status message:\t%s", err))
+							log.Println(lg("History", "", color.HiRedString,
+								logPrefix+"Failed to send replacement status message:\t%s", err))
 						}
 					}
 				}
