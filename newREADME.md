@@ -194,6 +194,7 @@ Argument / Flag         | Details
 **channel ID(s)**       | One or more channel IDs, separated by commas if multiple.
 `all`                   | Use all available registered channels.
 `cancel` or `stop`      | Stop downloading history for specified channel(s).
+`list` or `status`      | Output running history jobs in Discord & program.
 `--since=YYYY-MM-DD`    | Will process messages sent after this date.
 `--since=message_id`    | Will process messages sent after this message.
 `--before=YYYY-MM-DD`   | Will process messages sent before this date.
@@ -214,6 +215,8 @@ Argument / Flag         | Details
 * `ddg history 000111000111000 --since=2020-01-02`
 * `ddg history 000111000111000 --since=2020-10-12 --before=2021-05-06`
 * `ddg history 000111000111000 --since=000555000555000 --before=2021-05-06`
+* `ddg history status`
+* `ddg history list`
 
 </details>
 
@@ -226,6 +229,8 @@ When initially launching the bot it will create a default settings file if you d
 
 **If you have a ``config.ini`` from _Seklfreak's discord-image-downloader-go_, it will import settings if it's in the same folder as the program.**
 
+The bot accepts `.json` or `.jsonc` for comment-friendly json.
+
 ---
 
 ## 🛠 List of Settings
@@ -236,7 +241,7 @@ aaa
 
 ## ❔ FAQ
 * ***Q: How do I install?***
-* **A: [SEE #getting-started](#getting-started)** 
+* **A: [SEE #getting-started](#%EF%B8%8F-getting-started)** 
 ---
 * ***Q: How do I convert from Seklfreak's discord-image-downloader-go?***
 * **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
