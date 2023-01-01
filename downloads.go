@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
 	"github.com/rivo/duplo"
@@ -964,7 +965,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Format Filename
-		completePath := filepath.Clean(download.Path + subfolder + dynamicKeyReplacement(channelConfig, download))
+		filename := dynamicKeyReplacement(channelConfig, download)
+		download.Path = download.Path + subfolder
+		download.Filename = filename
+		completePath := filepath.Clean(download.Path + download.Filename)
 
 		// Check if filepath exists
 		if _, err := os.Stat(completePath); err == nil {
@@ -1008,6 +1012,12 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
 			}
 
+			fileinfo, err := os.Stat(completePath)
+			filesize := "unknown"
+			if err == nil {
+				filesize = humanize.Bytes(uint64(fileinfo.Size()))
+			}
+
 			dlColor := color.HiGreenString
 			msgTimestamp := ""
 			if download.HistoryCmd {
@@ -1015,10 +1025,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent %sin \"%s / %s\" from \"%s\" to %s (%s)",
-				strings.ToUpper(contentTypeFound), msgTimestamp, sourceName, sourceChannelName,
-				condenseString(download.InputURL, 50), download.Path+subfolder,
-				durafmt.ParseShort(time.Since(download.StartTime)).String()))
+				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t%s",
+				strings.ToUpper(contentTypeFound), msgTimestamp, color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
+				color.GreenString("from %s to \"%s%s\" (%s, %s, %0.1f MB/s)", parsedURL.Hostname(), download.Path, download.Filename,
+					durafmt.ParseShort(time.Since(download.StartTime)).String(), filesize, float64(fileinfo.Size()/1000000)/time.Since(download.StartTime).Seconds())))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",

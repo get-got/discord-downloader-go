@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
 	"runtime"
 	"strconv"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/AvraamMavridis/randomcolor"
 	"github.com/aidarkhanov/nanoid/v2"
 	"github.com/bwmarrin/discordgo"
+	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
 	"github.com/teris-io/shortid"
@@ -289,10 +291,17 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			domain = parsedURL.Hostname()
 		}
 
+		fileinfo, err := os.Stat(download.Path + download.Filename)
+		filesize := "unknown"
+		if err == nil {
+			filesize = humanize.Bytes(uint64(fileinfo.Size()))
+		}
+
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
 			{"{{fileType}}", download.FileExtension},
+			{"{{fileSize}}", filesize},
 			{"{{messageID}}", download.Message.ID},
 			{"{{userID}}", userID},
 			{"{{username}}", username},

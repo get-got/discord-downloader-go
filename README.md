@@ -1098,6 +1098,7 @@ Key                     | Description
 `{{date}}`              | Timestamp
 `{{file}}`              | Filename
 `{{fileType}}`          | File type
+`{{fileSize}}`          | File size short (43 MB, 24 kB, etc)
 `{{messageID}}`         | Source Message ID
 `{{userID}}`            | Source Author User ID
 `{{username}}`          | Source Author Username
