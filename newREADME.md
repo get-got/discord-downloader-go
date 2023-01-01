@@ -47,16 +47,15 @@ This project is a cross-platform command-line program to interact with a Discord
 
 ---
 
-<h2 align="center">Table of Contents</h2>
-
 <h3 align="center">
-    <a href="#Features"><b>- List of Features -</b></a><br>
-    <a href="#getting-started"><b>- Getting Started -</b></a><br>
-    <a href="#guide-downloading-history-old-messages"><b>- Guide: Downloading History <i>(Old Messages)</i> -</b></a><br>
-    <a href="#guide-settings--configuration"><b>- Guide: Settings / Configuration -</b></a><br>
-    <a href="#list-of-settings"><b>- List of Settings -</b></a><br>
-    <a href="#faq"><b>- FAQ (Frequently Asked Questions) -</b></a><br>
-    <a href="#development"><b>- Development, Credits, Dependencies -</b></a><br>
+    Table of Contents<br><br>
+    <a href="#Features"><b>- List of Features -</b></a><br><br>
+    <a href="#getting-started"><b>- Getting Started -</b></a><br><br>
+    <a href="#guide-downloading-history-old-messages"><b>- Guide: Downloading History <i>(Old Messages)</i> -</b></a><br><br>
+    <a href="#guide-settings--configuration"><b>- Guide: Settings / Configuration -</b></a><br><br>
+    <a href="#list-of-settings"><b>- List of Settings -</b></a><br><br>
+    <a href="#faq"><b>- FAQ (Frequently Asked Questions) -</b></a><br><br>
+    <a href="#development"><b>- Development, Credits, Dependencies -</b></a><br><br>
 </h3>
 
 ---
