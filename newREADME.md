@@ -36,7 +36,7 @@
     </a>
 </h2><br>
 
-This project is a cross-platform command-line program to interact with a Discord Bot (genuine bot application or user account) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _(see list below)._ It also supports **very extensive** global, server-specific, category-specific, channel-specific, and user-specific settings configuration and customization. Tailor the bot to your exact needs. See the [Features](#Features) list below for the full list. Any operating system supported by the latest version of Golang is compatible.
+This project is a cross-platform command-line program to interact with a Discord Bot (genuine bot application or user account) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _([see list below](#supported-download-sources))._ It also supports **very extensive** global, server-specific, category-specific, channel-specific, and user-specific settings configuration and customization. Tailor the bot to your exact needs. See the [Features](#-Features) list below for the full list. Any operating system supported by the latest version of Golang is compatible.
 
 <h3 align="center">
     <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
@@ -49,13 +49,13 @@ This project is a cross-platform command-line program to interact with a Discord
 
 <h3 align="center">
     Table of Contents<br><br>
-    <a href="#Features"><b>- 🤖 List of Features -</b></a><br><br>
+    <a href="#-Features"><b>- 🤖 List of Features -</b></a><br><br>
     <a href="#getting-started"><b>- ✔️ Getting Started -</b></a><br><br>
-    <a href="#guide-downloading-history-old-messages"><b>- 📚 Guide: Downloading History <i>(Old Messages)</i> -</b></a><br><br>
-    <a href="#guide-settings--configuration"><b>- 🔨 Guide: Settings / Configuration -</b></a><br><br>
-    <a href="#list-of-settings"><b>- 🛠 List of Settings -</b></a><br><br>
-    <a href="#faq"><b>- ❔ FAQ (Frequently Asked Questions) -</b></a><br><br>
-    <a href="#development"><b>- ⚙️ Development, Credits, Dependencies -</b></a><br><br>
+    <a href="#-guide-downloading-history-old-messages"><b>- 📚 Guide: Downloading History <i>(Old Messages)</i> -</b></a><br><br>
+    <a href="#-guide-settings--configuration"><b>- 🔨 Guide: Settings / Configuration -</b></a><br><br>
+    <a href="#-list-of-settings"><b>- 🛠 List of Settings -</b></a><br><br>
+    <a href="#-faq"><b>- ❔ FAQ (Frequently Asked Questions) -</b></a><br><br>
+    <a href="#-development"><b>- ⚙️ Development, Credits, Dependencies -</b></a><br><br>
 </h3>
 
 ---
