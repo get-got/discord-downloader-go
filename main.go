@@ -286,7 +286,7 @@ func main() {
 
 			case <-tickerCheckup.C:
 				if config.DebugOutput {
-					str := fmt.Sprintf("Routine Checkup ... %dms latency, last discord heartbeat %s ago, %s uptime",
+					str := fmt.Sprintf(" ... %dms latency, last discord heartbeat %s ago, %s uptime",
 						bot.HeartbeatLatency().Milliseconds(),
 						durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)), durafmt.ParseShort(time.Since(startTime)))
 					if !timeLastMessage.IsZero() {

@@ -980,12 +980,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 
 			dlColor := color.HiGreenString
+			msgTimestamp := ""
 			if download.HistoryCmd {
 				dlColor = color.HiCyanString
+				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent in %s#%s from \"%s\" to %s",
-				strings.ToUpper(contentTypeFound), sourceName, sourceChannelName, condenseString(download.InputURL, 50), download.Path+subfolder))
+				logPrefix+"SAVED %s sent %sin %s#%s from \"%s\" to %s",
+				strings.ToUpper(contentTypeFound), msgTimestamp, sourceName, sourceChannelName, condenseString(download.InputURL, 50), download.Path+subfolder))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
