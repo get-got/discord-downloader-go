@@ -26,7 +26,7 @@
         <img src="https://img.shields.io/discord/780985109608005703?logo=discord"alt="Join the Discord">
     </a>
 </p>
-<h3 align="center">
+<h2 align="center">
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
         <b>DOWNLOAD LATEST RELEASE</b>
     </a>
@@ -34,7 +34,7 @@
     <a href="https://discord.com/invite/6Z6FJZVaDV">
         <b>Need help? Have suggestions? Join the Discord server!</b>
     </a>
-</h3>
+</h2><br>
 
 This project is a cross-platform command-line program to interact with a Discord Bot (genuine bot application or user account) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _(see list below)._ It also supports **very extensive** global, server-specific, category-specific, channel-specific, and user-specific settings configuration and customization. Tailor the bot to your exact needs. See the [Features](#Features) list below for the full list. Any operating system supported by the latest version of Golang is compatible.
 
@@ -47,14 +47,17 @@ This project is a cross-platform command-line program to interact with a Discord
 
 ---
 
-### Table of Contents
-* [**List of Features**](#Features)
-* [**Getting Started**](#getting-started)
-* [**Guide: Downloading History _(Old Messages)_**](#guide-downloading-history-old-messages)
-* [**Guide: Settings / Configuration**](#guide-settings--configuration)
-* [**List of Settings**](#list-of-settings)
-* [**FAQ (Frequently Asked Questions)**](#faq)
-* [**Development, Credits, Dependencies**](#development)
+<h2 align="center">Table of Contents</h2>
+
+<h3 align="center">
+    <a href="#Features"><b>- List of Features -</b></a><br>
+    <a href="#getting-started"><b>- Getting Started -</b></a><br>
+    <a href="#guide-downloading-history-old-messages"><b>- Guide: Downloading History <i>(Old Messages)</i> -</b></a><br>
+    <a href="#guide-settings--configuration"><b>- Guide: Settings / Configuration -</b></a><br>
+    <a href="#list-of-settings"><b>- List of Settings -</b></a><br>
+    <a href="#faq"><b>- FAQ (Frequently Asked Questions) -</b></a><br>
+    <a href="#development"><b>- Development, Credits, Dependencies -</b></a><br>
+</h3>
 
 ---
 
