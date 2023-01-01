@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"runtime"
 	"strconv"
 	"strings"
@@ -268,6 +269,26 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			username = download.Message.Author.Username
 		}
 
+		channelName := download.Message.ChannelID
+		categoryID := download.Message.ChannelID
+		categoryName := download.Message.ChannelID
+		guildName := download.Message.GuildID
+		if chinfo, err := bot.State.Channel(download.Message.ChannelID); err == nil {
+			channelName = chinfo.Name
+			categoryID = chinfo.ParentID
+			if catinfo, err := bot.State.Channel(categoryID); err == nil {
+				categoryName = catinfo.Name
+			}
+		}
+		if guildinfo, err := bot.State.Guild(download.Message.GuildID); err == nil {
+			guildName = guildinfo.Name
+		}
+
+		domain := "unknown"
+		if parsedURL, err := url.Parse(download.InputURL); err == nil {
+			domain = parsedURL.Hostname()
+		}
+
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
@@ -276,8 +297,14 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			{"{{userID}}", userID},
 			{"{{username}}", username},
 			{"{{channelID}}", download.Message.ChannelID},
+			{"{{channelName}}", channelName},
+			{"{{categoryID}}", categoryID},
+			{"{{categoryName}}", categoryName},
 			{"{{serverID}}", download.Message.GuildID},
+			{"{{serverName}}", guildName},
 			{"{{message}}", clearPath(download.Message.Content)},
+			{"{{url}}", clearPath(download.InputURL)},
+			{"{{domain}}", domain},
 			{"{{nanoID}}", nanoID},
 			{"{{shortID}}", shortID},
 		}
