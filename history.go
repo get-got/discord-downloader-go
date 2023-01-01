@@ -234,7 +234,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 		}
 		log.Println(lg("History", "", color.HiCyanString,
-			logPrefix+"Began checking history for %s...", subjectChannelID))
+			logPrefix+"Began checking history for %s #%s...",
+			getGuildName(getChannelGuildID(subjectChannelID)), getChannelName(subjectChannelID)))
 
 		lastMessageID := ""
 	MessageRequestingLoop:
@@ -251,8 +252,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 				// Update Status
 				log.Println(lg("History", "", color.CyanString,
-					logPrefix+"Requesting 100 more, %d downloaded, %d processed — Before %s",
-					totalDownloads, totalMessages, beforeTime))
+					logPrefix+"Requesting 100 more, %d downloaded, %d processed — Before %s ago (%s)",
+					totalDownloads, totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
 				if sendStatus {
 					status := fmt.Sprintf(
 						"``%s:`` **%s files downloaded**\n``"+
@@ -311,8 +312,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			// Request More Messages
 			msg_rq_cnt := 0
 		request_messages:
+			msg_rq_cnt++
 			if messages, err := bot.ChannelMessages(subjectChannelID, 100, beforeID, sinceID, ""); err != nil {
-				msg_rq_cnt++
 				// Error requesting messages
 				if sendStatus {
 					if !hasPermsToRespond {
@@ -343,7 +344,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							historyJobs[subjectChannelID] = job
 						}
 						break MessageRequestingLoop
-					} else {
+					} else { // retry to make sure no more
+						time.Sleep(10 * time.Millisecond)
 						goto request_messages
 					}
 				}

@@ -824,13 +824,14 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		// Names
+
 		sourceChannelName := download.Message.ChannelID
 		sourceName := "UNKNOWN"
 		sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
 		if sourceChannel != nil {
 			// Channel Naming
 			if sourceChannel.Name != "" {
-				sourceChannelName = "\"" + sourceChannel.Name + "\""
+				sourceChannelName = "#" + sourceChannel.Name
 			}
 			switch sourceChannel.Type {
 			case discordgo.ChannelTypeGuildText:
@@ -838,7 +839,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if sourceChannel.GuildID != "" {
 					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
 					if sourceGuild != nil && sourceGuild.Name != "" {
-						sourceName = "\"" + sourceGuild.Name + "\""
+						sourceName = sourceGuild.Name
 					}
 				}
 				// Category Naming
@@ -846,7 +847,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
 					if sourceParent != nil {
 						if sourceParent.Name != "" {
-							sourceChannelName = "\"" + sourceParent.Name + "\" - " + sourceChannelName
+							sourceChannelName = sourceParent.Name + " / " + sourceChannelName
 						}
 					}
 				}
@@ -986,7 +987,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent %sin %s#%s from \"%s\" to %s",
+				logPrefix+"SAVED %s sent %sin \"%s / %s\" from \"%s\" to %s",
 				strings.ToUpper(contentTypeFound), msgTimestamp, sourceName, sourceChannelName, condenseString(download.InputURL, 50), download.Path+subfolder))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
