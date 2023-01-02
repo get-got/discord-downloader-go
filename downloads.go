@@ -715,6 +715,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		if err != nil {
 			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
 		}
+		domain := parsedURL.Hostname()
 
 		// Check extension
 		if channelConfig.Filters.AllowedExtensions != nil || channelConfig.Filters.BlockedExtensions != nil {
@@ -772,12 +773,12 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			}
 
 			if channelConfig.Filters.BlockedDomains != nil {
-				if stringInSlice(parsedURL.Hostname(), *channelConfig.Filters.BlockedDomains) {
+				if stringInSlice(domain, *channelConfig.Filters.BlockedDomains) {
 					shouldAbort = true
 				}
 			}
 			if channelConfig.Filters.AllowedDomains != nil {
-				if stringInSlice(parsedURL.Hostname(), *channelConfig.Filters.AllowedDomains) {
+				if stringInSlice(domain, *channelConfig.Filters.AllowedDomains) {
 					shouldAbort = false
 				}
 			}
@@ -786,7 +787,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if shouldAbort {
 				if !download.HistoryCmd {
 					log.Println(lg("Download", "Skip", color.GreenString,
-						"Unpermitted domain (%s) found at %s", parsedURL.Hostname(), download.InputURL))
+						"Unpermitted domain (%s) found at %s", domain, download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedDomain)
 			}
@@ -1035,7 +1036,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t%s",
 				strings.ToUpper(contentTypeFound), msgTimestamp,
 				color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
-				color.GreenString("from %s to \"%s%s\"\t\t%s", parsedURL.Hostname(), download.Path, download.Filename,
+				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
 					color.WhiteString("(%s, %s, %0.1f %s)",
 						filesize, durafmt.ParseShort(time.Since(download.StartTime)).String(), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
 		} else {
