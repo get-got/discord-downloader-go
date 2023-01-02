@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"image"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -426,10 +427,11 @@ type downloadRequestStruct struct {
 	StartTime      time.Time
 }
 
-func handleDownload(download downloadRequestStruct) downloadStatusStruct {
+func handleDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 	status := mDownloadStatus(downloadFailed)
+	var tempfilesize int64 = -1
 	for i := 0; i < config.DownloadRetryMax; i++ {
-		status = tryDownload(download)
+		status, tempfilesize = tryDownload(download)
 		if status.Status < downloadFailed || status.Status == downloadFailedCode404 { // Success or Skip
 			break
 		} else {
@@ -595,10 +597,10 @@ func handleDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 	}
 
-	return status
+	return status, tempfilesize
 }
 
-func tryDownload(download downloadRequestStruct) downloadStatusStruct {
+func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 	var err error
 
 	cachedDownloadID++
@@ -608,6 +610,8 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 	if download.HistoryCmd {
 		logPrefix = "HISTORY "
 	}
+
+	var fileinfo fs.FileInfo
 
 	var channelConfig configurationSource
 	channelDefault(&channelConfig)
@@ -619,13 +623,13 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 
 		// Source validation
 		if _, err = url.ParseRequestURI(download.InputURL); err != nil {
-			return mDownloadStatus(downloadFailedInvalidSource, err)
+			return mDownloadStatus(downloadFailedInvalidSource, err), 0
 		}
 
 		// Clean/fix path
 		if download.Path == "" || download.Path == string(os.PathSeparator) {
 			log.Println(lg("Download", "", color.HiRedString, "Destination cannot be empty path..."))
-			return mDownloadStatus(downloadFailedInvalidPath, err)
+			return mDownloadStatus(downloadFailedInvalidPath, err), 0
 		}
 		if !strings.HasSuffix(download.Path, string(os.PathSeparator)) {
 			download.Path = download.Path + string(os.PathSeparator)
@@ -636,7 +640,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			log.Println(lg("Download", "", color.HiRedString,
 				"Error while creating destination folder \"%s\": %s",
 				download.Path, err))
-			return mDownloadStatus(downloadFailedCreatingFolder, err)
+			return mDownloadStatus(downloadFailedCreatingFolder, err), 0
 		}
 
 		// Request
@@ -648,7 +652,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36")
 		if err != nil {
 			log.Println(lg("Download", "", color.HiRedString, "Error while requesting \"%s\": %s", download.InputURL, err))
-			return mDownloadStatus(downloadFailedRequesting, err)
+			return mDownloadStatus(downloadFailedRequesting, err), 0
 		}
 		request.Header.Add("Accept-Encoding", "identity")
 		response, err := client.Do(request)
@@ -658,7 +662,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					"Error while receiving response from \"%s\": %s",
 					download.InputURL, err))
 			}
-			return mDownloadStatus(downloadFailedDownloadingResponse, err)
+			return mDownloadStatus(downloadFailedDownloadingResponse, err), 0
 		}
 		defer response.Body.Close()
 
@@ -668,7 +672,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			log.Println(lg("Download", "", color.HiRedString,
 				"Could not read response from \"%s\": %s",
 				download.InputURL, err))
-			return mDownloadStatus(downloadFailedReadResponse, err)
+			return mDownloadStatus(downloadFailedReadResponse, err), 0
 		}
 
 		// Errors
@@ -676,9 +680,9 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			log.Println(lg("Download", "", color.HiRedString, logPrefix+"DOWNLOAD FAILED, %d %s: %s",
 				response.StatusCode, http.StatusText(response.StatusCode), download.InputURL))
 			if response.StatusCode == 404 {
-				return mDownloadStatus(downloadFailedCode404, err)
+				return mDownloadStatus(downloadFailedCode404, err), 0
 			} else {
-				return mDownloadStatus(downloadFailedCode, err)
+				return mDownloadStatus(downloadFailedCode, err), 0
 			}
 		}
 
@@ -740,7 +744,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if !download.HistoryCmd {
 					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted extension (%s) found at %s", extension, download.InputURL))
 				}
-				return mDownloadStatus(downloadSkippedUnpermittedExtension)
+				return mDownloadStatus(downloadSkippedUnpermittedExtension), 0
 			}
 		}
 
@@ -789,7 +793,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					log.Println(lg("Download", "Skip", color.GreenString,
 						"Unpermitted domain (%s) found at %s", domain, download.InputURL))
 				}
-				return mDownloadStatus(downloadSkippedUnpermittedDomain)
+				return mDownloadStatus(downloadSkippedUnpermittedDomain), 0
 			}
 		}
 
@@ -803,7 +807,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				log.Println(lg("Download", "Skip", color.GreenString,
 					"Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
 			}
-			return mDownloadStatus(downloadSkippedUnpermittedType)
+			return mDownloadStatus(downloadSkippedUnpermittedType), 0
 		}
 
 		// Duplicate Image Filter
@@ -820,7 +824,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					if match.Score < config.FilterDuplicateImagesThreshold {
 						log.Println(lg("Download", "Skip", color.GreenString,
 							"Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
-						return mDownloadStatus(downloadSkippedDetectedDuplicate)
+						return mDownloadStatus(downloadSkippedDetectedDuplicate), 0
 					}
 				}
 				imgStore.Add(cachedDownloadID, hash)
@@ -874,7 +878,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
 				log.Println(lg("Download", "", color.HiRedString,
 					"Error while creating server subfolder \"%s\": %s", download.Path, err))
-				return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 			}
 		}
 		// Subfolder Division - Month Nesting
@@ -889,7 +893,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
 				log.Println(lg("Download", "", color.HiRedString,
 					"Error while creating server subfolder \"%s\": %s", download.Path, err))
-				return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 			}
 		}
 		// Subfolder Division - Server Nesting
@@ -905,7 +909,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
 					log.Println(lg("Download", "", color.HiRedString,
 						"Error while creating server subfolder \"%s\": %s", download.Path, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 				}
 			}
 		}
@@ -921,7 +925,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
 					log.Println(lg("Download", "", color.HiRedString,
 						"Error while creating channel subfolder \"%s\": %s", download.Path, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 				}
 			}
 		}
@@ -938,7 +942,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
 					log.Println(lg("Download", "", color.HiRedString,
 						"Error while creating user subfolder \"%s\": %s", download.Path, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 				}
 			}
 		}
@@ -960,7 +964,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
 					log.Println(lg("Download", "", color.HiRedString,
 						"Error while creating type subfolder \"%s\": %s", download.Path+subfolder, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err)
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 				}
 			}
 		}
@@ -995,7 +999,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					log.Println(lg("Download", "Skip", color.GreenString,
 						"Matching filenames, possible duplicate..."))
 				}
-				return mDownloadStatus(downloadSkippedDuplicate)
+				return mDownloadStatus(downloadSkippedDuplicate), 0
 			}
 		}
 
@@ -1004,7 +1008,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 			if err = ioutil.WriteFile(completePath, bodyOfResp, 0644); err != nil {
 				log.Println(lg("Download", "", color.HiRedString,
 					"Error while writing file to disk \"%s\": %s", download.InputURL, err))
-				return mDownloadStatus(downloadFailedWritingFile, err)
+				return mDownloadStatus(downloadFailedWritingFile, err), 0
 			}
 
 			// Change file time
@@ -1013,10 +1017,10 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 					logPrefix+"Error while changing metadata date \"%s\": %s", download.InputURL, err))
 			}
 
-			fileinfo, err := os.Stat(completePath)
 			filesize := "unknown"
 			speed := 0.0
 			speedlabel := "kB/s"
+			fileinfo, err = os.Stat(completePath)
 			if err == nil {
 				filesize = humanize.Bytes(uint64(fileinfo.Size()))
 				speed = float64(fileinfo.Size() / humanize.KByte)
@@ -1033,7 +1037,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
 			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t%s",
+				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t\t%s",
 				strings.ToUpper(contentTypeFound), msgTimestamp,
 				color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
 				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
@@ -1060,7 +1064,7 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		})
 		if err != nil {
 			log.Println(lg("Download", "", color.HiRedString, "Error writing to database: %s", err))
-			return mDownloadStatus(downloadFailedWritingDatabase, err)
+			return mDownloadStatus(downloadFailedWritingDatabase, err), 0
 		}
 
 		// React
@@ -1224,8 +1228,8 @@ func tryDownload(download downloadRequestStruct) downloadStatusStruct {
 		}
 
 		timeLastDownload = time.Now()
-		return mDownloadStatus(downloadSuccess)
+		return mDownloadStatus(downloadSuccess), fileinfo.Size()
 	}
 
-	return mDownloadStatus(downloadIgnored)
+	return mDownloadStatus(downloadIgnored), 0
 }

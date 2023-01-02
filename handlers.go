@@ -30,10 +30,10 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	}
 }
 
-func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
+func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int64) {
 	// Ignore own messages unless told not to
 	if m.Author.ID == botUser.ID && !config.ScanOwnMessages {
-		return -1
+		return -1, 0
 	}
 
 	if !history && !edited {
@@ -64,11 +64,11 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 	if channelConfig := getSource(m); channelConfig != emptyConfig {
 		// Ignore bots if told to do so
 		if m.Author.Bot && *channelConfig.IgnoreBots {
-			return -1
+			return -1, 0
 		}
 		// Ignore if told so by config
 		if (!history && !*channelConfig.Enabled) || (edited && !*channelConfig.ScanEdits) {
-			return -1
+			return -1, 0
 		}
 
 		m = fixMessage(m)
@@ -301,12 +301,13 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 						"%s Filter decided to ignore message...",
 						color.HiMagentaString("(FILTER)")))
 				}
-				return -1
+				return -1, 0
 			}
 		}
 
 		// Process Files
-		var downloadCount int64
+		var downloadCount int64 = 0
+		var totalfilesize int64 = 0
 		files := getFileLinks(m)
 		for _, file := range files {
 			if file.Link == "" {
@@ -315,7 +316,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			if config.DebugOutput && !history {
 				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link))
 			}
-			status := handleDownload(
+			status, filesize := handleDownload(
 				downloadRequestStruct{
 					InputURL:   file.Link,
 					Filename:   file.Filename,
@@ -328,12 +329,13 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				})
 			if status.Status == downloadSuccess {
 				downloadCount++
+				totalfilesize += filesize
 			}
 		}
-		return downloadCount
+		return downloadCount, totalfilesize
 	}
 
-	return -1
+	return -1, 0
 }
 
 //#endregion

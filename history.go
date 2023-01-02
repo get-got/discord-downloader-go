@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
 )
@@ -60,6 +61,8 @@ type historyJob struct {
 	TargetChannelID         string
 	TargetBefore            string
 	TargetSince             string
+	DownloadCount           int64
+	DownloadSize            int64
 	Updated                 time.Time
 	Added                   time.Time
 }
@@ -81,6 +84,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	var totalMessages int64 = 0
 	var totalDownloads int64 = 0
+	var totalFilesize int64 = 0
 	var messageRequestCount int = 0
 
 	var responseMsg *discordgo.Message = &discordgo.Message{}
@@ -257,15 +261,16 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 				// Update Status
 				log.Println(lg("History", "", color.CyanString,
-					logPrefix+"Requesting 100 more, %d downloaded, %d processed — Before %s ago (%s)",
-					totalDownloads, totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
+					logPrefix+"Requesting 100 more, %d downloaded (%s), %d processed — Before %s ago (%s)",
+					totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
 				if sendStatus {
 					status := fmt.Sprintf(
-						"``%s:`` **%s files downloaded**\n``"+
-							"%s messages processed``\n\n"+
+						"``%s:`` **%s files downloaded...** `(%s so far, avg %1.1f MB/s)`\n``"+
+							"%s messages processed...``\n\n"+
 							"%s\n\n"+
 							"%s`(%d)` _Processing more messages, please wait..._",
 						durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(totalDownloads),
+						humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/time.Since(historyStartTime).Seconds(),
 						formatNumber(totalMessages),
 						msgSourceDisplay, rangeContent, messageRequestCount)
 					if responseMsg == nil {
@@ -403,9 +408,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 
 					// Process Message
-					downloadCount := handleMessage(message, false, true)
+					downloadCount, filesize := handleMessage(message, false, true)
 					if downloadCount > 0 {
 						totalDownloads += downloadCount
+						totalFilesize += filesize
 					}
 					totalMessages++
 				}
@@ -419,19 +425,19 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 
 		// Final log
-		log.Println(lg("History", "", color.HiGreenString, logPrefix+"Finished history for \"%s\", %s files",
-			sourceName,
-			formatNumber(totalDownloads)))
+		log.Println(lg("History", "", color.HiGreenString, logPrefix+"Finished history for \"%s\", %s files, %s total",
+			sourceName, formatNumber(totalDownloads), humanize.Bytes(uint64(totalFilesize))))
 		// Final status update
 		if sendStatus {
 			status := fmt.Sprintf(
-				"``%s:`` **%s total files downloaded!**\n"+
+				"``%s:`` **%s total files downloaded!** `%s total, avg %1.1f MB/s`\n"+
 					"``%s total messages processed``\n\n"+
 					"%s\n\n"+ // msgSourceDisplay^
 					"**DONE!** - %s\n"+
 					"Ran ``%d`` message history requests\n\n"+
 					"%s_Duration was %s_",
 				durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
+				humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/time.Since(historyStartTime).Seconds(),
 				formatNumber(int64(totalMessages)),
 				msgSourceDisplay,
 				historyStatusLabel(historyJobs[subjectChannelID].Status),

@@ -334,7 +334,7 @@ func handleCommands() *exrouter.Route {
 							nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)
 						}
 						log.Println(lg("Command", "History", color.HiMagentaString,
-							"Queueing history job for \"%s\" (%s)...", nameDisplay, channel))
+							"Queueing history job for \"%s\"\t\t(%s) ...", nameDisplay, channel))
 					}
 					if !isBotAdmin(ctx.Msg) {
 						log.Println(lg("Command", "History", color.CyanString,
@@ -462,7 +462,7 @@ func handleCommands() *exrouter.Route {
 									message.ChannelID = ctx.Msg.ChannelID
 									url := "https://cdn.discordapp.com/emojis/" + emoji.ID
 
-									status := handleDownload(
+									status, _ := handleDownload(
 										downloadRequestStruct{
 											InputURL:   url,
 											Filename:   emoji.ID,

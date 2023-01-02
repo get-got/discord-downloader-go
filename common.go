@@ -389,7 +389,7 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		pp = color.YellowString("? ")
 	}
 
-	return pp + colorPrefix + " " + colorFunc(line, p...)
+	return "\t" + pp + colorPrefix + " " + colorFunc(line, p...)
 }
 
 //#endregion
