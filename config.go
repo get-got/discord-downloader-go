@@ -1057,6 +1057,30 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	return false
 }
 
+func getBoundUsers() []string {
+	var users []string
+	for _, item := range config.Users {
+		if item.UserID != "" {
+			if !stringInSlice(item.UserID, users) {
+				users = append(users, item.UserID)
+			}
+		} else if item.UserIDs != nil {
+			for _, subuser := range *item.UserIDs {
+				if subuser != "" {
+					if !stringInSlice(subuser, users) {
+						users = append(users, subuser)
+					}
+				}
+			}
+		}
+	}
+	return users
+}
+
+func getBoundUsersCount() int {
+	return len(getBoundUsers())
+}
+
 func getBoundServers() []string {
 	var servers []string
 	for _, item := range config.Servers {
@@ -1103,6 +1127,30 @@ func getBoundChannels() []string {
 
 func getBoundChannelsCount() int {
 	return len(getBoundChannels())
+}
+
+func getBoundCategories() []string {
+	var categories []string
+	for _, item := range config.Categories {
+		if item.CategoryID != "" {
+			if !stringInSlice(item.CategoryID, categories) {
+				categories = append(categories, item.CategoryID)
+			}
+		} else if item.CategoryIDs != nil {
+			for _, subcategory := range *item.CategoryIDs {
+				if subcategory != "" {
+					if !stringInSlice(subcategory, categories) {
+						categories = append(categories, subcategory)
+					}
+				}
+			}
+		}
+	}
+	return categories
+}
+
+func getBoundCategoriesCount() int {
+	return len(getBoundCategories())
 }
 
 func getAllRegisteredChannels() []string {

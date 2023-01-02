@@ -198,7 +198,9 @@ func dataKeyReplacement(input string) string {
 			{"{{countShort}}", formatNumberShort(countInt)},
 			{"{{numServers}}", fmt.Sprint(len(bot.State.Guilds))},
 			{"{{numBoundChannels}}", fmt.Sprint(getBoundChannelsCount())},
+			{"{{numBoundCategories}}", fmt.Sprint(getBoundCategoriesCount())},
 			{"{{numBoundServers}}", fmt.Sprint(getBoundServersCount())},
+			{"{{numBoundUsers}}", fmt.Sprint(getBoundUsersCount())},
 			{"{{numAdminChannels}}", fmt.Sprint(len(config.AdminChannels))},
 			{"{{numAdmins}}", fmt.Sprint(len(config.Admins))},
 			{"{{timeSavedShort}}", timeLastUpdated.Format("3:04pm")},
@@ -542,7 +544,12 @@ func sendStatusMessage(status sendStatusType) {
 				message += fmt.Sprintf("%s %s and connected to %d server%s...\n", projectLabel, sendStatusLabel(status), len(bot.State.Guilds), pluralS(len(bot.State.Guilds)))
 				message += fmt.Sprintf("\n• Uptime is %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
-				message += fmt.Sprintf("\n• Bound to %d channel%s and %d server%s", getBoundChannelsCount(), pluralS(getBoundChannelsCount()), getBoundServersCount(), pluralS(getBoundServersCount()))
+				message += fmt.Sprintf("\n• Bound to %d channel%s, %d categories, %d server%s, %d user%s",
+					getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+					getBoundCategoriesCount(),
+					getBoundServersCount(), pluralS(getBoundServersCount()),
+					getBoundUsersCount(), pluralS(getBoundUsersCount()),
+				)
 				if config.All != nil {
 					message += "\n• **ALL MODE ENABLED -** Bot will use all available channels"
 				}
@@ -561,7 +568,12 @@ func sendStatusMessage(status sendStatusType) {
 				message += fmt.Sprintf("%s %s...\n", projectLabel, sendStatusLabel(status))
 				message += fmt.Sprintf("\n• Uptime was %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
-				message += fmt.Sprintf("\n• Bound to %d channel%s and %d server%s", getBoundChannelsCount(), pluralS(getBoundChannelsCount()), getBoundServersCount(), pluralS(getBoundServersCount()))
+				message += fmt.Sprintf("\n• Bound to %d channel%s, %d categories, %d server%s, %d user%s",
+					getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+					getBoundCategoriesCount(),
+					getBoundServersCount(), pluralS(getBoundServersCount()),
+					getBoundUsersCount(), pluralS(getBoundUsersCount()),
+				)
 			}
 			// Send
 			if config.DebugOutput {

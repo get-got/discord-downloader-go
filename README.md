@@ -1064,7 +1064,9 @@ Key | Description
 `{{count}}`                 | Raw total count of downloads
 `{{countShort}}`            | Shortened total count of downloads
 `{{numServers}}`            | Number of servers bot is in
+`{{numBoundUsers}}`         | Number of bound users
 `{{numBoundServers}}`       | Number of bound servers
+`{{numBoundCategories}}`    | Number of bound categories
 `{{numBoundChannels}}`      | Number of bound channels
 `{{numAdminChannels}}`      | Number of admin channels
 `{{numAdmins}}`             | Number of designated admins

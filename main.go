@@ -113,9 +113,16 @@ func init() {
 func main() {
 	//#region Config
 	loadConfig()
-	log.Println(lg("Settings", "", color.HiYellowString, "Loaded - bound to %d channel%s and %d server%s",
+	allString := ""
+	if config.All != nil {
+		allString = ", ALL ENABLED"
+	}
+	log.Println(lg("Settings", "", color.HiYellowString,
+		"Loaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
 		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+		getBoundCategoriesCount(),
 		getBoundServersCount(), pluralS(getBoundServersCount()),
+		getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
 	))
 	//#endregion
 
@@ -439,10 +446,16 @@ func main() {
 						log.Println(lg("Settings", "Watcher", color.YellowString,
 							"Detected changes in \"%s\", reloading...", configFile))
 						loadConfig()
+						allString := ""
+						if config.All != nil {
+							allString = ", ALL ENABLED"
+						}
 						log.Println(lg("Settings", "Watcher", color.HiYellowString,
-							"Reloaded - bound to %d channel%s and %d server%s",
+							"Reloaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
 							getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+							getBoundCategoriesCount(),
 							getBoundServersCount(), pluralS(getBoundServersCount()),
+							getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
 						))
 
 						updateDiscordPresence()

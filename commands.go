@@ -111,14 +111,18 @@ func handleCommands() *exrouter.Route {
 					"• **Started at —** %s\n"+
 					"• **Joined Servers —** %d\n"+
 					"• **Bound Channels —** %d\n"+
+					"• **Bound Cagetories —** %d\n"+
 					"• **Bound Servers —** %d\n"+
+					"• **Bound Users —** %d\n"+
 					"• **Admin Channels —** %d\n"+
 					"• **Heartbeat Latency —** %dms",
 					durafmt.Parse(time.Since(startTime)).String(),
 					startTime.Format("03:04:05pm on Monday, January 2, 2006 (MST)"),
 					len(bot.State.Guilds),
 					getBoundChannelsCount(),
+					getBoundCategoriesCount(),
 					getBoundServersCount(),
+					getBoundUsersCount(),
 					len(config.AdminChannels),
 					bot.HeartbeatLatency().Milliseconds(),
 				)
