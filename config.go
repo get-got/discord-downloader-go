@@ -49,6 +49,7 @@ type configurationCredentials struct {
 var (
 	// Setup
 	defConfig_DebugOutput          bool   = false
+	defConfig_SettingsOutput       bool   = true
 	defConfig_MessageOutput        bool   = true
 	defConfig_CommandPrefix        string = "ddg "
 	defConfig_ScanOwnMessages      bool   = false
@@ -76,6 +77,7 @@ func defaultConfiguration() configuration {
 
 		DiscordLogLevel:     discordgo.LogError,
 		DebugOutput:         defConfig_DebugOutput,
+		SettingsOutput:      defConfig_SettingsOutput,
 		MessageOutput:       defConfig_MessageOutput,
 		CheckupRate:         30,
 		ConnectionCheckRate: 5,
@@ -122,6 +124,7 @@ type configuration struct {
 	// Main
 	DiscordLogLevel     int  `json:"discordLogLevel,omitempty"`     // optional, defaults
 	DebugOutput         bool `json:"debugOutput"`                   // optional, defaults
+	SettingsOutput      bool `json:"settingsOutput"`                // optional, defaults
 	MessageOutput       bool `json:"messageOutput"`                 // optional, defaults
 	CheckupRate         int  `json:"checkupRate,omitempty"`         // optional, defaults
 	ConnectionCheckRate int  `json:"connectionCheckRate,omitempty"` // optional, defaults
@@ -446,8 +449,8 @@ func loadConfig() {
 			adminChannelDefault(&config.AdminChannels[i])
 		}
 
-		// Debug Output
-		if config.DebugOutput {
+		// Settings Output
+		if config.SettingsOutput {
 			dupeConfig := config
 			if dupeConfig.Credentials.Token != "" && dupeConfig.Credentials.Token != placeholderToken {
 				dupeConfig.Credentials.Token = "STRIPPED_FOR_OUTPUT"

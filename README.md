@@ -628,6 +628,10 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.debugOutput : boolean_
     * _Default:_ `false`
     * Output debugging information.
+* :small_blue_diamond: "settingsOutput"
+    * — _settings.settingsOutput : boolean_
+    * _Default:_ `true`
+    * Output parsed settings on launch or reload.
 * :small_blue_diamond: "messageOutput"
     * — _settings.messageOutput : boolean_
     * _Default:_ `true`
