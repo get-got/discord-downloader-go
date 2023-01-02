@@ -220,10 +220,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		categoryName := getChannelCategoryName(subjectChannelID)
 		channelName := getChannelName(subjectChannelID)
 		sourceName := fmt.Sprintf("%s / %s", guildName, channelName)
-		msgSourceDisplay := fmt.Sprintf("`Server:` **%s**\n`Channel:` _#%s_", guildName, channelName)
+		msgSourceDisplay := fmt.Sprintf("`Server:` **%s**\n`Channel:` #%s", guildName, channelName)
 		if categoryName != "unknown" {
 			sourceName = fmt.Sprintf("%s / %s / %s", guildName, categoryName, channelName)
-			msgSourceDisplay = fmt.Sprintf("`Server:` **%s**\n`Category:` %s\n`Channel:` _#%s_",
+			msgSourceDisplay = fmt.Sprintf("`Server:` **%s**\n`Category:` _%s_\n`Channel:` #%s",
 				guildName, categoryName, channelName)
 		}
 
@@ -263,7 +263,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					status := fmt.Sprintf(
 						"``%s:`` **%s files downloaded**\n``"+
 							"%s messages processed``\n\n"+
-							"%s\n"+
+							"%s\n\n"+
 							"%s`(%d)` _Processing more messages, please wait..._",
 						durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(totalDownloads),
 						formatNumber(totalMessages),
@@ -427,7 +427,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			status := fmt.Sprintf(
 				"``%s:`` **%s total files downloaded!**\n"+
 					"``%s total messages processed``\n\n"+
-					"%s\n"+ // msgSourceDisplay^
+					"%s\n\n"+ // msgSourceDisplay^
 					"**DONE!** - %s\n"+
 					"Ran ``%d`` message history requests\n\n"+
 					"%s_Duration was %s_",

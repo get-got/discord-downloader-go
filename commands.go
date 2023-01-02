@@ -261,7 +261,8 @@ func handleCommands() *exrouter.Route {
 						beforeID = before
 					}
 					if config.DebugOutput {
-						log.Println(lg("Command", "History", color.CyanString, "Date range applied, before %s", beforeID))
+						log.Println(lg("Command", "History", color.CyanString, "Date before range applied, snowflake %s, converts back to %s",
+							beforeID, discordSnowflakeToTimestamp(beforeID, "2006-01-02T15:04:05.000Z07:00")))
 					}
 				} else if strings.Contains(strings.ToLower(argValue), "--since=") { //  since key
 					since = strings.ReplaceAll(strings.ToLower(argValue), "--since=", "")
@@ -271,7 +272,8 @@ func handleCommands() *exrouter.Route {
 						sinceID = since
 					}
 					if config.DebugOutput {
-						log.Println(lg("Command", "History", color.CyanString, "Date range applied, since %s", sinceID))
+						log.Println(lg("Command", "History", color.CyanString, "Date since range applied, snowflake %s, converts back to %s",
+							sinceID, discordSnowflakeToTimestamp(sinceID, "2006-01-02T15:04:05.000Z07:00")))
 					}
 				} else {
 					// Actual Source ID(s)
@@ -321,12 +323,18 @@ func handleCommands() *exrouter.Route {
 				// Foreach Channel
 				for _, channel := range channels {
 					if config.DebugOutput {
-						label := channel
+						nameGuild := channel
 						if chinfo, err := bot.State.Channel(channel); err == nil {
-							label = chinfo.GuildID + "#" + chinfo.Name
+							nameGuild = getGuildName(chinfo.GuildID)
 						}
-						log.Println(lg("Command", "History", color.GreenString,
-							"Queueing history job for %s...", label))
+						nameCategory := getChannelCategoryName(channel)
+						nameChannel := getChannelName(channel)
+						nameDisplay := fmt.Sprintf("%s / %s", nameGuild, nameChannel)
+						if nameCategory != "unknown" {
+							nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)
+						}
+						log.Println(lg("Command", "History", color.HiMagentaString,
+							"Queueing history job for \"%s\" (%s)...", nameDisplay, channel))
 					}
 					if !isBotAdmin(ctx.Msg) {
 						log.Println(lg("Command", "History", color.CyanString,
