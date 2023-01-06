@@ -63,6 +63,12 @@ This project is a cross-platform command-line program to interact with a Discord
     - [Examples](#examples)
 - [🔨 Guide: Settings / Configuration](#-guide-settings--configuration)
 - [🛠 List of Settings](#-list-of-settings)
+  - [main](#main)
+  - [credentials group](#credentials-group)
+  - [adminChannels group](#adminchannels-group)
+  - [source group](#source-group)
+  - [source / filters group](#source--filters-group)
+  - [source / log group](#source--log-group)
 - [❔ FAQ](#-faq)
 - [⚙️ Development](#️-development)
   - [Credits \& Dependencies](#credits--dependencies)
@@ -122,6 +128,7 @@ Command     | Arguments? | Description
 _Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)_
 
 Depending on your purpose for this program, there are various ways you can run it.
+
 - [Run the executable file for your platform. _(Process managers like **pm2** work well for this)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run the executable file via command prompt. _(`discord-downloader-go.exe settings2` or similar to run multiple instances sharing a database with separate settings files)_](https://github.com/get-got/discord-downloader-go/releases/latest)
 - [Run automated image builds in Docker.](https://hub.docker.com/r/getgot/discord-downloader-go) _(Google it)._
@@ -132,8 +139,11 @@ Depending on your purpose for this program, there are various ways you can run i
 - Install Golang and compile/run the source code yourself. _(Google it)_
 
 You can either create a `settings.json` following the examples & variables listed below, or have the program create a default file (if it is missing when you run the program, it will make one, and ask you if you want to enter in basic info for the new file).
+
 - [Ensure you follow proper JSON syntax to avoid any unexpected errors.](https://www.w3schools.com/js/js_json_syntax.asp)
 - [Having issues? Try this JSON Validator to ensure it's correctly formatted.](https://jsonformatter.curiousconcept.com/)
+
+[![Tutorial Video](http://img.youtube.com/vi/06UUXDQ80f8/0.jpg)](http://www.youtube.com/watch?v=06UUXDQ80f8)
 
 ### Getting Started Step-by-Step
 
@@ -143,7 +153,7 @@ You can either create a `settings.json` following the examples & variables liste
 4. Put your Discord User ID as in the `"admins"` list of the settings. [_(SEE BELOW)_](#list-of-settings)
 5. Put a Discord Channel ID for a private channel you have access to into the `"adminChannels"`. [_(SEE BELOW)_](#list-of-settings)
 6. Put your desired Discord Channel IDs into the `"channels"` section. [_(SEE BELOW)_](#list-of-settings)
-- I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
+   - I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
 
 ### Bot Login Credentials
 
@@ -210,24 +220,24 @@ Argument / Flag         | Details
 `--before=YYYY-MM-DD`   | Will process messages sent before this date.
 `--before=message_id`   | Will process messages sent before this message.
 
-***Order of arguments does not matter.***
+**_Order of arguments does not matter_**
 
 #### Examples
 
-* `ddg history`
-* `ddg history cancel`
-* `ddg history all`
-* `ddg history stop all`
-* `ddg history 000111000111000`
-* `ddg history 000111000111000, 000222000222000`
-* `ddg history 000111000111000,000222000222000,000333000333000`
-* `ddg history 000111000111000, 000333000333000 cancel`
-* `ddg history 000111000111000 --before=000555000555000`
-* `ddg history 000111000111000 --since=2020-01-02`
-* `ddg history 000111000111000 --since=2020-10-12 --before=2021-05-06`
-* `ddg history 000111000111000 --since=000555000555000 --before=2021-05-06`
-* `ddg history status`
-* `ddg history list`
+- `ddg history`
+- `ddg history cancel`
+- `ddg history all`
+- `ddg history stop all`
+- `ddg history 000111000111000`
+- `ddg history 000111000111000, 000222000222000`
+- `ddg history 000111000111000,000222000222000,000333000333000`
+- `ddg history 000111000111000, 000333000333000 cancel`
+- `ddg history 000111000111000 --before=000555000555000`
+- `ddg history 000111000111000 --since=2020-01-02`
+- `ddg history 000111000111000 --since=2020-10-12 --before=2021-05-06`
+- `ddg history 000111000111000 --since=000555000555000 --before=2021-05-06`
+- `ddg history status`
+- `ddg history list`
 
 ---
 
@@ -247,6 +257,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE BRACKETS.
 
+### main
+
 | SETTING KEY         | TYPE                                    | DEFAULT    | DESCRIPTION                                                          | EXAMPLE                           |
 | :-----------------: | --------------------------------------- | :--------: | -------------------------------------------------------------------- | --------------------------------- |
 | credentials         | `credentials group`                     |            | See `credentials group` below.                                       |                                   |
@@ -256,6 +268,15 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 | debugOutput         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debugOutput": true,`            |
 | messageOutput       | boolean <br/>(true or false)            | true       | Enables discord message output.                                      | `"messageOutput": true,`          |
 
+### credentials group
+
+### adminChannels group
+
+### source group
+
+### source / filters group
+
+### source / log group
 
 ---
 
