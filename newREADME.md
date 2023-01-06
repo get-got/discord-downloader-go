@@ -227,7 +227,10 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 Setting Key         | Type                              | Default       | Description                                               | Example
 ---                 | ---                               | ---           | ---                                                       | ---
 credentials         | `credentials group`               |               | See `credentials group` below.                        |
-admins              | array of strings                  | None          | Discord IDs of users to use admin commands.           | ```"admins": [ "111", "222" ],```
+admins              | array of strings                  | None          | Discord IDs of users to use admin commands.           |
+```
+"admins": [ "111", "222" ],
+```
 adminChannels       | array of `adminChannel groups`    | None          | See `adminChannel group` below.                       |
 discordLogLevel     | int (whole number)                | 0 (errors)    | 0 = Errors, 1 = Warning, 2 = Informational, 3 = Debug | ```"discordLogLevel": 2,```
 debugOutput         | boolean (true or false)           | false         | Enables extra output for narrowing down problems.     | ```"debugOutput": true,```
