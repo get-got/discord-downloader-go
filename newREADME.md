@@ -47,20 +47,32 @@ This project is a cross-platform command-line program to interact with a Discord
 
 ---
 
-<h3 align="center">
-    Table of Contents<br><br>
-    <a href="#-Features"><b>- 🤖 List of Features -</b></a><br><br>
-    <a href="#%EF%B8%8F-getting-started"><b>- ✔️ Getting Started -</b></a><br><br>
-    <a href="#-guide-downloading-history-old-messages"><b>- 📚 Guide: Downloading History <i>(Old Messages)</i> -</b></a><br><br>
-    <a href="#-guide-settings--configuration"><b>- 🔨 Guide: Settings / Configuration -</b></a><br><br>
-    <a href="#-list-of-settings"><b>- 🛠 List of Settings -</b></a><br><br>
-    <a href="#-faq"><b>- ❔ FAQ (Frequently Asked Questions) -</b></a><br><br>
-    <a href="#%EF%B8%8F-development"><b>- ⚙️ Development, Credits, Dependencies -</b></a><br><br>
-</h3>
+- [**WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)](#warning-discord-does-not-allow-automated-user-accounts-self-botsuser-bots)
+- [🤖 Features](#-features)
+  - [Supported Download Sources](#supported-download-sources)
+  - [Commands](#commands)
+- [✔️ Getting Started](#️-getting-started)
+  - [Getting Started Step-by-Step](#getting-started-step-by-step)
+  - [Bot Login Credentials](#bot-login-credentials)
+  - [Bot Permissions in Discord](#bot-permissions-in-discord)
+    - [NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED](#note-genuine-discord-bots-require-permissions-enabled)
+  - [How to Find Discord IDs](#how-to-find-discord-ids)
+  - [Differences from Seklfreak's _discord-image-downloader-go_ \& Why I made this](#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this)
+- [📚 Guide: Downloading History (Old Messages)](#-guide-downloading-history-old-messages)
+  - [Command Arguments](#command-arguments)
+    - [Examples](#examples)
+- [🔨 Guide: Settings / Configuration](#-guide-settings--configuration)
+- [🛠 List of Settings](#-list-of-settings)
+- [❔ FAQ](#-faq)
+- [⚙️ Development](#️-development)
+  - [Credits \& Dependencies](#credits--dependencies)
+    - [Core Dependencies](#core-dependencies)
+    - [Other Dependencies](#other-dependencies)
 
 ---
 
 ## **WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
+
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
 While this project works for user logins, I do not reccomend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
@@ -74,21 +86,23 @@ Now that that's out of the way...
 ## 🤖 Features
 
 ### Supported Download Sources
-* Discord File Attachments
-* Direct Links to Files
-* Twitter _(requires API key, see config section)_
-* Instagram [BROKEN, WORKING ON IT]
-* Reddit [BROKEN, WORKING ON IT]
-* Imgur _(Single Posts & Albums)_
-* Streamable
-* Gfycat
-* Tistory
-* Mastodon [BROKEN, WORKING ON IT]
-* Flickr _(requires API key, see config section)_
-* Google Drive _(requires API Credentials, see config section)_
-* _I'll always welcome requests but some sources can be tricky to parse..._
+
+- Discord File Attachments
+- Direct Links to Files
+- Twitter _(requires API key, see config section)_
+- Instagram [BROKEN, WORKING ON IT]
+- Reddit [BROKEN, WORKING ON IT]
+- Imgur _(Single Posts & Albums)_
+- Streamable
+- Gfycat
+- Tistory
+- Mastodon [BROKEN, WORKING ON IT]
+- Flickr _(requires API key, see config section)_
+- Google Drive _(requires API Credentials, see config section)_
+- _I'll always welcome requests but some sources can be tricky to parse..._
   
 ### Commands
+
 Commands are used as `ddg <command> <?arguments?>` _(unless you've changed the prefix)_
 Command     | Arguments? | Description
 ---         | ---   | ---
@@ -122,6 +136,7 @@ You can either create a `settings.json` following the examples & variables liste
 - [Having issues? Try this JSON Validator to ensure it's correctly formatted.](https://jsonformatter.curiousconcept.com/)
 
 ### Getting Started Step-by-Step
+
 1. Download & put executable within it's own folder.
 2. Configure Main Settings (or run once to have settings generated). [_(SEE BELOW)_](#list-of-settings)
 3. Enter your login credentials in the `"credentials"` section. [_(SEE BELOW)_](#list-of-settings)
@@ -130,42 +145,47 @@ You can either create a `settings.json` following the examples & variables liste
 6. Put your desired Discord Channel IDs into the `"channels"` section. [_(SEE BELOW)_](#list-of-settings)
 - I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
 
-### Bot Login Credentials...
-* If using a **Bot Application,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
-* If using a **User Account (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
-* If using a **User Account (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
+### Bot Login Credentials
 
-### Bot Permissions in Discord...
-* In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
-* In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
-* In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
+- If using a **Bot Application,** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). **To create a Bot User,** go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a `New Application`. Once created, go to `Bot` and create. The token can be found on the `Bot` page. To invite to your server(s), go to `OAuth2` and check `"bot"`, copy the url, paste into browser and follow prompts for adding to server(s).
+- If using a **User Account (Self-Bot),** fill out the `"username"` and `"password"` settings. Remove the line for `"token"` or leave blank (`""`).
+- If using a **User Account (Self-Bot) with 2FA (Two-Factor Authentication),** enter the token into the `"token"` setting. Remove the lines for `"username"` and `"password"` or leave blank (`""`). Token can be found from `Developer Tools` in browser under `localStorage.token` or in the Discord client `Ctrl+Shift+I (Windows)`/`Cmd+Option+I (Mac)` under `Application → Local Storage → https://discordapp.com → "token"`.
 
-#### NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED!
-* Go to the Discord Application management page, choose your application, go to the `Bot` category, and ensure `Message Content Intent` is enabled.
+### Bot Permissions in Discord
+
+- In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
+- In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
+- In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
+
+#### NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED
+
+- Go to the Discord Application management page, choose your application, go to the `Bot` category, and ensure `Message Content Intent` is enabled.
 
 <img src="https://i.imgur.com/2GcyA2B.png"/>
 
-### How to Find Discord IDs...
-* ***Use the info command!***
-* **Discord Developer Mode:** Enable `Developer Mode` in Discord settings under `Appearance`.
-* **Finding Channel ID:** _Enable Discord Developer Mode (see above),_ right click on the channel and `Copy ID`.
-* **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
-* **Finding Emoji ID:** _Enable Discord Developer Mode (see above),_ right click on the emoji and `Copy ID`.
-* **Finding DM/PM ID:** Inspect Element on the DM icon for the desired user. Look for `href="/channels/@me/CHANNEL_ID_HERE"`. Using this ID in place of a normal channel ID should work perfectly fine.
+### How to Find Discord IDs
+
+- ***Use the info command!***
+- **Discord Developer Mode:** Enable `Developer Mode` in Discord settings under `Appearance`.
+- **Finding Channel ID:** _Enable Discord Developer Mode (see above),_ right click on the channel and `Copy ID`.
+- **Finding User ID:** _Enable Discord Developer Mode (see above),_ right click on the user and `Copy ID`.
+- **Finding Emoji ID:** _Enable Discord Developer Mode (see above),_ right click on the emoji and `Copy ID`.
+- **Finding DM/PM ID:** Inspect Element on the DM icon for the desired user. Look for `href="/channels/@me/CHANNEL_ID_HERE"`. Using this ID in place of a normal channel ID should work perfectly fine.
 
 ---
 
 ### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
-* _Better command formatting & support_
-* Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
-* Channel-specific control of downloaded filetypes / content types (considers things like .mov as videos as well, rather than ignore them), Optional dividing of content types into separate folders.
-* **Download Support for Reddit & Mastodon.**
-* (Optional) Reactions upon download success.
-* (Optional) Discord messages upon encountered errors.
-* Extensive bot status/presence customization.
-* Consistent Log Formatting, Color-Coded Logging
-* Somewhat different organization than original project; initially created from scratch then components ported over.
-* _Various fixes, improvements, and dependency updates that I also contributed to Seklfreak's original project._
+
+- _Better command formatting & support_
+- Configuration is JSON-based rather than ini to allow more elaborate settings and better organization. With this came many features such as channel-specific settings.
+- Channel-specific control of downloaded filetypes / content types (considers things like .mov as videos as well, rather than ignore them), Optional dividing of content types into separate folders.
+- **Download Support for Reddit & Mastodon.**
+- (Optional) Reactions upon download success.
+- (Optional) Discord messages upon encountered errors.
+- Extensive bot status/presence customization.
+- Consistent Log Formatting, Color-Coded Logging
+- Somewhat different organization than original project; initially created from scratch then components ported over.
+- _Various fixes, improvements, and dependency updates that I also contributed to Seklfreak's original project._
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
@@ -176,6 +196,7 @@ You can either create a `settings.json` following the examples & variables liste
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
 
 ### Command Arguments
+
 If no channel IDs are specified, it will try and use the channel ID for the channel you're using the command in.
 
 Argument / Flag         | Details
@@ -192,6 +213,7 @@ Argument / Flag         | Details
 ***Order of arguments does not matter.***
 
 #### Examples
+
 * `ddg history`
 * `ddg history cancel`
 * `ddg history all`
@@ -210,6 +232,7 @@ Argument / Flag         | Details
 ---
 
 ## 🔨 Guide: Settings / Configuration
+
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax **(watch those commas)**. Most settings are optional and will use default values or be unused if missing from your settings file.
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` manually. All JSON settings follow camelCase format.
@@ -226,39 +249,46 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 
 | SETTING KEY         | TYPE                                    | DEFAULT    | DESCRIPTION                                                          | EXAMPLE                           |
 | :-----------------: | --------------------------------------- | :--------: | -------------------------------------------------------------------- | --------------------------------- |
-| credentials         | `credentials group`                     |            | <small>See `credentials group` below.                                        </small> |                                   |
-| admins              | array of <br/>strings                   | None       | <small>Discord IDs of users<br/> to use admin commands.                      </small> | `"admins": [ "0", "0" ],`         |
-| adminChannels       | array of <br/>`adminChannel groups`     | None       | <small>See `adminChannel group` below.                                       </small> |                                   |
-| discordLogLevel     | int (whole number)                      | 0 (errors) | <small>0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug  </small> | `"discordLogLevel": 2,`           |
-| debugOutput         | boolean <br/>(true or false)            | false      | <small>Enables extra output for narrowing down problems.                     </small> | `"debugOutput": true,`            |
-| messageOutput       | boolean <br/>(true or false)            | true       | <small>Enables discord message output.                                       </small> | `"messageOutput": true,`          |
+| credentials         | `credentials group`                     |            | See `credentials group` below.                                       |                                   |
+| admins              | array of <br/>strings                   | None       | Discord IDs of users<br/> to use admin commands.                     | `"admins": [ "0", "0" ],`         |
+| adminChannels       | array of <br/>`adminChannel groups`     | None       | See `adminChannel group` below.                                      |                                   |
+| discordLogLevel     | int (whole number)                      | 0 (errors) | 0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug | `"discordLogLevel": 2,`           |
+| debugOutput         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debugOutput": true,`            |
+| messageOutput       | boolean <br/>(true or false)            | true       | Enables discord message output.                                      | `"messageOutput": true,`          |
 
 
 ---
 
 ## ❔ FAQ
-* ***Q: How do I install?***
-* **A: [SEE #getting-started](#%EF%B8%8F-getting-started)** 
+
+- **_Q: How do I install?_**
+- **A: [SEE #getting-started](#%EF%B8%8F-getting-started)** 
+
 ---
-* ***Q: How do I convert from Seklfreak's discord-image-downloader-go?***
-* **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
+
+- **_Q: How do I convert from Seklfreak's discord-image-downloader-go?_**
+- **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
 
 ---
 
 ## ⚙️ Development
-* I'm a complete amateur with Golang. If anything's bad please make a pull request.
-* Versioning is `[MAJOR].[MINOR].[PATCH]`
+
+- I'm a complete amateur with Golang. If anything's bad please make a pull request.
+- Versioning is `[MAJOR].[MINOR].[PATCH]`
 
 ### Credits & Dependencies
+
 * [github.com/Seklfreak/discord-image-downloader-go - the original project this was founded on](https://github.com/Seklfreak/discord-image-downloader-go)
 
 #### Core Dependencies
+
 * [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo) - I modify the latest versions to re-support user accounts, see [github.com/get-got/discordgo](https://github.com/get-got/discordgo)
 * [github.com/Necroforger/dgrouter](https://github.com/Necroforger/dgrouter)
 * [github.com/HouzuoGuo/tiedot/db](https://github.com/HouzuoGuo/tiedot)
 * [github.com/fatih/color](https://github.com/fatih/color)
 
 #### Other Dependencies
+
 * [github.com/AvraamMavridis/randomcolor](https://github.com/AvraamMavridis/randomcolor)
 * [github.com/ChimeraCoder/anaconda](https://github.com/ChimeraCoder/anaconda)
 * [github.com/ChimeraCoder/tokenbucket](https://github.com/ChimeraCoder/tokenbucket)
