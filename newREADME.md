@@ -71,9 +71,6 @@ This project is a cross-platform command-line program to interact with a Discord
   - [source / log group](#source--log-group)
 - [❔ FAQ](#-faq)
 - [⚙️ Development](#️-development)
-  - [Credits \& Dependencies](#credits--dependencies)
-    - [Core Dependencies](#core-dependencies)
-    - [Other Dependencies](#other-dependencies)
 
 ---
 
@@ -296,37 +293,4 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 
 - I'm a complete amateur with Golang. If anything's bad please make a pull request.
 - Versioning is `[MAJOR].[MINOR].[PATCH]`
-
-### Credits & Dependencies
-
-* [github.com/Seklfreak/discord-image-downloader-go - the original project this was founded on](https://github.com/Seklfreak/discord-image-downloader-go)
-
-#### Core Dependencies
-
-* [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo) - I modify the latest versions to re-support user accounts, see [github.com/get-got/discordgo](https://github.com/get-got/discordgo)
-* [github.com/Necroforger/dgrouter](https://github.com/Necroforger/dgrouter)
-* [github.com/HouzuoGuo/tiedot/db](https://github.com/HouzuoGuo/tiedot)
-* [github.com/fatih/color](https://github.com/fatih/color)
-
-#### Other Dependencies
-
-* [github.com/AvraamMavridis/randomcolor](https://github.com/AvraamMavridis/randomcolor)
-* [github.com/ChimeraCoder/anaconda](https://github.com/ChimeraCoder/anaconda)
-* [github.com/ChimeraCoder/tokenbucket](https://github.com/ChimeraCoder/tokenbucket)
-* [github.com/Jeffail/gabs](https://github.com/Jeffail/gabs)
-* [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery)
-* [github.com/azr/backoff](https://github.com/azr/backoff)
-* [github.com/dustin/go-jsonpointer](https://github.com/dustin/go-jsonpointer)
-* [github.com/dustin/gojson](https://github.com/dustin/gojson)
-* [github.com/fsnotify/fsnotify](https://github.com/fsnotify/fsnotify)
-* [github.com/garyburd/go-oauth](https://github.com/garyburd/go-oauth)
-* [github.com/hako/durafmt](https://github.com/hako/durafmt)
-* [github.com/hashicorp/go-version](https://github.com/hashicorp/go-version)
-* [github.com/kennygrant/sanitize](https://github.com/kennygrant/sanitize)
-* [github.com/nfnt/resize](https://github.com/nfnt/resize)
-* [github.com/rivo/duplo](https://github.com/rivo/duplo)
-* [golang.org/x/net](https://golang.org/x/net)
-* [golang.org/x/oauth2](https://golang.org/x/oauth2)
-* [google.golang.org/api](https://google.golang.org/api)
-* [gopkg.in/ini.v1](https://gopkg.in/ini.v1)
-* [mvdan.cc/xurls/v2](https://mvdan.cc/xurls/v2)
+- [github.com/Seklfreak/discord-image-downloader-go - the original project this was founded on](https://github.com/Seklfreak/discord-image-downloader-go)
