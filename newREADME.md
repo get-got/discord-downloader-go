@@ -73,9 +73,6 @@ Now that that's out of the way...
 
 ## 🤖 Features
 
-<details>
-<summary><b><i>(COLLAPSABLE SECTION)</i> LIST OF FEATURES & COMMANDS</b></summary>
-
 ### Supported Download Sources
 * Discord File Attachments
 * Direct Links to Files
@@ -104,13 +101,9 @@ Command     | Arguments? | Description
 `exit`, `kill`, `reload`    | No    | **(BOT ADMINS ONLY)** Exits the bot _(or restarts if using a keep-alive process manager)_.
 `emojis`    | Optionally specify server IDs to download emojis from; separate by commas | **(BOT ADMINS ONLY)** Saves all emojis for channel.
 
-</details>
-
 ---
 
 ## ✔️ Getting Started
-<details>
-<summary><b><i>(COLLAPSABLE SECTION)</i> GETTING STARTED, HOW-TO, OTHER INFO...</b></summary>
 
 _Confused? Try looking at [the step-by-step list.](#getting-started-step-by-step)_
 
@@ -176,13 +169,9 @@ You can either create a `settings.json` following the examples & variables liste
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
 
-</details>
-
 ---
 
 ## 📚 Guide: Downloading History (Old Messages)
-<details>
-<summary><b><i>(COLLAPSABLE SECTION)</i> HISTORY GUIDE</b></summary>
 
 > This guide is to show you how to make the bot go through all old messages in a channel and catalog them as though they were being sent right now, in order to download them all.
 
@@ -217,8 +206,6 @@ Argument / Flag         | Details
 * `ddg history 000111000111000 --since=000555000555000 --before=2021-05-06`
 * `ddg history status`
 * `ddg history list`
-
-</details>
 
 ---
 
@@ -262,9 +249,6 @@ messageOutput       | boolean (true or false)           | true          | Enable
 * I'm a complete amateur with Golang. If anything's bad please make a pull request.
 * Versioning is `[MAJOR].[MINOR].[PATCH]`
 
-<details>
-<summary><b><i>(COLLAPSABLE SECTION)</i> CREDITS & SOURCES</b></summary>
-
 ### Credits & Dependencies
 * [github.com/Seklfreak/discord-image-downloader-go - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
 
@@ -295,5 +279,3 @@ messageOutput       | boolean (true or false)           | true          | Enable
 * [google.golang.org/api](https://google.golang.org/api)
 * [gopkg.in/ini.v1](https://gopkg.in/ini.v1)
 * [mvdan.cc/xurls/v2](https://mvdan.cc/xurls/v2)
-  
-</details>
