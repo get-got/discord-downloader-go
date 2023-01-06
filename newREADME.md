@@ -210,7 +210,7 @@ Argument / Flag         | Details
 ---
 
 ## 🔨 Guide: Settings / Configuration
-> I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax (watch those commas). All settings specified below labeled `[DEFAULTS]` will use default values if missing from the settings file, and those labeled `[OPTIONAL]` will not be used if missing from the settings file.
+> I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax **(watch those commas)**. Most settings are optional and will use default values or be unused if missing from your settings file.
 
 When initially launching the bot it will create a default settings file if you do not create your own `settings.json` manually. All JSON settings follow camelCase format.
 
@@ -224,14 +224,14 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE BRACKETS.
 
-Setting Key         | Type                              | Default       | Description                                           | Example
----                 | ---                               | ---           | ---                                                   | ---
+Setting Key         | Type                              | Default       | Description                                               | Example
+---                 | ---                               | ---           | ---                                                       | ---
 credentials         | `credentials group`               |               | See `credentials group` below.                        |
-admins              | array of strings                  | None          | Discord IDs of users to use admin commands.           | `"admins": [ "111", "222" ],`
+admins              | array of strings                  | None          | Discord IDs of users to use admin commands.           | ```"admins": [ "111", "222" ],```
 adminChannels       | array of `adminChannel groups`    | None          | See `adminChannel group` below.                       |
-discordLogLevel     | int (whole number)                | 0 (errors)    | 0 = Errors, 1 = Warning, 2 = Informational, 3 = Debug | `"discordLogLevel": 2,`
-debugOutput         | boolean (true or false)           | false         | Enables extra output for narrowing down problems.     | `"debugOutput": true,`
-messageOutput       | boolean (true or false)           | true          | Enables discord message output.                       | `"messageOutput": true,`
+discordLogLevel     | int (whole number)                | 0 (errors)    | 0 = Errors, 1 = Warning, 2 = Informational, 3 = Debug | ```"discordLogLevel": 2,```
+debugOutput         | boolean (true or false)           | false         | Enables extra output for narrowing down problems.     | ```"debugOutput": true,```
+messageOutput       | boolean (true or false)           | true          | Enables discord message output.                       | ```"messageOutput": true,```
 
 
 ---
@@ -250,10 +250,10 @@ messageOutput       | boolean (true or false)           | true          | Enable
 * Versioning is `[MAJOR].[MINOR].[PATCH]`
 
 ### Credits & Dependencies
-* [github.com/Seklfreak/discord-image-downloader-go - the original project this originated from](https://github.com/Seklfreak/discord-image-downloader-go)
+* [github.com/Seklfreak/discord-image-downloader-go - the original project this was founded on](https://github.com/Seklfreak/discord-image-downloader-go)
 
 #### Core Dependencies
-* [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo)
+* [github.com/bwmarrin/discordgo](https://github.com/bwmarrin/discordgo) - I modify the latest versions to re-support user accounts, see [github.com/get-got/discordgo](https://github.com/get-got/discordgo)
 * [github.com/Necroforger/dgrouter](https://github.com/Necroforger/dgrouter)
 * [github.com/HouzuoGuo/tiedot/db](https://github.com/HouzuoGuo/tiedot)
 * [github.com/fatih/color](https://github.com/fatih/color)
