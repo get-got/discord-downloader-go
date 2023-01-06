@@ -226,12 +226,12 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 
 | SETTING KEY         | TYPE                                    | DEFAULT    | DESCRIPTION                                                          | EXAMPLE                           |
 | :-----------------: | --------------------------------------- | :--------: | -------------------------------------------------------------------- | --------------------------------- |
-| credentials         | `credentials group`                     |            | See `credentials group` below.                                       |                                   |
-| admins              | array of <br/>strings                   | None       | Discord IDs of users<br/> to use admin commands.                     | `"admins": [ "0", "0" ],`         |
-| adminChannels       | array of <br/>`adminChannel groups`     | None       | See `adminChannel group` below.                                      |                                   |
-| discordLogLevel     | int (whole number)                      | 0 (errors) | 0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug | `"discordLogLevel": 2,`           |
-| debugOutput         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debugOutput": true,`            |
-| messageOutput       | boolean <br/>(true or false)            | true       | Enables discord message output.                                      | `"messageOutput": true,`          |
+| credentials         | `credentials group`                     |            | <small>See `credentials group` below.                                        </small> |                                   |
+| admins              | array of <br/>strings                   | None       | <small>Discord IDs of users<br/> to use admin commands.                      </small> | `"admins": [ "0", "0" ],`         |
+| adminChannels       | array of <br/>`adminChannel groups`     | None       | <small>See `adminChannel group` below.                                       </small> |                                   |
+| discordLogLevel     | int (whole number)                      | 0 (errors) | <small>0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug  </small> | `"discordLogLevel": 2,`           |
+| debugOutput         | boolean <br/>(true or false)            | false      | <small>Enables extra output for narrowing down problems.                     </small> | `"debugOutput": true,`            |
+| messageOutput       | boolean <br/>(true or false)            | true       | <small>Enables discord message output.                                       </small> | `"messageOutput": true,`          |
 
 
 ---
