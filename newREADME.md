@@ -224,14 +224,14 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE BRACKETS.
 
-| Setting Key         | Type                            | Default    | Description                                                          | Example                        |
-| :-----------------: | ------------------------------- | :--------: | ----------------------------------------------------------           | ------------------------------ |
-| credentials         | `credentials group`             |            | See `credentials group` below.                                       |                                |
-| admins              | array of strings                | None       | Discord IDs of users to use admin commands.                          | `"admins": [ "111", "222" ],`  |
-| adminChannels       | array of `adminChannel groups`  | None       | See `adminChannel group` below.                                      |                                |
-| discordLogLevel     | int (whole number)              | 0 (errors) | 0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug      | `"discordLogLevel": 2,`        |
-| debugOutput         | boolean (true or false)         | false      | Enables extra output for narrowing down problems.                        | `"debugOutput": true,`         |
-| messageOutput       | boolean (true or false)         | true       | Enables discord message output.                                          | `"messageOutput": true,`       |
+| SETTING KEY         | TYPE                                    | DEFAULT    | DESCRIPTION                                                          | EXAMPLE                        |
+| :-----------------: | --------------------------------------- | :--------: | -------------------------------------------------------------------- | ------------------------------ |
+| credentials         | `credentials group`                     |            | See `credentials group` below.                                       |                                |
+| admins              | array of <br/>strings                   | None       | Discord IDs of users to use admin commands.                          | `"admins": <br/>[ "111", "222" ],`  |
+| adminChannels       | array of <br/>`adminChannel groups`     | None       | See `adminChannel group` below.                                      |                                |
+| discordLogLevel     | int (whole number)                      | 0 (errors) | 0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug | `"discordLogLevel": 2,`        |
+| debugOutput         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debugOutput": true,`         |
+| messageOutput       | boolean <br/>(true or false)            | true       | Enables discord message output.                                      | `"messageOutput": true,`       |
 
 
 ---
