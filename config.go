@@ -98,9 +98,7 @@ func defaultConfiguration() configuration {
 		DownloadTimeout:     60,
 		DiscordTimeout:      180,
 
-		GithubUpdateChecking:           defConfig_GithubUpdateChecking,
-		FilterDuplicateImages:          false,
-		FilterDuplicateImagesThreshold: 0,
+		GithubUpdateChecking: defConfig_GithubUpdateChecking,
 		// Appearance
 		PresenceEnabled:            defConfig_PresenceEnabled,
 		PresenceStatus:             defConfig_PresenceStatus,
@@ -116,19 +114,24 @@ func defaultConfiguration() configuration {
 
 type configuration struct {
 	Constants map[string]string `json:"_constants,omitempty"`
-	// Required
+
+	// Logins
 	Credentials configurationCredentials `json:"credentials"` // required
-	// Setup
+
+	// Commander Settings
 	Admins        []string                    `json:"admins"`        // optional
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
-	// Main
-	DiscordLogLevel     int  `json:"discordLogLevel,omitempty"`     // optional, defaults
-	DebugOutput         bool `json:"debugOutput"`                   // optional, defaults
-	SettingsOutput      bool `json:"settingsOutput"`                // optional, defaults
-	MessageOutput       bool `json:"messageOutput"`                 // optional, defaults
-	CheckupRate         int  `json:"checkupRate,omitempty"`         // optional, defaults
-	ConnectionCheckRate int  `json:"connectionCheckRate,omitempty"` // optional, defaults
-	PresenceRefreshRate int  `json:"presenceRefreshRate,omitempty"` // optional, defaults
+
+	// Program Settings
+	DiscordLogLevel int `json:"discordLogLevel,omitempty"` // optional, defaults
+
+	DebugOutput    bool `json:"debugOutput"`    // optional, defaults
+	SettingsOutput bool `json:"settingsOutput"` // optional, defaults
+	MessageOutput  bool `json:"messageOutput"`  // optional, defaults
+
+	CheckupRate         int `json:"checkupRate,omitempty"`         // optional, defaults
+	ConnectionCheckRate int `json:"connectionCheckRate,omitempty"` // optional, defaults
+	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty"` // optional, defaults
 
 	CommandPrefix       string `json:"commandPrefix"`                  // optional, defaults
 	ScanOwnMessages     bool   `json:"scanOwnMessages"`                // optional, defaults
@@ -148,8 +151,6 @@ type configuration struct {
 
 	GithubUpdateChecking bool `json:"githubUpdateChecking"` // optional, defaults
 
-	FilterDuplicateImages          bool    `json:"filterDuplicateImages,omitempty"`          // optional, defaults
-	FilterDuplicateImagesThreshold float64 `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
 	// Appearance
 	PresenceEnabled            bool               `json:"presenceEnabled"`                      // optional, defaults
 	PresenceStatus             string             `json:"presenceStatus"`                       // optional, defaults

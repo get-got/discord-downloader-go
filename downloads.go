@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"image"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -13,7 +12,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -22,7 +20,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
-	"github.com/rivo/duplo"
 	"mvdan.cc/xurls/v2"
 )
 
@@ -604,7 +601,6 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 	var err error
 
 	cachedDownloadID++
-	thisDownloadID := cachedDownloadID
 
 	logPrefix := ""
 	if download.HistoryCmd {
@@ -808,27 +804,6 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 					"Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
 			}
 			return mDownloadStatus(downloadSkippedUnpermittedType), 0
-		}
-
-		// Duplicate Image Filter
-		if config.FilterDuplicateImages && contentTypeFound == "image" && extension != ".gif" && extension != ".webp" {
-			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
-			if err != nil {
-				log.Println(lg("Download", "", color.HiRedString,
-					"[FilterDuplicateImages] Error converting buffer to image for hashing:\t%s", err))
-			} else {
-				hash, _ := duplo.CreateHash(img)
-				matches := imgStore.Query(hash)
-				sort.Sort(matches)
-				for _, match := range matches {
-					if match.Score < config.FilterDuplicateImagesThreshold {
-						log.Println(lg("Download", "Skip", color.GreenString,
-							"Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
-						return mDownloadStatus(downloadSkippedDetectedDuplicate), 0
-					}
-				}
-				imgStore.Add(cachedDownloadID, hash)
-			}
 		}
 
 		// Names
@@ -1203,27 +1178,6 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 			timeLastUpdated = time.Now()
 			if *channelConfig.UpdatePresence {
 				updateDiscordPresence()
-			}
-		}
-
-		// Filter Duplicate Images
-		if config.FilterDuplicateImages && thisDownloadID > 0 {
-			encodedStore, err := imgStore.GobEncode()
-			if err != nil {
-				log.Println(lg("Download", "", color.HiRedString, "Failed to encode imgStore:\t%s"))
-			} else {
-				f, err := os.OpenFile(imgStorePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
-				if err != nil {
-					log.Println(lg("Download", "", color.HiRedString, "Failed to open imgStore file:\t%s"))
-				}
-				_, err = f.Write(encodedStore)
-				if err != nil {
-					log.Println(lg("Download", "", color.HiRedString, "Failed to update imgStore file:\t%s"))
-				}
-				err = f.Close()
-				if err != nil {
-					log.Println(lg("Download", "", color.HiRedString, "Failed to close imgStore file:\t%s"))
-				}
 			}
 		}
 

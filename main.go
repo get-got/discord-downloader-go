@@ -161,27 +161,6 @@ func main() {
 	cachedDownloadID = dbDownloadCount()
 	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
 
-	//#region Duplicate Filter Storage
-	if config.FilterDuplicateImages {
-		imgStore = duplo.New()
-		if _, err := os.Stat(imgStorePath); err == nil {
-			log.Println(lg("Database", "", color.YellowString, "Opening image filter database..."))
-			storeFile, err := ioutil.ReadFile(imgStorePath)
-			if err != nil {
-				log.Println(lg("Database", "", color.HiRedString, "Error opening imgStore file:\t%s", err))
-			} else {
-				err = imgStore.GobDecode(storeFile)
-				if err != nil {
-					log.Println(lg("Database", "", color.HiRedString, "Error decoding imgStore:\t%s", err))
-				}
-				if imgStore != nil {
-					log.Println(lg("Database", "", color.HiYellowString, "filterDuplicateImages database opened %d", imgStore.Size()))
-				}
-			}
-		}
-	}
-	//#endregion
-
 	//#endregion
 
 	//#region Component Initialization
