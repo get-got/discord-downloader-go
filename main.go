@@ -70,6 +70,7 @@ var (
 	// Validation
 	invalidAdminChannels []string
 	invalidChannels      []string
+	invalidCategories    []string
 	invalidServers       []string
 )
 
@@ -581,7 +582,7 @@ func botLoadDiscord() {
 
 	// Source Validation
 	if config.Debug {
-		log.Println(lg("Discord", "Validation", color.HiYellowString, "Validating configured channels/servers..."))
+		log.Println(lg("Discord", "Validation", color.HiYellowString, "Validating configured sources..."))
 	}
 	//-
 	if config.AdminChannels != nil {
@@ -626,6 +627,26 @@ func botLoadDiscord() {
 			}
 		}
 	}
+	for _, category := range config.Categories {
+		if category.CategoryIDs != nil {
+			for _, subcategory := range *category.CategoryIDs {
+				_, err := bot.State.Channel(subcategory)
+				if err != nil {
+					invalidCategories = append(invalidCategories, subcategory)
+					log.Println(lg("Discord", "Validation", color.HiRedString,
+						"Bot cannot access subcategory %s...\t%s", subcategory, err))
+				}
+			}
+
+		} else {
+			_, err := bot.State.Channel(category.CategoryID)
+			if err != nil {
+				invalidCategories = append(invalidCategories, category.CategoryID)
+				log.Println(lg("Discord", "Validation", color.HiRedString,
+					"Bot cannot access category %s...\t%s", category.CategoryID, err))
+			}
+		}
+	}
 	for _, channel := range config.Channels {
 		if channel.ChannelIDs != nil {
 			for _, subchannel := range *channel.ChannelIDs {
@@ -647,7 +668,7 @@ func botLoadDiscord() {
 		}
 	}
 	//-
-	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidServers)
+	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidCategories) + len(invalidServers)
 	if invalidSources > 0 {
 		log.Println(lg("Discord", "Validation", color.HiRedString,
 			"Found %d invalid channels/servers in configuration...", invalidSources))
@@ -660,13 +681,17 @@ func botLoadDiscord() {
 			logMsg += fmt.Sprintf("\n**- Download Servers: (%d)** - %s",
 				len(invalidServers), strings.Join(invalidServers, ", "))
 		}
+		if len(invalidCategories) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Categories: (%d)** - %s",
+				len(invalidCategories), strings.Join(invalidCategories, ", "))
+		}
 		if len(invalidChannels) > 0 {
 			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s",
 				len(invalidChannels), strings.Join(invalidChannels, ", "))
 		}
 		sendErrorMessage(logMsg)
 	} else if config.Debug {
-		log.Println(lg("Discord", "Validation", color.HiGreenString, "All channels/servers successfully validated!"))
+		log.Println(lg("Discord", "Validation", color.HiGreenString, "All sources successfully validated!"))
 	}
 
 	// Start Presence
