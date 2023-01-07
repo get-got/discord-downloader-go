@@ -32,12 +32,11 @@ type configurationCredentials struct {
 	Email    string `json:"email,omitempty"`    // required for login (this or token)
 	Password string `json:"password,omitempty"` // required for login (this or token)
 	// APIs
-	TwitterAccessToken         string `json:"twitterAccessToken,omitempty"`         // optional
-	TwitterAccessTokenSecret   string `json:"twitterAccessTokenSecret,omitempty"`   // optional
-	TwitterConsumerKey         string `json:"twitterConsumerKey,omitempty"`         // optional
-	TwitterConsumerSecret      string `json:"twitterConsumerSecret,omitempty"`      // optional
-	FlickrApiKey               string `json:"flickrApiKey,omitempty"`               // optional
-	GoogleDriveCredentialsJSON string `json:"googleDriveCredentialsJSON,omitempty"` // optional
+	TwitterAccessToken       string `json:"twitterAccessToken,omitempty"`       // optional
+	TwitterAccessTokenSecret string `json:"twitterAccessTokenSecret,omitempty"` // optional
+	TwitterConsumerKey       string `json:"twitterConsumerKey,omitempty"`       // optional
+	TwitterConsumerSecret    string `json:"twitterConsumerSecret,omitempty"`    // optional
+	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
 }
 
 //#endregion
@@ -587,7 +586,6 @@ func createConfig() {
 			if !importKey("auth", "password", &defaultConfig.Credentials.Password, "string") {
 				defaultConfig.Credentials.Password = ""
 			}
-			importKey("google", "client credentials json", &defaultConfig.Credentials.GoogleDriveCredentialsJSON, "string")
 			importKey("flickr", "api key", &defaultConfig.Credentials.FlickrApiKey, "string")
 			importKey("twitter", "consumer key", &defaultConfig.Credentials.TwitterConsumerKey, "string")
 			importKey("twitter", "consumer secret", &defaultConfig.Credentials.TwitterConsumerSecret, "string")
@@ -1244,7 +1242,7 @@ func getAllRegisteredChannels() []string {
 						continue
 					}
 				}
-				if hasPerms(channel.ID, discordgo.PermissionReadMessages) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+				if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
 					channels = append(channels, channel.ID)
 				}
 			}
@@ -1253,9 +1251,7 @@ func getAllRegisteredChannels() []string {
 		// Compile all config channels
 		for _, channel := range config.Channels {
 			if channel.ChannelIDs != nil {
-				for _, subchannel := range *channel.ChannelIDs {
-					channels = append(channels, subchannel)
-				}
+				channels = append(channels, *channel.ChannelIDs...)
 			} else if isNumeric(channel.ChannelID) {
 				channels = append(channels, channel.ChannelID)
 			}

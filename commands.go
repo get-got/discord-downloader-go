@@ -17,13 +17,13 @@ import (
 	"github.com/kennygrant/sanitize"
 )
 
-// Multiple use messages to save space and make cleaner.
 // TODO: Implement this for more?
 const (
 	cmderrLackingBotAdminPerms = "You do not have permission to use this command. Your User ID must be set as a bot administrator in the settings file."
 	cmderrSendFailure          = "Failed to send command message (requested by %s)...\t%s"
 )
 
+// TODO: function for handling perm error messages, etc etc to reduce clutter
 func handleCommands() *exrouter.Route {
 	router := exrouter.New()
 

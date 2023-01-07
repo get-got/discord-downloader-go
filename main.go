@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -21,9 +20,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
-	"github.com/rivo/duplo"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/drive/v3"
 )
 
 /* v2.0.0 REWRITE TODO:
@@ -60,12 +56,9 @@ var (
 	selfbot     bool = false
 	botReady    bool = false
 	// Storage
-	myDB     *db.DB
-	imgStore *duplo.Store
+	myDB *db.DB
 	// APIs
-	twitterConnected     bool
-	googleDriveConnected bool
-	googleDriveService   *drive.Service
+	twitterConnected bool
 	// Gen
 	loop                 chan os.Signal
 	startTime            time.Time
@@ -490,30 +483,6 @@ func botLoadAPIs() {
 	} else {
 		log.Println(lg("API", "Twitter", color.MagentaString,
 			"API credentials missing, the bot won't use the Twitter API."))
-	}
-
-	// Google Drive Client
-	if config.Credentials.GoogleDriveCredentialsJSON != "" {
-		log.Println(lg("API", "Google", color.MagentaString, "Connecting..."))
-		ctx := context.Background()
-		authJson, err := ioutil.ReadFile(config.Credentials.GoogleDriveCredentialsJSON)
-		if err != nil {
-			log.Println(lg("API", "Google", color.HiRedString, "Error opening Google Credentials JSON:\t%s", err))
-		} else {
-			googleConfig, err := google.JWTConfigFromJSON(authJson, drive.DriveReadonlyScope)
-			if err != nil {
-				log.Println(lg("API", "Google", color.HiRedString, "Error parsing Google Credentials JSON:\t%s", err))
-			} else {
-				client := googleConfig.Client(ctx)
-				googleDriveService, err = drive.New(client)
-				if err != nil {
-					log.Println(lg("API", "Google", color.HiRedString, "Error setting up client:\t%s", err))
-				} else {
-					log.Println(lg("API", "Google", color.HiMagentaString, "Connected!"))
-					googleDriveConnected = true
-				}
-			}
-		}
 	}
 }
 

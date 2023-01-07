@@ -300,25 +300,6 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
-	if config.Credentials.GoogleDriveCredentialsJSON != "" {
-		if regexUrlGoogleDrive.MatchString(inputURL) {
-			links, err := getGoogleDriveUrls(inputURL)
-			if err != nil {
-				log.Println(lg("Download", "", color.RedString, "Google Drive Album URL for %s -- %s", inputURL, err))
-			} else if len(links) > 0 {
-				return trimDownloadedLinks(links, m)
-			}
-		}
-		if regexUrlGoogleDriveFolder.MatchString(inputURL) {
-			links, err := getGoogleDriveFolderUrls(inputURL)
-			if err != nil {
-				log.Println(lg("Download", "", color.RedString, "Google Drive Folder URL for %s -- %s", inputURL, err))
-			} else if len(links) > 0 {
-				return trimDownloadedLinks(links, m)
-			}
-		}
-	}
-
 	if regexUrlTistory.MatchString(inputURL) {
 		links, err := getTistoryUrls(inputURL)
 		if err != nil {
@@ -484,14 +465,14 @@ func handleDownload(download downloadRequestStruct) (downloadStatusStruct, int64
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
 				logPath := channelConfig.LogLinks.Destination
-				if *channelConfig.LogLinks.DestinationIsFolder == true {
+				if *channelConfig.LogLinks.DestinationIsFolder {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Links"
-						if *channelConfig.LogLinks.DivideLogsByServer == true {
+						if *channelConfig.LogLinks.DivideLogsByServer {
 							if download.Message.GuildID == "" {
 								ch, err := bot.State.Channel(download.Message.ChannelID)
 								if err == nil {
@@ -509,13 +490,13 @@ func handleDownload(download downloadRequestStruct) (downloadStatusStruct, int64
 								logPath += " SID_" + download.Message.GuildID
 							}
 						}
-						if *channelConfig.LogLinks.DivideLogsByChannel == true {
+						if *channelConfig.LogLinks.DivideLogsByChannel {
 							logPath += " CID_" + download.Message.ChannelID
 						}
-						if *channelConfig.LogLinks.DivideLogsByUser == true {
+						if *channelConfig.LogLinks.DivideLogsByUser {
 							logPath += " UID_" + download.Message.Author.ID
 						}
-						if *channelConfig.LogLinks.DivideLogsByStatus == true {
+						if *channelConfig.LogLinks.DivideLogsByStatus {
 							if status.Status >= downloadFailed {
 								logPath += " - FAILED"
 							} else if status.Status >= downloadSkipped {
@@ -570,7 +551,7 @@ func handleDownload(download downloadRequestStruct) (downloadStatusStruct, int64
 					// More Data
 					additionalInfo := ""
 					if channelConfig.LogLinks.UserData != nil {
-						if *channelConfig.LogLinks.UserData == true {
+						if *channelConfig.LogLinks.UserData {
 							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
 								download.Message.GuildID, download.Message.ChannelID,
 								download.Message.Author.Username, download.Message.Author.Discriminator,
@@ -1112,9 +1093,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 				}
 			}
 			if channelConfig.SendFileToChannels != nil {
-				for _, logChannel := range *channelConfig.SendFileToChannels {
-					logMediaChannels = append(logMediaChannels, logChannel)
-				}
+				logMediaChannels = append(logMediaChannels, *channelConfig.SendFileToChannels...)
 			}
 			for _, logChannel := range logMediaChannels {
 				if logChannel != "" {

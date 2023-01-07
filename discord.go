@@ -23,21 +23,21 @@ import (
 
 //TODO: Clean below
 
-func getChannelState(channelID string) *discordgo.Channel {
+/*func getChannelState(channelID string) *discordgo.Channel {
 	sourceChannel, _ := bot.State.Channel(channelID)
 	if sourceChannel != nil {
 		return sourceChannel
 	}
 	return &discordgo.Channel{}
-}
+}*/
 
-func getGuildState(guildID string) *discordgo.Guild {
+/*func getGuildState(guildID string) *discordgo.Guild {
 	sourceGuild, _ := bot.State.Guild(guildID)
 	if sourceGuild != nil {
 		return sourceGuild
 	}
 	return &discordgo.Guild{}
-}
+}*/
 
 func getChannelGuildID(channelID string) string {
 	sourceChannel, _ := bot.State.Channel(channelID)
@@ -86,15 +86,6 @@ func getChannelName(channelID string) string {
 		}
 	}
 	return sourceChannelName
-}
-
-func getSourceName(guildID string, channelID string) string {
-	guildName := getGuildName(guildID)
-	channelName := getChannelName(channelID)
-	if channelName == "dm" || channelName == "group-dm" {
-		return channelName
-	}
-	return fmt.Sprintf("\"%s\"#%s", guildName, channelName)
 }
 
 //#endregion
@@ -558,9 +549,6 @@ func sendStatusMessage(status sendStatusType) {
 				if twitterConnected {
 					message += "\n• Connected to Twitter API"
 				}
-				if googleDriveConnected {
-					message += "\n• Connected to Google Drive"
-				}
 				message += fmt.Sprintf("\n_%s-%s %s / discordgo v%s (modified) / Discord API v%s_",
 					runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
 			} else if status == sendStatusExit {
@@ -630,7 +618,7 @@ func isBotAdmin(m *discordgo.Message) bool {
 	// configurationAdminChannel.UnlockCommands Bypass
 	if isAdminChannelRegistered(m.ChannelID) {
 		channelConfig := getAdminChannelConfig(m.ChannelID)
-		if *channelConfig.UnlockCommands == true {
+		if *channelConfig.UnlockCommands {
 			return true
 		}
 	}
@@ -639,7 +627,7 @@ func isBotAdmin(m *discordgo.Message) bool {
 }
 
 // Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
-func isLocalAdmin(m *discordgo.Message) bool {
+/*func isLocalAdmin(m *discordgo.Message) bool {
 	if m == nil {
 		if config.Debug {
 			log.Println(lg("Debug", "isLocalAdmin", color.YellowString, "check failed due to empty message"))
@@ -678,7 +666,7 @@ func isLocalAdmin(m *discordgo.Message) bool {
 	localManageMessages := localPerms&discordgo.PermissionManageMessages > 0
 
 	return botSelf || botAdmin || guildOwner || guildAdmin || localManageMessages
-}
+}*/
 
 func hasPerms(channelID string, permission int64) bool {
 	if selfbot {

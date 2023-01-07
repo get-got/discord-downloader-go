@@ -101,7 +101,6 @@ Now that that's out of the way...
 - Tistory
 - Mastodon [BROKEN, WORKING ON IT]
 - Flickr _(requires API key, see config section)_
-- Google Drive _(requires API Credentials, see config section)_
 - _I'll always welcome requests but some sources can be tricky to parse..._
   
 ### Commands

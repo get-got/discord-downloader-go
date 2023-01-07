@@ -174,7 +174,7 @@ func dateLocalToUTC(s string) string {
 	return fmt.Sprintf("%04d-%02d-%02d", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
 }
 
-func condenseString(input string, length int) string {
+/*func condenseString(input string, length int) string {
 	filler := "....."
 	ret := input
 	if len(input) > length+len(filler) {
@@ -182,7 +182,7 @@ func condenseString(input string, length int) string {
 		ret = input[0:half] + filler + input[len(input)-half:]
 	}
 	return ret
-}
+}*/
 
 //#endregion
 

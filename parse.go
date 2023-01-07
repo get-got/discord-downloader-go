@@ -17,7 +17,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"golang.org/x/net/html"
-	"google.golang.org/api/googleapi"
 )
 
 const (
@@ -141,12 +140,12 @@ ParseLoop:
 							content = content[:len(content)-1]
 							jsonParsed, err := gabs.ParseJSON([]byte(content))
 							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "error parsing instagram json:", err))
+								log.Println(lg("API", "Instagram", color.HiRedString, "error parsing instagram json:\t"+err.Error()))
 								continue ParseLoop
 							}
 							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
 							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "unable to find entries children:", err))
+								log.Println(lg("API", "Instagram", color.HiRedString, "unable to find entries children:\t"+err.Error()))
 								continue ParseLoop
 							}
 							for _, entryChild := range entryChildren {
@@ -479,60 +478,6 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 		return getFlickrAlbumUrls(result.Request.URL.String())
 	}
 	return nil, errors.New("encountered invalid URL while trying to get long URL from short Flickr Album URL")
-}
-
-//#endregion
-
-//#region Google Drive
-
-func getGoogleDriveUrls(url string) (map[string]string, error) {
-	parts := strings.Split(url, "/")
-	if len(parts) != 7 {
-		return nil, errors.New("unable to parse google drive url")
-	}
-	fileId := parts[len(parts)-2]
-	return map[string]string{"https://drive.google.com/uc?export=download&id=" + fileId: ""}, nil
-}
-
-func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
-	matches := regexUrlGoogleDriveFolder.FindStringSubmatch(url)
-	if len(matches) < 4 || matches[3] == "" {
-		return nil, errors.New("unable to find google drive folder ID in link")
-	}
-	if googleDriveService.BasePath == "" {
-		return nil, errors.New("please set up google credentials")
-	}
-	googleDriveFolderID := matches[3]
-
-	links := make(map[string]string)
-
-	driveQuery := fmt.Sprintf("\"%s\" in parents", googleDriveFolderID)
-	driveFields := "nextPageToken, files(id)"
-	result, err := googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
-	if err != nil {
-		log.Println(lg("API", "Google", color.HiRedString, "driveQuery:\t%s", driveQuery))
-		log.Println(lg("API", "Google", color.HiRedString, "driveFields:\t%s", driveFields))
-		log.Println(lg("API", "Google", color.HiRedString, "err:\t%s", err))
-		return nil, err
-	}
-	for _, file := range result.Files {
-		fileUrl := "https://drive.google.com/uc?export=download&id=" + file.Id
-		links[fileUrl] = ""
-	}
-
-	for {
-		if result.NextPageToken == "" {
-			break
-		}
-		result, err = googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).PageToken(result.NextPageToken).Do()
-		if err != nil {
-			return nil, err
-		}
-		for _, file := range result.Files {
-			links[file.Id] = ""
-		}
-	}
-	return links, nil
 }
 
 //#endregion

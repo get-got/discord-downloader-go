@@ -18,41 +18,25 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0
-	github.com/rivo/duplo v0.0.0-20220703183130-751e882e6b83
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	golang.org/x/net v0.5.0
-	golang.org/x/oauth2 v0.4.0
-	google.golang.org/api v0.106.0
 	gopkg.in/ini.v1 v1.67.0
 	mvdan.cc/xurls/v2 v2.4.0
 )
 
 require (
-	cloud.google.com/go/compute v1.15.0 // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/ChimeraCoder/tokenbucket v0.0.0-20131201223612-c5a927568de7 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/azr/backoff v0.0.0-20160115115103-53511d3c7330 // indirect
 	github.com/dustin/go-jsonpointer v0.0.0-20160814072949-ba0abeacc3dc // indirect
 	github.com/dustin/gojson v0.0.0-20160307161227-2e71ec9dd5ad // indirect
 	github.com/garyburd/go-oauth v0.0.0-20180319155456-bca2e7f09a17 // indirect
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/uuid v1.3.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.2.1 // indirect
-	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
-	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
-	go.opencensus.io v0.24.0 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.6.0 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20230106154932-a12b697841d9 // indirect
-	google.golang.org/grpc v1.51.0 // indirect
-	google.golang.org/protobuf v1.28.1 // indirect
 )
 
 replace github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.1
