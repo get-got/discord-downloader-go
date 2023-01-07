@@ -527,7 +527,7 @@ func loadConfig() {
 }
 
 func createConfig() {
-	log.Println(lg("Settings", "createConfig", color.YellowString, "Creating new settings file..."))
+	log.Println(lg("Settings", "create", color.YellowString, "Creating new settings file..."))
 
 	enteredBaseChannel := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
 	enteredBaseDestination := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
@@ -554,11 +554,11 @@ func createConfig() {
 
 	// Import old config
 	if _, err := os.Stat("config.ini"); err == nil {
-		log.Println(lg("Settings", "createConfig", color.HiGreenString,
+		log.Println(lg("Settings", "create", color.HiGreenString,
 			"Detected config.ini from Seklfreak's discord-image-downloader-go, importing..."))
 		cfg, err := ini.Load("config.ini")
 		if err != nil {
-			log.Println(lg("Settings", "createConfig", color.HiRedString,
+			log.Println(lg("Settings", "create", color.HiRedString,
 				"Unable to read your old config file:\t%s", err))
 			cfg = ini.Empty()
 		} else { // Import old ini
@@ -571,7 +571,7 @@ func createConfig() {
 					} else if outType == "bool" {
 						outVar = cfg.Section(section).Key(key).MustBool()
 					}
-					log.Println(lg("Settings", "createConfig", color.GreenString, "IMPORTED %s - %s:\t\t\t%s", section, key, outVar))
+					log.Println(lg("Settings", "create", color.GreenString, "IMPORTED %s - %s:\t\t\t%s", section, key, outVar))
 					return true
 				}
 				return false
@@ -609,7 +609,7 @@ func createConfig() {
 				newChannel := configurationAdminChannel{
 					ChannelID: key,
 				}
-				log.Println(lg("Settings", "createConfig", color.GreenString, "IMPORTED Admin Channel:\t\t%s", key))
+				log.Println(lg("Settings", "create", color.GreenString, "IMPORTED Admin Channel:\t\t%s", key))
 				defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, newChannel)
 			}
 			ChannelWhitelist := cfg.Section("channels").KeysHash()
@@ -618,11 +618,11 @@ func createConfig() {
 					ChannelID:   key,
 					Destination: value,
 				}
-				log.Println(lg("Settings", "createConfig", color.GreenString, "IMPORTED Channel:\t\t\t%s to \"%s\"", key, value))
+				log.Println(lg("Settings", "create", color.GreenString, "IMPORTED Channel:\t\t\t%s to \"%s\"", key, value))
 				defaultConfig.Channels = append(defaultConfig.Channels, newChannel)
 			}
 		}
-		log.Println(lg("Settings", "createConfig", color.HiGreenString,
+		log.Println(lg("Settings", "create", color.HiGreenString,
 			"Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
 	} else {
 		baseChannel := configurationSource{
@@ -651,7 +651,7 @@ func createConfig() {
 		defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
 
 		//TODO: Improve, this is very crude, I just wanted *something* for this.
-		log.Print(lg("Settings", "createConfig", color.HiCyanString, "Would you like to enter settings info now? [Y/N]: "))
+		log.Print(lg("Settings", "create", color.HiCyanString, "Would you like to enter settings info now? [Y/N]: "))
 		reader := bufio.NewReader(os.Stdin)
 		inputCredsYN, _ := reader.ReadString('\n')
 		inputCredsYN = strings.ReplaceAll(inputCredsYN, "\n", "")
@@ -671,7 +671,7 @@ func createConfig() {
 				if inputToken != "" {
 					defaultConfig.Credentials.Token = inputToken
 				} else {
-					log.Println(lg("Settings", "createConfig", color.HiRedString, "Please input token..."))
+					log.Println(lg("Settings", "create", color.HiRedString, "Please input token..."))
 					goto EnterToken
 				}
 			} else if strings.Contains(strings.ToLower(inputCreds), "login") {
@@ -690,15 +690,15 @@ func createConfig() {
 					if inputPassword != "" {
 						defaultConfig.Credentials.Password = inputPassword
 					} else {
-						log.Println(lg("Settings", "createConfig", color.HiRedString, "Please input password..."))
+						log.Println(lg("Settings", "create", color.HiRedString, "Please input password..."))
 						goto EnterPassword
 					}
 				} else {
-					log.Println(lg("Settings", "createConfig", color.HiRedString, "Please input email..."))
+					log.Println(lg("Settings", "create", color.HiRedString, "Please input email..."))
 					goto EnterEmail
 				}
 			} else {
-				log.Println(lg("Settings", "createConfig", color.HiRedString, "Please input \"token\" or \"login\"..."))
+				log.Println(lg("Settings", "create", color.HiRedString, "Please input \"token\" or \"login\"..."))
 				goto EnterCreds
 			}
 
@@ -710,7 +710,7 @@ func createConfig() {
 			if isNumeric(inputAdmin) {
 				defaultConfig.Admins = []string{inputAdmin}
 			} else {
-				log.Println(lg("Settings", "createConfig", color.HiRedString, "Please input your Discord User ID..."))
+				log.Println(lg("Settings", "create", color.HiRedString, "Please input your Discord User ID..."))
 				goto EnterAdmin
 			}
 
@@ -719,25 +719,25 @@ func createConfig() {
 		}
 	}
 
-	log.Println(lg("Settings", "createConfig", color.MagentaString,
+	log.Println(lg("Settings", "create", color.MagentaString,
 		"The default settings will be missing some options to avoid clutter."))
-	log.Println(lg("Settings", "createConfig", color.HiMagentaString,
+	log.Println(lg("Settings", "create", color.HiMagentaString,
 		"There are MANY MORE SETTINGS! If you would like to maximize customization, see the GitHub README for all available settings."))
 
 	defaultJSON, err := json.MarshalIndent(defaultConfig, "", "\t")
 	if err != nil {
-		log.Println(lg("Settings", "createConfig", color.HiRedString, "Failed to format new settings...\t%s", err))
+		log.Println(lg("Settings", "create", color.HiRedString, "Failed to format new settings...\t%s", err))
 	} else {
 		err := ioutil.WriteFile(configFile, defaultJSON, 0644)
 		if err != nil {
-			log.Println(lg("Settings", "createConfig", color.HiRedString, "Failed to save new settings file...\t%s", err))
+			log.Println(lg("Settings", "create", color.HiRedString, "Failed to save new settings file...\t%s", err))
 		} else {
-			log.Println(lg("Settings", "createConfig", color.HiYellowString, "Created new settings file..."))
-			log.Println(lg("Settings", "createConfig", color.HiYellowString,
+			log.Println(lg("Settings", "create", color.HiYellowString, "Created new settings file..."))
+			log.Println(lg("Settings", "create", color.HiYellowString,
 				"Please save your credentials & info into \"%s\" then restart...", configFile))
-			log.Println(lg("Settings", "createConfig", color.MagentaString,
+			log.Println(lg("Settings", "create", color.MagentaString,
 				"You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
-			log.Println(lg("Settings", "createConfig", color.MagentaString,
+			log.Println(lg("Settings", "create", color.MagentaString,
 				"See README on GitHub for help and more info..."))
 		}
 	}
