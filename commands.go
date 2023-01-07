@@ -260,7 +260,7 @@ func handleCommands() *exrouter.Route {
 					} else if isNumeric(before) {
 						beforeID = before
 					}
-					if config.DebugOutput {
+					if config.Debug {
 						log.Println(lg("Command", "History", color.CyanString, "Date before range applied, snowflake %s, converts back to %s",
 							beforeID, discordSnowflakeToTimestamp(beforeID, "2006-01-02T15:04:05.000Z07:00")))
 					}
@@ -271,7 +271,7 @@ func handleCommands() *exrouter.Route {
 					} else if isNumeric(since) {
 						sinceID = since
 					}
-					if config.DebugOutput {
+					if config.Debug {
 						log.Println(lg("Command", "History", color.CyanString, "Date since range applied, snowflake %s, converts back to %s",
 							sinceID, discordSnowflakeToTimestamp(sinceID, "2006-01-02T15:04:05.000Z07:00")))
 					}
@@ -283,14 +283,14 @@ func handleCommands() *exrouter.Route {
 							// Test/Use if number is guild
 							guild, err := bot.State.Guild(target)
 							if err == nil {
-								if config.DebugOutput {
+								if config.Debug {
 									log.Println(lg("Command", "History", color.YellowString,
 										"Specified target %s is a guild: \"%s\", adding all channels...",
 										target, guild.Name))
 								}
 								for _, ch := range guild.Channels {
 									channels = append(channels, ch.ID)
-									if config.DebugOutput {
+									if config.Debug {
 										log.Println(lg("Command", "History", color.YellowString,
 											"Added %s (#%s in \"%s\") to history queue",
 											ch.ID, ch.Name, guild.Name))
@@ -300,7 +300,7 @@ func handleCommands() *exrouter.Route {
 								ch, err := bot.State.Channel(target)
 								if err == nil {
 									channels = append(channels, target)
-									if config.DebugOutput {
+									if config.Debug {
 										log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
 											ch.ID, ch.Name, ch.GuildID))
 									}
@@ -322,7 +322,7 @@ func handleCommands() *exrouter.Route {
 				}
 				// Foreach Channel
 				for _, channel := range channels {
-					if config.DebugOutput {
+					if config.Debug {
 						nameGuild := channel
 						if chinfo, err := bot.State.Channel(channel); err == nil {
 							nameGuild = getGuildName(chinfo.GuildID)

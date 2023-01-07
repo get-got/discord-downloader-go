@@ -77,7 +77,7 @@ func stringInSlice(a string, list []string) bool {
 
 func formatNumber(n int64) string {
 	var numberSeparator byte = ','
-	if config.NumberFormatEuropean {
+	if config.EuropeanNumbers {
 		numberSeparator = '.'
 	}
 
@@ -101,11 +101,11 @@ func formatNumber(n int64) string {
 
 func formatNumberShort(x int64) string {
 	var numberSeparator string = ","
-	if config.NumberFormatEuropean {
+	if config.EuropeanNumbers {
 		numberSeparator = "."
 	}
 	var decimalSeparator string = "."
-	if config.NumberFormatEuropean {
+	if config.EuropeanNumbers {
 		decimalSeparator = ","
 	}
 

@@ -610,7 +610,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 	var fileinfo fs.FileInfo
 
 	var channelConfig configurationSource
-	channelDefault(&channelConfig)
+	sourceDefault(&channelConfig)
 	_channelConfig := getSource(download.Message)
 	if _channelConfig != emptyConfig {
 		channelConfig = _channelConfig
@@ -842,7 +842,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 
 		subfolder := ""
 		// Subfolder Division - Year Nesting
-		if *channelConfig.DivideFoldersByYear {
+		if *channelConfig.DivideByYear {
 			year := fmt.Sprint(time.Now().Year())
 			if download.Message.Author != nil {
 				year = fmt.Sprint(download.Message.Timestamp.Year())
@@ -857,7 +857,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 			}
 		}
 		// Subfolder Division - Month Nesting
-		if *channelConfig.DivideFoldersByMonth {
+		if *channelConfig.DivideByMonth {
 			year := fmt.Sprintf("%02d", time.Now().Month())
 			if download.Message.Author != nil {
 				year = fmt.Sprintf("%02d", download.Message.Timestamp.Month())
@@ -872,7 +872,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 			}
 		}
 		// Subfolder Division - Server Nesting
-		if *channelConfig.DivideFoldersByServer {
+		if *channelConfig.DivideByServer {
 			subfolderSuffix := download.Message.GuildID
 			if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
 				subfolderSuffix = clearPath(sourceName)
@@ -889,7 +889,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 			}
 		}
 		// Subfolder Division - Channel Nesting
-		if *channelConfig.DivideFoldersByChannel {
+		if *channelConfig.DivideByChannel {
 			subfolderSuffix := download.Message.ChannelID
 			if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
 				subfolderSuffix = clearPath(sourceChannelName)
@@ -905,7 +905,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 			}
 		}
 		// Subfolder Division - User Nesting
-		if *channelConfig.DivideFoldersByUser && download.Message.Author != nil {
+		if *channelConfig.DivideByUser && download.Message.Author != nil {
 			subfolderSuffix := download.Message.Author.ID
 			if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
 				subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
@@ -923,7 +923,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 		}
 
 		// Subfolder Division - Content Type
-		if *channelConfig.DivideFoldersByType {
+		if *channelConfig.DivideByType {
 			subfolderSuffix := contentTypeFound
 			switch contentTypeFound {
 			case "image":
@@ -1176,7 +1176,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 		// Update Presence
 		if !download.HistoryCmd {
 			timeLastUpdated = time.Now()
-			if *channelConfig.UpdatePresence {
+			if *channelConfig.PresenceEnabled {
 				updateDiscordPresence()
 			}
 		}

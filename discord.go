@@ -161,18 +161,18 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 						break
 					}
 				}
-			} else if config.DebugOutput {
+			} else if config.Debug {
 				log.Println(lg("Debug", "fixMessage",
 					color.RedString, "%s, and an attempt to get channel messages found nothing...",
 					ubIssue))
 			}
-		} else if config.DebugOutput {
+		} else if config.Debug {
 			log.Println(lg("Debug", "fixMessage",
 				color.HiRedString, "%s, and an attempt to get channel messages encountered an error:\t%s", ubIssue, err))
 		}
 	}
 	if m.Content == "" && len(m.Attachments) == 0 && len(m.Embeds) == 0 {
-		if config.DebugOutput && selfbot {
+		if config.Debug && selfbot {
 			log.Println(lg("Debug", "fixMessage",
 				color.YellowString, "%s, and attempts to fix seem to have failed...", ubIssue))
 		}
@@ -187,7 +187,7 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 func dataKeyReplacement(input string) string {
 	//TODO: Case-insensitive key replacement. -- If no streamlined way to do it, convert to lower to find substring location but replace normally
 	if strings.Contains(input, "{{") && strings.Contains(input, "}}") {
-		countInt := int64(dbDownloadCount()) + *config.InflateCount
+		countInt := int64(dbDownloadCount()) + *config.InflateDownloadCount
 		timeNow := time.Now()
 		keys := [][]string{
 			{"{{dgVersion}}", discordgo.VERSION},
@@ -253,9 +253,9 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 	//TODO: same as dataKeyReplacement
 
 	ret := config.FilenameFormat
-	if channelConfig.OverwriteFilenameFormat != nil {
-		if *channelConfig.OverwriteFilenameFormat != "" {
-			ret = *channelConfig.OverwriteFilenameFormat
+	if channelConfig.FilenameFormat != nil {
+		if *channelConfig.FilenameFormat != "" {
+			ret = *channelConfig.FilenameFormat
 		}
 	}
 
@@ -263,20 +263,20 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 
 		// Format Filename Date
 		filenameDateFormat := config.FilenameDateFormat
-		if channelConfig.OverwriteFilenameDateFormat != nil {
-			if *channelConfig.OverwriteFilenameDateFormat != "" {
-				filenameDateFormat = *channelConfig.OverwriteFilenameDateFormat
+		if channelConfig.FilenameDateFormat != nil {
+			if *channelConfig.FilenameDateFormat != "" {
+				filenameDateFormat = *channelConfig.FilenameDateFormat
 			}
 		}
 		messageTime := download.Message.Timestamp
 
 		shortID, err := shortid.Generate()
-		if err != nil && config.DebugOutput {
+		if err != nil && config.Debug {
 			log.Println(lg("Debug", "dynamicKeyReplacement", color.HiCyanString, "Error when generating a shortID %s", err))
 		}
 
 		nanoID, err := nanoid.New()
-		if err != nil && config.DebugOutput {
+		if err != nil && config.Debug {
 			log.Println(lg("Debug", "dynamicKeyReplacement", color.HiCyanString, "Error when creating a nanoID %s", err))
 		}
 
@@ -347,7 +347,7 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 func updateDiscordPresence() {
 	if config.PresenceEnabled {
 		// Vars
-		countInt := int64(dbDownloadCount()) + *config.InflateCount
+		countInt := int64(dbDownloadCount()) + *config.InflateDownloadCount
 		count := formatNumber(countInt)
 		countShort := formatNumberShort(countInt)
 		timeShort := timeLastUpdated.Format("3:04pm")
@@ -576,7 +576,7 @@ func sendStatusMessage(status sendStatusType) {
 				)
 			}
 			// Send
-			if config.DebugOutput {
+			if config.Debug {
 				log.Println(lg("Debug", "Status", color.HiCyanString, "Sending log for %s to admin channel %s",
 					label, adminChannel.ChannelID))
 			}
@@ -598,13 +598,13 @@ func sendErrorMessage(err string) {
 		if *adminChannel.LogErrors {
 			// Send
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot { // not confident this is the right permission
-				if config.DebugOutput {
+				if config.Debug {
 					log.Println(lg("Debug", "sendErrorMessage", color.HiCyanString, "Sending embed log for error to %s",
 						adminChannel.ChannelID))
 				}
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID, buildEmbed(adminChannel.ChannelID, "Log — Error", err))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
-				if config.DebugOutput {
+				if config.Debug {
 					log.Println(lg("Debug", "sendErrorMessage", color.HiCyanString, "Sending embed log for error to %s",
 						adminChannel.ChannelID))
 				}
@@ -641,20 +641,20 @@ func isBotAdmin(m *discordgo.Message) bool {
 // Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
 func isLocalAdmin(m *discordgo.Message) bool {
 	if m == nil {
-		if config.DebugOutput {
+		if config.Debug {
 			log.Println(lg("Debug", "isLocalAdmin", color.YellowString, "check failed due to empty message"))
 		}
 		return true
 	}
 	sourceChannel, err := bot.State.Channel(m.ChannelID)
 	if err != nil || sourceChannel == nil {
-		if config.DebugOutput {
+		if config.Debug {
 			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
 				"check failed due to an error or received empty channel info for message:\t%s", err))
 		}
 		return true
 	} else if sourceChannel.Name == "" || sourceChannel.GuildID == "" {
-		if config.DebugOutput {
+		if config.Debug {
 			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
 				"check failed due to incomplete channel info"))
 		}
@@ -664,7 +664,7 @@ func isLocalAdmin(m *discordgo.Message) bool {
 	guild, _ := bot.State.Guild(m.GuildID)
 	localPerms, err := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
 	if err != nil {
-		if config.DebugOutput {
+		if config.Debug {
 			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
 				"check failed due to error when checking permissions:\t%s", err))
 		}

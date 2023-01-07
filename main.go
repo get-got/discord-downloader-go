@@ -183,7 +183,7 @@ func main() {
 
 	//#region MAIN STARTUP COMPLETE
 
-	if config.DebugOutput {
+	if config.Debug {
 		log.Println(lg("Main", "", color.YellowString, "Startup finished, took %s...", uptime()))
 	}
 	log.Println(lg("Main", "", color.HiCyanString,
@@ -263,7 +263,7 @@ func main() {
 			select {
 
 			case <-tickerCheckup.C:
-				if config.DebugOutput {
+				if config.Debug {
 					str := fmt.Sprintf("... %dms latency, last discord heartbeat %s ago, %s uptime",
 						bot.HeartbeatLatency().Milliseconds(),
 						durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)), durafmt.ParseShort(time.Since(startTime)))
@@ -323,30 +323,15 @@ func main() {
 	// Compile list of channels to autorun history
 	for _, channel := range getAllRegisteredChannels() {
 		channelConfig := getSource(&discordgo.Message{ChannelID: channel})
-		if channelConfig.OverwriteAutorunHistory != nil {
-			if *channelConfig.OverwriteAutorunHistory {
+		if channelConfig.AutorunHistory != nil {
+			if *channelConfig.AutorunHistory {
 				var autorunHistoryChannel arh
 				autorunHistoryChannel.channel = channel
-				if channelConfig.OverwriteAutorunHistoryBefore != nil {
-					autorunHistoryChannel.before = *channelConfig.OverwriteAutorunHistoryBefore
-				}
-				if channelConfig.OverwriteAutorunHistorySince != nil {
-					autorunHistoryChannel.since = *channelConfig.OverwriteAutorunHistorySince
-				}
+				autorunHistoryChannel.before = *channelConfig.AutorunHistoryBefore
+				autorunHistoryChannel.since = *channelConfig.AutorunHistorySince
 				autorunHistoryChannels = append(autorunHistoryChannels, autorunHistoryChannel)
 			}
 			continue
-		}
-		if config.AutorunHistory {
-			var autorunHistoryChannel arh
-			autorunHistoryChannel.channel = channel
-			if config.AutorunHistoryBefore != "" {
-				autorunHistoryChannel.before = config.AutorunHistoryBefore
-			}
-			if config.AutorunHistorySince != "" {
-				autorunHistoryChannel.since = config.AutorunHistorySince
-			}
-			autorunHistoryChannels = append(autorunHistoryChannels, autorunHistoryChannel)
 		}
 	}
 	// Process autorun history
@@ -626,7 +611,7 @@ func botLoadDiscord() {
 	bot.AddHandler(messageUpdate)
 
 	// Source Validation
-	if config.DebugOutput {
+	if config.Debug {
 		log.Println(lg("Discord", "Validation", color.HiYellowString, "Validating configured channels/servers..."))
 	}
 	//-
@@ -711,7 +696,7 @@ func botLoadDiscord() {
 				len(invalidChannels), strings.Join(invalidChannels, ", "))
 		}
 		sendErrorMessage(logMsg)
-	} else if config.DebugOutput {
+	} else if config.Debug {
 		log.Println(lg("Discord", "Validation", color.HiGreenString, "All channels/servers successfully validated!"))
 	}
 

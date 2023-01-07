@@ -262,7 +262,7 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 | admins              | array of <br/>strings                   | None       | Discord IDs of users<br/> to use admin commands.                     | `"admins": [ "0", "0" ],`         |
 | adminChannels       | array of <br/>`adminChannel groups`     | None       | See `adminChannel group` below.                                      |                                   |
 | discordLogLevel     | int (whole number)                      | 0 (errors) | 0 = Errors, <br/>1 = Warning, <br/>2 = Informational, <br/>3 = Debug | `"discordLogLevel": 2,`           |
-| debugOutput         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debugOutput": true,`            |
+| debug         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debug": true,`            |
 | messageOutput       | boolean <br/>(true or false)            | true       | Enables discord message output.                                      | `"messageOutput": true,`          |
 
 ### credentials group

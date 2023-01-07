@@ -132,7 +132,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	openHistoryCache := func(dirpath string, output *string) {
 		if f, err := ioutil.ReadFile(dirpath + string(os.PathSeparator) + subjectChannelID); err == nil {
 			*output = string(f)
-			if !autorun && config.DebugOutput {
+			if !autorun && config.Debug {
 				log.Println(lg("Debug", "History", color.YellowString,
 					logPrefix+"Found a cache file, picking up where we left off before %s...", string(f)))
 			}
@@ -151,7 +151,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		if _, err = f.WriteString(ID); err != nil {
 			log.Println(lg("Debug", "History", color.RedString,
 				logPrefix+"Failed to write cache file:\t%s", err))
-		} else if !autorun && config.DebugOutput {
+		} else if !autorun && config.Debug {
 			log.Println(lg("Debug", "History", color.YellowString,
 				logPrefix+"Wrote to cache file."))
 		}
@@ -164,7 +164,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			if err != nil {
 				log.Println(lg("Debug", "History", color.HiRedString,
 					logPrefix+"Encountered error deleting cache file:\t%s", err))
-			} else if commandingMessage != nil && config.DebugOutput {
+			} else if commandingMessage != nil && config.Debug {
 				log.Println(lg("Debug", "History", color.HiRedString,
 					logPrefix+"Deleted cache file."))
 			}
@@ -203,13 +203,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	if channelConfig := getSource(responseMsg); channelConfig != emptyConfig {
 
 		// Overwrite Send Status
-		if channelConfig.OverwriteSendAutorunHistoryStatus != nil {
-			if autorun && !*channelConfig.OverwriteSendAutorunHistoryStatus {
+		if channelConfig.SendAutorunHistoryStatus != nil {
+			if autorun && !*channelConfig.SendAutorunHistoryStatus {
 				sendStatus = false
 			}
 		}
-		if channelConfig.OverwriteSendHistoryStatus != nil {
-			if !autorun && !*channelConfig.OverwriteSendHistoryStatus {
+		if channelConfig.SendHistoryStatus != nil {
+			if !autorun && !*channelConfig.SendHistoryStatus {
 				sendStatus = false
 			}
 		}
@@ -311,7 +311,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 				// Update presence
 				timeLastUpdated = time.Now()
-				if *channelConfig.UpdatePresence {
+				if *channelConfig.PresenceEnabled {
 					updateDiscordPresence()
 				}
 			}
@@ -364,8 +364,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				sinceID = ""
 
 				// Process Messages
-				if channelConfig.TypeWhileProcessing != nil && !autorun {
-					if *channelConfig.TypeWhileProcessing && hasPermsToRespond {
+				if channelConfig.HistoryTyping != nil && !autorun {
+					if *channelConfig.HistoryTyping && hasPermsToRespond {
 						bot.ChannelTyping(commandingMessage.ChannelID)
 					}
 				}

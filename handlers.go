@@ -200,7 +200,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 				channelConfig.Filters.AllowedUsers != nil ||
 				channelConfig.Filters.AllowedRoles != nil {
 				shouldAbort = true
-				if config.DebugOutput {
+				if config.Debug {
 					log.Println(lg("Debug", "Message", color.YellowString,
 						"%s Filter will be ignoring by default...",
 						color.HiMagentaString("(FILTER)")))
@@ -211,7 +211,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 				for _, phrase := range *channelConfig.Filters.BlockedPhrases {
 					if strings.Contains(m.Content, phrase) {
 						shouldAbort = true
-						if config.DebugOutput {
+						if config.Debug {
 							log.Println(lg("Debug", "Message", color.YellowString,
 								"%s blockedPhrases found \"%s\" in message, planning to abort...",
 								color.HiMagentaString("(FILTER)"), phrase))
@@ -224,7 +224,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 				for _, phrase := range *channelConfig.Filters.AllowedPhrases {
 					if strings.Contains(m.Content, phrase) {
 						shouldAbort = false
-						if config.DebugOutput {
+						if config.Debug {
 							log.Println(lg("Debug", "Message", color.YellowString,
 								"%s allowedPhrases found \"%s\" in message, planning to process...",
 								color.HiMagentaString("(FILTER)"), phrase))
@@ -237,7 +237,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			if channelConfig.Filters.BlockedUsers != nil {
 				if stringInSlice(m.Author.ID, *channelConfig.Filters.BlockedUsers) {
 					shouldAbort = true
-					if config.DebugOutput {
+					if config.Debug {
 						log.Println(lg("Debug", "Message", color.YellowString,
 							"%s blockedUsers caught %s, planning to abort...",
 							color.HiMagentaString("(FILTER)"), m.Author.ID))
@@ -247,7 +247,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			if channelConfig.Filters.AllowedUsers != nil {
 				if stringInSlice(m.Author.ID, *channelConfig.Filters.AllowedUsers) {
 					shouldAbort = false
-					if config.DebugOutput {
+					if config.Debug {
 						log.Println(lg("Debug", "Message", color.YellowString,
 							"%s allowedUsers caught %s, planning to process...",
 							color.HiMagentaString("(FILTER)"), m.Author.ID))
@@ -264,7 +264,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 					for _, role := range member.Roles {
 						if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
 							shouldAbort = true
-							if config.DebugOutput {
+							if config.Debug {
 								log.Println(lg("Debug", "Message", color.YellowString,
 									"%s blockedRoles caught %s, planning to abort...",
 									color.HiMagentaString("(FILTER)"), role))
@@ -283,7 +283,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 					for _, role := range member.Roles {
 						if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
 							shouldAbort = false
-							if config.DebugOutput {
+							if config.Debug {
 								log.Println(lg("Debug", "Message", color.YellowString,
 									"%s allowedRoles caught %s, planning to allow...",
 									color.HiMagentaString("(FILTER)"), role))
@@ -296,7 +296,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 
 			// Abort
 			if shouldAbort {
-				if config.DebugOutput {
+				if config.Debug {
 					log.Println(lg("Debug", "Message", color.YellowString,
 						"%s Filter decided to ignore message...",
 						color.HiMagentaString("(FILTER)")))
@@ -313,7 +313,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			if file.Link == "" {
 				continue
 			}
-			if config.DebugOutput && !history {
+			if config.Debug && !history {
 				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link))
 			}
 			status, filesize := handleDownload(

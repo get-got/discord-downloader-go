@@ -27,7 +27,7 @@ func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[s
 
 		if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
 			newList[link] = filename
-		} else if config.DebugOutput {
+		} else if config.Debug {
 			log.Println(lg("Download", "SKIP", color.GreenString, "Found URL has already been downloaded for this channel: %s", link))
 		}
 	}

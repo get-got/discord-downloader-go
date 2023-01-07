@@ -297,7 +297,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             "channel": "CHANNEL_ID_FOR_ADMIN_CONTROL"
         }
     ],
-    "debugOutput": true,
+    "debug": true,
     "commandPrefix": "downloader_",
     "allowGlobalCommands": true,
     "asyncHistory": false,
@@ -314,7 +314,7 @@ This setup exempts many options so they will use default values _(see below)_. I
     "filenameFormat": "{{date}} {{file}}",
     "filenameDateFormat": "2006.01.02-15.04.05 ",
     "embedColor": "#EE22CC",
-    "inflateCount": 12345,
+    "inflateDownloadCount": 12345,
     "channels": [
         {
             "channel": "THIS_CHANNEL_ONLY_DOWNLOADS_MEDIA",
@@ -330,7 +330,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             "destination": "stealthy",
             "allowCommands": false,
             "errorMessages": false,
-            "updatePresence": false,
+            "presenceEnabled": false,
             "reactWhenDownloaded": false
         },
         {
@@ -338,7 +338,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             "destination": "stuff",
             "allowCommands": false,
             "errorMessages": false,
-            "updatePresence": false,
+            "presenceEnabled": false,
             "reactWhenDownloaded": false
         }
     ]
@@ -404,7 +404,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             "channel": "CHANNEL_BOBS_BOT_ADMIN"
         }
     ],
-    "debugOutput": true,
+    "debug": true,
     "commandPrefix": "d_",
     "scanOwnMessages": true,
     "allowGlobalCommands": false,
@@ -427,8 +427,8 @@ This setup exempts many options so they will use default values _(see below)_. I
     "filenameFormat": "{{date}} {{file}}",
     "filenameDateFormat": "2006.01.02_15.04.05_",
     "embedColor": "#FF0000",
-    "inflateCount": 69,
-    "numberFormatEuropean": true,
+    "inflateDownloadCount": 69,
+    "europeanNumbers": true,
     "all": {
         "destination": "DOWNLOAD_FOLDER/Unregistered",
         "allowCommands": false,
@@ -438,13 +438,13 @@ This setup exempts many options so they will use default values _(see below)_. I
         "overwriteAutorunHistory": false,
         "overwriteAutorunHistoryBefore": "2022-02-05",
         "overwriteAutorunHistorySince": "2020-02-05",
-        "updatePresence": false,
+        "presenceEnabled": false,
         "reactWhenDownloaded": false,
-        "typeWhileProcessing": false,
-        "divideFoldersByServer": true,
-        "divideFoldersByChannel": true,
-        "divideFoldersByUser": false,
-        "divideFoldersByType": false,
+        "historyTyping": false,
+        "divideByServer": true,
+        "divideByChannel": true,
+        "divideByUser": false,
+        "divideByType": false,
         "saveImages": true,
         "saveVideos": true,
         "saveAudioFiles": true,
@@ -485,13 +485,13 @@ This setup exempts many options so they will use default values _(see below)_. I
         {
             "server": "SERVER_MAIN",
             "destination": "DOWNLOAD_FOLDER/- My Server",
-            "divideFoldersByChannel": true
+            "divideByChannel": true
         },
         {
             "servers": [ "SERVER_BOBS", "SERVER_GAMERZ" ],
             "destination": "DOWNLOAD_FOLDER/- Friends Servers",
-            "divideFoldersByServer": true,
-            "divideFoldersByChannel": true
+            "divideByServer": true,
+            "divideByChannel": true
         }
     ],
     "channels": [
@@ -518,7 +518,7 @@ This setup exempts many options so they will use default values _(see below)_. I
             "destination": "DOWNLOAD_FOLDER/Our Memes",
             "allowCommands": true,
             "errorMessages": true,
-            "updatePresence": true,
+            "presenceEnabled": true,
             "reactWhenDownloaded": true,
             "saveImages": true,
             "saveVideos": true,
@@ -624,8 +624,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * _Default:_ `false`
         * _Unrestrict admin commands so anyone can use within this admin channel._
 ---
-* :small_blue_diamond: "debugOutput"
-    * — _settings.debugOutput : boolean_
+* :small_blue_diamond: "debug"
+    * — _settings.debug : boolean_
     * _Default:_ `false`
     * Output debugging information.
 * :small_blue_diamond: "settingsOutput"
@@ -745,12 +745,12 @@ This setup exempts many options so they will use default values _(see below)_. I
     * — _settings.embedColor : string_
     * _Unused by Default_
     * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
-* :small_orange_diamond: "inflateCount"
-    * — _settings.inflateCount : number_
+* :small_orange_diamond: "inflateDownloadCount"
+    * — _settings.inflateDownloadCount : number_
     * _Unused by Default_
     * Inflates the count of total files downloaded by the bot. I only added this for my own personal use to represent an accurate total amount of files downloaded by previous bots I used.
-* :small_blue_diamond: "numberFormatEuropean"
-    * — _settings.numberFormatEuropean : boolean_
+* :small_blue_diamond: "europeanNumbers"
+    * — _settings.europeanNumbers : boolean_
     * _Default:_ false
     * Formats numbers as `123.456,78`/`123.46k` rather than `123,456.78`/`123,46k`.
 ---
@@ -877,8 +877,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * Caption to accompany forwarded files, keys to replace follow [Key Placeholders for customization,](#key-placeholders-for-settings) in addition to `{{channelID}}, {{serverID}}, {{channelName}}`.
     ---
     #### _Source - Appearance_
-    * :small_blue_diamond: "updatePresence"
-        * — _settings.channels[].updatePresence : boolean_
+    * :small_blue_diamond: "presenceEnabled"
+        * — _settings.channels[].presenceEnabled : boolean_
         * _Default:_ `true`
         * Update Discord Presence when download succeeds within this channel.
     * :small_blue_diamond: "reactWhenDownloaded"
@@ -897,8 +897,8 @@ This setup exempts many options so they will use default values _(see below)_. I
         * — _settings.channels[].blacklistReactEmojis : list of strings_
         * _Unused by Default_
         * Block specific emojis from being used for reacts. Simply pasting a standard emoji will work, for custom Discord emojis use "name:ID" format.
-    * :small_blue_diamond: "typeWhileProcessing"
-        * — _settings.channels[].typeWhileProcessing : boolean_
+    * :small_blue_diamond: "historyTyping"
+        * — _settings.channels[].historyTyping : boolean_
         * _Default:_ `false`
         * Shows _"<name> is typing..."_ while processing things that aren't processed instantly, like history cataloging.
     ---
@@ -914,26 +914,26 @@ This setup exempts many options so they will use default values _(see below)_. I
         * Supports `random`/`rand`, `role`/`user`, or RGB in hex or int format (ex: #FF0000 or 16711680).
     ---
     #### _Source - Saving Rules_
-    * :small_blue_diamond: "divideFoldersByServer"
-        * — _settings.channels[].divideFoldersByServer : boolean_
+    * :small_blue_diamond: "divideByServer"
+        * — _settings.channels[].divideByServer : boolean_
         * _Default:_ `false`
         * Separate files into subfolders by server of origin _(e.g. "My Server", "My Friends Server")_
-    * :small_blue_diamond: "divideFoldersByChannel"
-        * — _settings.channels[].divideFoldersByChannel : boolean_
+    * :small_blue_diamond: "divideByChannel"
+        * — _settings.channels[].divideByChannel : boolean_
         * _Default:_ `false`
         * Separate files into subfolders by channel of origin _(e.g. "my-channel", "my-other-channel")_
-    * :small_blue_diamond: "divideFoldersByUser"
-        * — _settings.channels[].divideFoldersByUser : boolean_
+    * :small_blue_diamond: "divideByUser"
+        * — _settings.channels[].divideByUser : boolean_
         * _Default:_ `false`
         * Separate files into subfolders by user who sent _(e.g. "Me#1234", "My Friend#0000")_
-    * :small_blue_diamond: "divideFoldersByType"
-        * — _settings.channels[].divideFoldersByType : boolean_
+    * :small_blue_diamond: "divideByType"
+        * — _settings.channels[].divideByType : boolean_
         * _Default:_ `true`
         * Separate files into subfolders by type _(e.g. "images", "video", "audio", "text", "other")_
     * :small_blue_diamond: "divideFoldersUseID"
         * — _settings.channels[].divideFoldersUseID : boolean_
         * _Default:_ `false`
-        * Uses ID rather than Name for `"divideFoldersByServer"`, `"divideFoldersByChannel"`, `"divideFoldersByUser"`. I would recommend this if any servers you download from have server/channel/usernames changed frequently.
+        * Uses ID rather than Name for `"divideByServer"`, `"divideByChannel"`, `"divideByUser"`. I would recommend this if any servers you download from have server/channel/usernames changed frequently.
     * :small_blue_diamond: "saveImages"
         * — _settings.channels[].saveImages : boolean_
         * _Default:_ `true`
