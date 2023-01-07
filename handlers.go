@@ -56,7 +56,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 		if edited {
 			log.Println(lg("Message", "ADMIN CHANNEL", color.CyanString, "Edited [%s]: %s", sendLabel, content))
 		} else {
-			log.Println(lg("Message", "ADMIN CHANNEL", color.CyanString, "Message [%s]: %s", sendLabel, content))
+			log.Println(lg("Message", "ADMIN CHANNEL", color.CyanString, "[%s]: %s", sendLabel, content))
 		}
 	}
 
@@ -81,14 +81,14 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			)
 			content := m.Content
 			if len(m.Attachments) > 0 {
-				content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
+				content += fmt.Sprintf("\t[%d attachments]", len(m.Attachments))
 			}
 
 			if !history {
 				if edited {
 					log.Println(lg("Message", "", color.CyanString, "Edited [%s]: %s", sendLabel, content))
 				} else {
-					log.Println(lg("Message", "", color.CyanString, "Message [%s]: %s", sendLabel, content))
+					log.Println(lg("Message", "", color.CyanString, "[%s]: %s", sendLabel, content))
 				}
 			}
 		}
@@ -97,14 +97,14 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 		if channelConfig.LogMessages != nil {
 			if channelConfig.LogMessages.Destination != "" {
 				logPath := channelConfig.LogMessages.Destination
-				if *channelConfig.LogMessages.DestinationIsFolder == true {
+				if *channelConfig.LogMessages.DestinationIsFolder {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Messages"
-						if *channelConfig.LogMessages.DivideLogsByServer == true {
+						if *channelConfig.LogMessages.DivideLogsByServer {
 							if m.GuildID == "" {
 								ch, err := bot.State.Channel(m.ChannelID)
 								if err == nil {
@@ -122,10 +122,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 								logPath += " SID_" + m.GuildID
 							}
 						}
-						if *channelConfig.LogMessages.DivideLogsByChannel == true {
+						if *channelConfig.LogMessages.DivideLogsByChannel {
 							logPath += " CID_" + m.ChannelID
 						}
-						if *channelConfig.LogMessages.DivideLogsByUser == true {
+						if *channelConfig.LogMessages.DivideLogsByUser {
 							logPath += " UID_" + m.Author.ID
 						}
 					}
@@ -165,7 +165,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 					// More Data
 					additionalInfo := ""
 					if channelConfig.LogMessages.UserData != nil {
-						if *channelConfig.LogMessages.UserData == true {
+						if *channelConfig.LogMessages.UserData {
 							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID, m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Timestamp)
 						}
 					}
