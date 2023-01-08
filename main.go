@@ -336,8 +336,10 @@ func main() {
 							break
 						}
 					}
-					// because of modifying the job while iterating historyJobs above
-					go handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+					if job != (historyJob{}) {
+						// because of modifying the job while iterating historyJobs above
+						go handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+					}
 				}
 			}
 			time.Sleep(10 * time.Second)
