@@ -120,7 +120,7 @@ func main() {
 	))
 	//#endregion
 
-	go openDatabase()
+	openDatabase()
 
 	//#region Component Initialization
 
