@@ -43,6 +43,13 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 		return nil, errors.New("invalid Twitter API Keys Set")
 	}
 
+	if strings.Contains(inputURL, "/photo/") {
+		inputURL = inputURL[:strings.Index(inputURL, "/photo/")]
+	}
+	if strings.Contains(inputURL, "/video/") {
+		inputURL = inputURL[:strings.Index(inputURL, "/video/")]
+	}
+
 	matches := regexUrlTwitterStatus.FindStringSubmatch(inputURL)
 	statusId, err := strconv.ParseInt(matches[4], 10, 64)
 	if err != nil {
