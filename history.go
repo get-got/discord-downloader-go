@@ -106,8 +106,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		sendStatus = false
 	}
 
+	var channelinfo *discordgo.Channel
+	if channelinfo, err = bot.State.Channel(subjectChannelID); err != nil {
+		log.Println(lg("History", "", color.HiRedString, logPrefix+"ERROR FETCHING BOT STATE FROM DISCORDGO!!!\t%s", err))
+	}
+
 	// Check Read History perms
-	if !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
+	if !channelinfo.IsThread() && !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
 		if job, exists := historyJobs[subjectChannelID]; exists {
 			job.Status = historyStatusDownloading
 			job.Updated = time.Now()
