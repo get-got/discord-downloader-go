@@ -1041,7 +1041,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 			}
 			if download.Message.Author != nil && shouldReact {
 				reaction := ""
-				if *channelConfig.ReactWhenDownloadedEmoji == "" {
+				if channelConfig.ReactWhenDownloadedEmoji == nil {
 					if download.Message.GuildID != "" {
 						guild, err := bot.State.Guild(download.Message.GuildID)
 						if err != nil {
