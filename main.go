@@ -120,42 +120,7 @@ func main() {
 	))
 	//#endregion
 
-	//#region Database Initialization
-
-	// Database
-	log.Println(lg("Database", "", color.YellowString, "Opening database..."))
-	myDB, err = db.OpenDB(databasePath)
-	if err != nil {
-		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
-		return
-	}
-	if myDB.Use("Downloads") == nil {
-		log.Println(lg("Database", "Setup", color.YellowString, "Creating database, please wait..."))
-		if err := myDB.Create("Downloads"); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Error while trying to create database: %s", err))
-			return
-		}
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database..."))
-		log.Println(lg("Database", "Setup", color.YellowString, "Indexing database, please wait..."))
-		if err := myDB.Use("Downloads").Index([]string{"URL"}); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for URL: %s", err))
-			return
-		}
-		if err := myDB.Use("Downloads").Index([]string{"ChannelID"}); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for ChannelID: %s", err))
-			return
-		}
-		if err := myDB.Use("Downloads").Index([]string{"UserID"}); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for UserID: %s", err))
-			return
-		}
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes..."))
-	}
-	// Cache download tally
-	cachedDownloadID = dbDownloadCount()
-	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
-
-	//#endregion
+	go openDatabase()
 
 	//#region Component Initialization
 
@@ -448,6 +413,41 @@ func main() {
 
 	log.Println(lg("Main", "", color.HiRedString, "Exiting... "))
 	//#endregion
+}
+
+func openDatabase() {
+	// Database
+	log.Println(lg("Database", "", color.YellowString, "Opening database..."))
+	myDB, err = db.OpenDB(databasePath)
+	if err != nil {
+		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
+		return
+	}
+	if myDB.Use("Downloads") == nil {
+		log.Println(lg("Database", "Setup", color.YellowString, "Creating database, please wait..."))
+		if err := myDB.Create("Downloads"); err != nil {
+			log.Println(lg("Database", "Setup", color.HiRedString, "Error while trying to create database: %s", err))
+			return
+		}
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database..."))
+		log.Println(lg("Database", "Setup", color.YellowString, "Indexing database, please wait..."))
+		if err := myDB.Use("Downloads").Index([]string{"URL"}); err != nil {
+			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for URL: %s", err))
+			return
+		}
+		if err := myDB.Use("Downloads").Index([]string{"ChannelID"}); err != nil {
+			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for ChannelID: %s", err))
+			return
+		}
+		if err := myDB.Use("Downloads").Index([]string{"UserID"}); err != nil {
+			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for UserID: %s", err))
+			return
+		}
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes..."))
+	}
+	// Cache download tally
+	cachedDownloadID = dbDownloadCount()
+	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
 }
 
 func botLoad() {

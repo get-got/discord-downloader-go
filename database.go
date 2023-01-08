@@ -76,6 +76,16 @@ func dbFindDownloadByURL(inputURL string) []*downloadItem {
 	return downloadedImages
 }
 
+func dbDeleteByChannelID(channelID string) {
+	var query interface{}
+	json.Unmarshal([]byte(fmt.Sprintf(`[{"eq": "%s", "in": ["ChannelID"]}]`, channelID)), &query)
+	queryResult := make(map[int]struct{})
+	db.EvalQuery(query, myDB.Use("Downloads"), &queryResult)
+	for id := range queryResult {
+		myDB.Use("Downloads").Delete(id)
+	}
+}
+
 //#region Statistics
 
 func dbDownloadCount() int {

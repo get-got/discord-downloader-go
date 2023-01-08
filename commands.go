@@ -191,10 +191,13 @@ func handleCommands() *exrouter.Route {
 	go router.On("history", func(ctx *exrouter.Context) {
 		if isCommandableChannel(ctx.Msg) {
 			// Vars
+			var all = false
 			var channels []string
 
 			var shouldAbort bool = false
 			var shouldProcess bool = true
+			var shouldWipeDB bool = false
+			var shouldWipeCache bool = false
 
 			var before string
 			var beforeID string
@@ -209,6 +212,14 @@ func handleCommands() *exrouter.Route {
 				if strings.Contains(strings.ToLower(argValue), "cancel") ||
 					strings.Contains(strings.ToLower(argValue), "stop") {
 					shouldAbort = true
+				} else if strings.Contains(strings.ToLower(argValue), "dbwipe") ||
+					strings.Contains(strings.ToLower(argValue), "wipedb") {
+					shouldProcess = false
+					shouldWipeDB = true
+				} else if strings.Contains(strings.ToLower(argValue), "cachewipe") ||
+					strings.Contains(strings.ToLower(argValue), "wipecache") {
+					shouldProcess = false
+					shouldWipeCache = true
 				} else if strings.Contains(strings.ToLower(argValue), "help") ||
 					strings.Contains(strings.ToLower(argValue), "info") {
 					shouldProcess = false
@@ -308,47 +319,48 @@ func handleCommands() *exrouter.Route {
 							}
 						} else if strings.Contains(strings.ToLower(target), "all") {
 							channels = getAllRegisteredChannels()
+							all = true
 						}
 					}
 				}
 			}
 			//#endregion
 
-			//#region Process Channels
-			if shouldProcess {
-				// Local
-				if len(channels) == 0 {
-					channels = append(channels, ctx.Msg.ChannelID)
-				}
-				// Foreach Channel
-				for _, channel := range channels {
-					if config.Debug {
-						nameGuild := channel
-						if chinfo, err := bot.State.Channel(channel); err == nil {
-							nameGuild = getGuildName(chinfo.GuildID)
-						}
-						nameCategory := getChannelCategoryName(channel)
-						nameChannel := getChannelName(channel)
-						nameDisplay := fmt.Sprintf("%s / %s", nameGuild, nameChannel)
-						if nameCategory != "unknown" {
-							nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)
-						}
-						log.Println(lg("Command", "History", color.HiMagentaString,
-							"Queueing history job for \"%s\"\t\t(%s) ...", nameDisplay, channel))
+			// Local
+			if len(channels) == 0 {
+				channels = append(channels, ctx.Msg.ChannelID)
+			}
+			// Foreach Channel
+			for _, channel := range channels {
+				//#region Process Channels
+				if shouldProcess && config.Debug {
+					nameGuild := channel
+					if chinfo, err := bot.State.Channel(channel); err == nil {
+						nameGuild = getGuildName(chinfo.GuildID)
 					}
-					if !isBotAdmin(ctx.Msg) {
-						log.Println(lg("Command", "History", color.CyanString,
-							"%s tried to cache history for %s but lacked proper permission.",
-							getUserIdentifier(*ctx.Msg.Author), channel))
-						if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-							log.Println(lg("Command", "History", color.HiRedString, fmtBotSendPerm, channel))
-						} else {
-							if _, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms); err != nil {
-								log.Println(lg("Command", "History", color.HiRedString, cmderrSendFailure,
-									getUserIdentifier(*ctx.Msg.Author), err))
-							}
-						}
+					nameCategory := getChannelCategoryName(channel)
+					nameChannel := getChannelName(channel)
+					nameDisplay := fmt.Sprintf("%s / %s", nameGuild, nameChannel)
+					if nameCategory != "unknown" {
+						nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)
+					}
+					log.Println(lg("Command", "History", color.HiMagentaString,
+						"Queueing history job for \"%s\"\t\t(%s) ...", nameDisplay, channel))
+				}
+				if !isBotAdmin(ctx.Msg) {
+					log.Println(lg("Command", "History", color.CyanString,
+						"%s tried to handle history for %s but lacked proper permission.",
+						getUserIdentifier(*ctx.Msg.Author), channel))
+					if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+						log.Println(lg("Command", "History", color.HiRedString, fmtBotSendPerm, channel))
 					} else {
+						if _, err := replyEmbed(ctx.Msg, "Command — History", cmderrLackingBotAdminPerms); err != nil {
+							log.Println(lg("Command", "History", color.HiRedString, cmderrSendFailure,
+								getUserIdentifier(*ctx.Msg.Author), err))
+						}
+					}
+				} else {
+					if shouldProcess {
 						// Run
 						if !shouldAbort {
 							if job, exists := historyJobs[channel]; !exists ||
@@ -386,9 +398,73 @@ func handleCommands() *exrouter.Route {
 								getUserIdentifier(*ctx.Msg.Author), channel))
 						}
 					}
+					if shouldWipeDB {
+						if all {
+							myDB.Close()
+							time.Sleep(1 * time.Second)
+							if _, err := os.Stat(databasePath); err == nil {
+								err = os.RemoveAll(databasePath)
+								if err != nil {
+									log.Println(lg("Command", "History", color.HiRedString,
+										"Encountered error deleting database folder:\t%s", err))
+								} else {
+									log.Println(lg("Command", "History", color.HiGreenString,
+										"Deleted database."))
+								}
+								time.Sleep(1 * time.Second)
+								openDatabase()
+								break
+							} else {
+								log.Println(lg("Command", "History", color.HiRedString,
+									"Database folder inaccessible:\t%s", err))
+							}
+						} else {
+							dbDeleteByChannelID(channel)
+						}
+					}
+					if shouldWipeCache {
+						if all {
+							if _, err := os.Stat(historyCachePath); err == nil {
+								err = os.RemoveAll(historyCachePath)
+								if err != nil {
+									log.Println(lg("Command", "History", color.HiRedString,
+										"Encountered error deleting database folder:\t%s", err))
+								} else {
+									log.Println(lg("Command", "History", color.HiGreenString,
+										"Deleted database."))
+									break
+								}
+							} else {
+								log.Println(lg("Command", "History", color.HiRedString,
+									"Cache folder inaccessible:\t%s", err))
+							}
+						} else {
+							deleteHistoryCache := func(dirpath string) {
+								fp := dirpath + string(os.PathSeparator) + channel
+								if _, err := os.Stat(fp); err == nil {
+									err = os.RemoveAll(fp)
+									if err != nil {
+										log.Println(lg("Debug", "History", color.HiRedString,
+											"Encountered error deleting cache file for %s:\t%s", channel, err))
+									} else {
+										log.Println(lg("Debug", "History", color.HiGreenString,
+											"Deleted cache file for %s.", channel))
+									}
+								} else {
+									log.Println(lg("Command", "History", color.HiRedString,
+										"Cache folder inaccessible:\t%s", err))
+								}
+							}
+							deleteHistoryCache(historyCacheBefore)
+							deleteHistoryCache(historyCacheSince)
+						}
+					}
 				}
+				//#endregion
 			}
-			//#endregion
+			if shouldWipeDB {
+				cachedDownloadID = dbDownloadCount()
+			}
 		}
 	}).Cat("Admin").Alias("catalog", "cache").Desc("Catalogs history for this channel")
 
