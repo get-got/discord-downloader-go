@@ -22,5 +22,4 @@
 *.txt
 
 # Exclude program storage
-/database/*
-/cache/*
+**
