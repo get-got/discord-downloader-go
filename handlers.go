@@ -316,17 +316,16 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			if config.Debug && !history {
 				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link))
 			}
-			status, filesize := handleDownload(
-				downloadRequestStruct{
-					InputURL:   file.Link,
-					Filename:   file.Filename,
-					Path:       channelConfig.Destination,
-					Message:    m,
-					FileTime:   file.Time,
-					HistoryCmd: history,
-					EmojiCmd:   false,
-					StartTime:  time.Now(),
-				})
+			status, filesize := downloadRequestStruct{
+				InputURL:   file.Link,
+				Filename:   file.Filename,
+				Path:       channelConfig.Destination,
+				Message:    m,
+				FileTime:   file.Time,
+				HistoryCmd: history,
+				EmojiCmd:   false,
+				StartTime:  time.Now(),
+			}.handleDownload()
 			if status.Status == downloadSuccess {
 				downloadCount++
 				totalfilesize += filesize

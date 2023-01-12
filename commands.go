@@ -539,17 +539,16 @@ func handleCommands() *exrouter.Route {
 									message.ChannelID = ctx.Msg.ChannelID
 									url := "https://cdn.discordapp.com/emojis/" + emoji.ID
 
-									status, _ := handleDownload(
-										downloadRequestStruct{
-											InputURL:   url,
-											Filename:   emoji.ID,
-											Path:       destination,
-											Message:    &message,
-											FileTime:   time.Now(),
-											HistoryCmd: false,
-											EmojiCmd:   true,
-											StartTime:  time.Now(),
-										})
+									status, _ := downloadRequestStruct{
+										InputURL:   url,
+										Filename:   emoji.ID,
+										Path:       destination,
+										Message:    &message,
+										FileTime:   time.Now(),
+										HistoryCmd: false,
+										EmojiCmd:   true,
+										StartTime:  time.Now(),
+									}.handleDownload()
 
 									if status.Status == downloadSuccess {
 										i++

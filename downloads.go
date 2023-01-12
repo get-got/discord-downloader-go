@@ -144,6 +144,29 @@ func trimDuplicateLinks(fileItems []*fileItem) []*fileItem {
 	return result
 }
 
+// Trim files already downloaded and stored in database
+func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[string]string {
+	channelConfig := getSource(m)
+
+	newList := make(map[string]string, 0)
+	for link, filename := range linkList {
+		downloadedFiles := dbFindDownloadByURL(link)
+		alreadyDownloaded := false
+		for _, downloadedFile := range downloadedFiles {
+			if downloadedFile.ChannelID == m.ChannelID {
+				alreadyDownloaded = true
+			}
+		}
+
+		if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
+			newList[link] = filename
+		} else if config.Debug {
+			log.Println(lg("Download", "SKIP", color.GreenString, "Found URL has already been downloaded for this channel: %s", link))
+		}
+	}
+	return newList
+}
+
 func getRawLinks(m *discordgo.Message) []*fileItem {
 	var links []*fileItem
 
@@ -405,11 +428,11 @@ type downloadRequestStruct struct {
 	StartTime      time.Time
 }
 
-func handleDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
+func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, int64) {
 	status := mDownloadStatus(downloadFailed)
 	var tempfilesize int64 = -1
 	for i := 0; i < config.DownloadRetryMax; i++ {
-		status, tempfilesize = tryDownload(download)
+		status, tempfilesize = download.tryDownload()
 		if status.Status < downloadFailed || status.Status == downloadFailedCode404 { // Success or Skip
 			break
 		} else {
@@ -578,7 +601,7 @@ func handleDownload(download downloadRequestStruct) (downloadStatusStruct, int64
 	return status, tempfilesize
 }
 
-func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
+func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64) {
 	var err error
 
 	cachedDownloadID++

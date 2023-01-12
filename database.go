@@ -7,32 +7,8 @@ import (
 	"time"
 
 	"github.com/HouzuoGuo/tiedot/db"
-	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 )
-
-// Trim files already downloaded and stored in database
-func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[string]string {
-	channelConfig := getSource(m)
-
-	newList := make(map[string]string, 0)
-	for link, filename := range linkList {
-		downloadedFiles := dbFindDownloadByURL(link)
-		alreadyDownloaded := false
-		for _, downloadedFile := range downloadedFiles {
-			if downloadedFile.ChannelID == m.ChannelID {
-				alreadyDownloaded = true
-			}
-		}
-
-		if !alreadyDownloaded || *channelConfig.SavePossibleDuplicates {
-			newList[link] = filename
-		} else if config.Debug {
-			log.Println(lg("Download", "SKIP", color.GreenString, "Found URL has already been downloaded for this channel: %s", link))
-		}
-	}
-	return newList
-}
 
 func dbInsertDownload(download *downloadItem) error {
 	_, err := myDB.Use("Downloads").Insert(map[string]interface{}{
