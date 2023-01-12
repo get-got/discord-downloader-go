@@ -479,18 +479,26 @@ func botLoadAPIs() {
 
 		log.Println(lg("API", "Twitter", color.MagentaString, "Connecting to API..."))
 
+		twitterLoginCount := 0
+	do_twitter_login:
+		twitterLoginCount++
 		twitterClient = anaconda.NewTwitterApiWithCredentials(
 			config.Credentials.TwitterAccessToken,
 			config.Credentials.TwitterAccessTokenSecret,
 			config.Credentials.TwitterConsumerKey,
 			config.Credentials.TwitterConsumerSecret,
 		)
-
 		twitterSelf, err := twitterClient.GetSelf(url.Values{})
 		if err != nil {
 			log.Println(lg("API", "Twitter", color.HiRedString, "API Login Error: %s", err.Error()))
-			log.Println(lg("API", "Twitter", color.MagentaString,
-				"Error encountered while connecting to API, the bot won't use the Twitter API."))
+			if twitterLoginCount <= 3 {
+				time.Sleep(500 * time.Millisecond)
+				goto do_twitter_login
+			} else {
+				log.Println(lg("API", "Twitter", color.HiRedString,
+					"Failed to login to Twitter API, the bot will not fetch tweet media..."))
+			}
+
 		} else {
 			log.Println(lg("API", "Twitter", color.HiMagentaString,
 				"Connected to API @%s", twitterSelf.ScreenName))
