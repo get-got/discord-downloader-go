@@ -543,15 +543,18 @@ func botLoadDiscord() {
 		}
 	}
 
+	discord_login_count := 0
+do_discord_login:
+	discord_login_count++
+
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		// Login via Token (Bot or User)
 		log.Println(lg("Discord", "", color.GreenString, "Connecting to Discord via Token..."))
 		// attempt login without Bot prefix
 		bot, err = discordgo.New(config.Credentials.Token)
 		connectBot()
-		if botUser.Bot {
-			// is bot application, reconnect properly
-			log.Println(lg("Discord", "", color.GreenString, "Reconnecting as bot..."))
+		if botUser.Bot { // is bot application, reconnect properly
+			//log.Println(lg("Discord", "", color.GreenString, "Reconnecting as bot..."))
 			bot, err = discordgo.New("Bot " + config.Credentials.Token)
 			connectBot()
 		}
@@ -562,13 +565,22 @@ func botLoadDiscord() {
 		log.Println(lg("Discord", "", color.GreenString, "Connecting via Login..."))
 		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
 	} else {
-		log.Println(lg("Discord", "", color.HiRedString, "No valid credentials for Discord..."))
-		properExit()
+		if discord_login_count > 5 {
+			log.Println(lg("Discord", "", color.HiRedString, "No valid credentials for Discord..."))
+			properExit()
+		} else {
+			goto do_discord_login
+		}
 	}
 	if err != nil {
-		log.Println(lg("Discord", "", color.HiRedString, "Error logging in: %s", err))
-		properExit()
+		if discord_login_count > 5 {
+			log.Println(lg("Discord", "", color.HiRedString, "Error logging in: %s", err))
+			properExit()
+		} else {
+			goto do_discord_login
+		}
 	}
+
 	connectBot()
 
 	// Fetch Bot's User Info
@@ -576,12 +588,20 @@ func botLoadDiscord() {
 	if err != nil {
 		botUser = bot.State.User
 		if botUser == nil {
-			log.Println(lg("Discord", "", color.HiRedString, "Error obtaining user details: %s", err))
-			loop <- syscall.SIGINT
+			if discord_login_count > 5 {
+				log.Println(lg("Discord", "", color.HiRedString, "Error obtaining user details: %s", err))
+				properExit()
+			} else {
+				goto do_discord_login
+			}
 		}
 	} else if botUser == nil {
-		log.Println(lg("Discord", "", color.HiRedString, "No error encountered obtaining user details, but it's empty..."))
-		loop <- syscall.SIGINT
+		if discord_login_count > 5 {
+			log.Println(lg("Discord", "", color.HiRedString, "No error encountered obtaining user details, but it's empty..."))
+			properExit()
+		} else {
+			goto do_discord_login
+		}
 	} else {
 		botReady = true
 		log.Println(lg("Discord", "", color.HiGreenString, "Logged into %s", getUserIdentifier(*botUser)))
@@ -589,11 +609,13 @@ func botLoadDiscord() {
 			log.Println(lg("Discord", "", color.MagentaString, "This is a genuine Discord Bot Application"))
 			log.Println(lg("Discord", "", color.MagentaString, "- Presence details & state are disabled, only status will work."))
 			log.Println(lg("Discord", "", color.MagentaString, "- The bot can only see servers you have added it to."))
+			log.Println(lg("Discord", "", color.MagentaString, "- Nothing is wrong, this is just info :)"))
 		} else {
 			log.Println(lg("Discord", "", color.MagentaString, "This is a User Account (Self-Bot)"))
 			log.Println(lg("Discord", "", color.MagentaString, "- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
 			log.Println(lg("Discord", "", color.MagentaString, "- See GitHub page for link to Discord's official statement."))
 			log.Println(lg("Discord", "", color.MagentaString, "- If you wish to avoid this, use a Bot Application if possible."))
+			log.Println(lg("Discord", "", color.MagentaString, "- Nothing is wrong, this is just info :)"))
 		}
 	}
 	if bot.State.User != nil { // is selfbot
