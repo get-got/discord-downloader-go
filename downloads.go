@@ -1156,7 +1156,7 @@ func tryDownload(download downloadRequestStruct) (downloadStatusStruct, int64) {
 		if !download.HistoryCmd {
 			timeLastUpdated = time.Now()
 			if *channelConfig.PresenceEnabled {
-				updateDiscordPresence()
+				go updateDiscordPresence()
 			}
 		}
 

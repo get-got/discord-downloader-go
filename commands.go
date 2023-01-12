@@ -412,7 +412,8 @@ func handleCommands() *exrouter.Route {
 										"Deleted database."))
 								}
 								time.Sleep(1 * time.Second)
-								openDatabase()
+								mainWg.Add(1)
+								go openDatabase()
 								break
 							} else {
 								log.Println(lg("Command", "History", color.HiRedString,

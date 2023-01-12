@@ -393,7 +393,7 @@ type configurationAdminChannel struct {
 
 //#endregion
 
-func loadConfig() {
+func loadConfig() error {
 	// Determine json type
 	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
 		configFile = configFileBase + ".jsonc"
@@ -522,7 +522,21 @@ func loadConfig() {
 			log.Println(lg("Settings", "loadConfig", color.MagentaString, "You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
 			properExit()
 		}
+
+		allString := ""
+		if config.All != nil {
+			allString = ", ALL ENABLED"
+		}
+		log.Println(lg("Settings", "", color.HiYellowString,
+			"Loaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
+			getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+			getBoundCategoriesCount(),
+			getBoundServersCount(), pluralS(getBoundServersCount()),
+			getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
+		))
 	}
+	mainWg.Done()
+	return nil
 }
 
 func createConfig() {

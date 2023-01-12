@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"runtime"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -49,16 +50,22 @@ import (
 
 var (
 	err error
+
+	mainWg sync.WaitGroup
+
 	// Bot
 	bot         *discordgo.Session
 	botUser     *discordgo.User
 	botCommands *exrouter.Route
 	selfbot     bool = false
 	botReady    bool = false
+
 	// Storage
 	myDB *db.DB
+
 	// APIs
 	twitterConnected bool
+
 	// Gen
 	loop                 chan os.Signal
 	startTime            time.Time
@@ -67,6 +74,7 @@ var (
 	timeLastMessage      time.Time
 	cachedDownloadID     int
 	configReloadLastTime time.Time
+
 	// Validation
 	invalidAdminChannels []string
 	invalidChannels      []string
@@ -75,6 +83,10 @@ var (
 )
 
 func init() {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	log.SetOutput(color.Output)
+	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
+
 	loop = make(chan os.Signal, 1)
 	startTime = time.Now()
 	historyJobs = make(map[string]historyJob)
@@ -83,16 +95,13 @@ func init() {
 		configFileBase = os.Args[1]
 	}
 
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	log.SetOutput(color.Output)
-	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
 	log.Println(lg("Version", "", color.CyanString,
 		"%s / discord-go v%s (modified) / Discord API v%s", runtime.Version(), discordgo.VERSION, discordgo.APIVersion))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
-			log.Println(lg("Version", "UPDATE", color.HiCyanString, "*** Update Available! ***"))
+			log.Println(lg("Version", "UPDATE", color.HiCyanString, "***\tUPDATE AVAILABLE\t***"))
 			log.Println(lg("Version", "UPDATE", color.CyanString, projectReleaseURL))
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "*** See changelog for information ***"))
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "CHECK ALL CHANGELOGS SINCE YOUR LAST UPDATE"))
@@ -105,40 +114,28 @@ func init() {
 }
 
 func main() {
-	//#region Config
-	loadConfig()
-	allString := ""
-	if config.All != nil {
-		allString = ", ALL ENABLED"
-	}
-	log.Println(lg("Settings", "", color.HiYellowString,
-		"Loaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
-		getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
-		getBoundCategoriesCount(),
-		getBoundServersCount(), pluralS(getBoundServersCount()),
-		getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
-	))
-	//#endregion
 
-	openDatabase()
-
-	//#region Component Initialization
+	mainWg.Add(2)
+	go loadConfig()
+	go openDatabase()
 
 	// Regex
-	if err = compileRegex(); err != nil {
-		log.Println(lg("Regex", "", color.HiRedString, "Error initializing:\t%s", err))
-		return
-	}
+	mainWg.Add(1)
+	go func() {
+		if err = compileRegex(); err != nil {
+			log.Println(lg("Regex", "", color.HiRedString, "Error initializing:\t%s", err))
+			return
+		}
+		mainWg.Done()
+	}()
 
-	botLoadAPIs()
+	mainWg.Wait() // wait because api uses credentials from json
 
-	//#endregion
+	mainWg.Add(2)
+	go botLoadAPIs()
+	go botLoadDiscord()
 
-	//#region Discord Initialization
-
-	botLoadDiscord()
-
-	//#endregion
+	mainWg.Wait()
 
 	//#region MAIN STARTUP COMPLETE
 
@@ -151,64 +148,8 @@ func main() {
 	log.Println(lg("Main", "", color.RedString, "CTRL+C to exit..."))
 
 	// Log Status
-	sendStatusMessage(sendStatusStartup)
+	go sendStatusMessage(sendStatusStartup)
 
-	//#endregion
-
-	//#region Cache Constants
-	constants := make(map[string]string)
-	//--- Compile constants
-	for _, server := range bot.State.Guilds {
-		serverKey := fmt.Sprintf("SERVER_%s", stripSymbols(server.Name))
-		serverKey = strings.ReplaceAll(serverKey, " ", "_")
-		for strings.Contains(serverKey, "__") {
-			serverKey = strings.ReplaceAll(serverKey, "__", "_")
-		}
-		serverKey = strings.ToUpper(serverKey)
-		if constants[serverKey] == "" {
-			constants[serverKey] = server.ID
-		}
-		for _, channel := range server.Channels {
-			if channel.Type != discordgo.ChannelTypeGuildCategory {
-				categoryName := ""
-				if channel.ParentID != "" {
-					channelParent, err := bot.State.Channel(channel.ParentID)
-					if err == nil {
-						categoryName = channelParent.Name
-					}
-				}
-				channelKey := fmt.Sprintf("CHANNEL_%s_%s_%s",
-					stripSymbols(server.Name), stripSymbols(categoryName), stripSymbols(channel.Name))
-				channelKey = strings.ReplaceAll(channelKey, " ", "_")
-				for strings.Contains(channelKey, "__") {
-					channelKey = strings.ReplaceAll(channelKey, "__", "_")
-				}
-				channelKey = strings.ToUpper(channelKey)
-				if constants[channelKey] == "" {
-					constants[channelKey] = channel.ID
-				}
-			}
-		}
-	}
-	//--- Save constants
-	os.MkdirAll(cachePath, 0755)
-	if _, err := os.Stat(constantsPath); err == nil {
-		err = os.Remove(constantsPath)
-		if err != nil {
-			log.Println(lg("Constants", "", color.HiRedString, "Encountered error deleting cache file:\t%s", err))
-		}
-	}
-	constantsStruct := constStruct{}
-	constantsStruct.Constants = constants
-	newJson, err := json.MarshalIndent(constantsStruct, "", "\t")
-	if err != nil {
-		log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))
-	} else {
-		err := ioutil.WriteFile(constantsPath, newJson, 0644)
-		if err != nil {
-			log.Println(lg("Constants", "", color.HiRedString, "Failed to save new constants file...\t%s", err))
-		}
-	}
 	//#endregion
 
 	//#region BG Tasks
@@ -223,24 +164,32 @@ func main() {
 
 			case <-tickerCheckup.C:
 				if config.Debug {
-					str := fmt.Sprintf("... %dms latency, last discord heartbeat %s ago, %s uptime",
+					historyJobsWaiting := 0
+					if len(historyJobs) > 0 {
+						for _, job := range historyJobs {
+							if job.Status == historyStatusWaiting {
+								historyJobsWaiting++
+							}
+						}
+					}
+					str := fmt.Sprintf("... %dms latency,\tlast discord heartbeat %s ago,\t%s uptime",
 						bot.HeartbeatLatency().Milliseconds(),
 						durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)), durafmt.ParseShort(time.Since(startTime)))
 					if !timeLastMessage.IsZero() {
-						str += fmt.Sprintf(", last message %s ago", durafmt.ParseShort(time.Since(timeLastMessage)))
+						str += fmt.Sprintf(",\tlast message %s ago", durafmt.ParseShort(time.Since(timeLastMessage)))
 					}
 					if !timeLastDownload.IsZero() {
-						str += fmt.Sprintf(", last download %s ago", durafmt.ParseShort(time.Since(timeLastDownload)))
+						str += fmt.Sprintf(",\tlast download %s ago", durafmt.ParseShort(time.Since(timeLastDownload)))
 					}
-					if len(historyJobs) > 0 {
-						str += fmt.Sprintf(", %d history jobs", len(historyJobs))
+					if historyJobsWaiting > 0 {
+						str += fmt.Sprintf(",\t%d history jobs waiting", historyJobsWaiting)
 					}
-					log.Println(lg("Checkup", "", color.CyanString, str))
+					log.Println(lg("Checkup", "", color.YellowString, str))
 				}
 
 			case <-tickerPresence.C:
 				// If bot experiences connection interruption the status will go blank until updated by message, this fixes that
-				updateDiscordPresence()
+				go updateDiscordPresence()
 
 			case <-tickerConnection.C:
 				doReconnect := func() {
@@ -264,11 +213,11 @@ func main() {
 				if err != nil || gate == "" {
 					log.Println(lg("Discord", "", color.HiYellowString,
 						"Bot encountered a gateway error: GATEWAY: %s,\tERR: %s", gate, err))
-					doReconnect()
+					go doReconnect()
 				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 4*60 {
 					log.Println(lg("Discord", "", color.HiYellowString,
 						"Bot has not received a heartbeat from Discord in 4 minutes..."))
-					doReconnect()
+					go doReconnect()
 				}
 
 			}
@@ -342,7 +291,7 @@ func main() {
 					}
 				}
 			}
-			time.Sleep(10 * time.Second)
+			time.Sleep(8 * time.Second)
 		}
 	}()
 	//#endregion
@@ -353,8 +302,7 @@ func main() {
 		log.Println(lg("Settings", "Watcher", color.HiRedString, "Error creating NewWatcher:\t%s", err))
 	}
 	defer watcher.Close()
-	err = watcher.Add(configFile)
-	if err != nil {
+	if err = watcher.Add(configFile); err != nil {
 		log.Println(lg("Settings", "Watcher", color.HiRedString, "Error adding watcher for settings:\t%s", err))
 	}
 	go func() {
@@ -370,7 +318,8 @@ func main() {
 						time.Sleep(1 * time.Second)
 						log.Println(lg("Settings", "Watcher", color.YellowString,
 							"Detected changes in \"%s\", reloading...", configFile))
-						loadConfig()
+						mainWg.Add(1)
+						go loadConfig()
 						allString := ""
 						if config.All != nil {
 							allString = ", ALL ENABLED"
@@ -383,7 +332,7 @@ func main() {
 							getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
 						))
 
-						updateDiscordPresence()
+						go updateDiscordPresence()
 					}
 					configReloadLastTime = time.Now()
 				}
@@ -399,13 +348,69 @@ func main() {
 
 	//#endregion
 
+	//#region Cache Constants
+	constants := make(map[string]string)
+	//--- Compile constants
+	for _, server := range bot.State.Guilds {
+		serverKey := fmt.Sprintf("SERVER_%s", stripSymbols(server.Name))
+		serverKey = strings.ReplaceAll(serverKey, " ", "_")
+		for strings.Contains(serverKey, "__") {
+			serverKey = strings.ReplaceAll(serverKey, "__", "_")
+		}
+		serverKey = strings.ToUpper(serverKey)
+		if constants[serverKey] == "" {
+			constants[serverKey] = server.ID
+		}
+		for _, channel := range server.Channels {
+			if channel.Type != discordgo.ChannelTypeGuildCategory {
+				categoryName := ""
+				if channel.ParentID != "" {
+					channelParent, err := bot.State.Channel(channel.ParentID)
+					if err == nil {
+						categoryName = channelParent.Name
+					}
+				}
+				channelKey := fmt.Sprintf("CHANNEL_%s_%s_%s",
+					stripSymbols(server.Name), stripSymbols(categoryName), stripSymbols(channel.Name))
+				channelKey = strings.ReplaceAll(channelKey, " ", "_")
+				for strings.Contains(channelKey, "__") {
+					channelKey = strings.ReplaceAll(channelKey, "__", "_")
+				}
+				channelKey = strings.ToUpper(channelKey)
+				if constants[channelKey] == "" {
+					constants[channelKey] = channel.ID
+				}
+			}
+		}
+	}
+	//--- Save constants
+	os.MkdirAll(cachePath, 0755)
+	if _, err := os.Stat(constantsPath); err == nil {
+		err = os.Remove(constantsPath)
+		if err != nil {
+			log.Println(lg("Constants", "", color.HiRedString, "Encountered error deleting cache file:\t%s", err))
+		}
+	}
+	constantsStruct := constStruct{}
+	constantsStruct.Constants = constants
+	newJson, err := json.MarshalIndent(constantsStruct, "", "\t")
+	if err != nil {
+		log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))
+	} else {
+		err := ioutil.WriteFile(constantsPath, newJson, 0644)
+		if err != nil {
+			log.Println(lg("Constants", "", color.HiRedString, "Failed to save new constants file...\t%s", err))
+		}
+	}
+	//#endregion
+
 	// ~~~ RUNNING
 
 	//#region Exit...
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)
 	<-loop
 
-	sendStatusMessage(sendStatusExit)
+	sendStatusMessage(sendStatusExit) // not goroutine because we want to wait to send this before logout
 
 	log.Println(lg("Discord", "", color.GreenString, "Logging out of discord..."))
 	bot.Close()
@@ -450,10 +455,14 @@ func openDatabase() {
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
 	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
+
+	mainWg.Done()
 }
 
 func botLoad() {
+	mainWg.Add(1)
 	botLoadAPIs()
+	mainWg.Add(1)
 	botLoadDiscord()
 }
 
@@ -487,6 +496,8 @@ func botLoadAPIs() {
 		log.Println(lg("API", "Twitter", color.MagentaString,
 			"API credentials missing, the bot won't use the Twitter API."))
 	}
+
+	mainWg.Done()
 }
 
 func botLoadDiscord() {
@@ -698,5 +709,6 @@ func botLoadDiscord() {
 
 	// Start Presence
 	timeLastUpdated = time.Now()
-	updateDiscordPresence()
+	go updateDiscordPresence()
+	mainWg.Done()
 }

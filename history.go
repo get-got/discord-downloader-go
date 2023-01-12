@@ -317,7 +317,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				// Update presence
 				timeLastUpdated = time.Now()
 				if *channelConfig.PresenceEnabled {
-					updateDiscordPresence()
+					go updateDiscordPresence()
 				}
 			}
 
