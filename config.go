@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -76,6 +77,7 @@ func defaultConfiguration() configuration {
 		Debug:          defConfig_Debug,
 		SettingsOutput: true,
 		MessageOutput:  true,
+		ProcessLimit:   32,
 
 		DiscordLogLevel:      discordgo.LogError,
 		DiscordTimeout:       180,
@@ -170,6 +172,7 @@ type configuration struct {
 	Debug          bool `json:"debug"`          // optional, defaults
 	SettingsOutput bool `json:"settingsOutput"` // optional, defaults
 	MessageOutput  bool `json:"messageOutput"`  // optional, defaults
+	ProcessLimit   int  `json:"processLimit"`   // optional, defaults
 
 	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`     // optional, defaults
 	DiscordTimeout       int  `json:"discordTimeout,omitempty"`      // optional, defaults
@@ -534,6 +537,10 @@ func loadConfig() error {
 			getBoundServersCount(), pluralS(getBoundServersCount()),
 			getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
 		))
+
+		if config.ProcessLimit > 0 {
+			runtime.GOMAXPROCS(config.ProcessLimit)
+		}
 	}
 	mainWg.Done()
 	return nil
