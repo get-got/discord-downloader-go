@@ -251,8 +251,8 @@ func main() {
 			job.OriginUser = "AUTORUN"
 			job.TargetCommandingMessage = nil
 			job.TargetChannelID = arh.channel
-			job.TargetBefore = dateLocalToUTC(arh.before)
-			job.TargetSince = dateLocalToUTC(arh.since)
+			job.TargetBefore = arh.before
+			job.TargetSince = arh.since
 			job.Updated = time.Now()
 			job.Added = time.Now()
 			historyJobs[arh.channel] = job
@@ -405,6 +405,10 @@ func main() {
 	//#endregion
 
 	// ~~~ RUNNING
+
+	//#region ----------- TEST ENV / main
+
+	//#endregion ------------------------
 
 	//#region Exit...
 	signal.Notify(loop, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, os.Interrupt, os.Kill)

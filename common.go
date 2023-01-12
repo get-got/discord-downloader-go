@@ -165,15 +165,6 @@ func isDate(s string) bool {
 	return err == nil
 }
 
-func dateLocalToUTC(s string) string {
-	if s == "" || !isDate(s) {
-		return ""
-	}
-	rawDate, _ := time.Parse("2006-01-02", s)
-	localDate := time.Date(rawDate.Year(), rawDate.Month(), rawDate.Day(), 0, 0, 0, 0, time.Local)
-	return fmt.Sprintf("%04d-%02d-%02d", localDate.In(time.UTC).Year(), localDate.In(time.UTC).Month(), localDate.In(time.UTC).Day())
-}
-
 /*func condenseString(input string, length int) string {
 	filler := "....."
 	ret := input
