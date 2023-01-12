@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/fs"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	"mime"
@@ -534,7 +534,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 					logPath += ".txt"
 				}
 				// Read
-				currentLog, err := ioutil.ReadFile(logPath)
+				currentLog, err := os.ReadFile(logPath)
 				currentLogS := ""
 				if err == nil {
 					currentLogS = string(currentLog)
@@ -667,7 +667,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		defer response.Body.Close()
 
 		// Read
-		bodyOfResp, err := ioutil.ReadAll(response.Body)
+		bodyOfResp, err := io.ReadAll(response.Body)
 		if err != nil {
 			log.Println(lg("Download", "", color.HiRedString,
 				"Could not read response from \"%s\": %s",
@@ -984,7 +984,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 		// Write
 		if *channelConfig.Save {
-			if err = ioutil.WriteFile(completePath, bodyOfResp, 0644); err != nil {
+			if err = os.WriteFile(completePath, bodyOfResp, 0644); err != nil {
 				log.Println(lg("Download", "", color.HiRedString,
 					"Error while writing file to disk \"%s\": %s", download.InputURL, err))
 				return mDownloadStatus(downloadFailedWritingFile, err), 0

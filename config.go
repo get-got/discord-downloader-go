@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
@@ -408,7 +407,7 @@ func loadConfig() error {
 	// .
 	log.Println(lg("Settings", "loadConfig", color.YellowString, "Loading from \"%s\"...", configFile))
 	// Load settings
-	configContent, err := ioutil.ReadFile(configFile)
+	configContent, err := os.ReadFile(configFile)
 	if err != nil {
 		log.Println(lg("Settings", "loadConfig", color.HiRedString, "Failed to open file...\t%s", err))
 		createConfig()
@@ -747,7 +746,7 @@ func createConfig() {
 	if err != nil {
 		log.Println(lg("Settings", "create", color.HiRedString, "Failed to format new settings...\t%s", err))
 	} else {
-		err := ioutil.WriteFile(configFile, defaultJSON, 0644)
+		err := os.WriteFile(configFile, defaultJSON, 0644)
 		if err != nil {
 			log.Println(lg("Settings", "create", color.HiRedString, "Failed to save new settings file...\t%s", err))
 		} else {

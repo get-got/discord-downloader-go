@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -132,7 +131,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 					logPath += ".txt"
 				}
 				// Read
-				currentLog, err := ioutil.ReadFile(logPath)
+				currentLog, err := os.ReadFile(logPath)
 				currentLogS := ""
 				if err == nil {
 					currentLogS = string(currentLog)

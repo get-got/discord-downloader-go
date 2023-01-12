@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -135,7 +134,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	//#region Cache Files
 	openHistoryCache := func(dirpath string, output *string) {
-		if f, err := ioutil.ReadFile(dirpath + string(os.PathSeparator) + subjectChannelID); err == nil {
+		if f, err := os.ReadFile(dirpath + string(os.PathSeparator) + subjectChannelID); err == nil {
 			*output = string(f)
 			if !autorun && config.Debug {
 				log.Println(lg("Debug", "History", color.YellowString,

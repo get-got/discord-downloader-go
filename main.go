@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -397,7 +396,7 @@ func main() {
 	if err != nil {
 		log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))
 	} else {
-		err := ioutil.WriteFile(constantsPath, newJson, 0644)
+		err := os.WriteFile(constantsPath, newJson, 0644)
 		if err != nil {
 			log.Println(lg("Constants", "", color.HiRedString, "Failed to save new constants file...\t%s", err))
 		}
