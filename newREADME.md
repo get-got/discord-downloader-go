@@ -27,19 +27,31 @@
     </a>
 </p>
 <h2 align="center">
-    <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
-        <b>DOWNLOAD LATEST RELEASE</b>
-    </a>
-    <br/><br/>
     <a href="https://discord.com/invite/6Z6FJZVaDV">
         <b>Need help? Have suggestions? Join the Discord server!</b>
     </a>
-</h2><br>
+    <br/><br/>
+    <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
+        <b>DOWNLOAD LATEST RELEASE</b>
+    </a>
+</h2>
+<center>
 
-This project is a cross-platform command-line program to interact with a Discord Bot (genuine bot application or user account) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _([see list below](#supported-download-sources))._ It also supports **very extensive** global, server-specific, category-specific, channel-specific, and user-specific settings configuration and customization. Tailor the bot to your exact needs. See the [Features](#-Features) list below for the full list. Any operating system supported by the latest version of Golang is compatible.
+| Operating System  | Architectures _( ? = available but untested )_    |
+| -----------------:|:----------------------------------------------- |
+| Windows           | **amd64**, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
+| Linux             | **amd64**, **arm64**, **armv7/6/5**, risc-v64 _(?)_, mips64/64le _(?)_, s390x _(?)_, 386 _(?)_
+| Darwin (Mac)      | amd64 _(?)_, arm64 _(?)_
+| FreeBSD           | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
+| OpenBSD           | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
+| NetBSD            | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
+
+</center><br>
+
+This project is a cross-platform command-line program to interact with a Discord Bot (genuine bot application or user account) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _([see list below](#supported-download-sources))._ It also supports **very extensive** global, server-specific, category-specific, channel-specific, and user-specific settings configuration and customization. Tailor the bot to your exact needs. See the [Features](#-features) list below for the full list. Any operating system supported by the latest version of Golang is compatible.
 
 <h3 align="center">
-    <b>This project is a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
+    <b>Originally a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
 </h3>
 <h4 align="center">
     The original project was abandoned, for a list of differences and why I made an independent project, <a href="#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this"><b>see below</b></a>
