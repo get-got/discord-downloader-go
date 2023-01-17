@@ -24,26 +24,20 @@ import (
 
 /* v2.0.0 REWRITE TODO:
 
-* Logging System
-*** Implement Log Leveling?
-*** Truncate links to exact size?
-*** Table/Indentation output?
+* Goification
+*** better universal implementation of goroutines and waitgroup management.
+*** better universal implementation of function wrappers to reduce clutter for things like perm checks, response messages
+*** better error handling and error response, ensure as many nil checks as reasonably possible
+***
 
-* Better Message/Embed Send+Error Handling
-*** Ensure USER Permission Check Compat
-
-* Audit Settings/Config structure
-*** Better Settings Insight / Corrective Suggestions
-
-* Ensure 100% nil checks
+* Better Settings Insight / Corrective Suggestions
 
 * Fix Reddit
-
 * Fix Mastodon
-
 * Fix/Implement Instagram?
 
 * Command: Reboot System
+* Implement Log Leveling?
 
  */
 
@@ -142,7 +136,7 @@ func main() {
 		log.Println(lg("Main", "", color.YellowString, "Startup finished, took %s...", uptime()))
 	}
 	log.Println(lg("Main", "", color.HiCyanString,
-		wrapHyphensW(fmt.Sprintf("%s v%s is online and connected to %d server%s",
+		wrapHyphensW(fmt.Sprintf("%s v%s is online with access to %d server%s",
 			projectLabel, projectVersion, len(bot.State.Guilds), pluralS(len(bot.State.Guilds))))))
 	log.Println(lg("Main", "", color.RedString, "CTRL+C to exit..."))
 
@@ -427,7 +421,7 @@ func main() {
 
 func openDatabase() {
 	// Database
-	log.Println(lg("Database", "", color.YellowString, "Opening database..."))
+	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a second...)"))
 	myDB, err = db.OpenDB(databasePath)
 	if err != nil {
 		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
@@ -481,6 +475,9 @@ func botLoadAPIs() {
 		twitterLoginCount := 0
 	do_twitter_login:
 		twitterLoginCount++
+		if twitterLoginCount > 1 {
+			time.Sleep(1 * time.Second)
+		}
 		twitterClient = anaconda.NewTwitterApiWithCredentials(
 			config.Credentials.TwitterAccessToken,
 			config.Credentials.TwitterAccessTokenSecret,
@@ -491,7 +488,6 @@ func botLoadAPIs() {
 		if err != nil {
 			log.Println(lg("API", "Twitter", color.HiRedString, "API Login Error: %s", err.Error()))
 			if twitterLoginCount <= 3 {
-				time.Sleep(500 * time.Millisecond)
 				goto do_twitter_login
 			} else {
 				log.Println(lg("API", "Twitter", color.HiRedString,
@@ -545,6 +541,9 @@ func botLoadDiscord() {
 	discord_login_count := 0
 do_discord_login:
 	discord_login_count++
+	if discord_login_count > 1 {
+		time.Sleep(1 * time.Second)
+	}
 
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
 		// Login via Token (Bot or User)

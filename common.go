@@ -21,7 +21,7 @@ import (
 //#region Instance
 
 func uptime() time.Duration {
-	return time.Since(startTime)
+	return time.Since(startTime) //.Truncate(time.Second)
 }
 
 func properExit() {
@@ -263,9 +263,9 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 
 	case "main":
 		if subgroup == "" {
-			colorPrefix = color.CyanString("[~]")
+			colorPrefix = ""
 		} else {
-			colorPrefix = color.CyanString("[~:%s]", subgroup)
+			colorPrefix = ""
 		}
 	case "debug":
 		if subgroup == "" {
@@ -380,7 +380,10 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		pp = color.YellowString("? ")
 	}
 
-	return "\t" + pp + colorPrefix + " " + colorFunc(line, p...)
+	if colorPrefix != "" {
+		colorPrefix += " "
+	}
+	return "\t" + pp + colorPrefix + colorFunc(line, p...)
 }
 
 //#endregion
