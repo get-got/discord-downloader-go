@@ -26,7 +26,7 @@
         <img src="https://img.shields.io/discord/780985109608005703?logo=discord"alt="Join the Discord">
     </a>
 </p>
-<h3 align="center">
+<h1 align="center">
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
         <b>DOWNLOAD LATEST RELEASE</b>
     </a>
@@ -34,7 +34,10 @@
     <a href="https://discord.com/invite/6Z6FJZVaDV">
         <b>Need help? Have suggestions? Join the Discord server!</b>
     </a>
-</h3>
+    <a href="https://github.com/get-got/discord-downloader-go/tree/rewrite">
+        <b>WORKING ON A v2.0.0 REWRITE, JOIN THE DISCORD TO TRY OUT!</b>
+    </a>
+</h1>
 
 This is a program that connects to a Discord Bot or User to locally download files posted in Discord channels in real-time as well as old messages. It can download any directly linked files or Discord attachments, as well as the highest possible quality files from specific sources _(see list below)_. It also supports extensive channel-specific configuration and customization. _See [Features](#Features) below for full list!_
 
