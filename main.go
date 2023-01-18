@@ -75,9 +75,14 @@ var (
 	invalidServers       []string
 )
 
-func versions() string {
-	return fmt.Sprintf("%s/%s / %s / discordgo v%s (API v%s)",
-		runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
+func versions(multiline bool) string {
+	if multiline {
+		return fmt.Sprintf("%s/%s / %s\ndiscordgo v%s (API v%s)",
+			runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
+	} else {
+		return fmt.Sprintf("%s/%s / %s / discordgo v%s (API v%s)",
+			runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
+	}
 }
 
 func init() {
@@ -93,7 +98,7 @@ func init() {
 		configFileBase = os.Args[1]
 	}
 
-	log.Println(lg("Version", "", color.CyanString, versions()))
+	log.Println(lg("Version", "", color.CyanString, versions(false)))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
@@ -480,7 +485,7 @@ func botLoadAPIs() {
 	do_twitter_login:
 		twitterLoginCount++
 		if twitterLoginCount > 1 {
-			time.Sleep(1 * time.Second)
+			time.Sleep(3 * time.Second)
 		}
 		twitterClient = anaconda.NewTwitterApiWithCredentials(
 			config.Credentials.TwitterAccessToken,
@@ -546,7 +551,7 @@ func botLoadDiscord() {
 do_discord_login:
 	discord_login_count++
 	if discord_login_count > 1 {
-		time.Sleep(1 * time.Second)
+		time.Sleep(3 * time.Second)
 	}
 
 	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {

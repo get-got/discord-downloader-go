@@ -578,7 +578,7 @@ func sendStatusMessage(status sendStatusType) {
 				if twitterConnected {
 					message += "\n• Connected to Twitter API"
 				}
-				message += fmt.Sprintf("\n_%s_", versions())
+				message += fmt.Sprintf("\n_%s_", versions(true))
 			} else if status == sendStatusExit {
 				label = "exit"
 				message += fmt.Sprintf("%s %s...\n", projectLabel, sendStatusLabel(status))
