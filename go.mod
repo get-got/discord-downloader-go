@@ -10,8 +10,8 @@ require (
 	github.com/Necroforger/dgrouter v0.0.0-20200517224846-e66453b957c1
 	github.com/PuerkitoBio/goquery v1.8.0
 	github.com/aidarkhanov/nanoid/v2 v2.0.5
-	github.com/bwmarrin/discordgo v0.26.1
-	github.com/dustin/go-humanize v1.0.0
+	github.com/bwmarrin/discordgo v0.27.0
+	github.com/dustin/go-humanize v1.0.1
 	github.com/fatih/color v1.13.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
@@ -41,4 +41,4 @@ require (
 
 replace github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.1
 
-replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.26.1-12
+replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.27.0-gg.1
