@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -579,8 +578,7 @@ func sendStatusMessage(status sendStatusType) {
 				if twitterConnected {
 					message += "\n• Connected to Twitter API"
 				}
-				message += fmt.Sprintf("\n_%s-%s %s / discordgo v%s (modified) / Discord API v%s_",
-					runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
+				message += fmt.Sprintf("\n_%s_", versions())
 			} else if status == sendStatusExit {
 				label = "exit"
 				message += fmt.Sprintf("%s %s...\n", projectLabel, sendStatusLabel(status))

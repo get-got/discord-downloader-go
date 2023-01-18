@@ -75,6 +75,11 @@ var (
 	invalidServers       []string
 )
 
+func versions() string {
+	return fmt.Sprintf("%s/%s / %s / discordgo v%s (API v%s)",
+		runtime.GOOS, runtime.GOARCH, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
+}
+
 func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
@@ -88,8 +93,7 @@ func init() {
 		configFileBase = os.Args[1]
 	}
 
-	log.Println(lg("Version", "", color.CyanString,
-		"%s / discord-go v%s (modified) / Discord API v%s", runtime.Version(), discordgo.VERSION, discordgo.APIVersion))
+	log.Println(lg("Version", "", color.CyanString, versions()))
 
 	// Github Update Check
 	if config.GithubUpdateChecking {
