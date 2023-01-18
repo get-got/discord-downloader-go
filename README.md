@@ -75,12 +75,12 @@ This project is a cross-platform command-line program to interact with a Discord
     - [Examples](#examples)
 - [🔨 Guide: Settings / Configuration](#-guide-settings--configuration)
 - [🛠 List of Settings](#-list-of-settings)
-  - [main](#main)
-  - [credentials group](#credentials-group)
-  - [adminChannels group](#adminchannels-group)
-  - [source group](#source-group)
-  - [source / filters group](#source--filters-group)
-  - [source / log group](#source--log-group)
+  - [settings - main](#settings---main)
+  - [settings - credentials group](#settings---credentials-group)
+  - [settings - adminChannels group](#settings---adminchannels-group)
+  - [settings - source group](#settings---source-group)
+  - [settings - source / filters group](#settings---source--filters-group)
+  - [settings - source / log group](#settings---source--log-group)
 - [🤖 Settings Examples](#-settings-examples)
   - [example - minimum bot app](#example---minimum-bot-app)
   - [example - minimum user account without 2FA](#example---minimum-user-account-without-2fa)
@@ -274,7 +274,7 @@ TODO: UNDER CONSTRUCTION
 
 THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE BRACKETS.
 
-### main
+### settings - main
 
 | SETTING KEY         | TYPE                                    | DEFAULT    | DESCRIPTION                                                          | EXAMPLE                           |
 | :-----------------: | --------------------------------------- | :--------: | -------------------------------------------------------------------- | --------------------------------- |
@@ -285,15 +285,15 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 | debug         | boolean <br/>(true or false)            | false      | Enables extra output for narrowing down problems.                    | `"debug": true,`            |
 | messageOutput       | boolean <br/>(true or false)            | true       | Enables discord message output.                                      | `"messageOutput": true,`          |
 
-### credentials group
+### settings - credentials group
 
-### adminChannels group
+### settings - adminChannels group
 
-### source group
+### settings - source group
 
-### source / filters group
+### settings - source / filters group
 
-### source / log group
+### settings - source / log group
 
 ---
 
