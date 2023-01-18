@@ -40,7 +40,7 @@
 | Operating System  | Architectures _( ? = available but untested )_    |
 | -----------------:|:----------------------------------------------- |
 | Windows           | **amd64**, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
-| Linux             | **amd64**, **arm64**, **armv7/6/5**, risc-v64 _(?)_, mips64/64le _(?)_, s390x _(?)_, 386 _(?)_
+| Linux             | **amd64**, **arm64**, **armv7/6/5**,<br/>risc-v64 _(?)_, mips64/64le _(?)_, s390x _(?)_, 386 _(?)_
 | Darwin (Mac)      | amd64 _(?)_, arm64 _(?)_
 | FreeBSD           | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
 | OpenBSD           | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
@@ -132,7 +132,7 @@ Command     | Arguments? | Description
 `info`      | No    | Displays relevant Discord info.
 `status`    | No    | Shows the status of the bot.
 `stats`     | No    | Shows channel stats.
-`history`   | [**SEE HISTORY SECTION**](#guide-downloading-history-old-messages) | **(BOT AND SERVER ADMINS ONLY)** Processes history for old messages in channel.
+`history`   | [**SEE HISTORY SECTION**](#-guide-downloading-history-old-messages) | **(BOT AND SERVER ADMINS ONLY)** Processes history for old messages in channel.
 `exit`, `kill`, `reload`    | No    | **(BOT ADMINS ONLY)** Exits the bot _(or restarts if using a keep-alive process manager)_.
 `emojis`    | Optionally specify server IDs to download emojis from; separate by commas | **(BOT ADMINS ONLY)** Saves all emojis for channel.
 
@@ -163,12 +163,12 @@ You can either create a `settings.json` following the examples & variables liste
 ### Getting Started Step-by-Step
 
 1. Download & put executable within it's own folder.
-2. Configure Main Settings (or run once to have settings generated). [_(SEE BELOW)_](#list-of-settings)
-3. Enter your login credentials in the `"credentials"` section. [_(SEE BELOW)_](#list-of-settings)
-4. Put your Discord User ID as in the `"admins"` list of the settings. [_(SEE BELOW)_](#list-of-settings)
-5. Put a Discord Channel ID for a private channel you have access to into the `"adminChannels"`. [_(SEE BELOW)_](#list-of-settings)
-6. Put your desired Discord Channel IDs into the `"channels"` section. [_(SEE BELOW)_](#list-of-settings)
-   - I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#settings-examples)
+2. Configure Main Settings (or run once to have settings generated). [_(SEE BELOW)_](#-list-of-settings)
+3. Enter your login credentials in the `"credentials"` section. [_(SEE BELOW)_](#-list-of-settings)
+4. Put your Discord User ID as in the `"admins"` list of the settings. [_(SEE BELOW)_](#-list-of-settings)
+5. Put a Discord Channel ID for a private channel you have access to into the `"adminChannels"`. [_(SEE BELOW)_](#-list-of-settings)
+6. Put your desired Discord Channel IDs into th6e `"channels"` section. [_(SEE BELOW)_](#-list-of-settings)
+   - I know it can be confusing if you don't have experience with programming or JSON in general, but this was the ideal setup for extensive configuration like this. Just be careful with comma & quote placement and you should be fine. [See examples below for help.](#-settings-examples)
 
 ### Bot Login Credentials
 
@@ -318,7 +318,7 @@ TODO: UNDER CONSTRUCTION
 ## ❔ FAQ
 
 - **_Q: How do I install?_**
-- **A: [SEE #getting-started](#%EF%B8%8F-getting-started)** 
+- **A: [SEE #getting-started](#%EF%B8%8F-getting-started)**
 
 ---
 
