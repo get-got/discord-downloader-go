@@ -119,11 +119,11 @@ func defaultConfiguration() configuration {
 		HistoryTyping:              true,
 
 		// History
-		AutorunHistory:           false,
-		AutorunHistoryBefore:     "",
-		AutorunHistorySince:      "",
-		SendHistoryStatus:        true,
-		SendAutorunHistoryStatus: false,
+		AutoHistory:           false,
+		AutoHistoryBefore:     "",
+		AutoHistorySince:      "",
+		SendHistoryStatus:     true,
+		SendAutoHistoryStatus: false,
 
 		// Rules for Saving
 		DivideByYear:           false,
@@ -219,11 +219,11 @@ type configuration struct {
 	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
 
 	// History
-	AutorunHistory           bool   `json:"autorunHistory,omitempty"`           // optional, defaults
-	AutorunHistoryBefore     string `json:"autorunHistoryBefore,omitempty"`     // optional
-	AutorunHistorySince      string `json:"autorunHistorySince,omitempty"`      // optional
-	SendAutorunHistoryStatus bool   `json:"sendAutorunHistoryStatus,omitempty"` // optional, defaults
-	SendHistoryStatus        bool   `json:"sendHistoryStatus,omitempty"`        // optional, defaults
+	AutoHistory           bool   `json:"autoHistory,omitempty"`           // optional, defaults
+	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty"`     // optional
+	AutoHistorySince      string `json:"autoHistorySince,omitempty"`      // optional
+	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
+	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
 
 	// Rules for Saving
 	DivideByYear           bool                        `json:"divideByYear,omitempty"`           // defaults
@@ -304,11 +304,11 @@ type configurationSource struct {
 	EmbedColor                 *string   `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
 
 	// History
-	AutorunHistory           *bool   `json:"autorunHistory,omitempty"`           // optional
-	AutorunHistoryBefore     *string `json:"autorunHistoryBefore,omitempty"`     // optional
-	AutorunHistorySince      *string `json:"autorunHistorySince,omitempty"`      // optional
-	SendAutorunHistoryStatus *bool   `json:"sendAutorunHistoryStatus,omitempty"` // optional, defaults
-	SendHistoryStatus        *bool   `json:"sendHistoryStatus,omitempty"`        // optional, defaults
+	AutoHistory           *bool   `json:"autoHistory,omitempty"`           // optional
+	AutoHistoryBefore     *string `json:"autoHistoryBefore,omitempty"`     // optional
+	AutoHistorySince      *string `json:"autoHistorySince,omitempty"`      // optional
+	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
+	SendHistoryStatus     *bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
 
 	// Rules for Saving
 	DivideByYear           *bool                       `json:"divideByYear,omitempty"`           // optional, defaults
@@ -831,17 +831,17 @@ func sourceDefault(channel *configurationSource) {
 	}
 
 	// History
-	if channel.AutorunHistory == nil {
-		channel.AutorunHistory = &config.AutorunHistory
+	if channel.AutoHistory == nil {
+		channel.AutoHistory = &config.AutoHistory
 	}
-	if channel.AutorunHistoryBefore == nil {
-		channel.AutorunHistoryBefore = &config.AutorunHistoryBefore
+	if channel.AutoHistoryBefore == nil {
+		channel.AutoHistoryBefore = &config.AutoHistoryBefore
 	}
-	if channel.AutorunHistorySince == nil {
-		channel.AutorunHistorySince = &config.AutorunHistorySince
+	if channel.AutoHistorySince == nil {
+		channel.AutoHistorySince = &config.AutoHistorySince
 	}
-	if channel.SendAutorunHistoryStatus == nil {
-		channel.SendAutorunHistoryStatus = &config.SendAutorunHistoryStatus
+	if channel.SendAutoHistoryStatus == nil {
+		channel.SendAutoHistoryStatus = &config.SendAutoHistoryStatus
 	}
 	if channel.SendHistoryStatus == nil {
 		channel.SendHistoryStatus = &config.SendHistoryStatus

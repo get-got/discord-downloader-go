@@ -229,23 +229,23 @@ func main() {
 
 	//#region BG Tasks - Autorun History
 	type arh struct{ channel, before, since string }
-	var autorunHistoryChannels []arh
+	var autoHistoryChannels []arh
 	// Compile list of channels to autorun history
 	for _, channel := range getAllRegisteredChannels() {
 		channelConfig := getSource(&discordgo.Message{ChannelID: channel})
-		if channelConfig.AutorunHistory != nil {
-			if *channelConfig.AutorunHistory {
-				var autorunHistoryChannel arh
-				autorunHistoryChannel.channel = channel
-				autorunHistoryChannel.before = *channelConfig.AutorunHistoryBefore
-				autorunHistoryChannel.since = *channelConfig.AutorunHistorySince
-				autorunHistoryChannels = append(autorunHistoryChannels, autorunHistoryChannel)
+		if channelConfig.AutoHistory != nil {
+			if *channelConfig.AutoHistory {
+				var autoHistoryChannel arh
+				autoHistoryChannel.channel = channel
+				autoHistoryChannel.before = *channelConfig.AutoHistoryBefore
+				autoHistoryChannel.since = *channelConfig.AutoHistorySince
+				autoHistoryChannels = append(autoHistoryChannels, autoHistoryChannel)
 			}
 			continue
 		}
 	}
 	// Process autorun history
-	for _, arh := range autorunHistoryChannels {
+	for _, arh := range autoHistoryChannels {
 		if job, exists := historyJobs[arh.channel]; !exists ||
 			(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
 			job.Status = historyStatusWaiting
@@ -260,10 +260,10 @@ func main() {
 			historyJobs[arh.channel] = job
 		}
 	}
-	if len(autorunHistoryChannels) > 0 {
+	if len(autoHistoryChannels) > 0 {
 		log.Println(lg("History", "Autorun", color.HiYellowString,
 			"History Autoruns completed (for %d channel%s)",
-			len(autorunHistoryChannels), pluralS(len(autorunHistoryChannels))))
+			len(autoHistoryChannels), pluralS(len(autoHistoryChannels))))
 		log.Println(lg("History", "Autorun", color.CyanString,
 			"Waiting for something else to do..."))
 	}

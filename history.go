@@ -101,7 +101,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	// Send Status?
 	var sendStatus bool = true
-	if (autorun && !config.SendAutorunHistoryStatus) || (!autorun && !config.SendHistoryStatus) {
+	if (autorun && !config.SendAutoHistoryStatus) || (!autorun && !config.SendHistoryStatus) {
 		sendStatus = false
 	}
 
@@ -207,8 +207,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	if channelConfig := getSource(responseMsg); channelConfig != emptyConfig {
 
 		// Overwrite Send Status
-		if channelConfig.SendAutorunHistoryStatus != nil {
-			if autorun && !*channelConfig.SendAutorunHistoryStatus {
+		if channelConfig.SendAutoHistoryStatus != nil {
+			if autorun && !*channelConfig.SendAutoHistoryStatus {
 				sendStatus = false
 			}
 		}
