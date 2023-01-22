@@ -43,6 +43,9 @@ import (
 * Support Mediafire? (folder; direct singles)
 * Support Lightshot?
 * Support Gyazo?
+* Support TikTok -- Tried, once the connection is closed the cdn URL is rendered invalid
+* Support Facebook Photos -- Tried, it doesn't preload image data, it's loaded in after. Would have to keep connection open, find alternative way to grab, or use api.
+* Support Facebook Videos -- Previously supported but they split mp4 into separate audio and video streams
 
 * Add setting for filename max length, shorten if over given length, default to sys max
 
@@ -70,7 +73,7 @@ var (
 	myDB *db.DB
 
 	// APIs
-	twitterConnected bool
+	twitterConnected bool = false
 
 	// Gen
 	loop                 chan os.Signal
