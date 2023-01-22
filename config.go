@@ -73,10 +73,11 @@ func defaultConfiguration() configuration {
 		AdminChannels: []configurationAdminChannel{},
 
 		// Program Settings
-		Debug:          defConfig_Debug,
-		SettingsOutput: true,
-		MessageOutput:  true,
-		ProcessLimit:   32,
+		ProcessLimit:         32,
+		Debug:                defConfig_Debug,
+		SettingsOutput:       true,
+		MessageOutput:        true,
+		MessageOutputHistory: false,
 
 		DiscordLogLevel:      discordgo.LogError,
 		DiscordTimeout:       180,
@@ -168,10 +169,11 @@ type configuration struct {
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 
 	// Program Settings
-	Debug          bool `json:"debug"`          // optional, defaults
-	SettingsOutput bool `json:"settingsOutput"` // optional, defaults
-	MessageOutput  bool `json:"messageOutput"`  // optional, defaults
-	ProcessLimit   int  `json:"processLimit"`   // optional, defaults
+	ProcessLimit         int  `json:"processLimit"`         // optional, defaults
+	Debug                bool `json:"debug"`                // optional, defaults
+	SettingsOutput       bool `json:"settingsOutput"`       // optional, defaults
+	MessageOutput        bool `json:"messageOutput"`        // optional, defaults
+	MessageOutputHistory bool `json:"messageOutputHistory"` // optional, defaults
 
 	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`     // optional, defaults
 	DiscordTimeout       int  `json:"discordTimeout,omitempty"`      // optional, defaults
