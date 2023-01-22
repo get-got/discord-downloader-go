@@ -242,13 +242,15 @@ type configuration struct {
 	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
 
 	// Sources
-	All                  *configurationSource  `json:"all,omitempty"`
-	AllBlacklistServers  *[]string             `json:"allBlacklistServers,omitempty"`
-	AllBlacklistChannels *[]string             `json:"allBlacklistChannels,omitempty"`
-	Users                []configurationSource `json:"users"`
-	Servers              []configurationSource `json:"servers"`
-	Categories           []configurationSource `json:"categories"`
-	Channels             []configurationSource `json:"channels"`
+	All                    *configurationSource  `json:"all,omitempty"`
+	AllBlacklistUsers      *[]string             `json:"allBlacklistUsers,omitempty"`
+	AllBlacklistServers    *[]string             `json:"allBlacklistServers,omitempty"`
+	AllBlacklistCategories *[]string             `json:"allBlacklistCategories,omitempty"`
+	AllBlacklistChannels   *[]string             `json:"allBlacklistChannels,omitempty"`
+	Users                  []configurationSource `json:"users"`
+	Servers                []configurationSource `json:"servers"`
+	Categories             []configurationSource `json:"categories"`
+	Channels               []configurationSource `json:"channels"`
 }
 
 type constStruct struct {
@@ -1088,8 +1090,21 @@ func getSource(m *discordgo.Message) configurationSource {
 				return emptyConfig
 			}
 		}
+		if config.AllBlacklistCategories != nil {
+			chinf, err := bot.State.Channel(m.ChannelID)
+			if err == nil {
+				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(m.ChannelID, *config.AllBlacklistCategories) {
+					return emptyConfig
+				}
+			}
+		}
 		if config.AllBlacklistServers != nil {
 			if stringInSlice(m.GuildID, *config.AllBlacklistServers) {
+				return emptyConfig
+			}
+		}
+		if config.AllBlacklistUsers != nil && m.Author != nil {
+			if stringInSlice(m.Author.ID, *config.AllBlacklistUsers) {
 				return emptyConfig
 			}
 		}
@@ -1257,13 +1272,12 @@ func getAllRegisteredChannels() []string {
 				}
 			}
 			for _, channel := range guild.Channels {
-				if config.AllBlacklistChannels != nil {
-					if stringInSlice(channel.ID, *config.AllBlacklistChannels) {
-						continue
+				if r := getSource(&discordgo.Message{ChannelID: channel.ID}); r == emptyConfig { // easier than redoing it all but way less efficient, im lazy
+					continue
+				} else {
+					if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+						channels = append(channels, channel.ID)
 					}
-				}
-				if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-					channels = append(channels, channel.ID)
 				}
 			}
 		}
