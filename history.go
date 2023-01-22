@@ -265,7 +265,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 				// Update Status
 				log.Println(lg("History", "", color.CyanString,
-					logPrefix+"Requesting 100 more, %d downloaded (%s), %d processed — Before %s ago (%s)",
+					logPrefix+"Requesting more, \t%d downloaded (%s), \t%d processed, \tsearching before %s ago (%s)",
 					totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
 				if sendStatus {
 					status := fmt.Sprintf(

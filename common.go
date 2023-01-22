@@ -165,6 +165,28 @@ func isDate(s string) bool {
 	return err == nil
 }
 
+func shortenTime(input string) string {
+	input = strings.ReplaceAll(input, " nanoseconds", "ns")
+	input = strings.ReplaceAll(input, " nanosecond", "ns")
+	input = strings.ReplaceAll(input, " microseconds", "μs")
+	input = strings.ReplaceAll(input, " microsecond", "μs")
+	input = strings.ReplaceAll(input, " milliseconds", "ms")
+	input = strings.ReplaceAll(input, " millisecond", "ms")
+	input = strings.ReplaceAll(input, " seconds", "s")
+	input = strings.ReplaceAll(input, " second", "s")
+	input = strings.ReplaceAll(input, " minutes", "m")
+	input = strings.ReplaceAll(input, " minute", "m")
+	input = strings.ReplaceAll(input, " hours", "h")
+	input = strings.ReplaceAll(input, " hour", "h")
+	input = strings.ReplaceAll(input, " days", "d")
+	input = strings.ReplaceAll(input, " day", "d")
+	input = strings.ReplaceAll(input, " weeks", "w")
+	input = strings.ReplaceAll(input, " week", "w")
+	input = strings.ReplaceAll(input, " months", "mo")
+	input = strings.ReplaceAll(input, " month", "mo")
+	return input
+}
+
 /*func condenseString(input string, length int) string {
 	filler := "....."
 	ret := input

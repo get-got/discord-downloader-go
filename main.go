@@ -176,12 +176,15 @@ func main() {
 					}
 					str := fmt.Sprintf("... %dms latency,\tlast discord heartbeat %s ago,\t%s uptime",
 						bot.HeartbeatLatency().Milliseconds(),
-						durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)), durafmt.ParseShort(time.Since(startTime)))
+						shortenTime(durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)).String()),
+						shortenTime(durafmt.ParseShort(time.Since(startTime)).String()))
 					if !timeLastMessage.IsZero() {
-						str += fmt.Sprintf(",\tlast message %s ago", durafmt.ParseShort(time.Since(timeLastMessage)))
+						str += fmt.Sprintf(",\tlast message %s ago",
+							shortenTime(durafmt.ParseShort(time.Since(timeLastMessage)).String()))
 					}
 					if !timeLastDownload.IsZero() {
-						str += fmt.Sprintf(",\tlast download %s ago", durafmt.ParseShort(time.Since(timeLastDownload)))
+						str += fmt.Sprintf(",\tlast download %s ago",
+							shortenTime(durafmt.ParseShort(time.Since(timeLastDownload)).String()))
 					}
 					if historyJobsWaiting > 0 {
 						str += fmt.Sprintf(",\t%d history jobs waiting", historyJobsWaiting)

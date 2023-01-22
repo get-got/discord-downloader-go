@@ -1021,7 +1021,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 				color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
 				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
 					color.WhiteString("(%s, %s, %0.1f %s)",
-						filesize, durafmt.ParseShort(time.Since(download.StartTime)).String(), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
+						filesize, shortenTime(durafmt.ParseShort(time.Since(download.StartTime)).String()), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",

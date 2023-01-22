@@ -249,10 +249,10 @@ func handleCommands() *exrouter.Route {
 						}
 						output += fmt.Sprintf("• _%s_ - (%s)`%s`, `updated %s ago, added %s ago`\n",
 							historyStatusLabel(job.Status), job.OriginUser, channelLabel,
-							durafmt.ParseShort(time.Since(job.Updated)).String(), durafmt.ParseShort(time.Since(job.Added)).String())
+							shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()), shortenTime(durafmt.ParseShort(time.Since(job.Added)).String()))
 						log.Println(lg("Command", "History", color.HiCyanString, "History Job: %s - (%s)%s, updated %s ago, added %s ago",
 							historyStatusLabel(job.Status), job.OriginUser, channelLabel,
-							durafmt.ParseShort(time.Since(job.Updated)).String(), durafmt.ParseShort(time.Since(job.Added)).String()))
+							shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()), shortenTime(durafmt.ParseShort(time.Since(job.Added)).String())))
 					}
 					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 						_, err := ctx.Reply(output)
