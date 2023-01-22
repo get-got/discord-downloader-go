@@ -28,18 +28,31 @@ import (
 *** better universal implementation of goroutines and waitgroup management.
 *** better universal implementation of function wrappers to reduce clutter for things like perm checks, response messages
 *** better error handling and error response, ensure as many nil checks as reasonably possible
-***
 
 * Better Settings Insight / Corrective Suggestions
 
-* Fix Reddit
-* Fix Mastodon
-* Fix/Implement Instagram?
+* Fix unknown message hangups
+* Fix links being ignored
+* Fix filetype incorrect detection // constantly picking up webpages as txt files and NOT picking up proper media
 
-* Command: Reboot System
+* Fix Support for Reddit
+* Fix Support for Mastodon
+* Fix Support for Instagram
+* Support Google Drive (folder; direct singles)
+* Support Dropbox (folder; direct singles)
+* Support Mediafire? (folder; direct singles)
+* Support Lightshot?
+* Support Gyazo?
+
+* Add setting for filename max length, shorten if over given length, default to sys max
+
+---------------------------------
+FUTURE PLANS:
+* UI/GUI interface (i still want to be as cross-platform as possible), and have bot commands be an option.
 * Implement Log Leveling?
+* Command: Reboot System
 
- */
+*/
 
 var (
 	err error
@@ -174,7 +187,7 @@ func main() {
 							}
 						}
 					}
-					str := fmt.Sprintf("... %dms latency,\tlast discord heartbeat %s ago,\t%s uptime",
+					str := fmt.Sprintf("... %dms latency,\t\tlast discord heartbeat %s ago,\t\t%s uptime",
 						bot.HeartbeatLatency().Milliseconds(),
 						shortenTime(durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)).String()),
 						shortenTime(durafmt.ParseShort(time.Since(startTime)).String()))
