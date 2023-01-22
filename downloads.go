@@ -48,6 +48,7 @@ const (
 
 	downloadFailed
 	downloadFailedCode
+	downloadFailedCode403
 	downloadFailedCode404
 	downloadFailedInvalidSource
 	downloadFailedInvalidPath
@@ -103,6 +104,8 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Download Failed"
 	case downloadFailedCode:
 		return "Download Failed - BAD CONNECTION"
+	case downloadFailedCode403:
+		return "Download Failed - 403 UNAVAILABLE"
 	case downloadFailedCode404:
 		return "Download Failed - 404 NOT FOUND"
 	case downloadFailedInvalidSource:
@@ -433,7 +436,8 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 	var tempfilesize int64 = -1
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status, tempfilesize = download.tryDownload()
-		if status.Status < downloadFailed || status.Status == downloadFailedCode404 { // Success or Skip
+		// Success or Skip
+		if status.Status < downloadFailed || status.Status == downloadFailedCode404 || status.Status == downloadFailedCode403 {
 			break
 		} else {
 			time.Sleep(5 * time.Second)
@@ -679,7 +683,9 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		if response.StatusCode >= 400 {
 			log.Println(lg("Download", "", color.HiRedString, logPrefix+"DOWNLOAD FAILED, %d %s: %s",
 				response.StatusCode, http.StatusText(response.StatusCode), download.InputURL))
-			if response.StatusCode == 404 {
+			if response.StatusCode == 403 {
+				return mDownloadStatus(downloadFailedCode403, err), 0
+			} else if response.StatusCode == 404 {
 				return mDownloadStatus(downloadFailedCode404, err), 0
 			} else {
 				return mDownloadStatus(downloadFailedCode, err), 0
