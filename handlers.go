@@ -84,10 +84,14 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			}
 
 			if !history || config.MessageOutputHistory {
+				addOut := ""
+				if history && config.MessageOutputHistory && !m.Timestamp.IsZero() {
+					addOut = fmt.Sprintf(" @ %s", m.Timestamp.String()[:19])
+				}
 				if edited {
-					log.Println(lg("Message", "", color.CyanString, "Edited [%s]: %s", sendLabel, content))
+					log.Println(lg("Message", "", color.CyanString, "Edited [%s%s]: %s", sendLabel, addOut, content))
 				} else {
-					log.Println(lg("Message", "", color.CyanString, "[%s]: %s", sendLabel, content))
+					log.Println(lg("Message", "", color.CyanString, "[%s%s]: %s", sendLabel, addOut, content))
 				}
 			}
 		}
