@@ -273,7 +273,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							"%s messages processed...``\n\n"+
 							"%s\n\n"+
 							"%s`(%d)` _Processing more messages, please wait..._",
-						durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(totalDownloads),
+						shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()), formatNumber(totalDownloads),
 						humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/time.Since(historyStartTime).Seconds(),
 						formatNumber(totalMessages),
 						msgSourceDisplay, rangeContent, messageRequestCount)
