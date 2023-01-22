@@ -23,6 +23,9 @@ const (
 	constantsPath      = cachePath + string(os.PathSeparator) + "constants.json"
 
 	defaultReact = "✅"
+
+	limitMsg       = 2000
+	limitEmbedDesc = 4096
 )
 
 var (

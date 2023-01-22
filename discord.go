@@ -172,6 +172,42 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 
 //#endregion
 
+func channelDisplay(channelID string) (string, string) {
+	sourceChannelName := channelID
+	sourceName := "UNKNOWN"
+	sourceChannel, _ := bot.State.Channel(channelID)
+	if sourceChannel != nil {
+		// Channel Naming
+		if sourceChannel.Name != "" {
+			sourceChannelName = "#" + sourceChannel.Name
+		}
+		switch sourceChannel.Type {
+		case discordgo.ChannelTypeGuildText:
+			// Server Naming
+			if sourceChannel.GuildID != "" {
+				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+				if sourceGuild != nil && sourceGuild.Name != "" {
+					sourceName = sourceGuild.Name
+				}
+			}
+			// Category Naming
+			if sourceChannel.ParentID != "" {
+				sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
+				if sourceParent != nil {
+					if sourceParent.Name != "" {
+						sourceChannelName = sourceParent.Name + " / " + sourceChannelName
+					}
+				}
+			}
+		case discordgo.ChannelTypeDM:
+			sourceName = "Direct Messages"
+		case discordgo.ChannelTypeGroupDM:
+			sourceName = "Group Messages"
+		}
+	}
+	return sourceName, sourceChannelName
+}
+
 //#region Presence
 
 func dataKeyReplacement(input string) string {

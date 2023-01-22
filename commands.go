@@ -23,6 +23,20 @@ const (
 	cmderrSendFailure          = "Failed to send command message (requested by %s)...\t%s"
 )
 
+func safeReply(ctx *exrouter.Context, content string) bool {
+	if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
+		if _, err := ctx.Reply(content); err != nil {
+			log.Println(lg("Command", "", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
+			return false
+		} else {
+			return true
+		}
+	} else {
+		log.Println(lg("Command", "", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
+		return false
+	}
+}
+
 // TODO: function for handling perm error messages, etc etc to reduce clutter
 func handleCommands() *exrouter.Route {
 	router := exrouter.New()
@@ -209,21 +223,21 @@ func handleCommands() *exrouter.Route {
 				if argKey == 0 { // skip head
 					continue
 				}
+				//SUBCOMMAND: cancel
 				if strings.Contains(strings.ToLower(argValue), "cancel") ||
 					strings.Contains(strings.ToLower(argValue), "stop") {
 					shouldAbort = true
 				} else if strings.Contains(strings.ToLower(argValue), "dbwipe") ||
-					strings.Contains(strings.ToLower(argValue), "wipedb") {
+					strings.Contains(strings.ToLower(argValue), "wipedb") { //SUBCOMMAND: dbwipe
 					shouldProcess = false
 					shouldWipeDB = true
 				} else if strings.Contains(strings.ToLower(argValue), "cachewipe") ||
-					strings.Contains(strings.ToLower(argValue), "wipecache") {
+					strings.Contains(strings.ToLower(argValue), "wipecache") { //SUBCOMMAND: cachewipe
 					shouldProcess = false
 					shouldWipeCache = true
 				} else if strings.Contains(strings.ToLower(argValue), "help") ||
-					strings.Contains(strings.ToLower(argValue), "info") {
+					strings.Contains(strings.ToLower(argValue), "info") { //SUBCOMMAND: help
 					shouldProcess = false
-
 					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 						//content := fmt.Sprintf("")
 						_, err := replyEmbed(ctx.Msg, "Command — History Help", "TODO: this")
@@ -237,35 +251,63 @@ func handleCommands() *exrouter.Route {
 					log.Println(lg("Command", "History", color.CyanString, "%s requested history help.", getUserIdentifier(*ctx.Msg.Author)))
 				} else if strings.Contains(strings.ToLower(argValue), "list") ||
 					strings.Contains(strings.ToLower(argValue), "status") ||
-					strings.Contains(strings.ToLower(argValue), "output") {
+					strings.Contains(strings.ToLower(argValue), "output") { //SUBCOMMAND: list
 					shouldProcess = false
-
-					output := "Running history jobs...\n"
 					//MARKER: history jobs list
 
+					// 1st
+					output := fmt.Sprintf("**CURRENT HISTORY JOBS** ~ `%d total, %d running",
+						historyJobCnt, historyJobCntRunning)
+					outputC := fmt.Sprintf("CURRENT HISTORY JOBS ~ %d total, %d running",
+						historyJobCnt, historyJobCntRunning)
+					if historyJobCntCompleted > 0 {
+						t := fmt.Sprintf(", %d completed", historyJobCntCompleted)
+						output += t
+						outputC += t
+					}
+					if historyJobCntAborted > 0 {
+						t := fmt.Sprintf(", %d cancelled", historyJobCntAborted)
+						output += t
+						outputC += t
+					}
+					if historyJobCntErrored > 0 {
+						t := fmt.Sprintf(", %d failed", historyJobCntErrored)
+						output += t
+						outputC += t
+					}
+					safeReply(ctx, output+"`")
+					log.Println(lg("Command", "History", color.HiCyanString, outputC))
+
+					// Following
+					output = ""
 					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
 						channelID := pair.Key
 						job := pair.Value
-						channelLabel := channelID
-						channelInfo, err := bot.State.Channel(channelID)
-						if err == nil {
-							channelLabel = "#" + channelInfo.Name
+						jobSourceName, jobChannelName := channelDisplay(channelID)
+
+						newline := fmt.Sprintf("• _%s_ (%s) `%s - %s`, `updated %s ago, added %s ago`\n",
+							historyStatusLabel(job.Status), job.OriginUser, jobSourceName, jobChannelName,
+							shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()),
+							shortenTime(durafmt.ParseShort(time.Since(job.Added)).String()))
+					redothismath: // bad way but dont care right now
+						if len(output)+len(newline) > limitMsg {
+							// send batch
+							safeReply(ctx, output)
+							output = ""
+							goto redothismath
 						}
-						output += fmt.Sprintf("• _%s_ - (%s)`%s`, `updated %s ago, added %s ago`\n",
-							historyStatusLabel(job.Status), job.OriginUser, channelLabel,
-							shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()), shortenTime(durafmt.ParseShort(time.Since(job.Added)).String()))
-						log.Println(lg("Command", "History", color.HiCyanString, "History Job: %s - (%s)%s, updated %s ago, added %s ago",
-							historyStatusLabel(job.Status), job.OriginUser, channelLabel,
-							shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()), shortenTime(durafmt.ParseShort(time.Since(job.Added)).String())))
+						output += newline
+						log.Println(lg("Command", "History", color.HiCyanString,
+							fmt.Sprintf("%s (%s) %s - %s, updated %s ago, added %s ago",
+								historyStatusLabel(job.Status), job.OriginUser, jobSourceName, jobChannelName,
+								shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()),
+								shortenTime(durafmt.ParseShort(time.Since(job.Added)).String())))) // no batching
 					}
-					if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-						_, err := ctx.Reply(output)
-						if err != nil {
-							log.Println(lg("Command", "History", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
-						}
-					} else {
-						log.Println(lg("Command", "History", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
+					// finish off
+					if output != "" {
+						safeReply(ctx, output)
 					}
+					// done
 					log.Println(lg("Command", "History", color.HiRedString, "%s requested statuses of history jobs.",
 						getUserIdentifier(*ctx.Msg.Author)))
 				} else if strings.Contains(strings.ToLower(argValue), "--before=") { // before key
@@ -367,7 +409,7 @@ func handleCommands() *exrouter.Route {
 					if shouldProcess { // PROCESS TREE; MARKER: history queue via cmd
 						if shouldAbort { // ABORT
 							if job, exists := historyJobs.Get(channel); exists &&
-								(job.Status == historyStatusDownloading || job.Status == historyStatusWaiting) {
+								(job.Status == historyStatusRunning || job.Status == historyStatusWaiting) {
 								// DOWNLOADING, ABORTING
 								job.Status = historyStatusAbortRequested
 								if job.Status == historyStatusWaiting {
@@ -384,7 +426,7 @@ func handleCommands() *exrouter.Route {
 							}
 						} else { // RUN
 							if job, exists := historyJobs.Get(channel); !exists ||
-								(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
+								(job.Status != historyStatusRunning && job.Status != historyStatusAbortRequested) {
 								job.Status = historyStatusWaiting
 								job.OriginChannel = ctx.Msg.ChannelID
 								job.OriginUser = getUserIdentifier(*ctx.Msg.Author)

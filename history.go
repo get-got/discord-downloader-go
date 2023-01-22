@@ -18,7 +18,7 @@ type historyStatus int
 
 const (
 	historyStatusWaiting historyStatus = iota
-	historyStatusDownloading
+	historyStatusRunning
 	historyStatusAbortRequested
 	historyStatusAbortCompleted
 	historyStatusErrorReadMessageHistoryPerms
@@ -32,7 +32,7 @@ func historyStatusLabel(status historyStatus) string {
 	switch status {
 	case historyStatusWaiting:
 		return "Waiting..."
-	case historyStatusDownloading:
+	case historyStatusRunning:
 		return "Currently Downloading..."
 	case historyStatusAbortRequested:
 		return "Abort Requested..."
@@ -68,19 +68,31 @@ type historyJob struct {
 }
 
 var (
-	historyJobs       *orderedmap.OrderedMap[string, historyJob]
-	historyProcessing bool
+	historyJobs            *orderedmap.OrderedMap[string, historyJob]
+	historyJobCnt          int
+	historyJobCntWaiting   int
+	historyJobCntRunning   int
+	historyJobCntAborted   int
+	historyJobCntErrored   int
+	historyJobCntCompleted int
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
-	historyProcessing = true
-	defer func() { historyProcessing = false }()
+	var err error
+
+	var commander string = "AUTORUN"
+	var autorun bool = true
+	if commandingMessage != nil { // Only time commandingMessage is nil is Autorun
+		commander = getUserIdentifier(*commandingMessage.Author)
+		autorun = false
+	}
+	logPrefix := fmt.Sprintf("%s/%s: ", subjectChannelID, commander)
+
+	// skip?
 	if job, exists := historyJobs.Get(subjectChannelID); exists && job.Status != historyStatusWaiting {
-		log.Println(lg("History", "", color.RedString, "History job skipped, Status: %s", historyStatusLabel(job.Status)))
+		log.Println(lg("History", "", color.RedString, logPrefix+"History job skipped, Status: %s", historyStatusLabel(job.Status)))
 		return -1
 	}
-
-	var err error
 
 	var totalMessages int64 = 0
 	var totalDownloads int64 = 0
@@ -91,14 +103,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	responseMsg.ID = ""
 	responseMsg.ChannelID = subjectChannelID
 	responseMsg.GuildID = ""
-
-	var commander string = "AUTORUN"
-	var autorun bool = true
-	if commandingMessage != nil { // Only time commandingMessage is nil is Autorun
-		commander = getUserIdentifier(*commandingMessage.Author)
-		autorun = false
-	}
-	logPrefix := fmt.Sprintf("%s/%s: ", subjectChannelID, commander)
 
 	// Send Status?
 	var sendStatus bool = true
@@ -114,7 +118,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	// Check Read History perms
 	if !channelinfo.IsThread() && !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
 		if job, exists := historyJobs.Get(subjectChannelID); exists {
-			job.Status = historyStatusDownloading
+			job.Status = historyStatusRunning
 			job.Updated = time.Now()
 			historyJobs.Set(subjectChannelID, job)
 		}
@@ -128,7 +132,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	// Update Job Status to Downloading
 	if job, exists := historyJobs.Get(subjectChannelID); exists {
-		job.Status = historyStatusDownloading
+		job.Status = historyStatusRunning
 		job.Updated = time.Now()
 		historyJobs.Set(subjectChannelID, job)
 	}

@@ -120,6 +120,7 @@ func defaultConfiguration() configuration {
 		HistoryTyping:              true,
 
 		// History
+		HistoryMaxJobs:        3,
 		AutoHistory:           false,
 		AutoHistoryBefore:     "",
 		AutoHistorySince:      "",
@@ -221,6 +222,7 @@ type configuration struct {
 	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
 
 	// History
+	HistoryMaxJobs        int    `json:"historyMaxJobs"`                  // optional, defaults
 	AutoHistory           bool   `json:"autoHistory,omitempty"`           // optional, defaults
 	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty"`     // optional
 	AutoHistorySince      string `json:"autoHistorySince,omitempty"`      // optional

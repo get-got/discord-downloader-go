@@ -270,7 +270,7 @@ func main() {
 	for _, ah := range autoHistoryChannels {
 		//MARKER: history jobs queued from auto
 		if job, exists := historyJobs.Get(ah.channel); !exists ||
-			(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
+			(job.Status != historyStatusRunning && job.Status != historyStatusAbortRequested) {
 			job.Status = historyStatusWaiting
 			job.OriginChannel = "AUTORUN"
 			job.OriginUser = "AUTORUN"
@@ -296,30 +296,69 @@ func main() {
 	//#region BG Tasks - History Job Processing
 	go func() {
 		for {
+			// Empty Local Cache
+			nhistoryJobCnt,
+				nhistoryJobCntWaiting,
+				nhistoryJobCntRunning,
+				nhistoryJobCntAborted,
+				nhistoryJobCntErrored,
+				nhistoryJobCntCompleted := historyJobs.Len(), 0, 0, 0, 0, 0
+
 			//MARKER: history jobs launch
-			if !historyProcessing && historyJobs.Len() > 0 {
-				anyRunning := false
+			// do we even bother?
+			if nhistoryJobCnt > 0 {
+				// New Cache
 				for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
-					if pair.Value.Status == historyStatusDownloading {
-						anyRunning = true
-						break
+					job := pair.Value
+					if job.Status == historyStatusWaiting {
+						nhistoryJobCntWaiting++
+					} else if job.Status == historyStatusRunning {
+						nhistoryJobCntRunning++
+					} else if job.Status == historyStatusAbortRequested || job.Status == historyStatusAbortCompleted {
+						nhistoryJobCntAborted++
+					} else if job.Status == historyStatusErrorReadMessageHistoryPerms || job.Status == historyStatusErrorRequesting {
+						nhistoryJobCntErrored++
+					} else if job.Status >= historyStatusCompletedNoMoreMessages {
+						nhistoryJobCntCompleted++
 					}
 				}
-				if !anyRunning {
-					var job historyJob
+
+				// Should Start New Job(s)?
+				if nhistoryJobCntRunning < config.HistoryMaxJobs {
+					openSlots := config.HistoryMaxJobs - nhistoryJobCntRunning
+					newJobs := make([]historyJob, openSlots)
+					filledSlots := 0
+					// Find Jobs
 					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
-						if pair.Value.Status == historyStatusWaiting {
-							job = pair.Value
+						if filledSlots == openSlots {
 							break
 						}
+						if pair.Value.Status == historyStatusWaiting {
+							newJobs = append(newJobs, pair.Value)
+							filledSlots++
+						}
 					}
-					if job != (historyJob{}) {
-						// because of modifying the job while iterating historyJobs above
-						go handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+					// Start Jobs
+					if len(newJobs) > 0 {
+						for _, job := range newJobs {
+							if job != (historyJob{}) {
+								go handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+							}
+						}
 					}
 				}
 			}
-			time.Sleep(8 * time.Second)
+
+			// Update Cache
+			historyJobCnt = nhistoryJobCnt
+			historyJobCntWaiting = nhistoryJobCntWaiting
+			historyJobCntRunning = nhistoryJobCntRunning
+			historyJobCntAborted = nhistoryJobCntAborted
+			historyJobCntErrored = nhistoryJobCntErrored
+			historyJobCntCompleted = nhistoryJobCntCompleted
+
+			//~ optional setting?
+			time.Sleep(5 * time.Second)
 		}
 	}()
 	//#endregion
