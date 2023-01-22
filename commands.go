@@ -241,7 +241,11 @@ func handleCommands() *exrouter.Route {
 					shouldProcess = false
 
 					output := "Running history jobs...\n"
-					for channelID, job := range historyJobs {
+					//MARKER: history jobs list
+
+					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
+						channelID := pair.Key
+						job := pair.Value
 						channelLabel := channelID
 						channelInfo, err := bot.State.Channel(channelID)
 						if err == nil {
@@ -359,11 +363,27 @@ func handleCommands() *exrouter.Route {
 								getUserIdentifier(*ctx.Msg.Author), err))
 						}
 					}
-				} else {
-					if shouldProcess {
-						// Run
-						if !shouldAbort {
-							if job, exists := historyJobs[channel]; !exists ||
+				} else { // IS BOT ADMIN
+					if shouldProcess { // PROCESS TREE; MARKER: history queue via cmd
+						if shouldAbort { // ABORT
+							if job, exists := historyJobs.Get(channel); exists &&
+								(job.Status == historyStatusDownloading || job.Status == historyStatusWaiting) {
+								// DOWNLOADING, ABORTING
+								job.Status = historyStatusAbortRequested
+								if job.Status == historyStatusWaiting {
+									job.Status = historyStatusAbortCompleted
+								}
+								historyJobs.Set(channel, job)
+								log.Println(lg("Command", "History", color.CyanString,
+									"%s cancelled history cataloging for \"%s\"",
+									getUserIdentifier(*ctx.Msg.Author), channel))
+							} else { // NOT DOWNLOADING, ABORTING
+								log.Println(lg("Command", "History", color.CyanString,
+									"%s tried to cancel history for \"%s\" but it's not running",
+									getUserIdentifier(*ctx.Msg.Author), channel))
+							}
+						} else { // RUN
+							if job, exists := historyJobs.Get(channel); !exists ||
 								(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
 								job.Status = historyStatusWaiting
 								job.OriginChannel = ctx.Msg.ChannelID
@@ -374,28 +394,12 @@ func handleCommands() *exrouter.Route {
 								job.TargetSince = sinceID
 								job.Updated = time.Now()
 								job.Added = time.Now()
-								historyJobs[channel] = job
+								historyJobs.Set(channel, job)
 							} else { // ALREADY RUNNING
 								log.Println(lg("Command", "History", color.CyanString,
 									"%s tried using history command but history is already running for %s...",
 									getUserIdentifier(*ctx.Msg.Author), channel))
 							}
-						} else if historyJobs[channel].Status == historyStatusDownloading ||
-							historyJobs[channel].Status == historyStatusWaiting { // requested abort while downloading
-							if job, exists := historyJobs[channel]; exists {
-								job.Status = historyStatusAbortRequested
-								if historyJobs[channel].Status == historyStatusWaiting {
-									job.Status = historyStatusAbortCompleted
-								}
-								historyJobs[channel] = job
-							}
-							log.Println(lg("Command", "History", color.CyanString,
-								"%s cancelled history cataloging for \"%s\"",
-								getUserIdentifier(*ctx.Msg.Author), channel))
-						} else { // tried to stop but is not downloading
-							log.Println(lg("Command", "History", color.CyanString,
-								"%s tried to cancel history for \"%s\" but it's not running",
-								getUserIdentifier(*ctx.Msg.Author), channel))
 						}
 					}
 					if shouldWipeDB {

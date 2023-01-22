@@ -20,6 +20,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
 /* v2.0.0 REWRITE TODO:
@@ -108,7 +109,7 @@ func init() {
 
 	loop = make(chan os.Signal, 1)
 	startTime = time.Now()
-	historyJobs = make(map[string]historyJob)
+	historyJobs = orderedmap.New[string, historyJob]()
 
 	if len(os.Args) > 1 {
 		configFileBase = os.Args[1]
@@ -182,9 +183,11 @@ func main() {
 
 			case <-tickerCheckup.C:
 				if config.Debug {
+					//MARKER: history jobs polled for waiting count in checkup
 					historyJobsWaiting := 0
-					if len(historyJobs) > 0 {
-						for _, job := range historyJobs {
+					if historyJobs.Len() > 0 {
+						for jobPair := historyJobs.Oldest(); jobPair != nil; jobPair.Next() {
+							job := jobPair.Value
 							if job.Status == historyStatusWaiting {
 								historyJobsWaiting++
 							}
@@ -263,20 +266,22 @@ func main() {
 			continue
 		}
 	}
-	// Process autorun history
-	for _, arh := range autoHistoryChannels {
-		if job, exists := historyJobs[arh.channel]; !exists ||
+	// Process auto history
+	for _, ah := range autoHistoryChannels {
+		//MARKER: history jobs queued from auto
+		if job, exists := historyJobs.Get(ah.channel); !exists ||
 			(job.Status != historyStatusDownloading && job.Status != historyStatusAbortRequested) {
 			job.Status = historyStatusWaiting
 			job.OriginChannel = "AUTORUN"
 			job.OriginUser = "AUTORUN"
 			job.TargetCommandingMessage = nil
-			job.TargetChannelID = arh.channel
-			job.TargetBefore = arh.before
-			job.TargetSince = arh.since
+			job.TargetChannelID = ah.channel
+			job.TargetBefore = ah.before
+			job.TargetSince = ah.since
 			job.Updated = time.Now()
 			job.Added = time.Now()
-			historyJobs[arh.channel] = job
+			historyJobs.Set(ah.channel, job)
+			//TODO: signals for this and typical history cmd??
 		}
 	}
 	if len(autoHistoryChannels) > 0 {
@@ -291,18 +296,20 @@ func main() {
 	//#region BG Tasks - History Job Processing
 	go func() {
 		for {
-			if !historyProcessing {
+			//MARKER: history jobs launch
+			if !historyProcessing && historyJobs.Len() > 0 {
 				anyRunning := false
-				for _, job := range historyJobs {
-					if job.Status == historyStatusDownloading {
+				for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
+					if pair.Value.Status == historyStatusDownloading {
 						anyRunning = true
+						break
 					}
 				}
-				if !anyRunning && len(historyJobs) > 0 {
+				if !anyRunning {
 					var job historyJob
-					for _, _job := range historyJobs {
-						if _job.Status == historyStatusWaiting {
-							job = _job
+					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
+						if pair.Value.Status == historyStatusWaiting {
+							job = pair.Value
 							break
 						}
 					}

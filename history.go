@@ -11,6 +11,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
 type historyStatus int
@@ -67,14 +68,14 @@ type historyJob struct {
 }
 
 var (
-	historyJobs       map[string]historyJob
+	historyJobs       *orderedmap.OrderedMap[string, historyJob]
 	historyProcessing bool
 )
 
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
 	historyProcessing = true
 	defer func() { historyProcessing = false }()
-	if job, exists := historyJobs[subjectChannelID]; exists && job.Status != historyStatusWaiting {
+	if job, exists := historyJobs.Get(subjectChannelID); exists && job.Status != historyStatusWaiting {
 		log.Println(lg("History", "", color.RedString, "History job skipped, Status: %s", historyStatusLabel(job.Status)))
 		return -1
 	}
@@ -112,10 +113,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	// Check Read History perms
 	if !channelinfo.IsThread() && !hasPerms(subjectChannelID, discordgo.PermissionReadMessageHistory) {
-		if job, exists := historyJobs[subjectChannelID]; exists {
+		if job, exists := historyJobs.Get(subjectChannelID); exists {
 			job.Status = historyStatusDownloading
 			job.Updated = time.Now()
-			historyJobs[subjectChannelID] = job
+			historyJobs.Set(subjectChannelID, job)
 		}
 		log.Println(lg("History", "", color.HiRedString, logPrefix+"BOT DOES NOT HAVE PERMISSION TO READ MESSAGE HISTORY!!!"))
 		return -1
@@ -126,10 +127,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	// Update Job Status to Downloading
-	if job, exists := historyJobs[subjectChannelID]; exists {
+	if job, exists := historyJobs.Get(subjectChannelID); exists {
 		job.Status = historyStatusDownloading
 		job.Updated = time.Now()
-		historyJobs[subjectChannelID] = job
+		historyJobs.Set(subjectChannelID, job)
 	}
 
 	//#region Cache Files
@@ -340,20 +341,20 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 				}
 				log.Println(lg("History", "", color.HiRedString, logPrefix+"Error requesting messages:\t%s", err))
-				if job, exists := historyJobs[subjectChannelID]; exists {
+				if job, exists := historyJobs.Get(subjectChannelID); exists {
 					job.Status = historyStatusErrorRequesting
 					job.Updated = time.Now()
-					historyJobs[subjectChannelID] = job
+					historyJobs.Set(subjectChannelID, job)
 				}
 				break MessageRequestingLoop
 			} else {
 				// No More Messages
 				if len(messages) <= 0 {
 					if msg_rq_cnt > 3 {
-						if job, exists := historyJobs[subjectChannelID]; exists {
+						if job, exists := historyJobs.Get(subjectChannelID); exists {
 							job.Status = historyStatusCompletedNoMoreMessages
 							job.Updated = time.Now()
-							historyJobs[subjectChannelID] = job
+							historyJobs.Set(subjectChannelID, job)
 						}
 						break MessageRequestingLoop
 					} else { // retry to make sure no more
@@ -375,13 +376,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				}
 				for _, message := range messages {
 					// Ordered to Cancel
-					if historyJobs[subjectChannelID].Status == historyStatusAbortRequested {
-						if job, exists := historyJobs[subjectChannelID]; exists {
+					if job, exists := historyJobs.Get(subjectChannelID); exists {
+						if job.Status == historyStatusAbortRequested {
 							job.Status = historyStatusAbortCompleted
 							job.Updated = time.Now()
-							historyJobs[subjectChannelID] = job
+							historyJobs.Set(subjectChannelID, job)
+							break MessageRequestingLoop
 						}
-						break MessageRequestingLoop
 					}
 
 					lastMessageID = message.ID
@@ -391,10 +392,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if before != "" {
 						before64, _ := strconv.ParseInt(before, 10, 64)
 						if message64 > before64 {
-							if job, exists := historyJobs[subjectChannelID]; exists {
+							if job, exists := historyJobs.Get(subjectChannelID); exists {
 								job.Status = historyStatusCompletedToBeforeFilter
 								job.Updated = time.Now()
-								historyJobs[subjectChannelID] = job
+								historyJobs.Set(subjectChannelID, job)
 							}
 							break MessageRequestingLoop
 						}
@@ -402,10 +403,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if since != "" {
 						since64, _ := strconv.ParseInt(since, 10, 64)
 						if message64 < since64 {
-							if job, exists := historyJobs[subjectChannelID]; exists {
+							if job, exists := historyJobs.Get(subjectChannelID); exists {
 								job.Status = historyStatusCompletedToSinceFilter
 								job.Updated = time.Now()
-								historyJobs[subjectChannelID] = job
+								historyJobs.Set(subjectChannelID, job)
 							}
 							break MessageRequestingLoop
 						}
@@ -423,9 +424,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 
 		// Cache
-		if historyJobs[subjectChannelID].Status == historyStatusCompletedNoMoreMessages {
-			deleteHistoryCache(historyCacheBefore)
-			writeHistoryCache(historyCacheSince, lastMessageID)
+		if job, exists := historyJobs.Get(subjectChannelID); exists {
+			if job.Status == historyStatusCompletedNoMoreMessages {
+				deleteHistoryCache(historyCacheBefore)
+				writeHistoryCache(historyCacheSince, lastMessageID)
+			}
 		}
 
 		// Final log
@@ -433,6 +436,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			sourceName, formatNumber(totalDownloads), humanize.Bytes(uint64(totalFilesize))))
 		// Final status update
 		if sendStatus {
+			jobStatus := "Unknown"
+			if job, exists := historyJobs.Get(subjectChannelID); exists {
+				jobStatus = historyStatusLabel(job.Status)
+			}
 			status := fmt.Sprintf(
 				"``%s:`` **%s total files downloaded!** `%s total, avg %1.1f MB/s`\n"+
 					"``%s total messages processed``\n\n"+
@@ -444,7 +451,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/time.Since(historyStartTime).Seconds(),
 				formatNumber(int64(totalMessages)),
 				msgSourceDisplay,
-				historyStatusLabel(historyJobs[subjectChannelID].Status),
+				jobStatus,
 				messageRequestCount,
 				rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
 			)
