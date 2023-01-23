@@ -353,15 +353,6 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
-	if regexUrlMastodonPost1.MatchString(inputURL) || regexUrlMastodonPost2.MatchString(inputURL) {
-		links, err := getMastodonPostUrls(inputURL)
-		if err != nil {
-			log.Println(lg("Download", "", color.RedString, "Mastodon Post URL failed for %s -- %s", inputURL, err))
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, m)
-		}
-	}
-
 	// The original project has this as an option,
 	if regexUrlPossibleTistorySite.MatchString(inputURL) {
 		links, err := getPossibleTistorySiteUrls(inputURL)

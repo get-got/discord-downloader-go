@@ -37,7 +37,6 @@ import (
 * Fix filetype incorrect detection // constantly picking up webpages as txt files and NOT picking up proper media
 
 * Fix Support for Reddit
-* Fix Support for Mastodon
 * Fix Support for Instagram
 * Support Google Drive (folder; direct singles)
 * Support Dropbox (folder; direct singles)
@@ -47,6 +46,7 @@ import (
 * Support TikTok -- Tried, once the connection is closed the cdn URL is rendered invalid
 * Support Facebook Photos -- Tried, it doesn't preload image data, it's loaded in after. Would have to keep connection open, find alternative way to grab, or use api.
 * Support Facebook Videos -- Previously supported but they split mp4 into separate audio and video streams
+* Support Mastodon -- dropped due to login/api changes??
 
 * Add setting for filename max length, shorten if over given length, default to sys max
 

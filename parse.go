@@ -621,31 +621,3 @@ func getRedditPostUrls(link string) (map[string]string, error) {
 }
 
 //#endregion
-
-//#region Mastodon
-
-func getMastodonPostUrls(link string) (map[string]string, error) {
-	var post map[string]interface{}
-	err := getJSON(link+".json", &post)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse json from mastodon post:\t%s", err)
-	}
-	// Check for returned error
-	if errmsg, exists := post["error"]; exists {
-		return nil, fmt.Errorf("mastodon JSON returned an error:\t%s", errmsg)
-	}
-
-	// Check validity
-	if attachments, exists := post["attachment"]; exists {
-		files := make(map[string]string)
-		for _, attachmentObj := range attachments.([]interface{}) {
-			attachment := attachmentObj.(map[string]interface{})
-			files[attachment["url"].(string)] = ""
-		}
-		return files, nil
-	}
-
-	return nil, nil
-}
-
-//#endregion
