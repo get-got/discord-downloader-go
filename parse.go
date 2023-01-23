@@ -12,11 +12,8 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
-	"github.com/Jeffail/gabs"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bwmarrin/discordgo"
-	"github.com/fatih/color"
-	"golang.org/x/net/html"
 )
 
 const (
@@ -94,177 +91,14 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 
 //#region Instagram
 
+// see commit history for old functions, content is no longer given
+
 func getInstagramUrls(url string) (map[string]string, error) {
-	username, shortcode := getInstagramInfo(url)
-	filename := fmt.Sprintf("instagram %s - %s", username, shortcode)
-	// if instagram video
-	videoUrl := getInstagramVideoUrl(url)
-	if videoUrl != "" {
-		return map[string]string{videoUrl: filename + filepathExtension(videoUrl)}, nil
-	}
-	// if instagram album
-	albumUrls := getInstagramAlbumUrls(url)
-	if len(albumUrls) > 0 {
-		links := make(map[string]string)
-		for i, albumUrl := range albumUrls {
-			links[albumUrl] = filename + " " + strconv.Itoa(i+1) + filepathExtension(albumUrl)
-		}
-		return links, nil
-	}
-	// if instagram picture
+	filename := fmt.Sprintf("instagram")
 	afterLastSlash := strings.LastIndex(url, "/")
 	mediaUrl := url[:afterLastSlash]
 	mediaUrl += strings.Replace(strings.Replace(url[afterLastSlash:], "?", "&", -1), "/", "/media/?size=l", -1)
 	return map[string]string{mediaUrl: filename + ".jpg"}, nil
-}
-
-func getInstagramInfo(url string) (string, string) {
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return "unknown", "unknown"
-	}
-
-	defer resp.Body.Close()
-	z := html.NewTokenizer(resp.Body)
-
-ParseLoop:
-	for {
-		tt := z.Next()
-		switch {
-		case tt == html.ErrorToken:
-			break ParseLoop
-		}
-		if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
-			t := z.Token()
-			for _, a := range t.Attr {
-				if a.Key == "type" {
-					if a.Val == "text/javascript" {
-						z.Next()
-						content := string(z.Text())
-						if strings.Contains(content, "window._sharedData = ") {
-							content = strings.Replace(content, "window._sharedData = ", "", 1)
-							content = content[:len(content)-1]
-							jsonParsed, err := gabs.ParseJSON([]byte(content))
-							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "error parsing instagram json:\t"+err.Error()))
-								continue ParseLoop
-							}
-							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
-							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "unable to find entries children:\t"+err.Error()))
-								continue ParseLoop
-							}
-							for _, entryChild := range entryChildren {
-								shortcode := entryChild.Path("graphql.shortcode_media.shortcode").Data().(string)
-								username := entryChild.Path("graphql.shortcode_media.owner.username").Data().(string)
-								return username, shortcode
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return "unknown", "unknown"
-}
-
-func getInstagramVideoUrl(url string) string {
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return ""
-	}
-
-	defer resp.Body.Close()
-	z := html.NewTokenizer(resp.Body)
-
-	for {
-		tt := z.Next()
-		switch {
-		case tt == html.ErrorToken:
-			return ""
-		}
-		if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
-			t := z.Token()
-			if t.Data == "meta" {
-				for _, a := range t.Attr {
-					if a.Key == "property" {
-						if a.Val == "og:video" || a.Val == "og:video:secure_url" {
-							for _, at := range t.Attr {
-								if at.Key == "content" {
-									return at.Val
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-func getInstagramAlbumUrls(url string) []string {
-	var links []string
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return links
-	}
-
-	defer resp.Body.Close()
-	z := html.NewTokenizer(resp.Body)
-
-ParseLoop:
-	for {
-		tt := z.Next()
-		switch {
-		case tt == html.ErrorToken:
-			break ParseLoop
-		}
-		if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
-			t := z.Token()
-			for _, a := range t.Attr {
-				if a.Key == "type" {
-					if a.Val == "text/javascript" {
-						z.Next()
-						content := string(z.Text())
-						if strings.Contains(content, "window._sharedData = ") {
-							content = strings.Replace(content, "window._sharedData = ", "", 1)
-							content = content[:len(content)-1]
-							jsonParsed, err := gabs.ParseJSON([]byte(content))
-							if err != nil {
-								log.Println(lg("API", "Instagram", color.HiRedString, "error parsing instagram json:\t%s", err))
-								continue ParseLoop
-							}
-							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
-							if err != nil {
-								log.Println("Unable to find entries children: ", err)
-								continue ParseLoop
-							}
-							for _, entryChild := range entryChildren {
-								albumChildren, err := entryChild.Path("graphql.shortcode_media.edge_sidecar_to_children.edges").Children()
-								if err != nil {
-									continue ParseLoop
-								}
-								for _, albumChild := range albumChildren {
-									link, ok := albumChild.Path("node.display_url").Data().(string)
-									if ok {
-										links = append(links, link)
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	if len(links) > 0 {
-		log.Printf("Found instagram album with %d images (url: %s)\n", len(links), url)
-	}
-
-	return links
 }
 
 //#endregion
