@@ -8,7 +8,7 @@ before_install:
   - go install github.com/mitchellh/gox
 
 script:
-  - env GO111MODULE=on gox -osarch="windows/amd64 linux/amd64 linux/arm"
+  - env GO111MODULE=on env GODEBUG=http2client=0 gox -osarch="windows/amd64 linux/amd64 linux/arm"
 
 deploy:
   provider: releases
