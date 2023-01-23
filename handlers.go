@@ -80,8 +80,9 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 			)
 			content := m.Content
 			if len(m.Attachments) > 0 {
-				content += fmt.Sprintf("\t[%d attachments]", len(m.Attachments))
+				content += fmt.Sprintf(" \t[%d attachments]", len(m.Attachments))
 			}
+			content += fmt.Sprintf(" \t<%s>", m.ID)
 
 			if !history || config.MessageOutputHistory {
 				addOut := ""
@@ -317,7 +318,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 				continue
 			}
 			if config.Debug && (!history || config.MessageOutputHistory) {
-				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link))
+				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link+fmt.Sprintf(" \t<%s>", m.ID)))
 			}
 			status, filesize := downloadRequestStruct{
 				InputURL:   file.Link,

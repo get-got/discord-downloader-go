@@ -1025,7 +1025,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			log.Println(lg("Download", "", dlColor,
 				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t\t%s",
 				strings.ToUpper(contentTypeFound), msgTimestamp,
-				color.HiYellowString("\"%s / %s\" (%s)", sourceName, sourceChannelName, download.Message.ChannelID),
+				color.HiYellowString("\"%s / %s\" (%s, %s)", sourceName, sourceChannelName, download.Message.ChannelID, download.Message.ID),
 				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
 					color.WhiteString("(%s, %s, %0.1f %s)",
 						filesize, shortenTime(durafmt.ParseShort(time.Since(download.StartTime)).String()), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
