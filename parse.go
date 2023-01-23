@@ -601,6 +601,9 @@ type redditThreadObject []struct {
 }
 
 func getRedditPostUrls(link string) (map[string]string, error) {
+	if strings.Contains(link, "?") {
+		link = link[:strings.Index(link, "?")]
+	}
 	redditThread := new(redditThreadObject)
 	headers := make(map[string]string)
 	headers["Accept-Encoding"] = "identity"
