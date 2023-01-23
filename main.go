@@ -36,7 +36,6 @@ import (
 * Fix links being ignored
 * Fix filetype incorrect detection // constantly picking up webpages as txt files and NOT picking up proper media
 
-* Fix Support for Reddit
 * Fix Support for Instagram
 * Support Google Drive (folder; direct singles)
 * Support Dropbox (folder; direct singles)
