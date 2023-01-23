@@ -10,6 +10,7 @@ const (
 	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
 	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)$`
 	regexpUrlInstagram            = `^http(s?):\/\/(www\.)?instagram\.com\/p\/[^/]+\/(\?[^/]+)?$`
+	regexpUrlInstagramReel        = `^http(s?):\/\/(www\.)?instagram\.com\/reel\/[^/]+\/(\?[^/]+)?$`
 	regexpUrlImgurSingle          = `^http(s?):\/\/(i\.)?imgur\.com\/[A-Za-z0-9]+(\.gifv)?$`
 	regexpUrlImgurAlbum           = `^http(s?):\/\/imgur\.com\/(a\/|gallery\/|r\/[^\/]+\/)[A-Za-z0-9]+(#[A-Za-z0-9]+)?$`
 	regexpUrlStreamable           = `^http(s?):\/\/(www\.)?streamable\.com\/([0-9a-z]+)$`
@@ -28,6 +29,7 @@ var (
 	regexUrlTwitter              *regexp.Regexp
 	regexUrlTwitterStatus        *regexp.Regexp
 	regexUrlInstagram            *regexp.Regexp
+	regexUrlInstagramReel        *regexp.Regexp
 	regexUrlImgurSingle          *regexp.Regexp
 	regexUrlImgurAlbum           *regexp.Regexp
 	regexUrlStreamable           *regexp.Regexp
@@ -52,6 +54,9 @@ func compileRegex() error {
 		return err
 	}
 	if regexUrlInstagram, err = regexp.Compile(regexpUrlInstagram); err != nil {
+		return err
+	}
+	if regexUrlInstagramReel, err = regexp.Compile(regexpUrlInstagramReel); err != nil {
 		return err
 	}
 	if regexUrlImgurSingle, err = regexp.Compile(regexpUrlImgurSingle); err != nil {

@@ -20,6 +20,7 @@ const (
 	historyCachePath   = cachePath + string(os.PathSeparator) + "history"
 	historyCacheBefore = historyCachePath + string(os.PathSeparator) + "before"
 	historyCacheSince  = historyCachePath + string(os.PathSeparator) + "since"
+	instagramCachePath = cachePath + string(os.PathSeparator) + "instagram.json"
 	constantsPath      = cachePath + string(os.PathSeparator) + "constants.json"
 
 	defaultReact = "✅"

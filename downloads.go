@@ -258,12 +258,17 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
-	if regexUrlInstagram.MatchString(inputURL) {
-		links, err := getInstagramUrls(inputURL)
-		if err != nil {
-			log.Println(lg("Download", "", color.RedString, "Instagram fetch failed for %s -- %s", inputURL, err))
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, m)
+	if instagramConnected {
+		if regexUrlInstagram.MatchString(inputURL) || regexUrlInstagramReel.MatchString(inputURL) {
+			if strings.Contains(inputURL, "?") {
+				inputURL = inputURL[:strings.Index(inputURL, "?")]
+			}
+			links, err := getInstagramUrls(inputURL, m)
+			if err != nil {
+				log.Println(lg("Download", "", color.RedString, "Instagram media fetch failed for %s -- %s", inputURL, err))
+			} else if len(links) > 0 {
+				return trimDownloadedLinks(links, m)
+			}
 		}
 	}
 

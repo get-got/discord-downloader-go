@@ -614,6 +614,9 @@ func sendStatusMessage(status sendStatusType) {
 				if twitterConnected {
 					message += "\n• Connected to Twitter API"
 				}
+				if instagramConnected {
+					message += "\n• Connected to Instagram API"
+				}
 				message += fmt.Sprintf("\n_%s_", versions(true))
 			} else if status == sendStatusExit {
 				label = "exit"

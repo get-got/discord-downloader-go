@@ -12,17 +12,9 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/Davincible/goinsta/v3"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bwmarrin/discordgo"
-)
-
-const (
-	imgurClientID   = "08af502a9e70d65"
-	sneakyUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
-)
-
-var (
-	twitterClient *anaconda.TwitterApi
 )
 
 //#region Twitter
@@ -37,7 +29,7 @@ func getTwitterUrls(inputURL string) (map[string]string, error) {
 
 func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]string, error) {
 	if twitterClient == nil {
-		return nil, errors.New("invalid Twitter API Keys Set")
+		return nil, errors.New("invalid Twitter API credentials")
 	}
 
 	if strings.Contains(inputURL, "/photo/") {
@@ -91,14 +83,53 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 
 //#region Instagram
 
-// see commit history for old functions, content is no longer given
+func getInstagramUrls(inputURL string, m *discordgo.Message) (map[string]string, error) {
+	if instagramClient == nil {
+		return nil, errors.New("invalid Instagram API credentials")
+	}
 
-func getInstagramUrls(url string) (map[string]string, error) {
-	filename := fmt.Sprintf("instagram")
-	afterLastSlash := strings.LastIndex(url, "/")
-	mediaUrl := url[:afterLastSlash]
-	mediaUrl += strings.Replace(strings.Replace(url[afterLastSlash:], "?", "&", -1), "/", "/media/?size=l", -1)
-	return map[string]string{mediaUrl: filename + ".jpg"}, nil
+	links := make(map[string]string)
+
+	// fix
+	shortcode := inputURL
+	if strings.Contains(shortcode, ".com/p/") {
+		shortcode = shortcode[strings.Index(shortcode, ".com/p/")+7:]
+	}
+	if strings.Contains(shortcode, ".com/reel/") {
+		shortcode = shortcode[strings.Index(shortcode, ".com/reel/")+10:]
+	}
+	shortcode = strings.ReplaceAll(shortcode, "/", "")
+
+	// fetch
+	mediaID, err := goinsta.MediaIDFromShortID(shortcode)
+	if err == nil {
+		media, err := instagramClient.GetMedia(mediaID)
+		if err != nil {
+			return nil, err
+		} else {
+			postType := media.Items[0].MediaToString()
+			if postType == "carousel" {
+				for index, item := range media.Items[0].CarouselMedia {
+					itemType := item.MediaToString()
+					if itemType == "video" {
+						url := item.Videos[0].URL
+						links[url] = fmt.Sprintf("%s %d %s", shortcode, index, media.Items[0].User.Username)
+					} else if itemType == "photo" {
+						url := item.Images.GetBest()
+						links[url] = fmt.Sprintf("%s %d %s", shortcode, index, media.Items[0].User.Username)
+					}
+				}
+			} else if postType == "video" {
+				url := media.Items[0].Videos[0].URL
+				links[url] = fmt.Sprintf("%s %s", shortcode, media.Items[0].User.Username)
+			} else if postType == "photo" {
+				url := media.Items[0].Images.GetBest()
+				links[url] = fmt.Sprintf("%s %s", shortcode, media.Items[0].User.Username)
+			}
+		}
+	}
+
+	return links, nil
 }
 
 //#endregion

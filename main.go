@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/Davincible/goinsta/v3"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
@@ -73,7 +74,10 @@ var (
 	myDB *db.DB
 
 	// APIs
-	twitterConnected bool = false
+	twitterConnected   bool = false
+	twitterClient      *anaconda.TwitterApi
+	instagramConnected bool = false
+	instagramClient    *goinsta.Instagram
 
 	// Gen
 	loop                 chan os.Signal
@@ -89,6 +93,11 @@ var (
 	invalidChannels      []string
 	invalidCategories    []string
 	invalidServers       []string
+)
+
+const (
+	imgurClientID   = "08af502a9e70d65"
+	sneakyUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
 )
 
 func versions(multiline bool) string {
@@ -575,6 +584,44 @@ func botLoadAPIs() {
 	} else {
 		log.Println(lg("API", "Twitter", color.MagentaString,
 			"API credentials missing, the bot won't use the Twitter API."))
+	}
+
+	// Instagram API
+	if config.Credentials.InstagramUsername != "" &&
+		config.Credentials.InstagramPassword != "" {
+
+		log.Println(lg("API", "Instagram", color.MagentaString, "Connecting to API..."))
+
+		instagramLoginCount := 0
+	do_instagram_login:
+		instagramLoginCount++
+		if instagramLoginCount > 1 {
+			time.Sleep(3 * time.Second)
+		}
+		if instagramClient, err = goinsta.Import(instagramCachePath); err != nil {
+			instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
+			if err := instagramClient.Login(); err != nil {
+				log.Println(lg("API", "Instagram", color.HiRedString, "API Login Error: %s", err.Error()))
+				if instagramLoginCount <= 3 {
+					goto do_instagram_login
+				} else {
+					log.Println(lg("API", "Instagram", color.HiRedString,
+						"Failed to login to Instagram API, the bot will not fetch tweet media..."))
+				}
+			} else {
+				log.Println(lg("API", "Instagram", color.HiMagentaString,
+					"Connected to API @%s via new login", instagramClient.Account.Username))
+				instagramConnected = true
+			}
+		} else {
+			log.Println(lg("API", "Instagram", color.HiMagentaString,
+				"Connected to API @%s via cache", instagramClient.Account.Username))
+			instagramConnected = true
+		}
+		defer instagramClient.Export(instagramCachePath)
+	} else {
+		log.Println(lg("API", "Instagram", color.MagentaString,
+			"API credentials missing, the bot won't use the Instagram API."))
 	}
 
 	mainWg.Done()

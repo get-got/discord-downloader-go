@@ -36,6 +36,8 @@ type configurationCredentials struct {
 	TwitterAccessTokenSecret string `json:"twitterAccessTokenSecret,omitempty"` // optional
 	TwitterConsumerKey       string `json:"twitterConsumerKey,omitempty"`       // optional
 	TwitterConsumerSecret    string `json:"twitterConsumerSecret,omitempty"`    // optional
+	InstagramUsername        string `json:"instagramUsername,omitempty"`        // optional
+	InstagramPassword        string `json:"instagramPassword,omitempty"`        // optional
 	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
 }
 
@@ -502,6 +504,12 @@ func loadConfig() error {
 			}
 			if dupeConfig.Credentials.TwitterAccessTokenSecret != "" {
 				dupeConfig.Credentials.TwitterAccessTokenSecret = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.InstagramUsername != "" {
+				dupeConfig.Credentials.InstagramUsername = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.InstagramPassword != "" {
+				dupeConfig.Credentials.InstagramPassword = "STRIPPED_FOR_OUTPUT"
 			}
 			if dupeConfig.Credentials.TwitterConsumerKey != "" {
 				dupeConfig.Credentials.TwitterConsumerKey = "STRIPPED_FOR_OUTPUT"
