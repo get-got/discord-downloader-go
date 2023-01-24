@@ -372,7 +372,7 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
-			{"{{fileType}}", download.FileExtension},
+			{"{{fileType}}", download.Extension},
 			{"{{fileSize}}", filesize},
 			{"{{messageID}}", download.Message.ID},
 			{"{{userID}}", userID},

@@ -418,7 +418,7 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 type downloadRequestStruct struct {
 	InputURL       string
 	Filename       string
-	FileExtension  string
+	Extension      string
 	Path           string
 	Message        *discordgo.Message
 	FileTime       time.Time
@@ -689,6 +689,11 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 
+		// Content Type
+		contentType := http.DetectContentType(bodyOfResp)
+		contentTypeParts := strings.Split(contentType, "/")
+		contentTypeFound := contentTypeParts[0]
+
 		// Filename
 		if download.Filename == "" {
 			download.Filename = filenameFromURL(response.Request.URL.String())
@@ -707,22 +712,42 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 
+		// Extension
+		download.Extension = strings.ToLower(filepath.Ext(download.Filename))
+		if filepath.Ext(download.Filename) == "" {
+			if possibleExtension, _ := mime.ExtensionsByType(contentType); len(possibleExtension) > 0 {
+				download.Filename += possibleExtension[0]
+				download.Extension = possibleExtension[0]
+			}
+		}
+
+		// Format Keys
+		download.Filename = dynamicKeyReplacement(channelConfig, download)
+
+		// Fix filename length
 		if len(download.Filename) >= 260 {
-			download.Filename = download.Filename[:255]
+			download.Filename = download.Filename[:250]
+			download.Filename += download.Extension
 		}
 
-		extension := strings.ToLower(filepath.Ext(download.Filename))
-		download.FileExtension = extension
-
-		contentType := http.DetectContentType(bodyOfResp)
-		contentTypeParts := strings.Split(contentType, "/")
-		contentTypeFound := contentTypeParts[0]
-
-		parsedURL, err := url.Parse(download.InputURL)
-		if err != nil {
-			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
+		// Swap Extensions
+		if download.Extension == ".jfif" {
+			download.Extension = ".jpg"
+			download.Filename = strings.ReplaceAll(download.Filename, ".jfif", ".jpg")
 		}
-		domain := parsedURL.Hostname()
+
+		// Fix content type using extension
+		if stringInSlice(download.Extension, []string{".mov"}) ||
+			stringInSlice(download.Extension, []string{".mp4"}) ||
+			stringInSlice(download.Extension, []string{".webm"}) {
+			contentTypeFound = "video"
+		} else if stringInSlice(download.Extension, []string{".psd"}) ||
+			stringInSlice(download.Extension, []string{".nef"}) ||
+			stringInSlice(download.Extension, []string{".dng"}) ||
+			stringInSlice(download.Extension, []string{".tif"}) ||
+			stringInSlice(download.Extension, []string{".tiff"}) {
+			contentTypeFound = "image"
+		}
 
 		// Check extension
 		if channelConfig.Filters.AllowedExtensions != nil || channelConfig.Filters.BlockedExtensions != nil {
@@ -732,12 +757,12 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 
 			if channelConfig.Filters.BlockedExtensions != nil {
-				if stringInSlice(extension, *channelConfig.Filters.BlockedExtensions) {
+				if stringInSlice(download.Extension, *channelConfig.Filters.BlockedExtensions) {
 					shouldAbort = true
 				}
 			}
 			if channelConfig.Filters.AllowedExtensions != nil {
-				if stringInSlice(extension, *channelConfig.Filters.AllowedExtensions) {
+				if stringInSlice(download.Extension, *channelConfig.Filters.AllowedExtensions) {
 					shouldAbort = false
 				}
 			}
@@ -745,34 +770,19 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			// Abort
 			if shouldAbort {
 				if !download.HistoryCmd {
-					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted extension (%s) found at %s", extension, download.InputURL))
+					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted extension (%s) found at %s",
+						download.Extension, download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedExtension), 0
 			}
 		}
 
-		// Fix content type
-		if stringInSlice(extension, []string{".mov"}) ||
-			stringInSlice(extension, []string{".mp4"}) ||
-			stringInSlice(extension, []string{".webm"}) {
-			contentTypeFound = "video"
-		} else if stringInSlice(extension, []string{".psd"}) ||
-			stringInSlice(extension, []string{".nef"}) ||
-			stringInSlice(extension, []string{".dng"}) ||
-			stringInSlice(extension, []string{".tif"}) ||
-			stringInSlice(extension, []string{".tiff"}) {
-			contentTypeFound = "image"
-		}
-
-		// Filename extension fix
-		if filepath.Ext(download.Filename) == "" {
-			if possibleExtension, _ := mime.ExtensionsByType(contentType); len(possibleExtension) > 0 {
-				download.Filename += possibleExtension[0]
-				download.FileExtension = possibleExtension[0]
-			}
-		}
-
 		// Check Domain
+		parsedURL, err := url.Parse(download.InputURL)
+		if err != nil {
+			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
+		}
+		domain := parsedURL.Hostname()
 		if channelConfig.Filters.AllowedDomains != nil || channelConfig.Filters.BlockedDomains != nil {
 			shouldAbort := false
 			if channelConfig.Filters.AllowedDomains != nil {
@@ -951,10 +961,8 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 
-		// Format Filename
-		filename := dynamicKeyReplacement(channelConfig, download)
+		// Format Path
 		download.Path = download.Path + subfolder
-		download.Filename = filename
 		completePath := filepath.Clean(download.Path + download.Filename)
 
 		// Check if filepath exists
