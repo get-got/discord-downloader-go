@@ -692,7 +692,8 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// Content Type
 		contentType := http.DetectContentType(bodyOfResp)
 		contentTypeParts := strings.Split(contentType, "/")
-		contentTypeFound := contentTypeParts[0]
+		contentTypeBase := contentTypeParts[0]
+		isHtml := strings.Contains(contentType, "text/html")
 
 		// Filename
 		if download.Filename == "" {
@@ -740,13 +741,13 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		if stringInSlice(download.Extension, []string{".mov"}) ||
 			stringInSlice(download.Extension, []string{".mp4"}) ||
 			stringInSlice(download.Extension, []string{".webm"}) {
-			contentTypeFound = "video"
+			contentTypeBase = "video"
 		} else if stringInSlice(download.Extension, []string{".psd"}) ||
 			stringInSlice(download.Extension, []string{".nef"}) ||
 			stringInSlice(download.Extension, []string{".dng"}) ||
 			stringInSlice(download.Extension, []string{".tif"}) ||
 			stringInSlice(download.Extension, []string{".tiff"}) {
-			contentTypeFound = "image"
+			contentTypeBase = "image"
 		}
 
 		// Check extension
@@ -769,7 +770,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 			// Abort
 			if shouldAbort {
-				if !download.HistoryCmd {
+				if !download.HistoryCmd && !isHtml {
 					log.Println(lg("Download", "Skip", color.GreenString, "Unpermitted extension (%s) found at %s",
 						download.Extension, download.InputURL))
 				}
@@ -811,14 +812,14 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Check content type
-		if !((*channelConfig.SaveImages && contentTypeFound == "image") ||
-			(*channelConfig.SaveVideos && contentTypeFound == "video") ||
-			(*channelConfig.SaveAudioFiles && contentTypeFound == "audio") ||
-			(*channelConfig.SaveTextFiles && contentTypeFound == "text") ||
-			(*channelConfig.SaveOtherFiles && contentTypeFound == "application")) {
-			if !download.HistoryCmd {
+		if !((*channelConfig.SaveImages && contentTypeBase == "image") ||
+			(*channelConfig.SaveVideos && contentTypeBase == "video") ||
+			(*channelConfig.SaveAudioFiles && contentTypeBase == "audio") ||
+			(*channelConfig.SaveTextFiles && contentTypeBase == "text" && !isHtml) ||
+			(*channelConfig.SaveOtherFiles && contentTypeBase == "application")) {
+			if !download.HistoryCmd && !isHtml {
 				log.Println(lg("Download", "Skip", color.GreenString,
-					"Unpermitted filetype (%s) found at %s", contentTypeFound, download.InputURL))
+					"Unpermitted filetype (%s) found at %s", contentTypeBase, download.InputURL))
 			}
 			return mDownloadStatus(downloadSkippedUnpermittedType), 0
 		}
@@ -941,8 +942,8 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 		// Subfolder Division - Content Type
 		if *channelConfig.DivideByType {
-			subfolderSuffix := contentTypeFound
-			switch contentTypeFound {
+			subfolderSuffix := contentTypeBase
+			switch contentTypeBase {
 			case "image":
 				subfolderSuffix = "images"
 			case "video":
@@ -1028,7 +1029,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 			log.Println(lg("Download", "", dlColor,
 				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t\t%s",
-				strings.ToUpper(contentTypeFound), msgTimestamp,
+				strings.ToUpper(contentTypeBase), msgTimestamp,
 				color.HiYellowString("\"%s / %s\" (%s, %s)", sourceName, sourceChannelName, download.Message.ChannelID, download.Message.ID),
 				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
 					color.WhiteString("(%s, %s, %0.1f %s)",
@@ -1036,7 +1037,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
-				contentTypeFound, sourceName, sourceChannelName))
+				contentTypeBase, sourceName, sourceChannelName))
 		}
 
 		userID := botUser.ID
@@ -1162,13 +1163,13 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 									Text:    fmt.Sprintf("%s v%s", projectName, projectVersion),
 								},
 							}
-							if contentTypeFound == "image" {
+							if contentTypeBase == "image" {
 								embed.Image = &discordgo.MessageEmbedImage{URL: download.InputURL}
-							} else if contentTypeFound == "video" {
+							} else if contentTypeBase == "video" {
 								embed.Video = &discordgo.MessageEmbedVideo{URL: download.InputURL}
 							} else {
 								embed.Description = fmt.Sprintf("Unsupported filetype: %s\n%s",
-									contentTypeFound, download.InputURL)
+									contentTypeBase, download.InputURL)
 							}
 							_, err := bot.ChannelMessageSendComplex(logChannel,
 								&discordgo.MessageSend{
