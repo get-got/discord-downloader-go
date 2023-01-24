@@ -265,6 +265,11 @@ func handleCommands() *exrouter.Route {
 						output += t
 						outputC += t
 					}
+					if historyJobCntWaiting > 0 {
+						t := fmt.Sprintf(", %d waiting", historyJobCntWaiting)
+						output += t
+						outputC += t
+					}
 					if historyJobCntAborted > 0 {
 						t := fmt.Sprintf(", %d cancelled", historyJobCntAborted)
 						output += t
