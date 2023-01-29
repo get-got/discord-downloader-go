@@ -48,7 +48,7 @@
 
 </div><br>
 
-This project is a cross-platform cli single-file executable program to interact with a Discord Bot (genuine bot application or user account, limitations apply to both respectively) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _([see list below](#supported-download-sources))._ It also supports **very extensive** settings configurations and customization, applicable globally or per-server/category/channel/user. Tailor the bot to your exact needs and runtime environment. See the [Features](#-features) list below for the full list. See the [List of Settings](#-list-of-settings) below for a settings breakdown. See [Getting Started](#%EF%B8%8F-getting-started) or anything else in the table of contents right under this to learn more!
+This project is a cross-platform cli single-file program to interact with a Discord Bot (genuine bot application or user account, limitations apply to both respectively) to locally download files posted from Discord in real-time as well as a full archive of old messages. It can download any directly sent Discord attachments or linked files and supports fetching highest possible quality files from specific sources _([see list below](#supported-download-sources))._ It also supports **very extensive** settings configurations and customization, applicable globally or per-server/category/channel/user. Tailor the bot to your exact needs and runtime environment. See the [Features](#-features) list below for the full list. See the [List of Settings](#-list-of-settings) below for a settings breakdown. See [Getting Started](#%EF%B8%8F-getting-started) or anything else in the table of contents right under this to learn more!
 
 <h3 align="center">
     <b>Originally a fork of <a href="https://github.com/Seklfreak/discord-image-downloader-go">Seklfreak's <i>discord-image-downloader-go</i></a></b>
@@ -59,7 +59,7 @@ This project is a cross-platform cli single-file executable program to interact 
 
 ---
 
-- [**WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)](#warning-discord-does-not-allow-automated-user-accounts-self-botsuser-bots)
+- [⚠️ **WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)](#️-warning-discord-does-not-allow-automated-user-accounts-self-botsuser-bots)
 - [🤖 Features](#-features)
   - [Supported Download Sources](#supported-download-sources)
   - [Commands](#commands)
@@ -93,7 +93,7 @@ This project is a cross-platform cli single-file executable program to interact 
 
 ---
 
-## **WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
+## ⚠️ **WARNING!** Discord does not allow Automated User Accounts (Self-Bots/User-Bots)
 
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
@@ -109,12 +109,12 @@ Now that that's out of the way...
 
 ### Supported Download Sources
 
-- Discord File Attachments
 - Direct Links to Files
+- Discord File Attachments
 - Twitter _(requires API key, see config section)_
-- Instagram [BROKEN, WORKING ON IT]
-- Reddit [BROKEN, WORKING ON IT]
-- Imgur _(Single Posts & Albums)_
+- Instagram _(requires account login, see config section)_
+- Reddit
+- Imgur
 - Streamable
 - Gfycat
 - Tistory
