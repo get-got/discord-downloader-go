@@ -214,9 +214,9 @@ type configuration struct {
 	PresenceEnabled            bool               `json:"presenceEnabled"`                      // optional, defaults
 	PresenceStatus             string             `json:"presenceStatus"`                       // optional, defaults
 	PresenceType               discordgo.GameType `json:"presenceType,omitempty"`               // optional, defaults
-	PresenceOverwrite          *string            `json:"presenceOverwrite,omitempty"`          // optional, unused if undefined
-	PresenceOverwriteDetails   *string            `json:"presenceOverwriteDetails,omitempty"`   // optional, unused if undefined
-	PresenceOverwriteState     *string            `json:"presenceOverwriteState,omitempty"`     // optional, unused if undefined
+	presenceLabel              *string            `json:"presenceLabel,omitempty"`              // optional, unused if undefined
+	presenceDetails            *string            `json:"presenceDetails,omitempty"`            // optional, unused if undefined
+	presenceState              *string            `json:"presenceState,omitempty"`              // optional, unused if undefined
 	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
 	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji,omitempty"`   // optional
 	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults

@@ -415,22 +415,22 @@ func updateDiscordPresence() {
 		statusState := fmt.Sprintf("%s files total", count)
 
 		// Overwrite Presence
-		if config.PresenceOverwrite != nil {
-			status = *config.PresenceOverwrite
+		if config.presenceLabel != nil {
+			status = *config.presenceLabel
 			if status != "" {
 				status = dataKeyReplacement(status)
 			}
 		}
 		// Overwrite Details
-		if config.PresenceOverwriteDetails != nil {
-			statusDetails = *config.PresenceOverwriteDetails
+		if config.presenceDetails != nil {
+			statusDetails = *config.presenceDetails
 			if statusDetails != "" {
 				statusDetails = dataKeyReplacement(statusDetails)
 			}
 		}
 		// Overwrite State
-		if config.PresenceOverwriteState != nil {
-			statusState = *config.PresenceOverwriteState
+		if config.presenceState != nil {
+			statusState = *config.presenceState
 			if statusState != "" {
 				statusState = dataKeyReplacement(statusState)
 			}
