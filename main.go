@@ -24,38 +24,6 @@ import (
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
-/* v2.0.0 REWRITE TODO:
-
-* Finish Readme
-
-* Goification
-*** better universal implementation of goroutines and waitgroup management.
-*** better universal implementation of function wrappers to reduce clutter for things like perm checks, response messages
-*** better error handling and error response, ensure as many nil checks as reasonably possible
-
-* Better Settings Insight / Corrective Suggestions
-
-* Fix unknown message hangups
-* Fix links being ignored
-
-* Support Google Drive (folder; direct singles)
-* Support Dropbox (folder; direct singles)
-* Support Mediafire? (folder; direct singles)
-* Support Lightshot?
-* Support Gyazo?
-** Support TikTok -- Tried, once the connection is closed the cdn URL is rendered invalid
-** Support Facebook Photos -- Tried, it doesn't preload image data, it's loaded in after. Would have to keep connection open, find alternative way to grab, or use api.
-** Support Facebook Videos -- Previously supported but they split mp4 into separate audio and video streams
-** Support Mastodon -- dropped due to login/api changes??
-
----------------------------------
-FUTURE PLANS:
-* UI/GUI interface (i still want to be as cross-platform as possible), and have bot commands be an option.
-* Implement Log Leveling?
-* Command: Reboot System
-
-*/
-
 var (
 	err error
 
@@ -330,7 +298,7 @@ func main() {
 				}
 
 				// Should Start New Job(s)?
-				if nhistoryJobCntRunning < config.HistoryMaxJobs {
+				if nhistoryJobCntRunning < config.HistoryMaxJobs || config.HistoryMaxJobs < 1 {
 					openSlots := config.HistoryMaxJobs - nhistoryJobCntRunning
 					newJobs := make([]historyJob, openSlots)
 					filledSlots := 0
