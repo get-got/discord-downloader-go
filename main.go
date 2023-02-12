@@ -110,6 +110,7 @@ func main() {
 
 	mainWg.Add(2)
 	go loadConfig()
+	time.Sleep(1 * time.Second)
 	go openDatabase()
 
 	// Regex
@@ -196,6 +197,7 @@ func main() {
 					bot.CloseWithCode(1001)
 					bot = nil
 					log.Println(lg("Discord", "", color.RedString, "Discord connections closed!"))
+					time.Sleep(15 * time.Second)
 					if config.ExitOnBadConnection {
 						properExit()
 					} else {
@@ -211,11 +213,11 @@ func main() {
 				if err != nil || gate == "" {
 					log.Println(lg("Discord", "", color.HiYellowString,
 						"Bot encountered a gateway error: GATEWAY: %s,\tERR: %s", gate, err))
-					go doReconnect()
+					doReconnect()
 				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 4*60 {
 					log.Println(lg("Discord", "", color.HiYellowString,
 						"Bot has not received a heartbeat from Discord in 4 minutes..."))
-					go doReconnect()
+					doReconnect()
 				}
 
 			}
