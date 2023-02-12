@@ -574,6 +574,7 @@ const (
 	sendStatusStartup sendStatusType = iota
 	sendStatusReconnect
 	sendStatusExit
+	sendStatusSettings
 )
 
 func sendStatusLabel(status sendStatusType) string {
@@ -584,6 +585,8 @@ func sendStatusLabel(status sendStatusType) string {
 		return "has reconnected"
 	case sendStatusExit:
 		return "is exiting"
+	case sendStatusSettings:
+		return "updated settings"
 	}
 	return "is confused"
 }
@@ -593,10 +596,15 @@ func sendStatusMessage(status sendStatusType) {
 		if *adminChannel.LogStatus {
 			var message string
 			var label string
+			var emoji string
 
 			//TODO: CLEAN
 			if status == sendStatusStartup || status == sendStatusReconnect {
 				label = "startup"
+				emoji = "🟩"
+				if status == sendStatusReconnect {
+					emoji = "🟧"
+				}
 				message += fmt.Sprintf("%s %s and connected to %d server%s...\n", projectLabel, sendStatusLabel(status), len(bot.State.Guilds), pluralS(len(bot.State.Guilds)))
 				message += fmt.Sprintf("\n• Uptime is %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
@@ -620,9 +628,20 @@ func sendStatusMessage(status sendStatusType) {
 				message += fmt.Sprintf("\n_%s_", versions(true))
 			} else if status == sendStatusExit {
 				label = "exit"
+				emoji = "🟥"
 				message += fmt.Sprintf("%s %s...\n", projectLabel, sendStatusLabel(status))
 				message += fmt.Sprintf("\n• Uptime was %s", uptime())
 				message += fmt.Sprintf("\n• %s total downloads", formatNumber(int64(dbDownloadCount())))
+				message += fmt.Sprintf("\n• Bound to %d channel%s, %d categories, %d server%s, %d user%s",
+					getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+					getBoundCategoriesCount(),
+					getBoundServersCount(), pluralS(getBoundServersCount()),
+					getBoundUsersCount(), pluralS(getBoundUsersCount()),
+				)
+			} else if status == sendStatusSettings {
+				label = "settings"
+				emoji = "🟨"
+				message += fmt.Sprintf("%s %s...\n", projectLabel, sendStatusLabel(status))
 				message += fmt.Sprintf("\n• Bound to %d channel%s, %d categories, %d server%s, %d user%s",
 					getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
 					getBoundCategoriesCount(),
@@ -637,7 +656,7 @@ func sendStatusMessage(status sendStatusType) {
 			}
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot {
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID,
-					buildEmbed(adminChannel.ChannelID, "Log — Status", message))
+					buildEmbed(adminChannel.ChannelID, emoji+" Log — Status", message))
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
 			} else {

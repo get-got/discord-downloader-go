@@ -374,8 +374,9 @@ func main() {
 						))
 
 						go updateDiscordPresence()
+						go sendStatusMessage(sendStatusSettings)
+						configReloadLastTime = time.Now()
 					}
-					configReloadLastTime = time.Now()
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
