@@ -123,7 +123,7 @@ func main() {
 		mainWg.Done()
 	}()
 
-	mainWg.Wait() // wait because api uses credentials from json
+	mainWg.Wait() // wait because credentials from json
 
 	mainWg.Add(2)
 	go botLoadAPIs()
@@ -600,6 +600,10 @@ func botLoadDiscord() {
 
 	// Discord Login
 	connectBot := func() {
+		// Event Handlers
+		botCommands = handleCommands()
+		bot.AddHandler(messageCreate)
+		bot.AddHandler(messageUpdate)
 		// Connect Bot
 		bot.LogLevel = -1 // to ignore dumb wsapi error
 		err = bot.Open()
@@ -707,11 +711,6 @@ do_discord_login:
 	if bot.State.User != nil { // is selfbot
 		selfbot = bot.State.User.Email != ""
 	}
-
-	// Event Handlers
-	botCommands = handleCommands()
-	bot.AddHandler(messageCreate)
-	bot.AddHandler(messageUpdate)
 
 	// Source Validation
 	if config.Debug {
