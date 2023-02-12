@@ -108,10 +108,8 @@ func init() {
 
 func main() {
 
-	mainWg.Add(2)
-	go loadConfig()
-	time.Sleep(1 * time.Second)
-	go openDatabase()
+	loadConfig()
+	openDatabase()
 
 	// Regex
 	mainWg.Add(1)
@@ -502,8 +500,6 @@ func openDatabase() {
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
 	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
-
-	mainWg.Done()
 }
 
 func botLoad() {
@@ -515,82 +511,86 @@ func botLoad() {
 
 func botLoadAPIs() {
 	// Twitter API
-	if config.Credentials.TwitterAccessToken != "" &&
-		config.Credentials.TwitterAccessTokenSecret != "" &&
-		config.Credentials.TwitterConsumerKey != "" &&
-		config.Credentials.TwitterConsumerSecret != "" {
+	go func() {
+		if config.Credentials.TwitterAccessToken != "" &&
+			config.Credentials.TwitterAccessTokenSecret != "" &&
+			config.Credentials.TwitterConsumerKey != "" &&
+			config.Credentials.TwitterConsumerSecret != "" {
 
-		log.Println(lg("API", "Twitter", color.MagentaString, "Connecting to API..."))
+			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting to API..."))
 
-		twitterLoginCount := 0
-	do_twitter_login:
-		twitterLoginCount++
-		if twitterLoginCount > 1 {
-			time.Sleep(3 * time.Second)
-		}
-		twitterClient = anaconda.NewTwitterApiWithCredentials(
-			config.Credentials.TwitterAccessToken,
-			config.Credentials.TwitterAccessTokenSecret,
-			config.Credentials.TwitterConsumerKey,
-			config.Credentials.TwitterConsumerSecret,
-		)
-		twitterSelf, err := twitterClient.GetSelf(url.Values{})
-		if err != nil {
-			log.Println(lg("API", "Twitter", color.HiRedString, "API Login Error: %s", err.Error()))
-			if twitterLoginCount <= 3 {
-				goto do_twitter_login
-			} else {
-				log.Println(lg("API", "Twitter", color.HiRedString,
-					"Failed to login to Twitter API, the bot will not fetch tweet media..."))
+			twitterLoginCount := 0
+		do_twitter_login:
+			twitterLoginCount++
+			if twitterLoginCount > 1 {
+				time.Sleep(3 * time.Second)
 			}
+			twitterClient = anaconda.NewTwitterApiWithCredentials(
+				config.Credentials.TwitterAccessToken,
+				config.Credentials.TwitterAccessTokenSecret,
+				config.Credentials.TwitterConsumerKey,
+				config.Credentials.TwitterConsumerSecret,
+			)
+			twitterSelf, err := twitterClient.GetSelf(url.Values{})
+			if err != nil {
+				log.Println(lg("API", "Twitter", color.HiRedString, "API Login Error:\n%s", err.Error()))
+				if twitterLoginCount <= 3 {
+					goto do_twitter_login
+				} else {
+					log.Println(lg("API", "Twitter", color.HiRedString,
+						"Failed to login to Twitter API, the bot will not fetch tweet media..."))
+				}
 
+			} else {
+				log.Println(lg("API", "Twitter", color.HiMagentaString,
+					"Connected to API @%s", twitterSelf.ScreenName))
+				twitterConnected = true
+			}
 		} else {
-			log.Println(lg("API", "Twitter", color.HiMagentaString,
-				"Connected to API @%s", twitterSelf.ScreenName))
-			twitterConnected = true
+			log.Println(lg("API", "Twitter", color.MagentaString,
+				"API credentials missing, the bot won't use the Twitter API."))
 		}
-	} else {
-		log.Println(lg("API", "Twitter", color.MagentaString,
-			"API credentials missing, the bot won't use the Twitter API."))
-	}
+	}()
 
 	// Instagram API
-	if config.Credentials.InstagramUsername != "" &&
-		config.Credentials.InstagramPassword != "" {
+	go func() {
+		if config.Credentials.InstagramUsername != "" &&
+			config.Credentials.InstagramPassword != "" {
 
-		log.Println(lg("API", "Instagram", color.MagentaString, "Connecting to API..."))
+			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting to API..."))
 
-		instagramLoginCount := 0
-	do_instagram_login:
-		instagramLoginCount++
-		if instagramLoginCount > 1 {
-			time.Sleep(3 * time.Second)
-		}
-		if instagramClient, err = goinsta.Import(instagramCachePath); err != nil {
-			instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
-			if err := instagramClient.Login(); err != nil {
-				log.Println(lg("API", "Instagram", color.HiRedString, "API Login Error: %s", err.Error()))
-				if instagramLoginCount <= 3 {
-					goto do_instagram_login
+			instagramLoginCount := 0
+		do_instagram_login:
+			instagramLoginCount++
+			if instagramLoginCount > 1 {
+				time.Sleep(3 * time.Second)
+			}
+			if instagramClient, err = goinsta.Import(instagramCachePath); err != nil {
+				instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
+				if err := instagramClient.Login(); err != nil {
+					log.Println(lg("API", "Instagram", color.HiRedString, "API Login Error: %s", err.Error()))
+					if instagramLoginCount <= 3 {
+						goto do_instagram_login
+					} else {
+						log.Println(lg("API", "Instagram", color.HiRedString,
+							"Failed to login to Instagram API, the bot will not fetch instagram media..."))
+					}
 				} else {
-					log.Println(lg("API", "Instagram", color.HiRedString,
-						"Failed to login to Instagram API, the bot will not fetch tweet media..."))
+					log.Println(lg("API", "Instagram", color.HiMagentaString,
+						"Connected to API @%s via new login", instagramClient.Account.Username))
+					instagramConnected = true
+					defer instagramClient.Export(instagramCachePath)
 				}
 			} else {
 				log.Println(lg("API", "Instagram", color.HiMagentaString,
-					"Connected to API @%s via new login", instagramClient.Account.Username))
+					"Connected to API @%s via cache", instagramClient.Account.Username))
 				instagramConnected = true
 			}
 		} else {
-			log.Println(lg("API", "Instagram", color.HiMagentaString,
-				"Connected to API @%s via cache", instagramClient.Account.Username))
-			instagramConnected = true
+			log.Println(lg("API", "Instagram", color.MagentaString,
+				"API credentials missing, the bot won't use the Instagram API."))
 		}
-		defer instagramClient.Export(instagramCachePath)
-	} else {
-		log.Println(lg("API", "Instagram", color.MagentaString,
-			"API credentials missing, the bot won't use the Instagram API."))
-	}
+	}()
 
 	mainWg.Done()
 }
@@ -600,10 +600,12 @@ func botLoadDiscord() {
 
 	// Discord Login
 	connectBot := func() {
+
 		// Event Handlers
 		botCommands = handleCommands()
 		bot.AddHandler(messageCreate)
 		bot.AddHandler(messageUpdate)
+
 		// Connect Bot
 		bot.LogLevel = -1 // to ignore dumb wsapi error
 		err = bot.Open()
@@ -611,6 +613,7 @@ func botLoadDiscord() {
 			log.Println(lg("Discord", "", color.HiRedString, "Discord login failed:\t%s", err))
 			properExit()
 		}
+
 		bot.LogLevel = config.DiscordLogLevel // reset
 		bot.ShouldReconnectOnError = true
 		dur, err := time.ParseDuration(fmt.Sprint(config.DiscordTimeout) + "s")
@@ -618,6 +621,7 @@ func botLoadDiscord() {
 			dur, _ = time.ParseDuration("180s")
 		}
 		bot.Client.Timeout = dur
+
 		bot.State.MaxMessageCount = 100000
 		bot.State.TrackChannels = true
 		bot.State.TrackThreads = true
@@ -712,11 +716,15 @@ do_discord_login:
 		selfbot = bot.State.User.Email != ""
 	}
 
-	// Source Validation
+	// Start Presence
+	timeLastUpdated = time.Now()
+	go updateDiscordPresence()
+
+	//(SV) Source Validation
 	if config.Debug {
 		log.Println(lg("Discord", "Validation", color.HiYellowString, "Validating configured sources..."))
 	}
-	//-
+	//(SV) Check Admin Channels
 	if config.AdminChannels != nil {
 		for _, adminChannel := range config.AdminChannels {
 			if adminChannel.ChannelIDs != nil {
@@ -739,7 +747,7 @@ do_discord_login:
 			}
 		}
 	}
-	//-
+	//(SV) Check Sources
 	for _, server := range config.Servers {
 		if server.ServerIDs != nil {
 			for _, subserver := range *server.ServerIDs {
@@ -799,7 +807,7 @@ do_discord_login:
 			}
 		}
 	}
-	//-
+	//(SV) Output
 	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidCategories) + len(invalidServers)
 	if invalidSources > 0 {
 		log.Println(lg("Discord", "Validation", color.HiRedString,
@@ -826,8 +834,5 @@ do_discord_login:
 		log.Println(lg("Discord", "Validation", color.HiGreenString, "All sources successfully validated!"))
 	}
 
-	// Start Presence
-	timeLastUpdated = time.Now()
-	go updateDiscordPresence()
 	mainWg.Done()
 }

@@ -18,7 +18,7 @@ var (
 	config = defaultConfiguration()
 )
 
-//#region Credentials
+//#region Config, Credentials
 
 var (
 	placeholderToken    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
@@ -43,7 +43,7 @@ type configurationCredentials struct {
 
 //#endregion
 
-//#region Configuration
+//#region Config, Main
 
 // defConfig_ = Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
@@ -58,6 +58,22 @@ var (
 	defConfig_PresenceType         discordgo.GameType = discordgo.GameTypeGame
 	defConfig_ReactWhenDownloaded  bool               = true
 	defConfig_InflateDownloadCount int64              = 0
+
+	// These are only defaults to "fix" when loading settings for when people put stupid values
+	defConfig_ProcessLimit int = 32
+
+	defConfig_DiscordTimeout   int = 180
+	defConfig_DownloadTimeout  int = 60
+	defConfig_DownloadRetryMax int = 3
+
+	defConfig_CheckupRate         int = 30
+	defConfig_ConnectionCheckRate int = 5
+	defConfig_PresenceRefreshRate int = 3
+
+	defConfig_FilenameDateFormat string = "2006-01-02_15-04-05"
+	defConfig_FilenameFormat     string = "{{date}} {{shortID}} {{file}}"
+
+	defConfig_HistoryMaxJobs int = 3
 )
 
 func defaultConfiguration() configuration {
@@ -75,16 +91,16 @@ func defaultConfiguration() configuration {
 		AdminChannels: []configurationAdminChannel{},
 
 		// Program Settings
-		ProcessLimit:         32,
+		ProcessLimit:         defConfig_ProcessLimit,
 		Debug:                defConfig_Debug,
 		SettingsOutput:       true,
 		MessageOutput:        true,
 		MessageOutputHistory: false,
 
 		DiscordLogLevel:      discordgo.LogError,
-		DiscordTimeout:       180,
-		DownloadTimeout:      60,
-		DownloadRetryMax:     3,
+		DiscordTimeout:       defConfig_DiscordTimeout,
+		DownloadTimeout:      defConfig_DownloadTimeout,
+		DownloadRetryMax:     defConfig_DownloadRetryMax,
 		ExitOnBadConnection:  false,
 		GithubUpdateChecking: defConfig_GithubUpdateChecking,
 
@@ -94,9 +110,9 @@ func defaultConfiguration() configuration {
 		InflateDownloadCount: &defConfig_InflateDownloadCount,
 		EuropeanNumbers:      false,
 
-		CheckupRate:         30,
-		ConnectionCheckRate: 5,
-		PresenceRefreshRate: 3,
+		CheckupRate:         defConfig_CheckupRate,
+		ConnectionCheckRate: defConfig_ConnectionCheckRate,
+		PresenceRefreshRate: defConfig_PresenceRefreshRate,
 
 		// Source Setup Defaults
 		Save:          true,
@@ -110,8 +126,8 @@ func defaultConfiguration() configuration {
 		SendFileDirectly:   true,
 		SendFileCaption:    "",
 
-		FilenameDateFormat: "2006-01-02_15-04-05",
-		FilenameFormat:     "{{date}} {{shortID}} {{file}}",
+		FilenameDateFormat: defConfig_FilenameDateFormat,
+		FilenameFormat:     defConfig_FilenameFormat,
 
 		// Appearance
 		PresenceEnabled:            defConfig_PresenceEnabled,
@@ -122,7 +138,7 @@ func defaultConfiguration() configuration {
 		HistoryTyping:              true,
 
 		// History
-		HistoryMaxJobs:        3,
+		HistoryMaxJobs:        defConfig_HistoryMaxJobs,
 		AutoHistory:           false,
 		AutoHistoryBefore:     "",
 		AutoHistorySince:      "",
@@ -253,10 +269,10 @@ type configuration struct {
 	AllBlacklistServers    *[]string             `json:"allBlacklistServers,omitempty"`
 	AllBlacklistCategories *[]string             `json:"allBlacklistCategories,omitempty"`
 	AllBlacklistChannels   *[]string             `json:"allBlacklistChannels,omitempty"`
-	Users                  []configurationSource `json:"users"`
-	Servers                []configurationSource `json:"servers"`
-	Categories             []configurationSource `json:"categories"`
-	Channels               []configurationSource `json:"channels"`
+	Users                  []configurationSource `json:"users,omitempty"`
+	Servers                []configurationSource `json:"servers,omitempty"`
+	Categories             []configurationSource `json:"categories,omitempty"`
+	Channels               []configurationSource `json:"channels,omitempty"`
 }
 
 type constStruct struct {
@@ -265,7 +281,7 @@ type constStruct struct {
 
 //#endregion
 
-//#region Sources
+//#region Config, Sources
 
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
@@ -383,7 +399,7 @@ type configurationSourceLog struct {
 
 //#endregion
 
-//#region Admin Channels
+//#region Config, Admin Channels
 
 var (
 	adefConfig_LogProgram     bool = false
@@ -403,6 +419,8 @@ type configurationAdminChannel struct {
 
 //#endregion
 
+//#region Management
+
 func loadConfig() error {
 	// Determine json type
 	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
@@ -412,8 +430,9 @@ func loadConfig() error {
 		configFile = configFileBase + ".json"
 		configFileC = false
 	}
-	// .
+
 	log.Println(lg("Settings", "loadConfig", color.YellowString, "Loading from \"%s\"...", configFile))
+
 	// Load settings
 	configContent, err := os.ReadFile(configFile)
 	if err != nil {
@@ -465,8 +484,7 @@ func loadConfig() error {
 		}
 		config = newConfig
 
-		// Channel Config Defaults
-		// this is dumb but don't see a better way to initialize defaults
+		// Source Defaults
 		for i := 0; i < len(config.Channels); i++ {
 			sourceDefault(&config.Channels[i])
 		}
@@ -482,9 +500,41 @@ func loadConfig() error {
 		if config.All != nil {
 			sourceDefault(config.All)
 		}
-
+		// Admin Channel Defaults
 		for i := 0; i < len(config.AdminChannels); i++ {
 			adminChannelDefault(&config.AdminChannels[i])
+		}
+
+		// Checks & Fixes
+		if config.ProcessLimit < 1 {
+			config.ProcessLimit = defConfig_ProcessLimit
+		}
+		if config.DiscordTimeout < 10 {
+			config.DiscordTimeout = defConfig_DiscordTimeout
+		}
+		if config.DownloadTimeout < 10 {
+			config.DownloadTimeout = defConfig_DownloadTimeout
+		}
+		if config.DownloadRetryMax < 1 {
+			config.DownloadRetryMax = defConfig_DownloadRetryMax
+		}
+		if config.CheckupRate < 1 {
+			config.CheckupRate = defConfig_CheckupRate
+		}
+		if config.ConnectionCheckRate < 1 {
+			config.ConnectionCheckRate = defConfig_ConnectionCheckRate
+		}
+		if config.PresenceRefreshRate < 1 {
+			config.PresenceRefreshRate = defConfig_PresenceRefreshRate
+		}
+		if config.FilenameDateFormat == "" {
+			config.FilenameDateFormat = defConfig_FilenameDateFormat
+		}
+		if config.FilenameFormat == "" {
+			config.FilenameFormat = defConfig_FilenameFormat
+		}
+		if config.HistoryMaxJobs < 1 {
+			config.HistoryMaxJobs = defConfig_HistoryMaxJobs
 		}
 
 		// Settings Output
@@ -532,10 +582,10 @@ func loadConfig() error {
 		if (config.Credentials.Token == "" || config.Credentials.Token == placeholderToken) &&
 			(config.Credentials.Email == "" || config.Credentials.Email == placeholderEmail) &&
 			(config.Credentials.Password == "" || config.Credentials.Password == placeholderPassword) {
-			log.Println(lg("Settings", "loadConfig", color.HiRedString, "No valid discord login found. Token, Email, and Password are all invalid..."))
+			log.Println(lg("Settings", "loadConfig", color.HiRedString, "No valid discord login found..."))
 			log.Println(lg("Settings", "loadConfig", color.HiYellowString, "Please save your credentials & info into \"%s\" then restart...", configFile))
-			log.Println(lg("Settings", "loadConfig", color.MagentaString, "If your credentials are already properly saved, please ensure you're following proper JSON format syntax."))
-			log.Println(lg("Settings", "loadConfig", color.MagentaString, "You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
+			log.Println(lg("Settings", "loadConfig", color.MagentaString, "If your credentials are already properly saved, please ensure you're following proper JSON format syntax..."))
+			log.Println(lg("Settings", "loadConfig", color.MagentaString, "You DO NOT NEED token *AND* email/password, just one OR the other."))
 			properExit()
 		}
 
@@ -551,11 +601,13 @@ func loadConfig() error {
 			getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
 		))
 
+		// SETTINGS TO BE APPLIED IMMEDIATELY
+
 		if config.ProcessLimit > 0 {
 			runtime.GOMAXPROCS(config.ProcessLimit)
 		}
 	}
-	mainWg.Done()
+
 	return nil
 }
 
@@ -768,9 +820,9 @@ func createConfig() {
 			log.Println(lg("Settings", "create", color.HiYellowString,
 				"Please save your credentials & info into \"%s\" then restart...", configFile))
 			log.Println(lg("Settings", "create", color.MagentaString,
-				"You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
+				"You DO NOT NEED token *AND* email/password, just one OR the other."))
 			log.Println(lg("Settings", "create", color.MagentaString,
-				"See README on GitHub for help and more info..."))
+				"THERE ARE MANY HIDDEN SETTINGS AVAILABLE, SEE THE GITHUB README github.com/"+projectRepo))
 		}
 	}
 }
@@ -969,7 +1021,9 @@ func adminChannelDefault(channel *configurationAdminChannel) {
 	}
 }
 
-//#region Channel Checks/Returns
+//#endregion
+
+//#region Functions, Admin & Source
 
 func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bool {
 	if subjectMessage.ID != "" {
