@@ -172,21 +172,21 @@ type configuration struct {
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 
 	// Program Settings
-	ProcessLimit         int  `json:"processLimit"`         // optional, defaults
-	Debug                bool `json:"debug"`                // optional, defaults
-	SettingsOutput       bool `json:"settingsOutput"`       // optional, defaults
-	MessageOutput        bool `json:"messageOutput"`        // optional, defaults
-	MessageOutputHistory bool `json:"messageOutputHistory"` // optional, defaults
+	ProcessLimit         int  `json:"processLimit,omitempty"`         // optional, defaults
+	Debug                bool `json:"debug,omitempty"`                // optional, defaults
+	SettingsOutput       bool `json:"settingsOutput,omitempty"`       // optional, defaults
+	MessageOutput        bool `json:"messageOutput,omitempty"`        // optional, defaults
+	MessageOutputHistory bool `json:"messageOutputHistory,omitempty"` // optional, defaults
 
-	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`     // optional, defaults
-	DiscordTimeout       int  `json:"discordTimeout,omitempty"`      // optional, defaults
-	DownloadTimeout      int  `json:"downloadTimeout,omitempty"`     // optional, defaults
-	DownloadRetryMax     int  `json:"downloadRetryMax,omitempty"`    // optional, defaults
-	ExitOnBadConnection  bool `json:"exitOnBadConnection,omitempty"` // optional, defaults
-	GithubUpdateChecking bool `json:"githubUpdateChecking"`          // optional, defaults
+	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`      // optional, defaults
+	DiscordTimeout       int  `json:"discordTimeout,omitempty"`       // optional, defaults
+	DownloadTimeout      int  `json:"downloadTimeout,omitempty"`      // optional, defaults
+	DownloadRetryMax     int  `json:"downloadRetryMax,omitempty"`     // optional, defaults
+	ExitOnBadConnection  bool `json:"exitOnBadConnection,omitempty"`  // optional, defaults
+	GithubUpdateChecking bool `json:"githubUpdateChecking,omitempty"` // optional, defaults
 
-	CommandPrefix        string `json:"commandPrefix"`                  // optional, defaults
-	ScanOwnMessages      bool   `json:"scanOwnMessages"`                // optional, defaults
+	CommandPrefix        string `json:"commandPrefix,omitempty"`        // optional, defaults
+	ScanOwnMessages      bool   `json:"scanOwnMessages,omitempty"`      // optional, defaults
 	AllowGeneralCommands bool   `json:"allowGeneralCommands,omitempty"` // optional, defaults
 	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty"` // optional, defaults to 0 if undefined
 	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty"`      // optional, defaults
@@ -196,7 +196,7 @@ type configuration struct {
 	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty"` // optional, defaults
 
 	// Source Setup Defaults
-	Save          bool `json:"save"`                    // optional, defaults
+	Save          bool `json:"save,omitempty"`          // optional, defaults
 	AllowCommands bool `json:"allowCommands,omitempty"` // optional, defaults
 	ScanEdits     bool `json:"scanEdits,omitempty"`     // optional, defaults
 	IgnoreBots    bool `json:"ignoreBots,omitempty"`    // optional, defaults
@@ -211,8 +211,8 @@ type configuration struct {
 	FilenameFormat     string `json:"filenameFormat,omitempty"`     // optional, defaults
 
 	// Appearance
-	PresenceEnabled            bool               `json:"presenceEnabled"`                      // optional, defaults
-	PresenceStatus             string             `json:"presenceStatus"`                       // optional, defaults
+	PresenceEnabled            bool               `json:"presenceEnabled,omitempty"`            // optional, defaults
+	PresenceStatus             string             `json:"presenceStatus,omitempty"`             // optional, defaults
 	PresenceType               discordgo.GameType `json:"presenceType,omitempty"`               // optional, defaults
 	PresenceLabel              *string            `json:"presenceLabel,omitempty"`              // optional, unused if undefined
 	PresenceDetails            *string            `json:"presenceDetails,omitempty"`            // optional, unused if undefined
@@ -224,7 +224,7 @@ type configuration struct {
 	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
 
 	// History
-	HistoryMaxJobs        int    `json:"historyMaxJobs"`                  // optional, defaults
+	HistoryMaxJobs        int    `json:"historyMaxJobs,omitempty"`        // optional, defaults
 	AutoHistory           bool   `json:"autoHistory,omitempty"`           // optional, defaults
 	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty"`     // optional
 	AutoHistorySince      string `json:"autoHistorySince,omitempty"`      // optional
