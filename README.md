@@ -74,8 +74,7 @@ This project is a cross-platform cli single-file program to interact with a Disc
 - [📚 Guide: Downloading History (Old Messages)](#-guide-downloading-history-old-messages)
   - [Command Arguments](#command-arguments)
     - [Examples](#examples)
-- [🔨 Guide: Settings / Configuration](#-guide-settings--configuration)
-- [🛠 Settings](#-settings)
+- [🛠 Settings / Configuration](#-settings--configuration)
   - [EXAMPLE: ALL WITH DEFAULT VALUES](#example-all-with-default-values)
   - [EXAMPLE: BARE MINIMUM](#example-bare-minimum)
   - [EXAMPLE: SERVER WITH FRIENDS](#example-server-with-friends)
@@ -250,7 +249,7 @@ Argument / Flag         | Details
 
 ---
 
-## 🔨 Guide: Settings / Configuration
+## 🛠 Settings / Configuration
 
 > I tried to make the configuration as user friendly as possible, though you still need to follow proper JSON syntax **(watch those commas)**. Most settings are optional and will use default values or be unused if missing from your settings file.
 
@@ -261,8 +260,6 @@ When initially launching the bot it will create a default settings file if you d
 The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 ---
-
-## 🛠 Settings
 
 ### EXAMPLE: ALL WITH DEFAULT VALUES
 
