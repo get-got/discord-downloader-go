@@ -323,7 +323,11 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 		colorPrefix = color.HiGreenString("[Checkup]")
 
 	case "discord":
-		colorPrefix = color.HiBlueString("[Discord]")
+		if subgroup == "" {
+			colorPrefix = color.HiBlueString("[Discord]")
+		} else {
+			colorPrefix = color.HiBlueString("[Discord | %s]", subgroup)
+		}
 
 	case "history":
 		if subgroup == "" {

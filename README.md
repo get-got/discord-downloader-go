@@ -66,8 +66,9 @@ This project is a cross-platform cli single-file program to interact with a Disc
 - [✔️ Getting Started](#️-getting-started)
   - [Getting Started Step-by-Step](#getting-started-step-by-step)
   - [Bot Login Credentials](#bot-login-credentials)
-  - [Bot Permissions in Discord](#bot-permissions-in-discord)
-    - [NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED](#note-genuine-discord-bots-require-permissions-enabled)
+  - [Permissions in Discord](#permissions-in-discord)
+    - [Bot Intents for Discord Application Bots](#bot-intents-for-discord-application-bots)
+      - [NECESSARY IF USING A GENUINE DISCORD APPLICATION](#necessary-if-using-a-genuine-discord-application)
   - [How to Find Discord IDs](#how-to-find-discord-ids)
   - [Differences from Seklfreak's _discord-image-downloader-go_ \& Why I made this](#differences-from-seklfreaks-discord-image-downloader-go--why-i-made-this)
 - [📚 Guide: Downloading History (Old Messages)](#-guide-downloading-history-old-messages)
@@ -75,96 +76,8 @@ This project is a cross-platform cli single-file program to interact with a Disc
     - [Examples](#examples)
 - [🔨 Guide: Settings / Configuration](#-guide-settings--configuration)
 - [🛠 List of Settings](#-list-of-settings)
-      - [\_constants](#_constants)
-      - [credentials](#credentials)
-        - [token](#token)
-        - [email](#email)
-        - [password](#password)
-        - [twitterAccessToken](#twitteraccesstoken)
-        - [twitterAccessTokenSecret](#twitteraccesstokensecret)
-        - [twitterConsumerKey](#twitterconsumerkey)
-        - [twitterConsumerSecret](#twitterconsumersecret)
-        - [instagramUsername](#instagramusername)
-        - [instagramPassword](#instagrampassword)
-        - [flickrApiKey](#flickrapikey)
-      - [admins](#admins)
-      - [adminChannels](#adminchannels)
-      - [processLimit](#processlimit)
-      - [debug](#debug)
-      - [settingsOutput](#settingsoutput)
-      - [messageOutput](#messageoutput)
-      - [messageOutputHistory](#messageoutputhistory)
-      - [discordLogLevel](#discordloglevel)
-      - [discordTimeout](#discordtimeout)
-      - [\_constants](#_constants-1)
-      - [\_constants](#_constants-2)
-      - [\_constants](#_constants-3)
-      - [\_constants](#_constants-4)
-      - [\_constants](#_constants-5)
-      - [\_constants](#_constants-6)
-      - [\_constants](#_constants-7)
-      - [\_constants](#_constants-8)
-      - [\_constants](#_constants-9)
-      - [\_constants](#_constants-10)
-      - [\_constants](#_constants-11)
-      - [\_constants](#_constants-12)
-      - [\_constants](#_constants-13)
-      - [\_constants](#_constants-14)
-      - [\_constants](#_constants-15)
-      - [\_constants](#_constants-16)
-      - [\_constants](#_constants-17)
-      - [\_constants](#_constants-18)
-      - [\_constants](#_constants-19)
-      - [\_constants](#_constants-20)
-      - [\_constants](#_constants-21)
-      - [\_constants](#_constants-22)
-      - [\_constants](#_constants-23)
-      - [\_constants](#_constants-24)
-      - [\_constants](#_constants-25)
-      - [\_constants](#_constants-26)
-      - [\_constants](#_constants-27)
-      - [\_constants](#_constants-28)
-      - [\_constants](#_constants-29)
-      - [\_constants](#_constants-30)
-      - [\_constants](#_constants-31)
-      - [\_constants](#_constants-32)
-      - [\_constants](#_constants-33)
-      - [\_constants](#_constants-34)
-      - [\_constants](#_constants-35)
-      - [\_constants](#_constants-36)
-      - [\_constants](#_constants-37)
-      - [\_constants](#_constants-38)
-      - [\_constants](#_constants-39)
-      - [\_constants](#_constants-40)
-      - [\_constants](#_constants-41)
-      - [\_constants](#_constants-42)
-      - [\_constants](#_constants-43)
-      - [\_constants](#_constants-44)
-      - [\_constants](#_constants-45)
-      - [\_constants](#_constants-46)
-      - [\_constants](#_constants-47)
-      - [\_constants](#_constants-48)
-      - [\_constants](#_constants-49)
-      - [\_constants](#_constants-50)
-      - [\_constants](#_constants-51)
-      - [\_constants](#_constants-52)
-      - [\_constants](#_constants-53)
-      - [\_constants](#_constants-54)
-      - [\_constants](#_constants-55)
-      - [\_constants](#_constants-56)
-      - [\_constants](#_constants-57)
-      - [\_constants](#_constants-58)
-      - [\_constants](#_constants-59)
-      - [\_constants](#_constants-60)
-      - [\_constants](#_constants-61)
-      - [\_constants](#_constants-62)
-      - [\_constants](#_constants-63)
-      - [\_constants](#_constants-64)
-      - [\_constants](#_constants-65)
-      - [\_constants](#_constants-66)
-      - [\_constants](#_constants-67)
-      - [\_constants](#_constants-68)
-      - [\_constants](#_constants-69)
+  - [🛠 ... UNDER CONSTRUCTION ... 🔨](#--under-construction--)
+  - [ALL SETTINGS WITH DEFAULT VALUES](#all-settings-with-default-values)
   - [settings - main](#settings---main)
   - [settings - credentials group](#settings---credentials-group)
   - [settings - adminChannels group](#settings---adminchannels-group)
@@ -267,13 +180,15 @@ You can either create a `settings.json` following the examples & variables liste
 
 <img src="https://i.imgur.com/2BdaJSH.png"> <img src="https://i.imgur.com/i9DItcH.png">
 
-### Bot Permissions in Discord
+### Permissions in Discord
 
 - In order to perform basic downloading functions, the bot will need `Read Message` permissions in the server(s) of your designated channel(s).
 - In order to respond to commands, the bot will need `Send Message` permissions in the server(s) of your designated channel(s). If executing commands via an Admin Channel, the bot will only need `Send Message` permissions for that channel, and that permission will not be required for the source channel.
 - In order to process history commands, the bot will need `Read Message History` permissions in the server(s) of your designated channel(s).
 
-#### NOTE: GENUINE DISCORD BOTS REQUIRE PERMISSIONS ENABLED
+#### Bot Intents for Discord Application Bots
+
+##### NECESSARY IF USING A GENUINE DISCORD APPLICATION
 
 - Go to the Discord Application management page, choose your application, go to the `Bot` category, and ensure `Message Content Intent` is enabled.
 
@@ -360,528 +275,281 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 ## 🛠 List of Settings
 
-TODO: UNDER CONSTRUCTION
-
-THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE BRACKETS.
-
-- [_constants](#_constants) `{ "key": "value", "key2": "value2" }`
-- [credentials](#credentials)
-  - [token](#token) `string ; genuine bot or 2FA user`
-  - [email](#email) `string ; non-2FA user`
-  - [password](#password) `string ; non-2FA user`
-  - [twitterAccessToken](#twitteraccesstoken) `string`
-  - [twitterAccessTokenSecret](#twitteraccesstokensecret) `string`
-  - [twitterConsumerKey](#twitterconsumerkey) `string`
-  - [twitterConsumerSecret](#twitterconsumersecret) `string`
-  - [instagramUsername](#instagramusername) `string`
-  - [instagramPassword](#instagrampassword) `string`
-  - [flickrApiKey](#flickrapikey) `string`
-- [admins](#admins) `[ ] of strings`
-- [adminChannels](#adminchannels)  `[ ] of adminChannels`
-- [processLimit](#processlimit) `int ; 3`
-- debug `bool ; false`
-- settingsOutput `bool ; true`
-- messageOutput `bool ; true`
-- messageOutputHistory `bool ; false`
-- discordLogLevel `int ; 0`
-- discordTimeout `int ; 180`
-- downloadTimeout `int ; 60`
-- downloadRetryMax `int ; 3`
-- exitOnBadConnection `bool ; false`
-- githubUpdateChecking `bool ; true`
-- commandPrefix `string ; "ddg "`
-- scanOwnMessages `bool ; false`
-- allowGeneralCommands `bool ; true`
-- inflateDownloadCount `int`
-- europeanNumbers `bool ; false`
-- checkupRate `int ; 30`
-- connectionCheckRate `int ; 5`
-- presenceRefreshRate `int ; 3`
-- save `bool ; true`
-- allowCommands `bool ; true`
-- scanEdits `bool ; true`
-- ignoreBots `bool ; true`
-- sendErrorMessages `bool ; true`
-- sendFileToChannel `string`
-- sendFileToChannels `[ ] of strings`
-- sendFileDirectly `bool`
-- sendFileCaption `string`
-- filenameDateFormat `string ; "2006-01-02_15-04-05"`
-- filenameFormat `string ; "{{date}} {{file}}"`
-- presenceEnabled `bool ; true`
-- presenceStatus `string ; "idle"`
-- presenceType `int ; 0`
-- presenceLabel `string`
-- presenceDetails `string`
-- presenceState `string`
-- reactWhenDownloaded `bool ; true`
-- reactWhenDownloadedEmoji `string`
-- reactWhenDownloadedHistory `bool ; false`
-- historyTyping `bool ; true`
-- embedColor `string`
-- historyMaxJobs `int ; 3`
-- autoHistory `bool ; false`
-- autoHistoryBefore `string`
-- autoHistorySince `string`
-- sendAutoHistoryStatus `bool ; false`
-- sendHistoryStatus `bool ; true`
-- divideByYear `bool ; false`
-- divideByMonth `bool ; false`
-- divideByServer `bool ; false`
-- divideByChannel `bool ; false`
-- divideByUser `bool ; false`
-- divideByType `bool ; true`
-- divideFoldersUseID `bool ; false`
-- saveImages `bool ; true`
-- saveVideos `bool ; true`
-- saveAudioFiles `bool ; true`
-- saveTextFiles `bool ; false`
-- saveOtherFiles `bool ; false`
-- savePossibleDuplicates `bool ; false`
-- filters
-  - blockedPhrases `[ ] of strings`
-  - allowedPhrases `[ ] of strings`
-  - blockedUsers `[ ] of strings`
-  - allowedUsers `[ ] of strings`
-  - blockedRoles `[ ] of strings`
-  - allowedRoles `[ ] of strings`
-  - blockedExtensions `[ ] of strings ; common misc files by default`
-  - allowedExtensions `[ ] of strings`
-  - blockedDomains `[ ] of strings`
-  - allowedDomains `[ ] of strings`
-- **all**
-  - _... follow **channels** below ..._
-- allBlacklistUsers `[ ] of strings`
-- allBlacklistServers `[ ] of strings`
-- allBlacklistCategories `[ ] of strings`
-- allBlacklistChannels `[ ] of strings`
-- **users**
-  - user `string`
-  - users `[ ] of strings`
-  - _... all other options follow **channels** below ..._
-- **servers**
-  - server `string`
-  - servers `[ ] of strings`
-  - serverBlacklist `[ ] of strings`
-  - _... all other options follow **channels** below ..._
-- **categories**
-  - category `string`
-  - categories `[ ] of strings`
-  - categoryBlacklist `[ ] of strings`
-  - _... all other options follow **channels** below ..._
-- **channels**
-  - channel `string`
-  - channels `[ ] of strings`
-  - destination `string`
-  - enabled `bool ; true`
-  - save `bool ; true`
-  - allowCommands `bool ; true`
-  - scanEdits `bool ; true`
-  - sendErrorMessages `bool ; true`
-  - sendFileToChannel `string`
-  - sendFileToChannels `[ ] of strings`
-  - sendFileDirectly `bool ; true`
-  - sendFileCaption `string`
-  - filenameDateFormat `string ; "2006-01-02_15-04-05"`
-  - filenameFormat `string ; "{{date}} {{file}}"`
-  - presenceEnabled `bool ; true`
-  - reactWhenDownloaded `bool ; true`
-  - reactWhenDownloadedEmoji `string`
-  - reactWhenDownloadedHistory `bool ; false`
-  - blacklistReactEmojis `[ ] of strings`
-  - historyTyping `bool ; true`
-  - embedColor `string`
-  - autoHistory `bool ; false`
-  - autoHistoryBefore `string`
-  - autoHistorySince `string`
-  - sendAutoHistoryStatus `bool ; false`
-  - sendHistoryStatus `bool ; true`
-  - divideByYear `bool ; false`
-  - divideByMonth `bool ; false`
-  - divideByServer `bool ; false`
-  - divideByChannel `bool ; false`
-  - divideByUser `bool ; false`
-  - divideByType `bool ; true`
-  - divideFoldersUseID `bool ; false`
-  - saveImages `bool ; true`
-  - saveVideos `bool ; true`
-  - saveAudioFiles `bool ; true`
-  - saveTextFiles `bool ; false`
-  - saveOtherFiles `bool ; false`
-  - savePossibleDuplicates `bool ; false`
-  - filters
-    - blockedPhrases `[ ] of strings`
-    - allowedPhrases `[ ] of strings`
-    - blockedUsers `[ ] of strings`
-    - allowedUsers `[ ] of strings`
-    - blockedRoles `[ ] of strings`
-    - allowedRoles `[ ] of strings`
-    - blockedExtensions `[ ] of strings ; common misc files by default`
-    - allowedExtensions `[ ] of strings`
-    - blockedDomains `[ ] of strings`
-    - allowedDomains `[ ] of strings`
-  - logLinks
-  - logMessages
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### credentials
-
-<sup>LOREM IPSUM</sup>
-
-###### token
-
-<sup>LOREM IPSUM</sup>
-
-###### email
-
-<sup>LOREM IPSUM</sup>
-
-###### password
-
-<sup>LOREM IPSUM</sup>
-
-###### twitterAccessToken
-
-<sup>LOREM IPSUM</sup>
-
-###### twitterAccessTokenSecret
-
-<sup>LOREM IPSUM</sup>
-
-###### twitterConsumerKey
-
-<sup>LOREM IPSUM</sup>
-
-###### twitterConsumerSecret
-
-<sup>LOREM IPSUM</sup>
-
-###### instagramUsername
-
-<sup>LOREM IPSUM</sup>
-
-###### instagramPassword
-
-<sup>LOREM IPSUM</sup>
-
-###### flickrApiKey
-
-<sup>LOREM IPSUM</sup>
-
-##### admins
-
-<sup>LOREM IPSUM</sup>
-
-##### adminChannels
-
-<sup>LOREM IPSUM</sup>
-
-##### processLimit
-
-<sup>LOREM IPSUM</sup>
-
-##### debug
-
-<sup>LOREM IPSUM</sup>
-
-##### settingsOutput
-
-<sup>LOREM IPSUM</sup>
-
-##### messageOutput
-
-<sup>LOREM IPSUM</sup>
-
-##### messageOutputHistory
-
-<sup>LOREM IPSUM</sup>
-
-##### discordLogLevel
-
-<sup>LOREM IPSUM</sup>
-
-##### discordTimeout
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
-
-##### _constants
-
-<sup>LOREM IPSUM</sup>
+### 🛠 ... UNDER CONSTRUCTION ... 🔨
+
+### ALL SETTINGS WITH DEFAULT VALUES
+
+```json
+{
+    "credentials": {
+        "token": "YOUR_USER_OR_BOT_TOKEN",
+        "email": "YOUR_USER_EMAIL_NO_2FA",
+        "password": "YOUR_USER_PASSWORD_NO_2FA",
+        "twitterAccessToken": "",
+        "twitterAccessTokenSecret": "",
+        "twitterConsumerKey": "",
+        "twitterConsumerSecret": "",
+        "instagramUsername": "",
+        "instagramPassword": "",
+        "flickrApiKey": ""
+    },
+
+    "admins": [
+        "YOUR_DISCORD_USER_ID"
+    ],
+    "adminChannels": [
+        {
+            "channel": "DISCORD_CHANNEL_ID_FOR_COMMANDS",
+            "logProgram": false,
+            "logStatus": true,
+            "logErrors": true,
+            "unlockCommands": false
+        }
+    ],
+
+    "processLimit": 32,
+
+    "debug": false,
+    "settingsOutput": true,
+    "messageOutput": true,
+    "messageOutputHistory": false,
+
+    "discordLogLevel": 0,
+    "discordTimeout": 180,
+    "downloadTimeout": 60,
+    "downloadRetryMax": 3,
+    "exitOnBadConnection": false,
+    "githubUpdateChecking": true,
+
+    "commandPrefix": "ddg ",
+    "scanOwnMessages": false,
+    "allowGeneralCommands": true,
+    "inflateDownloadCount": 0,
+    "europeanNumbers": false,
+
+    "checkupRate": 30,
+    "connectionCheckRate": 5,
+    "presenceRefreshRate": 3,
+
+    "save": true,
+    "allowCommands": true,
+    "scanEdits": true,
+    "ignoreBots": true,
+
+    "sendErrorMessages": true,
+    "sendFileToChannel": "",
+    "sendFileToChannels": [ "" ],
+    "sendFileDirectly": true,
+    "sendFileCaption": "",
+
+    "filenameDateFormat": "2006-01-02_15-04-05",
+    "filenameFormat": "{{date}} {{file}}",
+
+    "presenceEnabled": true,
+    "presenceStatus": "idle",
+    "presenceType": 0,
+    "presenceLabel": "{{timeSavedShort}} - {{countShort}} files",
+    "presenceDetails": "{{timeSavedLong}}",
+    "presenceDetails": "{{count}} files total",
+
+    "reactWhenDownloaded": true,
+    "reactWhenDownloadedEmoji": "",
+    "reactWhenDownloadedHistory": false,
+    "historyTyping": true,
+    "embedColor": "",
+
+    "historyMaxJobs": 3,
+    "autoHistory": false,
+    "autoHistoryBefore": "",
+    "autoHistorySince": "",
+    "sendAutoHistoryStatus": false,
+    "sendHistoryStatus": true,
+
+    "divideByYear": false,
+    "divideByMonth": false,
+    "divideByServer": false,
+    "divideByChannel": false,
+    "divideByUser": false,
+    "divideByType": true,
+    "divideFoldersUseID": false,
+    "saveImages": true,
+    "saveVideos": true,
+    "saveAudioFiles": true,
+    "saveTextFiles": false,
+    "saveOtherFiles": false,
+    "savePossibleDuplicates": true,
+    "filters": {
+        "blockedPhrases": [ "" ],
+        "allowedPhrases": [ "" ],       
+        "blockedUsers": [ "" ],
+        "allowedUsers": [ "" ],       
+        "blockedRoles": [ "" ],
+        "allowedRoles": [ "" ],       
+        "blockedExtensions": [
+            ".htm",
+            ".html",
+            ".php",
+            ".exe",
+            ".dll",
+            ".bin",
+            ".cmd",
+            ".sh",
+            ".py",
+            ".jar"
+        ],
+        "allowedExtensions": [ "" ],
+
+        "blockedDomains": [ "" ],
+        "allowedDomains": [ "" ]
+    },
+
+    "all": {
+        "destination": "FOLLOW_CHANNELS_BELOW_FOR_REST"
+    },
+    "allBlacklistUsers": [ "" ],
+    "allBlacklistServers": [ "" ],
+    "allBlacklistCategories": [ "" ],
+    "allBlacklistChannels": [ "" ],
+
+    "users": [
+        {
+            "user": "SOURCE_DISCORD_USER_ID",
+            "users": [ "SOURCE_DISCORD_USER_ID" ],
+            "destination": "FOLLOW_CHANNELS_BELOW_FOR_REST"
+        }
+    ],
+
+    "servers": [
+        {
+            "server": "SOURCE_DISCORD_SERVER_ID",
+            "servers": [ "SOURCE_DISCORD_SERVER_ID" ],
+            "serverBlacklist": [ "DISCORD_CHANNELS_TO_BLOCK" ],
+            "destination": "FOLLOW_CHANNELS_BELOW_FOR_REST"
+        }
+    ],
+
+    "categories": [
+        {
+            "category": "SOURCE_DISCORD_CATEGORY_ID",
+            "categories": [ "SOURCE_DISCORD_CATEGORY_ID" ],
+            "categoryBlacklist": [ "DISCORD_CHANNELS_TO_BLOCK" ],
+            "destination": "FOLLOW_CHANNELS_BELOW_FOR_REST"
+        }
+    ],
+
+    "channels": [
+        {
+            "channel": "SOURCE_DISCORD_CHANNEL_ID",
+            "channels": [ "SOURCE_DISCORD_CHANNEL_ID" ],
+            "destination": "files/example-folder",
+
+            "enabled": true,
+            "save": true,
+            "allowCommands": true,
+            "scanEdits": true,
+            "ignoreBots": true,
+
+            "sendErrorMessages": true,
+            "sendFileToChannel": "",
+            "sendFileToChannels": [ "" ],
+            "sendFileDirectly": true,
+            "sendFileCaption": "",
+
+            "filenameDateFormat": "2006-01-02_15-04-05",
+            "filenameFormat": "{{date}} {{file}}",
+
+            "presenceEnabled": true,
+            "reactWhenDownloaded": true,
+            "reactWhenDownloadedEmoji": "",
+            "reactWhenDownloadedHistory": false,
+            "blacklistReactEmojis": [ "" ],
+            "historyTyping": true,
+            "embedColor": "",
+
+            "autoHistory": false,
+            "autoHistoryBefore": "",
+            "autoHistorySince": "",
+            "sendAutoHistoryStatus": false,
+            "sendHistoryStatus": true,
+
+            "divideByYear": false,
+            "divideByMonth": false,
+            "divideByServer": false,
+            "divideByChannel": false,
+            "divideByUser": false,
+            "divideByType": true,
+            "divideFoldersUseID": false,
+            "saveImages": true,
+            "saveVideos": true,
+            "saveAudioFiles": true,
+            "saveTextFiles": false,
+            "saveOtherFiles": false,
+            "savePossibleDuplicates": true,
+            "filters": {
+                "blockedPhrases": [ "" ],
+                "allowedPhrases": [ "" ],
+
+                "blockedUsers": [ "" ],
+                "allowedUsers": [ "" ],
+
+                "blockedRoles": [ "" ],
+                "allowedRoles": [ "" ],
+
+                "blockedExtensions": [
+                    ".htm",
+                    ".html",
+                    ".php",
+                    ".exe",
+                    ".dll",
+                    ".bin",
+                    ".cmd",
+                    ".sh",
+                    ".py",
+                    ".jar"
+                ],
+                "allowedExtensions": [ "" ],
+
+                "blockedDomains": [ "" ],
+                "allowedDomains": [ "" ]
+            },
+
+            "logLinks": {
+                "destination": "",
+                "destinationIsFolder": false,
+
+                "divideLogsByServer": true,
+                "divideLogsByChannel": true,
+                "divideLogsByUser": false,
+                "divideLogsByStatus": false,
+                
+                "logDownloads": true,
+                "logFailures": true,
+
+                "filterDuplicates": false,
+                "prefix": "",
+                "suffix": "",
+                "userData": false
+            },
+
+            "logMessages": {
+                "destination": "",
+                "destinationIsFolder": false,
+
+                "divideLogsByServer": true,
+                "divideLogsByChannel": true,
+                "divideLogsByUser": false,
+
+                "filterDuplicates": false,
+                "prefix": "",
+                "suffix": "",
+                "userData": false
+            }
+
+        }
+
+    ]
+}
+```
 
 ### settings - main
 

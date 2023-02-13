@@ -694,16 +694,17 @@ do_discord_login:
 		botReady = true
 		log.Println(lg("Discord", "", color.HiGreenString, "Logged into %s", getUserIdentifier(*botUser)))
 		if botUser.Bot {
-			log.Println(lg("Discord", "", color.MagentaString, "This is a genuine Discord Bot Application"))
-			log.Println(lg("Discord", "", color.MagentaString, "- Presence details & state are disabled, only status will work."))
-			log.Println(lg("Discord", "", color.MagentaString, "- The bot can only see servers you have added it to."))
-			log.Println(lg("Discord", "", color.MagentaString, "- Nothing is wrong, this is just info :)"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "This is a genuine Discord Bot Application"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ Presence details & state are disabled, only activity label will work."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ The bot can only see servers you have added it to. Usually you need to be admin or know an admin."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ Nothing is wrong, this is just info :)"))
 		} else {
-			log.Println(lg("Discord", "", color.MagentaString, "This is a User Account (Self-Bot)"))
-			log.Println(lg("Discord", "", color.MagentaString, "- Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
-			log.Println(lg("Discord", "", color.MagentaString, "- See GitHub page for link to Discord's official statement."))
-			log.Println(lg("Discord", "", color.MagentaString, "- If you wish to avoid this, use a Bot Application if possible."))
-			log.Println(lg("Discord", "", color.MagentaString, "- Nothing is wrong, this is just info :)"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "This is a User Account (Self-Bot)"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ See GitHub page for link to Discord's official statement."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ If you wish to avoid this, use a Bot Application if possible."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ But since you're using a self-bot, you can download from any channels this account can access."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ Nothing is wrong, this is just info :)"))
 		}
 	}
 	if bot.State.User != nil { // is selfbot
