@@ -56,7 +56,7 @@ var (
 	defConfig_PresenceEnabled      bool               = true
 	defConfig_PresenceStatus       string             = string(discordgo.StatusIdle)
 	defConfig_PresenceType         discordgo.GameType = discordgo.GameTypeGame
-	defConfig_ReactWhenDownloaded  bool               = true
+	defConfig_ReactWhenDownloaded  bool               = false
 	defConfig_InflateDownloadCount int64              = 0
 
 	// These are only defaults to "fix" when loading settings for when people put stupid values
@@ -120,7 +120,7 @@ func defaultConfiguration() configuration {
 		ScanEdits:     true,
 		IgnoreBots:    true,
 
-		SendErrorMessages:  true,
+		SendErrorMessages:  false,
 		SendFileToChannel:  "",
 		SendFileToChannels: []string{},
 		SendFileDirectly:   true,

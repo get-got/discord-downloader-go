@@ -324,7 +324,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "scanEdits": true,
     "ignoreBots": true,
 
-    "sendErrorMessages": true,
+    "sendErrorMessages": false,
     "sendFileToChannel": "",      // Forward detected media to channel.
     "sendFileToChannels": [ "" ], // ^.
     "sendFileDirectly": true,     // Send direct file as attachment or embed in message.
@@ -340,7 +340,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "presenceDetails": "{{timeSavedLong}}",       // user accounts only.
     "presenceDetails": "{{count}} files total",   // user accounts only.
 
-    "reactWhenDownloaded": true,          // react to messages downloaded from.
+    "reactWhenDownloaded": false,          // react to messages downloaded from.
     "reactWhenDownloadedEmoji": "",       // specify emoji for reactions, random otherwise.
     "reactWhenDownloadedHistory": false,  // react to messages downloaded from in history jobs.
     "historyTyping": true,  // show user as typing when processing history.
@@ -430,7 +430,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
             "scanEdits": true,
             "ignoreBots": true,
 
-            "sendErrorMessages": true,
+            "sendErrorMessages": false,
             "sendFileToChannel": "",
             "sendFileToChannels": [ "" ],
             "sendFileDirectly": true,
@@ -440,7 +440,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
             "filenameFormat": "{{date}} {{file}}",
 
             "presenceEnabled": true,
-            "reactWhenDownloaded": true,
+            "reactWhenDownloaded": false,
             "reactWhenDownloadedEmoji": "",
             "reactWhenDownloadedHistory": false,
             "blacklistReactEmojis": [ "" ],
