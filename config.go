@@ -71,7 +71,7 @@ var (
 	defConfig_PresenceRefreshRate int = 3
 
 	defConfig_FilenameDateFormat string = "2006-01-02_15-04-05"
-	defConfig_FilenameFormat     string = "{{date}} {{shortID}} {{file}}"
+	defConfig_FilenameFormat     string = "{{date}} {{file}}"
 
 	defConfig_HistoryMaxJobs int = 3
 )
@@ -158,7 +158,7 @@ func defaultConfiguration() configuration {
 		SaveAudioFiles:         true,
 		SaveTextFiles:          false,
 		SaveOtherFiles:         false,
-		SavePossibleDuplicates: false,
+		SavePossibleDuplicates: true,
 		Filters: &configurationSourceFilters{
 			BlockedExtensions: &[]string{
 				".htm",

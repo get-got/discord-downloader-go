@@ -407,7 +407,7 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
 - sendFileDirectly `bool`
 - sendFileCaption `string`
 - filenameDateFormat `string ; "2006-01-02_15-04-05"`
-- filenameFormat `string ; "{{date}} {{shortID}} {{file}}"`
+- filenameFormat `string ; "{{date}} {{file}}"`
 - presenceEnabled `bool ; true`
 - presenceStatus `string ; "idle"`
 - presenceType `int ; 0`
@@ -483,7 +483,7 @@ THIS IS THE MAIN SETTINGS GROUP, ALL OF THIS WOULD GO INSIDE THE MAIN `{ }` FILE
   - sendFileDirectly `bool ; true`
   - sendFileCaption `string`
   - filenameDateFormat `string ; "2006-01-02_15-04-05"`
-  - filenameFormat `string ; "{{date}} {{shortID}} {{file}}"`
+  - filenameFormat `string ; "{{date}} {{file}}"`
   - presenceEnabled `bool ; true`
   - reactWhenDownloaded `bool ; true`
   - reactWhenDownloadedEmoji `string`
