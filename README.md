@@ -263,6 +263,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 ### EXAMPLE: ALL WITH DEFAULT VALUES
 
+**DO NOT LEAVE COMMAS `,` AFTER THE LAST ITEM IN A SECTION. JSON DOES NOT LIKE THIS, IT WILL ERROR.**
+
 ```json
 {
     "credentials": {
@@ -286,68 +288,68 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "adminChannels": [
         {
             "channel": "DISCORD_CHANNEL_ID_FOR_COMMANDS",
-            "logProgram": false,
-            "logStatus": true,
-            "logErrors": true,
-            "unlockCommands": false
+            "logProgram": false,      // output most program logging to channel (this is typically a lot)
+            "logStatus": true,        // output program status updates to channel
+            "logErrors": true,        // output download errors to channel
+            "unlockCommands": false   // allow non-admins to use commands in this channel
         }
     ],
 
-    "processLimit": 32, // # of concurrent tasks allowed at once
+    "processLimit": 32, // # of concurrent tasks allowed at once.
 
-    "debug": false, // Detailed program info
-    "settingsOutput": true, // Display parsed settings on load
-    "messageOutput": true, // Display messages being processed in real time
-    "messageOutputHistory": false, // Display messages being processed while running history
+    "debug": false,                 // detailed program info.
+    "settingsOutput": true,         // display parsed settings on load.
+    "messageOutput": true,          // display messages being processed in real time.
+    "messageOutputHistory": false,  // display messages being processed while running history.
 
-    "discordLogLevel": 0, // Discord API log leveling setting
-    "discordTimeout": 180, // Seconds to wait before giving up on a stale Discord connection
-    "downloadTimeout": 60, // Seconds to wait before giving up on a download
-    "downloadRetryMax": 3, // Times to retry a failed download
+    "discordLogLevel": 0,         // discord API log leveling setting.
+    "discordTimeout": 180,        // seconds to wait before giving up on a stale Discord connection.
+    "downloadTimeout": 60,        // seconds to wait before giving up on a download.
+    "downloadRetryMax": 3,        // times to retry a failed download.
     "exitOnBadConnection": false, // kill the program when encountering a faulty Discord connection rather than retrying.
-    "githubUpdateChecking": true, // check for program updates on launch
+    "githubUpdateChecking": true, // check for program updates on launch.
 
-    "commandPrefix": "ddg ", // prefix for discord commands
-    "scanOwnMessages": false, // Checks messages of authenticated user, should be false if genuine bot, true if selfbot.
-    "allowGeneralCommands": true, // ping/help/info/etc
-    "inflateDownloadCount": 0, // +/- displayed download tally
-    "europeanNumbers": false, // 1.000.000,00 (disgusting) versus 1,000,000.00 (normal)
+    "commandPrefix": "ddg ",      // prefix for discord commands.
+    "scanOwnMessages": false,     // checks messages of authenticated user, should be false if genuine bot, true if selfbot.
+    "allowGeneralCommands": true, // ping/help/info/etc.
+    "inflateDownloadCount": 0,    // +/- displayed download tally.
+    "europeanNumbers": false,     // 1.000.000,00 (disgusting) versus 1,000,000.00 (normal).
 
-    "checkupRate": 30, // Minutes to print checkup line in program
-    "connectionCheckRate": 5, // Minutes to check Discord connection for failure
-    "presenceRefreshRate": 3, // Minutes to refresh Discord presence, sometimes it randomly goes blank
+    "checkupRate": 30,        // minutes to print checkup line in program.
+    "connectionCheckRate": 5, // minutes to check Discord connection for failure.
+    "presenceRefreshRate": 3, // minutes to refresh Discord presence, sometimes it randomly goes blank.
 
     "save": true,
-    "allowCommands": true,
+    "allowCommands": true,  
     "scanEdits": true,
     "ignoreBots": true,
 
     "sendErrorMessages": true,
-    "sendFileToChannel": "",
-    "sendFileToChannels": [ "" ],
-    "sendFileDirectly": true,
-    "sendFileCaption": "",
+    "sendFileToChannel": "",      // Forward detected media to channel.
+    "sendFileToChannels": [ "" ], // ^.
+    "sendFileDirectly": true,     // Send direct file as attachment or embed in message.
+    "sendFileCaption": "",        // Caption to accompany media.
 
-    "filenameDateFormat": "2006-01-02_15-04-05",
+    "filenameDateFormat": "2006-01-02_15-04-05",  // Format for {{date}}.
     "filenameFormat": "{{date}} {{file}}",
 
     "presenceEnabled": true,
-    "presenceStatus": "idle",
-    "presenceType": 0,
+    "presenceStatus": "idle", // "online" or "idle" or "dnd" or "invisible".
+    "presenceType": 0,        // 0 = Playing, 1 = Streaming, 2 = Listening, 3 = Watching.
     "presenceLabel": "{{timeSavedShort}} - {{countShort}} files",
-    "presenceDetails": "{{timeSavedLong}}",
-    "presenceDetails": "{{count}} files total",
+    "presenceDetails": "{{timeSavedLong}}",       // user accounts only.
+    "presenceDetails": "{{count}} files total",   // user accounts only.
 
-    "reactWhenDownloaded": true,
-    "reactWhenDownloadedEmoji": "",
-    "reactWhenDownloadedHistory": false,
-    "historyTyping": true,
-    "embedColor": "",
+    "reactWhenDownloaded": true,          // react to messages downloaded from.
+    "reactWhenDownloadedEmoji": "",       // specify emoji for reactions, random otherwise.
+    "reactWhenDownloadedHistory": false,  // react to messages downloaded from in history jobs.
+    "historyTyping": true,  // show user as typing when processing history.
+    "embedColor": "",       // override embed color, role color by default.
 
-    "historyMaxJobs": 3, // # of history jobs allowed to run concurrently, constrained by processLimit above
-    "autoHistory": false, // automatically run history on launch
-    "autoHistoryBefore": "", // YYYY-MM-DD for date filtering
-    "autoHistorySince": "", // YYYY-MM-DD for date filtering
+    "historyMaxJobs": 3,      // # of history jobs allowed to run concurrently, constrained by processLimit above
+    "autoHistory": false,     // automatically run history on launch
+    "autoHistoryBefore": "",  // YYYY-MM-DD for date filtering
+    "autoHistorySince": "",   // YYYY-MM-DD for date filtering
     "sendAutoHistoryStatus": false,
     "sendHistoryStatus": true,
 
