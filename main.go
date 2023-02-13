@@ -601,12 +601,6 @@ func botLoadDiscord() {
 
 	// Discord Login
 	connectBot := func() {
-
-		// Event Handlers
-		botCommands = handleCommands()
-		bot.AddHandler(messageCreate)
-		bot.AddHandler(messageUpdate)
-
 		// Connect Bot
 		bot.LogLevel = -1 // to ignore dumb wsapi error
 		err = bot.Open()
@@ -651,7 +645,6 @@ do_discord_login:
 		if botUser.Bot { // is bot application, reconnect properly
 			//log.Println(lg("Discord", "", color.GreenString, "Reconnecting as bot..."))
 			bot, err = discordgo.New("Bot " + config.Credentials.Token)
-			connectBot()
 		}
 
 	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
@@ -716,6 +709,11 @@ do_discord_login:
 	if bot.State.User != nil { // is selfbot
 		selfbot = bot.State.User.Email != ""
 	}
+
+	// Event Handlers
+	botCommands = handleCommands()
+	bot.AddHandler(messageCreate)
+	bot.AddHandler(messageUpdate)
 
 	// Start Presence
 	timeLastUpdated = time.Now()

@@ -19,14 +19,22 @@ type fileItem struct {
 
 //#region Events
 
+var lastMessageID string
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	handleMessage(m.Message, false, false)
+	if lastMessageID != m.ID {
+		handleMessage(m.Message, false, false)
+	}
+	lastMessageID = m.ID
 }
 
 func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	if m.EditedTimestamp != nil {
-		handleMessage(m.Message, true, false)
+	if lastMessageID != m.ID {
+		if m.EditedTimestamp != nil {
+			handleMessage(m.Message, true, false)
+		}
 	}
+	lastMessageID = m.ID
 }
 
 func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int64) {
@@ -318,7 +326,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 				continue
 			}
 			if config.Debug && (!history || config.MessageOutputHistory) {
-				log.Println(lg("Debug", "Message", color.CyanString, "FOUND FILE: "+file.Link+fmt.Sprintf(" \t<%s>", m.ID)))
+				log.Println(lg("Debug", "Message", color.HiCyanString, "FOUND FILE: "+file.Link+fmt.Sprintf(" \t<%s>", m.ID)))
 			}
 			status, filesize := downloadRequestStruct{
 				InputURL:   file.Link,
