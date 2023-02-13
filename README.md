@@ -368,23 +368,15 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "savePossibleDuplicates": true,
     "filters": {
         "blockedPhrases": [ "" ],
-        "allowedPhrases": [ "" ],       
+        "allowedPhrases": [ "" ],     
+
         "blockedUsers": [ "" ],
-        "allowedUsers": [ "" ],       
+        "allowedUsers": [ "" ],     
+
         "blockedRoles": [ "" ],
-        "allowedRoles": [ "" ],       
-        "blockedExtensions": [
-            ".htm",
-            ".html",
-            ".php",
-            ".exe",
-            ".dll",
-            ".bin",
-            ".cmd",
-            ".sh",
-            ".py",
-            ".jar"
-        ],
+        "allowedRoles": [ "" ], 
+
+        "blockedExtensions": [ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ],
         "allowedExtensions": [ "" ],
 
         "blockedDomains": [ "" ],
@@ -483,18 +475,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
                 "blockedRoles": [ "" ],
                 "allowedRoles": [ "" ],
 
-                "blockedExtensions": [
-                    ".htm",
-                    ".html",
-                    ".php",
-                    ".exe",
-                    ".dll",
-                    ".bin",
-                    ".cmd",
-                    ".sh",
-                    ".py",
-                    ".jar"
-                ],
+                "blockedExtensions": [ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ],
                 "allowedExtensions": [ "" ],
 
                 "blockedDomains": [ "" ],
