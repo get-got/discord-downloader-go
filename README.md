@@ -268,15 +268,15 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 ```json
 {
     "credentials": {
-        "token": "YOUR_USER_OR_BOT_TOKEN",        // User with 2FA or Genuine Discord Bot
-        "email": "YOUR_USER_EMAIL_NO_2FA",        // User without 2FA
-        "password": "YOUR_USER_PASSWORD_NO_2FA",  // User without 2FA
-        "twitterAccessToken": "",       // Twitter v1.1 API
-        "twitterAccessTokenSecret": "", // Twitter v1.1 API
-        "twitterConsumerKey": "",       // Twitter v1.1 API
-        "twitterConsumerSecret": "",    // Twitter v1.1 API
-        "instagramUsername": "", // Instagram Account
-        "instagramPassword": "", // Instagram Account
+        "token": "YOUR_USER_OR_BOT_TOKEN",        // user with 2FA or genuine Discord bot.
+        "email": "YOUR_USER_EMAIL_NO_2FA",        // user without 2FA.
+        "password": "YOUR_USER_PASSWORD_NO_2FA",  // user without 2FA.
+        "twitterAccessToken": "",       // Twitter v1.1 API.
+        "twitterAccessTokenSecret": "", // Twitter v1.1 API.
+        "twitterConsumerKey": "",       // Twitter v1.1 API.
+        "twitterConsumerSecret": "",    // Twitter v1.1 API.
+        "instagramUsername": "", // Instagram Account, captcha required at some point(s).
+        "instagramPassword": "", // Instagram Account, captcha required at some point(s).
         "flickrApiKey": ""
     },
 
@@ -346,35 +346,36 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "historyTyping": true,  // show user as typing when processing history.
     "embedColor": "",       // override embed color, role color by default.
 
-    "historyMaxJobs": 3,      // # of history jobs allowed to run concurrently, constrained by processLimit above
-    "autoHistory": false,     // automatically run history on launch
-    "autoHistoryBefore": "",  // YYYY-MM-DD for date filtering
-    "autoHistorySince": "",   // YYYY-MM-DD for date filtering
-    "sendAutoHistoryStatus": false,
-    "sendHistoryStatus": true,
+    "historyMaxJobs": 3,      // # of history jobs allowed to run concurrently, constrained by processLimit above.
+    "autoHistory": false,     // automatically run history on launch.
+    "autoHistoryBefore": "",  // YYYY-MM-DD for date filtering.
+    "autoHistorySince": "",   // YYYY-MM-DD for date filtering.
+    "sendAutoHistoryStatus": false, // send status message for auto history jobs.
+    "sendHistoryStatus": true, // send status message for history jobs.
 
     "divideByYear": false,
     "divideByMonth": false,
     "divideByServer": false,
     "divideByChannel": false,
     "divideByUser": false,
-    "divideByType": true,
-    "divideFoldersUseID": false,
+    "divideByType": true, // images/videos/audio/text/other.
+    "divideFoldersUseID": false, // use Discord IDs rather than user/server/channel names.
     "saveImages": true,
     "saveVideos": true,
     "saveAudioFiles": true,
     "saveTextFiles": false,
     "saveOtherFiles": false,
-    "savePossibleDuplicates": true,
+    "savePossibleDuplicates": true, // save if exact filename already exists.
     "filters": {
+      // when "allowed" options are enabled, nothing is allowed unless it meets their criteria
         "blockedPhrases": [ "" ],
-        "allowedPhrases": [ "" ],     
+        "allowedPhrases": [ "" ],
 
-        "blockedUsers": [ "" ],
-        "allowedUsers": [ "" ],     
+        "blockedUsers": [ "" ], // by Discord ID
+        "allowedUsers": [ "" ], // by Discord ID
 
-        "blockedRoles": [ "" ],
-        "allowedRoles": [ "" ], 
+        "blockedRoles": [ "" ], // by Discord ID
+        "allowedRoles": [ "" ], // by Discord ID
 
         "blockedExtensions": [ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ],
         "allowedExtensions": [ "" ],
@@ -596,18 +597,18 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "adminChannels": [{ "channel": "DISCORD_CHANNEL_ID_FOR_COMMANDS" }],
 
     "save": true,
-    "allowCommands": false,
+    "allowCommands": false, // they'll probably kick you otherwise.
     "scanEdits": true,
     "ignoreBots": false,
 
-    "sendErrorMessages": false,
+    "sendErrorMessages": false, // they'll probably kick you otherwise.
 
-    "presenceEnabled": false,
+    "presenceEnabled": false, // they'll probably kick you otherwise.
     "presenceStatus": "invisible", // or "dnd" or "idle"
     
-    "reactWhenDownloaded": false,
-    "reactWhenDownloadedHistory": false,
-    "historyTyping": false,
+    "reactWhenDownloaded": false, // they'll probably kick you otherwise.
+    "reactWhenDownloadedHistory": false, // they'll probably kick you otherwise.
+    "historyTyping": false, // they'll probably kick you otherwise.
 
     "channels": [
         {
