@@ -266,20 +266,22 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 ```json
 {
     "credentials": {
-        "token": "YOUR_USER_OR_BOT_TOKEN",
-        "email": "YOUR_USER_EMAIL_NO_2FA",
-        "password": "YOUR_USER_PASSWORD_NO_2FA",
-        "twitterAccessToken": "",
-        "twitterAccessTokenSecret": "",
-        "twitterConsumerKey": "",
-        "twitterConsumerSecret": "",
-        "instagramUsername": "",
-        "instagramPassword": "",
+        "token": "YOUR_USER_OR_BOT_TOKEN",        // User with 2FA or Genuine Discord Bot
+        "email": "YOUR_USER_EMAIL_NO_2FA",        // User without 2FA
+        "password": "YOUR_USER_PASSWORD_NO_2FA",  // User without 2FA
+        "twitterAccessToken": "",       // Twitter v1.1 API
+        "twitterAccessTokenSecret": "", // Twitter v1.1 API
+        "twitterConsumerKey": "",       // Twitter v1.1 API
+        "twitterConsumerSecret": "",    // Twitter v1.1 API
+        "instagramUsername": "", // Instagram Account
+        "instagramPassword": "", // Instagram Account
         "flickrApiKey": ""
     },
 
     "admins": [
-        "YOUR_DISCORD_USER_ID"
+        "YOUR_DISCORD_USER_ID",
+        "YOUR_FRIENDS_DISCORD_USER_ID",
+        "YOUR_OTHER_FRIENDS_DISCORD_USER_ID"
     ],
     "adminChannels": [
         {
@@ -291,29 +293,29 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
         }
     ],
 
-    "processLimit": 32,
+    "processLimit": 32, // # of concurrent tasks allowed at once
 
-    "debug": false,
-    "settingsOutput": true,
-    "messageOutput": true,
-    "messageOutputHistory": false,
+    "debug": false, // Detailed program info
+    "settingsOutput": true, // Display parsed settings on load
+    "messageOutput": true, // Display messages being processed in real time
+    "messageOutputHistory": false, // Display messages being processed while running history
 
-    "discordLogLevel": 0,
-    "discordTimeout": 180,
-    "downloadTimeout": 60,
-    "downloadRetryMax": 3,
-    "exitOnBadConnection": false,
-    "githubUpdateChecking": true,
+    "discordLogLevel": 0, // Discord API log leveling setting
+    "discordTimeout": 180, // Seconds to wait before giving up on a stale Discord connection
+    "downloadTimeout": 60, // Seconds to wait before giving up on a download
+    "downloadRetryMax": 3, // Times to retry a failed download
+    "exitOnBadConnection": false, // kill the program when encountering a faulty Discord connection rather than retrying.
+    "githubUpdateChecking": true, // check for program updates on launch
 
-    "commandPrefix": "ddg ",
-    "scanOwnMessages": false,
-    "allowGeneralCommands": true,
-    "inflateDownloadCount": 0,
-    "europeanNumbers": false,
+    "commandPrefix": "ddg ", // prefix for discord commands
+    "scanOwnMessages": false, // Checks messages of authenticated user, should be false if genuine bot, true if selfbot.
+    "allowGeneralCommands": true, // ping/help/info/etc
+    "inflateDownloadCount": 0, // +/- displayed download tally
+    "europeanNumbers": false, // 1.000.000,00 (disgusting) versus 1,000,000.00 (normal)
 
-    "checkupRate": 30,
-    "connectionCheckRate": 5,
-    "presenceRefreshRate": 3,
+    "checkupRate": 30, // Minutes to print checkup line in program
+    "connectionCheckRate": 5, // Minutes to check Discord connection for failure
+    "presenceRefreshRate": 3, // Minutes to refresh Discord presence, sometimes it randomly goes blank
 
     "save": true,
     "allowCommands": true,
@@ -342,10 +344,10 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "historyTyping": true,
     "embedColor": "",
 
-    "historyMaxJobs": 3,
-    "autoHistory": false,
-    "autoHistoryBefore": "",
-    "autoHistorySince": "",
+    "historyMaxJobs": 3, // # of history jobs allowed to run concurrently, constrained by processLimit above
+    "autoHistory": false, // automatically run history on launch
+    "autoHistoryBefore": "", // YYYY-MM-DD for date filtering
+    "autoHistorySince": "", // YYYY-MM-DD for date filtering
     "sendAutoHistoryStatus": false,
     "sendHistoryStatus": true,
 
@@ -561,7 +563,39 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 ```json
 {
-    ""
+    "credentials": {
+        "token": "YOUR_USER_OR_BOT_TOKEN",
+        "email": "YOUR_USER_EMAIL_NO_2FA",
+        "password": "YOUR_USER_PASSWORD_NO_2FA"
+    },
+
+    "admins": [ "YOUR_DISCORD_USER_ID" ],
+    "adminChannels": [{ "channel": "DISCORD_CHANNEL_ID_FOR_COMMANDS" }],
+
+    "save": true,
+    "allowCommands": true,
+    "scanEdits": true,
+    "ignoreBots": false,
+
+    "sendErrorMessages": true,
+
+    "presenceEnabled": true,
+    "presenceStatus": "idle",
+    "presenceType": 0,
+    "presenceLabel": "{{timeSavedShort}} - {{countShort}} files",
+    "presenceDetails": "{{timeSavedLong}}",
+    "presenceDetails": "{{count}} files total",
+
+    "reactWhenDownloaded": true,
+    "reactWhenDownloadedHistory": true,
+    "historyTyping": true,
+
+    "channels": [
+        {
+            "channel": "SOURCE_DISCORD_CHANNEL_ID",
+            "destination": "files/example-folder"
+        }
+    ]
 }
 ```
 
@@ -569,7 +603,35 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
 ```json
 {
-    ""
+    "credentials": {
+        "token": "YOUR_USER_OR_BOT_TOKEN",
+        "email": "YOUR_USER_EMAIL_NO_2FA",
+        "password": "YOUR_USER_PASSWORD_NO_2FA"
+    },
+
+    "admins": [ "YOUR_DISCORD_USER_ID" ],
+    "adminChannels": [{ "channel": "DISCORD_CHANNEL_ID_FOR_COMMANDS" }],
+
+    "save": true,
+    "allowCommands": false,
+    "scanEdits": true,
+    "ignoreBots": false,
+
+    "sendErrorMessages": false,
+
+    "presenceEnabled": false,
+    "presenceStatus": "invisible", // or "dnd" or "idle"
+    
+    "reactWhenDownloaded": false,
+    "reactWhenDownloadedHistory": false,
+    "historyTyping": false,
+
+    "channels": [
+        {
+            "channel": "SOURCE_DISCORD_CHANNEL_ID",
+            "destination": "files/example-folder"
+        }
+    ]
 }
 ```
 
