@@ -410,9 +410,7 @@ func getFileLinks(m *discordgo.Message) []*fileItem {
 		}
 	}
 
-	fileItems = trimDuplicateLinks(fileItems)
-
-	return fileItems
+	return trimDuplicateLinks(fileItems)
 }
 
 type downloadRequestStruct struct {
@@ -1196,7 +1194,11 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		timeLastDownload = time.Now()
-		return mDownloadStatus(downloadSuccess), fileinfo.Size()
+		if *channelConfig.Save {
+			return mDownloadStatus(downloadSuccess), fileinfo.Size()
+		} else {
+			return mDownloadStatus(downloadSuccess), 0
+		}
 	}
 
 	return mDownloadStatus(downloadIgnored), 0
