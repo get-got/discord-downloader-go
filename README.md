@@ -387,8 +387,9 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     // caching of image data is stored via a database file; it will not read all pre-existing images
     "duplo": false,
     // threshold for what the bot considers too similar of an image comparison score
-    // lower = more similar (lowest is around -109.7)
-    // higher = less similar (does not really have a maximum, would require your own testing)
+    // * lower = more similar (lowest is around -109.7)
+    // * higher = less similar (does not really have a maximum, would require your own testing)
+    // if score is lower than your threshold, the image will be skipped
     "duploThreshold": 0,
 
     "all": {
