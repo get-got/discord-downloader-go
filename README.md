@@ -383,8 +383,13 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
         "blockedDomains": [ "" ],
         "allowedDomains": [ "" ]
     },
-    "duplo": false, // duplicate image filtering - caching of image data is stored via a database file; it will not read all pre-existing images.
-    "duploThreshold": 0, // threshold for what the bot considers too similar of an image comparison score. lower = more similar (lowest is around -109.7), higher = less similar (does not really have a maximum, would require your own testing).
+    // duplicate image filtering
+    // caching of image data is stored via a database file; it will not read all pre-existing images
+    "duplo": false,
+    // threshold for what the bot considers too similar of an image comparison score
+    // lower = more similar (lowest is around -109.7)
+    // higher = less similar (does not really have a maximum, would require your own testing)
+    "duploThreshold": 0,
 
     "all": {
         "destination": "FOLLOW_CHANNELS_BELOW_FOR_REST"
@@ -484,6 +489,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
                 "blockedDomains": [ "" ],
                 "allowedDomains": [ "" ]
             },
+            "duplo": false,
+            "duploThreshold": 0,
 
             "logLinks": {
                 "destination": "",
