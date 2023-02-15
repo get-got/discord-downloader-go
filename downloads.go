@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"image"
 	"io"
 	"io/fs"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +22,7 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/hako/durafmt"
+	"github.com/rivo/duplo"
 	"mvdan.cc/xurls/v2"
 )
 
@@ -820,6 +823,27 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 					"Unpermitted filetype (%s) found at %s", contentTypeBase, download.InputURL))
 			}
 			return mDownloadStatus(downloadSkippedUnpermittedType), 0
+		}
+
+		// Duplicate Image Filter
+		if config.Duplo && contentTypeBase == "image" && download.Extension != ".gif" && download.Extension != ".webp" {
+			img, _, err := image.Decode(bytes.NewReader(bodyOfResp))
+			if err != nil {
+				log.Println(lg("Duplo", "Download", color.HiRedString,
+					"Error converting buffer to image for hashing:\t%s", err))
+			} else {
+				hash, _ := duplo.CreateHash(img)
+				matches := duploCatalog.Query(hash)
+				sort.Sort(matches)
+				for _, match := range matches {
+					if match.Score < config.DuploThreshold {
+						log.Println(lg("Duplo", "Download", color.GreenString,
+							"Duplicate detected (Score of %f) found at %s", match.Score, download.InputURL))
+						return mDownloadStatus(downloadSkippedDetectedDuplicate), 0
+					}
+				}
+				duploCatalog.Add(cachedDownloadID, hash)
+			}
 		}
 
 		// Names

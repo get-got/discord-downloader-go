@@ -18,6 +18,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0
+	github.com/rivo/duplo v0.0.0-20220703183130-751e882e6b83
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/wk8/go-ordered-map/v2 v2.1.5
 	gopkg.in/ini.v1 v1.67.0
@@ -45,6 +46,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect

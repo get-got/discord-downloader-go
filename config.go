@@ -174,6 +174,8 @@ func defaultConfiguration() configuration {
 			},
 			BlockedPhrases: &[]string{},
 		},
+		Duplo:          false,
+		DuploThreshold: 0,
 	}
 }
 
@@ -262,6 +264,8 @@ type configuration struct {
 	SaveOtherFiles         bool                        `json:"saveOtherFiles,omitempty"`         // defaults
 	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates,omitempty"` // defaults
 	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
+	Duplo                  bool                        `json:"duplo,omitempty"`                  // optional, defaults
+	DuploThreshold         float64                     `json:"duploThreshold,omitempty"`         // optional, defaults
 
 	// Sources
 	All                    *configurationSource  `json:"all,omitempty"`
@@ -349,6 +353,8 @@ type configurationSource struct {
 	SaveOtherFiles         *bool                       `json:"saveOtherFiles,omitempty"`         // optional, defaults
 	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates,omitempty"` // optional, defaults
 	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
+	Duplo                  *bool                       `json:"duplo,omitempty"`                  // optional, defaults
+	DuploThreshold         *float64                    `json:"duploThreshold,omitempty"`         // optional, defaults
 
 	// Misc Rules
 	LogLinks    *configurationSourceLog `json:"logLinks,omitempty"`    // optional
@@ -962,6 +968,12 @@ func sourceDefault(channel *configurationSource) {
 	if channel.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
 		channel.Filters.BlockedPhrases = config.Filters.BlockedPhrases
 	}
+	if channel.Duplo == nil {
+		channel.Duplo = &config.Duplo
+	}
+	if channel.DuploThreshold == nil {
+		channel.DuploThreshold = &config.DuploThreshold
+	}
 
 	// Misc Rules
 	if channel.LogLinks == nil {
@@ -1004,7 +1016,16 @@ func sourceDefault(channel *configurationSource) {
 	if channel.LogMessages.DivideLogsByUser == nil {
 		channel.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
 	}
+
+	// LAZY CHECKS
+	if channel.Duplo != nil {
+		if *channel.Duplo {
+			sourceHasDuplo = true
+		}
+	}
 }
+
+var sourceHasDuplo bool = false
 
 func adminChannelDefault(channel *configurationAdminChannel) {
 	if channel.LogProgram == nil {

@@ -15,11 +15,13 @@ const (
 	projectReleaseURL    = projectRepoURL + "/releases/latest"
 	projectReleaseApiURL = "https://api.github.com/repos/" + projectRepo + "/releases/latest"
 
-	databasePath       = "database"
+	databasePath = "database"
+
 	cachePath          = "cache"
 	historyCachePath   = cachePath + string(os.PathSeparator) + "history"
 	historyCacheBefore = historyCachePath + string(os.PathSeparator) + "before"
 	historyCacheSince  = historyCachePath + string(os.PathSeparator) + "since"
+	duploCatalogPath   = cachePath + string(os.PathSeparator) + ".duplo"
 	instagramCachePath = cachePath + string(os.PathSeparator) + "instagram.json"
 	constantsPath      = cachePath + string(os.PathSeparator) + "constants.json"
 

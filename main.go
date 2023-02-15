@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -21,6 +22,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
+	"github.com/rivo/duplo"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
@@ -37,7 +39,8 @@ var (
 	botReady    bool = false
 
 	// Storage
-	myDB *db.DB
+	myDB         *db.DB
+	duploCatalog *duplo.Store
 
 	// APIs
 	twitterConnected   bool = false
@@ -501,6 +504,26 @@ func openDatabase() {
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
 	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
+
+	// Duplo
+	if config.Duplo || sourceHasDuplo {
+		duploCatalog = duplo.New()
+		if _, err := os.Stat(duploCatalogPath); err == nil {
+			log.Println(lg("Duplo", "", color.YellowString, "Opening duplo image catalog..."))
+			storeFile, err := ioutil.ReadFile(duploCatalogPath)
+			if err != nil {
+				log.Println(lg("Duplo", "", color.HiRedString, "Error opening duplo catalog:\t%s", err))
+			} else {
+				err = duploCatalog.GobDecode(storeFile)
+				if err != nil {
+					log.Println(lg("Duplo", "", color.HiRedString, "Error decoding duplo catalog:\t%s", err))
+				}
+				if duploCatalog != nil {
+					log.Println(lg("Duplo", "", color.HiYellowString, "Duplo catalog opened (%d)", duploCatalog.Size()))
+				}
+			}
+		}
+	}
 }
 
 func botLoad() {
