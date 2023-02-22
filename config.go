@@ -371,11 +371,17 @@ type configurationSourceFilters struct {
 	BlockedRoles *[]string `json:"blockedRoles,omitempty"` // optional
 	AllowedRoles *[]string `json:"allowedRoles,omitempty"` // optional
 
+	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
+	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
+
 	BlockedExtensions *[]string `json:"blockedExtensions,omitempty"` // optional
 	AllowedExtensions *[]string `json:"allowedExtensions,omitempty"` // optional
 
-	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
-	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
+	BlockedFilenames *[]string `json:"blockedFilenames,omitempty"` // optional
+	AllowedFilenames *[]string `json:"allowedFilenames,omitempty"` // optional
+
+	BlockedReactions *[]string `json:"blockedReactions,omitempty"` // optional
+	AllowedReactions *[]string `json:"allowedReactions,omitempty"` // optional
 }
 
 var (

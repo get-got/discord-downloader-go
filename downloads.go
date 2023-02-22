@@ -45,6 +45,7 @@ const (
 	downloadSkipped
 	downloadSkippedDuplicate
 	downloadSkippedUnpermittedDomain
+	downloadSkippedUnpermittedFilename
 	downloadSkippedUnpermittedType
 	downloadSkippedUnpermittedExtension
 	downloadSkippedDetectedDuplicate
@@ -96,6 +97,8 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Skipped - Duplicate"
 	case downloadSkippedUnpermittedDomain:
 		return "Skipped - Unpermitted Domain"
+	case downloadSkippedUnpermittedFilename:
+		return "Skipped - Unpermitted Filename Content"
 	case downloadSkippedUnpermittedType:
 		return "Skipped - Unpermitted File Type"
 	case downloadSkippedUnpermittedExtension:
@@ -711,6 +714,38 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						}
 					}
 				}
+			}
+		}
+
+		// Check Filename
+		if channelConfig.Filters.AllowedFilenames != nil || channelConfig.Filters.BlockedFilenames != nil {
+			shouldAbort := false
+			if channelConfig.Filters.AllowedFilenames != nil {
+				shouldAbort = true
+			}
+
+			if channelConfig.Filters.BlockedFilenames != nil {
+				for _, phrase := range *channelConfig.Filters.BlockedFilenames {
+					if phrase != "" && phrase != " " && strings.ContainsAny(download.Filename, phrase) {
+						shouldAbort = true
+					}
+				}
+			}
+			if channelConfig.Filters.AllowedFilenames != nil {
+				for _, phrase := range *channelConfig.Filters.AllowedFilenames {
+					if phrase != "" && phrase != " " && strings.ContainsAny(download.Filename, phrase) {
+						shouldAbort = false
+					}
+				}
+			}
+
+			// Abort
+			if shouldAbort {
+				if !download.HistoryCmd {
+					log.Println(lg("Download", "Skip", color.GreenString,
+						"Unpermitted filename content \"%s\"", download.Filename))
+				}
+				return mDownloadStatus(downloadSkippedUnpermittedFilename), 0
 			}
 		}
 

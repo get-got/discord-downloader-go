@@ -367,29 +367,32 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "saveOtherFiles": false,
     "savePossibleDuplicates": true, // save if exact filename already exists.
     "filters": {
-      // when "allowed" options are enabled, nothing is allowed unless it meets their criteria
+      // when "allowed" options are enabled, nothing is allowed unless it meets their criteria.
         "blockedPhrases": [ "" ],
         "allowedPhrases": [ "" ],
 
-        "blockedUsers": [ "" ], // by Discord ID
-        "allowedUsers": [ "" ], // by Discord ID
+        "blockedUsers": [ "" ], // by Discord ID.
+        "allowedUsers": [ "" ], // by Discord ID.
 
-        "blockedRoles": [ "" ], // by Discord ID
-        "allowedRoles": [ "" ], // by Discord ID
+        "blockedRoles": [ "" ], // by Discord ID.
+        "allowedRoles": [ "" ], // by Discord ID.
 
         "blockedExtensions": [ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ],
         "allowedExtensions": [ "" ],
 
         "blockedDomains": [ "" ],
-        "allowedDomains": [ "" ]
+        "allowedDomains": [ "" ],
+
+        "blockedFilenames": [ "" ], // List of phrases to check for in original filename, pre-formatting.
+        "allowedFilenames": [ "" ]
     },
     // duplicate image filtering
-    // caching of image data is stored via a database file; it will not read all pre-existing images
+    // caching of image data is stored via a database file; it will not read all pre-existing images.
     "duplo": false,
-    // threshold for what the bot considers too similar of an image comparison score
-    // * lower = more similar (lowest is around -109.7)
-    // * higher = less similar (does not really have a maximum, would require your own testing)
-    // if score is lower than your threshold, the image will be skipped
+    // threshold for what the bot considers too similar of an image comparison score.
+    // * lower = more similar (lowest is around -109.7).
+    // * higher = less similar (does not really have a maximum, would require your own testing).
+    // if score is lower than your threshold, the image will be skipped.
     "duploThreshold": 0,
 
     "all": {
