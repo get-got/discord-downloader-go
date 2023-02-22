@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
@@ -18,7 +18,7 @@ var (
 	config = defaultConfiguration()
 )
 
-//#region Credentials
+//#region Config, Credentials
 
 var (
 	placeholderToken    string = "REPLACE_WITH_YOUR_TOKEN_OR_DELETE_LINE"
@@ -31,135 +31,252 @@ type configurationCredentials struct {
 	Token    string `json:"token,omitempty"`    // required for bot token (this or login)
 	Email    string `json:"email,omitempty"`    // required for login (this or token)
 	Password string `json:"password,omitempty"` // required for login (this or token)
-	UserBot  bool   `json:"userBot,omitempty"`  // required
 	// APIs
-	TwitterAccessToken         string `json:"twitterAccessToken,omitempty"`         // optional
-	TwitterAccessTokenSecret   string `json:"twitterAccessTokenSecret,omitempty"`   // optional
-	TwitterConsumerKey         string `json:"twitterConsumerKey,omitempty"`         // optional
-	TwitterConsumerSecret      string `json:"twitterConsumerSecret,omitempty"`      // optional
-	FlickrApiKey               string `json:"flickrApiKey,omitempty"`               // optional
-	GoogleDriveCredentialsJSON string `json:"googleDriveCredentialsJSON,omitempty"` // optional
+	TwitterAccessToken       string `json:"twitterAccessToken,omitempty"`       // optional
+	TwitterAccessTokenSecret string `json:"twitterAccessTokenSecret,omitempty"` // optional
+	TwitterConsumerKey       string `json:"twitterConsumerKey,omitempty"`       // optional
+	TwitterConsumerSecret    string `json:"twitterConsumerSecret,omitempty"`    // optional
+	InstagramUsername        string `json:"instagramUsername,omitempty"`        // optional
+	InstagramPassword        string `json:"instagramPassword,omitempty"`        // optional
+	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
 }
 
 //#endregion
 
-//#region Configuration
+//#region Config, Main
 
-// cd = Config Default
+// defConfig_ = Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
-	// Setup
-	cdDebugOutput          bool   = false
-	cdMessageOutput        bool   = true
-	cdCommandPrefix        string = "ddg "
-	cdAllowSkipping        bool   = true
-	cdScanOwnMessages      bool   = false
-	cdCheckPermissions     bool   = true
-	cdAllowGlobalCommands  bool   = true
-	cdGithubUpdateChecking bool   = true
+	defConfig_Debug                bool   = false
+	defConfig_CommandPrefix        string = "ddg "
+	defConfig_ScanOwnMessages      bool   = false
+	defConfig_GithubUpdateChecking bool   = true
 	// Appearance
-	cdPresenceEnabled            bool               = true
-	cdPresenceStatus             string             = string(discordgo.StatusIdle)
-	cdPresenceType               discordgo.GameType = discordgo.GameTypeGame
-	cdReactWhenDownloaded        bool               = true
-	cdReactWhenDownloadedHistory bool               = false
-	cdInflateCount               int64              = 0
+	defConfig_PresenceEnabled      bool               = true
+	defConfig_PresenceStatus       string             = string(discordgo.StatusIdle)
+	defConfig_PresenceType         discordgo.GameType = discordgo.GameTypeGame
+	defConfig_ReactWhenDownloaded  bool               = false
+	defConfig_InflateDownloadCount int64              = 0
+
+	// These are only defaults to "fix" when loading settings for when people put stupid values
+	defConfig_ProcessLimit int = 32
+
+	defConfig_DiscordTimeout   int = 180
+	defConfig_DownloadTimeout  int = 60
+	defConfig_DownloadRetryMax int = 3
+
+	defConfig_CheckupRate         int = 30
+	defConfig_ConnectionCheckRate int = 5
+	defConfig_PresenceRefreshRate int = 3
+
+	defConfig_FilenameDateFormat string = "2006-01-02_15-04-05"
+	defConfig_FilenameFormat     string = "{{date}} {{file}}"
+
+	defConfig_HistoryMaxJobs int = 3
 )
 
 func defaultConfiguration() configuration {
 	return configuration{
-		// Required
+
+		// Logins
 		Credentials: configurationCredentials{
 			Token:    placeholderToken,
 			Email:    placeholderEmail,
 			Password: placeholderPassword,
 		},
-		// Setup
-		Admins:                         []string{},
-		DebugOutput:                    cdDebugOutput,
-		MessageOutput:                  cdMessageOutput,
-		CommandPrefix:                  cdCommandPrefix,
-		AllowSkipping:                  cdAllowSkipping,
-		ScanOwnMessages:                cdScanOwnMessages,
-		CheckPermissions:               cdCheckPermissions,
-		AllowGlobalCommands:            cdAllowGlobalCommands,
-		AutorunHistory:                 false,
-		AutorunHistoryBefore:           "",
-		AutorunHistorySince:            "",
-		AsynchronousHistory:            false,
-		ExitOnBadConnection:            false,
-		DownloadRetryMax:               3,
-		DownloadTimeout:                60,
-		DiscordTimeout:                 180,
-		GithubUpdateChecking:           cdGithubUpdateChecking,
-		DiscordLogLevel:                discordgo.LogError,
-		FilterDuplicateImages:          false,
-		FilterDuplicateImagesThreshold: 0,
+
+		// Owner Settings
+		Admins:        []string{},
+		AdminChannels: []configurationAdminChannel{},
+
+		// Program Settings
+		ProcessLimit:         defConfig_ProcessLimit,
+		Debug:                defConfig_Debug,
+		SettingsOutput:       true,
+		MessageOutput:        true,
+		MessageOutputHistory: false,
+
+		DiscordLogLevel:      discordgo.LogError,
+		DiscordTimeout:       defConfig_DiscordTimeout,
+		DownloadTimeout:      defConfig_DownloadTimeout,
+		DownloadRetryMax:     defConfig_DownloadRetryMax,
+		ExitOnBadConnection:  false,
+		GithubUpdateChecking: defConfig_GithubUpdateChecking,
+
+		CommandPrefix:        defConfig_CommandPrefix,
+		ScanOwnMessages:      defConfig_ScanOwnMessages,
+		AllowGeneralCommands: true,
+		InflateDownloadCount: &defConfig_InflateDownloadCount,
+		EuropeanNumbers:      false,
+
+		CheckupRate:         defConfig_CheckupRate,
+		ConnectionCheckRate: defConfig_ConnectionCheckRate,
+		PresenceRefreshRate: defConfig_PresenceRefreshRate,
+
+		// Source Setup Defaults
+		Save:          true,
+		AllowCommands: true,
+		ScanEdits:     true,
+		IgnoreBots:    true,
+
+		SendErrorMessages:  false,
+		SendFileToChannel:  "",
+		SendFileToChannels: []string{},
+		SendFileDirectly:   true,
+		SendFileCaption:    "",
+
+		FilenameDateFormat: defConfig_FilenameDateFormat,
+		FilenameFormat:     defConfig_FilenameFormat,
+
 		// Appearance
-		PresenceEnabled:            cdPresenceEnabled,
-		PresenceStatus:             cdPresenceStatus,
-		PresenceType:               cdPresenceType,
-		ReactWhenDownloaded:        cdReactWhenDownloaded,
-		ReactWhenDownloadedHistory: cdReactWhenDownloadedHistory,
-		FilenameDateFormat:         "2006-01-02_15-04-05",
-		FilenameFormat:             "{{date}} {{shortID}} {{file}}",
-		InflateCount:               &cdInflateCount,
-		NumberFormatEuropean:       false,
+		PresenceEnabled:            defConfig_PresenceEnabled,
+		PresenceStatus:             defConfig_PresenceStatus,
+		PresenceType:               defConfig_PresenceType,
+		ReactWhenDownloaded:        defConfig_ReactWhenDownloaded,
+		ReactWhenDownloadedHistory: false,
+		HistoryTyping:              true,
+
+		// History
+		HistoryMaxJobs:        defConfig_HistoryMaxJobs,
+		AutoHistory:           false,
+		AutoHistoryBefore:     "",
+		AutoHistorySince:      "",
+		SendHistoryStatus:     true,
+		SendAutoHistoryStatus: false,
+
+		// Rules for Saving
+		DivideByYear:           false,
+		DivideByMonth:          false,
+		DivideByServer:         false,
+		DivideByChannel:        false,
+		DivideByUser:           false,
+		DivideByType:           true,
+		DivideFoldersUseID:     false,
+		SaveImages:             true,
+		SaveVideos:             true,
+		SaveAudioFiles:         true,
+		SaveTextFiles:          false,
+		SaveOtherFiles:         false,
+		SavePossibleDuplicates: true,
+		Filters: &configurationSourceFilters{
+			BlockedExtensions: &[]string{
+				".htm",
+				".html",
+				".php",
+				".exe",
+				".dll",
+				".bin",
+				".cmd",
+				".sh",
+				".py",
+				".jar",
+			},
+			BlockedPhrases: &[]string{},
+		},
+		Duplo:          false,
+		DuploThreshold: 0,
 	}
 }
 
 type configuration struct {
 	Constants map[string]string `json:"_constants,omitempty"`
-	// Required
+
+	// Logins
 	Credentials configurationCredentials `json:"credentials"` // required
-	// Setup
-	Admins                         []string                    `json:"admins"`                                   // optional
-	AdminChannels                  []configurationAdminChannel `json:"adminChannels"`                            // optional
-	DebugOutput                    bool                        `json:"debugOutput"`                              // optional, defaults
-	MessageOutput                  bool                        `json:"messageOutput"`                            // optional, defaults
-	CommandPrefix                  string                      `json:"commandPrefix"`                            // optional, defaults
-	AllowSkipping                  bool                        `json:"allowSkipping"`                            // optional, defaults
-	ScanOwnMessages                bool                        `json:"scanOwnMessages"`                          // optional, defaults
-	CheckPermissions               bool                        `json:"checkPermissions,omitempty"`               // optional, defaults
-	AllowGlobalCommands            bool                        `json:"allowGlobalCommmands,omitempty"`           // optional, defaults
-	AutorunHistory                 bool                        `json:"autorunHistory,omitempty"`                 // optional, defaults
-	AutorunHistoryBefore           string                      `json:"autorunHistoryBefore,omitempty"`           // optional
-	AutorunHistorySince            string                      `json:"autorunHistorySince,omitempty"`            // optional
-	AsynchronousHistory            bool                        `json:"asyncHistory,omitempty"`                   // optional, defaults
-	ExitOnBadConnection            bool                        `json:"exitOnBadConnection,omitempty"`            // optional, defaults
-	DownloadRetryMax               int                         `json:"downloadRetryMax,omitempty"`               // optional, defaults
-	DownloadTimeout                int                         `json:"downloadTimeout,omitempty"`                // optional, defaults
-	DiscordTimeout                 int                         `json:"discordTimeout,omitempty"`                 // optional, defaults
-	GithubUpdateChecking           bool                        `json:"githubUpdateChecking"`                     // optional, defaults
-	DiscordLogLevel                int                         `json:"discordLogLevel,omitempty"`                // optional, defaults
-	FilterDuplicateImages          bool                        `json:"filterDuplicateImages,omitempty"`          // optional, defaults
-	FilterDuplicateImagesThreshold float64                     `json:"filterDuplicateImagesThreshold,omitempty"` // optional, defaults
+
+	// Owner Settings
+	Admins        []string                    `json:"admins"`        // optional
+	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
+
+	// Program Settings
+	ProcessLimit         int  `json:"processLimit,omitempty"`         // optional, defaults
+	Debug                bool `json:"debug,omitempty"`                // optional, defaults
+	SettingsOutput       bool `json:"settingsOutput,omitempty"`       // optional, defaults
+	MessageOutput        bool `json:"messageOutput,omitempty"`        // optional, defaults
+	MessageOutputHistory bool `json:"messageOutputHistory,omitempty"` // optional, defaults
+
+	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`      // optional, defaults
+	DiscordTimeout       int  `json:"discordTimeout,omitempty"`       // optional, defaults
+	DownloadTimeout      int  `json:"downloadTimeout,omitempty"`      // optional, defaults
+	DownloadRetryMax     int  `json:"downloadRetryMax,omitempty"`     // optional, defaults
+	ExitOnBadConnection  bool `json:"exitOnBadConnection,omitempty"`  // optional, defaults
+	GithubUpdateChecking bool `json:"githubUpdateChecking,omitempty"` // optional, defaults
+
+	CommandPrefix        string `json:"commandPrefix,omitempty"`        // optional, defaults
+	ScanOwnMessages      bool   `json:"scanOwnMessages,omitempty"`      // optional, defaults
+	AllowGeneralCommands bool   `json:"allowGeneralCommands,omitempty"` // optional, defaults
+	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty"` // optional, defaults to 0 if undefined
+	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty"`      // optional, defaults
+
+	CheckupRate         int `json:"checkupRate,omitempty"`         // optional, defaults
+	ConnectionCheckRate int `json:"connectionCheckRate,omitempty"` // optional, defaults
+	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty"` // optional, defaults
+
+	// Source Setup Defaults
+	Save          bool `json:"save,omitempty"`          // optional, defaults
+	AllowCommands bool `json:"allowCommands,omitempty"` // optional, defaults
+	ScanEdits     bool `json:"scanEdits,omitempty"`     // optional, defaults
+	IgnoreBots    bool `json:"ignoreBots,omitempty"`    // optional, defaults
+
+	SendErrorMessages  bool     `json:"sendErrorMessages,omitempty"`  // optional, defaults
+	SendFileToChannel  string   `json:"sendFileToChannel,omitempty"`  // optional, defaults
+	SendFileToChannels []string `json:"sendFileToChannels,omitempty"` // optional, defaults
+	SendFileDirectly   bool     `json:"sendFileDirectly,omitempty"`   // optional, defaults
+	SendFileCaption    string   `json:"sendFileCaption,omitempty"`    // optional
+
+	FilenameDateFormat string `json:"filenameDateFormat,omitempty"` // optional, defaults
+	FilenameFormat     string `json:"filenameFormat,omitempty"`     // optional, defaults
+
 	// Appearance
-	PresenceEnabled            bool               `json:"presenceEnabled"`                      // optional, defaults
-	PresenceStatus             string             `json:"presenceStatus"`                       // optional, defaults
+	PresenceEnabled            bool               `json:"presenceEnabled,omitempty"`            // optional, defaults
+	PresenceStatus             string             `json:"presenceStatus,omitempty"`             // optional, defaults
 	PresenceType               discordgo.GameType `json:"presenceType,omitempty"`               // optional, defaults
-	PresenceOverwrite          *string            `json:"presenceOverwrite,omitempty"`          // optional, unused if undefined
-	PresenceOverwriteDetails   *string            `json:"presenceOverwriteDetails,omitempty"`   // optional, unused if undefined
-	PresenceOverwriteState     *string            `json:"presenceOverwriteState,omitempty"`     // optional, unused if undefined
+	PresenceLabel              *string            `json:"presenceLabel,omitempty"`              // optional, unused if undefined
+	PresenceDetails            *string            `json:"presenceDetails,omitempty"`            // optional, unused if undefined
+	PresenceState              *string            `json:"presenceState,omitempty"`              // optional, unused if undefined
 	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
+	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji,omitempty"`   // optional
 	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults
-	FilenameDateFormat         string             `json:"filenameDateFormat,omitempty"`         // optional, defaults
-	FilenameFormat             string             `json:"filenameFormat,omitempty"`             // optional, defaults
+	HistoryTyping              bool               `json:"historyTyping,omitempty"`              // optional, defaults
 	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
-	InflateCount               *int64             `json:"inflateCount,omitempty"`               // optional, defaults to 0 if undefined
-	NumberFormatEuropean       bool               `json:"numberFormatEuropean,omitempty"`       // optional, defaults
-	// Channels
-	All                  *configurationChannel  `json:"all,omitempty"`                  // optional, defaults
-	AllBlacklistChannels *[]string              `json:"allBlacklistChannels,omitempty"` // optional
-	AllBlacklistServers  *[]string              `json:"allBlacklistServers,omitempty"`  // optional
-	Servers              []configurationChannel `json:"servers"`                        // required
-	Channels             []configurationChannel `json:"channels"`                       // required
 
-	/* IDEAS / TODO:
+	// History
+	HistoryMaxJobs        int    `json:"historyMaxJobs,omitempty"`        // optional, defaults
+	AutoHistory           bool   `json:"autoHistory,omitempty"`           // optional, defaults
+	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty"`     // optional
+	AutoHistorySince      string `json:"autoHistorySince,omitempty"`      // optional
+	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
+	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
 
-	*
+	// Rules for Saving
+	DivideByYear           bool                        `json:"divideByYear,omitempty"`           // defaults
+	DivideByMonth          bool                        `json:"divideByMonth,omitempty"`          // defaults
+	DivideByServer         bool                        `json:"divideByServer,omitempty"`         // defaults
+	DivideByChannel        bool                        `json:"divideByChannel,omitempty"`        // defaults
+	DivideByUser           bool                        `json:"divideByUser,omitempty"`           // defaults
+	DivideByType           bool                        `json:"divideByType,omitempty"`           // defaults
+	DivideFoldersUseID     bool                        `json:"divideFoldersUseID,omitempty"`     // defaults
+	SaveImages             bool                        `json:"saveImages,omitempty"`             // defaults
+	SaveVideos             bool                        `json:"saveVideos,omitempty"`             // defaults
+	SaveAudioFiles         bool                        `json:"saveAudioFiles,omitempty"`         // defaults
+	SaveTextFiles          bool                        `json:"saveTextFiles,omitempty"`          // defaults
+	SaveOtherFiles         bool                        `json:"saveOtherFiles,omitempty"`         // defaults
+	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates,omitempty"` // defaults
+	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
+	Duplo                  bool                        `json:"duplo,omitempty"`                  // optional, defaults
+	DuploThreshold         float64                     `json:"duploThreshold,omitempty"`         // optional, defaults
 
-	 */
+	// Sources
+	All                    *configurationSource  `json:"all,omitempty"`
+	AllBlacklistUsers      *[]string             `json:"allBlacklistUsers,omitempty"`
+	AllBlacklistServers    *[]string             `json:"allBlacklistServers,omitempty"`
+	AllBlacklistCategories *[]string             `json:"allBlacklistCategories,omitempty"`
+	AllBlacklistChannels   *[]string             `json:"allBlacklistChannels,omitempty"`
+	Users                  []configurationSource `json:"users,omitempty"`
+	Servers                []configurationSource `json:"servers,omitempty"`
+	Categories             []configurationSource `json:"categories,omitempty"`
+	Channels               []configurationSource `json:"channels,omitempty"`
 }
 
 type constStruct struct {
@@ -168,113 +285,83 @@ type constStruct struct {
 
 //#endregion
 
-//#region Channels
+//#region Config, Sources
 
-// ccd = Channel Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
-	// Setup
-	ccdEnabled           bool = true
-	ccdSave              bool = true
-	ccdAllowCommands     bool = true
-	ccdScanEdits         bool = true
-	ccdIgnoreBots        bool = false
-	ccdSendErrorMessages bool = true
-	ccdSendFileDirectly  bool = true
-	// Appearance
-	ccdUpdatePresence             bool     = true
-	ccdReactWhenDownloadedEmoji   string   = ""
-	ccdReactWhenDownloaded        bool     = false
-	ccdReactWhenDownloadedHistory bool     = false
-	ccdBlacklistReactEmojis       []string = []string{}
-	ccdTypeWhileProcessing        bool     = false
-	// Rules for Saving
-	ccdDivideFoldersByServer  bool = false
-	ccdDivideFoldersByChannel bool = false
-	ccdDivideFoldersByUser    bool = false
-	ccdDivideFoldersByType    bool = true
-	ccdDivideFoldersUseID     bool = false
-	ccdSaveImages             bool = true
-	ccdSaveVideos             bool = true
-	ccdSaveAudioFiles         bool = false
-	ccdSaveTextFiles          bool = false
-	ccdSaveOtherFiles         bool = false
-	ccdSavePossibleDuplicates bool = false
+	defSource_Enabled bool = true
 )
 
-type configurationChannel struct {
-	// Main
-	ChannelID       string    `json:"channel,omitempty"`         // used for config.Channels
-	ChannelIDs      *[]string `json:"channels,omitempty"`        // ---> alternative to ChannelID
-	ServerID        string    `json:"server,omitempty"`          // used for config.Servers
-	ServerIDs       *[]string `json:"servers,omitempty"`         // ---> alternative to ServerID
-	ServerBlacklist *[]string `json:"serverBlacklist,omitempty"` // for server.ServerID & server.ServerIDs
-	Destination     string    `json:"destination"`               // required
+type configurationSource struct {
+	// ~
+	UserID            string    `json:"user,omitempty"`              // used for config.Users
+	UserIDs           *[]string `json:"users,omitempty"`             // ---> alternative to UserID
+	ServerID          string    `json:"server,omitempty"`            // used for config.Servers
+	ServerIDs         *[]string `json:"servers,omitempty"`           // ---> alternative to ServerID
+	ServerBlacklist   *[]string `json:"serverBlacklist,omitempty"`   // for server.ServerID & server.ServerIDs
+	CategoryID        string    `json:"category,omitempty"`          // used for config.Categories
+	CategoryIDs       *[]string `json:"categories,omitempty"`        // ---> alternative to CategoryID
+	CategoryBlacklist *[]string `json:"categoryBlacklist,omitempty"` // for server.CategoryID & server.CategoryIDs
+	ChannelID         string    `json:"channel,omitempty"`           // used for config.Channels
+	ChannelIDs        *[]string `json:"channels,omitempty"`          // ---> alternative to ChannelID
+	Destination       string    `json:"destination"`                 // required
+
 	// Setup
-	Enabled                       *bool     `json:"enabled,omitempty"`                       // optional, defaults
-	Save                          *bool     `json:"save,omitempty"`                          // optional, defaults
-	AllowCommands                 *bool     `json:"allowCommands,omitempty"`                 // optional, defaults
-	ScanEdits                     *bool     `json:"scanEdits,omitempty"`                     // optional, defaults
-	IgnoreBots                    *bool     `json:"ignoreBots,omitempty"`                    // optional, defaults
-	OverwriteAutorunHistory       *bool     `json:"overwriteAutorunHistory,omitempty"`       // optional
-	OverwriteAutorunHistoryBefore *string   `json:"overwriteAutorunHistoryBefore,omitempty"` // optional
-	OverwriteAutorunHistorySince  *string   `json:"overwriteAutorunHistorySince,omitempty"`  // optional
-	SendErrorMessages             *bool     `json:"sendErrorMessages,omitempty"`             // optional, defaults
-	SendFileToChannel             *string   `json:"sendFileToChannel"`                       // optional, defaults
-	SendFileToChannels            *[]string `json:"sendFileToChannels"`                      // optional, defaults
-	SendFileDirectly              *bool     `json:"sendFileDirectly"`                        // optional, defaults
+	Enabled       *bool `json:"enabled"`                 // optional, defaults
+	Save          *bool `json:"save"`                    // optional, defaults
+	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
+	ScanEdits     *bool `json:"scanEdits,omitempty"`     // optional, defaults
+	IgnoreBots    *bool `json:"ignoreBots,omitempty"`    // optional, defaults
+
+	SendErrorMessages  *bool     `json:"sendErrorMessages,omitempty"`  // optional, defaults
+	SendFileToChannel  *string   `json:"sendFileToChannel,omitempty"`  // optional, defaults
+	SendFileToChannels *[]string `json:"sendFileToChannels,omitempty"` // optional, defaults
+	SendFileDirectly   *bool     `json:"sendFileDirectly,omitempty"`   // optional, defaults
+	SendFileCaption    *string   `json:"sendFileCaption,omitempty"`    // optional
+
+	FilenameDateFormat *string `json:"filenameDateFormat,omitempty"` // optional
+	FilenameFormat     *string `json:"filenameFormat,omitempty"`     // optional
+
 	// Appearance
-	UpdatePresence             *bool     `json:"updatePresence,omitempty"`             // optional, defaults
+	PresenceEnabled            *bool     `json:"presenceEnabled,omitempty"`            // optional, defaults
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
 	ReactWhenDownloadedEmoji   *string   `json:"reactWhenDownloadedEmoji,omitempty"`   // optional, defaults
 	ReactWhenDownloadedHistory *bool     `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults
 	BlacklistReactEmojis       *[]string `json:"blacklistReactEmojis,omitempty"`       // optional
-	TypeWhileProcessing        *bool     `json:"typeWhileProcessing,omitempty"`        // optional, defaults
-	// Overwrite Global Settings
-	OverwriteFilenameDateFormat *string `json:"overwriteFilenameDateFormat,omitempty"` // optional
-	OverwriteFilenameFormat     *string `json:"overwriteFilenameFormat,omitempty"`     // optional
-	OverwriteAllowSkipping      *bool   `json:"overwriteAllowSkipping,omitempty"`      // optional
-	OverwriteEmbedColor         *string `json:"overwriteEmbedColor,omitempty"`         // optional, defaults to role if undefined, then defaults random if no role color
+	HistoryTyping              *bool     `json:"historyTyping,omitempty"`              // optional, defaults
+	EmbedColor                 *string   `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
+
+	// History
+	AutoHistory           *bool   `json:"autoHistory,omitempty"`           // optional
+	AutoHistoryBefore     *string `json:"autoHistoryBefore,omitempty"`     // optional
+	AutoHistorySince      *string `json:"autoHistorySince,omitempty"`      // optional
+	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
+	SendHistoryStatus     *bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
+
 	// Rules for Saving
-	DivideFoldersByServer  *bool `json:"divideFoldersByServer,omitempty"`  // optional, defaults
-	DivideFoldersByChannel *bool `json:"divideFoldersByChannel,omitempty"` // optional, defaults
-	DivideFoldersByUser    *bool `json:"divideFoldersByUser,omitempty"`    // optional, defaults
-	DivideFoldersByType    *bool `json:"divideFoldersByType,omitempty"`    // optional, defaults
-	DivideFoldersUseID     *bool `json:"divideFoldersUseID,omitempty"`     // optional, defaults
-	SaveImages             *bool `json:"saveImages,omitempty"`             // optional, defaults
-	SaveVideos             *bool `json:"saveVideos,omitempty"`             // optional, defaults
-	SaveAudioFiles         *bool `json:"saveAudioFiles,omitempty"`         // optional, defaults
-	SaveTextFiles          *bool `json:"saveTextFiles,omitempty"`          // optional, defaults
-	SaveOtherFiles         *bool `json:"saveOtherFiles,omitempty"`         // optional, defaults
-	SavePossibleDuplicates *bool `json:"savePossibleDuplicates,omitempty"` // optional, defaults
+	DivideByYear           *bool                       `json:"divideByYear,omitempty"`           // optional, defaults
+	DivideByMonth          *bool                       `json:"divideByMonth,omitempty"`          // optional, defaults
+	DivideByServer         *bool                       `json:"divideByServer,omitempty"`         // optional, defaults
+	DivideByChannel        *bool                       `json:"divideByChannel,omitempty"`        // optional, defaults
+	DivideByUser           *bool                       `json:"divideByUser,omitempty"`           // optional, defaults
+	DivideByType           *bool                       `json:"divideByType,omitempty"`           // optional, defaults
+	DivideFoldersUseID     *bool                       `json:"divideFoldersUseID,omitempty"`     // optional, defaults
+	SaveImages             *bool                       `json:"saveImages,omitempty"`             // optional, defaults
+	SaveVideos             *bool                       `json:"saveVideos,omitempty"`             // optional, defaults
+	SaveAudioFiles         *bool                       `json:"saveAudioFiles,omitempty"`         // optional, defaults
+	SaveTextFiles          *bool                       `json:"saveTextFiles,omitempty"`          // optional, defaults
+	SaveOtherFiles         *bool                       `json:"saveOtherFiles,omitempty"`         // optional, defaults
+	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates,omitempty"` // optional, defaults
+	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
+	Duplo                  *bool                       `json:"duplo,omitempty"`                  // optional, defaults
+	DuploThreshold         *float64                    `json:"duploThreshold,omitempty"`         // optional, defaults
+
 	// Misc Rules
-	Filters     *configurationChannelFilters `json:"filters,omitempty"`     // optional
-	LogLinks    *configurationChannelLog     `json:"logLinks,omitempty"`    // optional
-	LogMessages *configurationChannelLog     `json:"logMessages,omitempty"` // optional
+	LogLinks    *configurationSourceLog `json:"logLinks,omitempty"`    // optional
+	LogMessages *configurationSourceLog `json:"logMessages,omitempty"` // optional
 }
 
-var (
-	ccfdBlockedExtensions = []string{
-		".htm",
-		".html",
-		".php",
-		".exe",
-		".dll",
-		".bin",
-		".cmd",
-		".sh",
-		".py",
-		".jar",
-	}
-	ccfdBlockedPhrases = []string{
-		"skip",
-		"ignore",
-		"don't save",
-		"no save",
-	}
-)
-
-type configurationChannelFilters struct {
+type configurationSourceFilters struct {
 	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"` // optional
 	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"` // optional
 
@@ -284,24 +371,30 @@ type configurationChannelFilters struct {
 	BlockedRoles *[]string `json:"blockedRoles,omitempty"` // optional
 	AllowedRoles *[]string `json:"allowedRoles,omitempty"` // optional
 
+	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
+	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
+
 	BlockedExtensions *[]string `json:"blockedExtensions,omitempty"` // optional
 	AllowedExtensions *[]string `json:"allowedExtensions,omitempty"` // optional
 
-	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
-	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
+	BlockedFilenames *[]string `json:"blockedFilenames,omitempty"` // optional
+	AllowedFilenames *[]string `json:"allowedFilenames,omitempty"` // optional
+
+	BlockedReactions *[]string `json:"blockedReactions,omitempty"` // optional
+	AllowedReactions *[]string `json:"allowedReactions,omitempty"` // optional
 }
 
 var (
-	ccldDestinationIsFolder bool = false
-	ccldDivideLogsByServer  bool = true
-	ccldDivideLogsByChannel bool = true
-	ccldDivideLogsByUser    bool = false
-	ccldDivideLogsByStatus  bool = false
-	ccldLogDownloads        bool = true
-	ccldLogFailures         bool = true
+	defSourceLog_DestinationIsFolder bool = false
+	defSourceLog_DivideLogsByServer  bool = true
+	defSourceLog_DivideLogsByChannel bool = true
+	defSourceLog_DivideLogsByUser    bool = false
+	defSourceLog_DivideLogsByStatus  bool = false
+	defSourceLog_LogDownloads        bool = true
+	defSourceLog_LogFailures         bool = true
 )
 
-type configurationChannelLog struct {
+type configurationSourceLog struct {
 	Destination         string  `json:"destination"`                   // required
 	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty"` // optional, defaults
 	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty"`  // optional, defaults
@@ -318,43 +411,29 @@ type configurationChannelLog struct {
 
 //#endregion
 
-//#region Admin Channels
+//#region Config, Admin Channels
 
 var (
-	acdLogStatus      bool = true
-	acdLogErrors      bool = true
-	acdUnlockCommands bool = false
+	adefConfig_LogProgram     bool = false
+	adefConfig_LogStatus      bool = true
+	adefConfig_LogErrors      bool = true
+	adefConfig_UnlockCommands bool = false
 )
 
 type configurationAdminChannel struct {
-	// Required
 	ChannelID      string    `json:"channel"`                  // required
 	ChannelIDs     *[]string `json:"channels,omitempty"`       // ---> alternative to ChannelID
+	LogProgram     *bool     `json:"logProgram,omitempty"`     // optional, defaults
 	LogStatus      *bool     `json:"logStatus,omitempty"`      // optional, defaults
 	LogErrors      *bool     `json:"logErrors,omitempty"`      // optional, defaults
 	UnlockCommands *bool     `json:"unlockCommands,omitempty"` // optional, defaults
-
-	/* IDEAS / TODO:
-
-	* SendHourlyDigest *bool `json:"sendHourlyDigest,omitempty"` // optional
-	* SendDailyDigest *bool `json:"sendDailyDigest,omitempty"` // optional
-
-	 */
 }
 
 //#endregion
 
-func initConfig() {
-	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
-		configFile = configFileBase + ".jsonc"
-		configFileC = true
-	} else {
-		configFile = configFileBase + ".json"
-		configFileC = false
-	}
-}
+//#region Management
 
-func loadConfig() {
+func loadConfig() error {
 	// Determine json type
 	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
 		configFile = configFileBase + ".jsonc"
@@ -363,12 +442,13 @@ func loadConfig() {
 		configFile = configFileBase + ".json"
 		configFileC = false
 	}
-	// .
-	log.Println(logPrefixSettings, color.YellowString("Loading from \"%s\"...", configFile))
+
+	log.Println(lg("Settings", "loadConfig", color.YellowString, "Loading from \"%s\"...", configFile))
+
 	// Load settings
-	configContent, err := ioutil.ReadFile(configFile)
+	configContent, err := os.ReadFile(configFile)
 	if err != nil {
-		log.Println(logPrefixSettings, color.HiRedString("Failed to open file...\t%s", err))
+		log.Println(lg("Settings", "loadConfig", color.HiRedString, "Failed to open file...\t%s", err))
 		createConfig()
 		properExit()
 	} else {
@@ -388,8 +468,8 @@ func loadConfig() {
 			err = json.Unmarshal([]byte(fixed), &newConfig)
 		}
 		if err != nil {
-			log.Println(logPrefixSettings, color.HiRedString("Failed to parse settings file...\t%s", err))
-			log.Println(logPrefixSettings, color.MagentaString("Please ensure you're following proper JSON format syntax."))
+			log.Println(lg("Settings", "loadConfig", color.HiRedString, "Failed to parse settings file...\t%s", err))
+			log.Println(lg("Settings", "loadConfig", color.MagentaString, "Please ensure you're following proper JSON format syntax."))
 			properExit()
 		}
 		// Constants
@@ -407,32 +487,70 @@ func loadConfig() {
 				err = json.Unmarshal([]byte(fixed), &newConfig)
 			}
 			if err != nil {
-				log.Println(logPrefixSettings, color.HiRedString("Failed to re-parse settings file after replacing constants...\t%s", err))
-				log.Println(logPrefixSettings, color.MagentaString("Please ensure you're following proper JSON format syntax."))
+				log.Println(lg("Settings", "loadConfig", color.HiRedString,
+					"Failed to re-parse settings file after replacing constants...\t%s", err))
+				log.Println(lg("Settings", "loadConfig", color.MagentaString, "Please ensure you're following proper JSON format syntax."))
 				properExit()
 			}
 			newConfig.Constants = nil
 		}
 		config = newConfig
 
-		// Channel Config Defaults
-		// this is dumb but don't see a better way to initialize defaults
-		for i := 0; i < len(config.Servers); i++ {
-			channelDefault(&config.Servers[i])
-		}
+		// Source Defaults
 		for i := 0; i < len(config.Channels); i++ {
-			channelDefault(&config.Channels[i])
+			sourceDefault(&config.Channels[i])
+		}
+		for i := 0; i < len(config.Categories); i++ {
+			sourceDefault(&config.Categories[i])
+		}
+		for i := 0; i < len(config.Servers); i++ {
+			sourceDefault(&config.Servers[i])
+		}
+		for i := 0; i < len(config.Users); i++ {
+			sourceDefault(&config.Users[i])
 		}
 		if config.All != nil {
-			channelDefault(config.All)
+			sourceDefault(config.All)
 		}
-
+		// Admin Channel Defaults
 		for i := 0; i < len(config.AdminChannels); i++ {
 			adminChannelDefault(&config.AdminChannels[i])
 		}
 
-		// Debug Output
-		if config.DebugOutput {
+		// Checks & Fixes
+		if config.ProcessLimit < 1 {
+			config.ProcessLimit = defConfig_ProcessLimit
+		}
+		if config.DiscordTimeout < 10 {
+			config.DiscordTimeout = defConfig_DiscordTimeout
+		}
+		if config.DownloadTimeout < 10 {
+			config.DownloadTimeout = defConfig_DownloadTimeout
+		}
+		if config.DownloadRetryMax < 1 {
+			config.DownloadRetryMax = defConfig_DownloadRetryMax
+		}
+		if config.CheckupRate < 1 {
+			config.CheckupRate = defConfig_CheckupRate
+		}
+		if config.ConnectionCheckRate < 1 {
+			config.ConnectionCheckRate = defConfig_ConnectionCheckRate
+		}
+		if config.PresenceRefreshRate < 1 {
+			config.PresenceRefreshRate = defConfig_PresenceRefreshRate
+		}
+		if config.FilenameDateFormat == "" {
+			config.FilenameDateFormat = defConfig_FilenameDateFormat
+		}
+		if config.FilenameFormat == "" {
+			config.FilenameFormat = defConfig_FilenameFormat
+		}
+		if config.HistoryMaxJobs < 1 {
+			config.HistoryMaxJobs = defConfig_HistoryMaxJobs
+		}
+
+		// Settings Output
+		if config.SettingsOutput {
 			dupeConfig := config
 			if dupeConfig.Credentials.Token != "" && dupeConfig.Credentials.Token != placeholderToken {
 				dupeConfig.Credentials.Token = "STRIPPED_FOR_OUTPUT"
@@ -449,6 +567,12 @@ func loadConfig() {
 			if dupeConfig.Credentials.TwitterAccessTokenSecret != "" {
 				dupeConfig.Credentials.TwitterAccessTokenSecret = "STRIPPED_FOR_OUTPUT"
 			}
+			if dupeConfig.Credentials.InstagramUsername != "" {
+				dupeConfig.Credentials.InstagramUsername = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.InstagramPassword != "" {
+				dupeConfig.Credentials.InstagramPassword = "STRIPPED_FOR_OUTPUT"
+			}
 			if dupeConfig.Credentials.TwitterConsumerKey != "" {
 				dupeConfig.Credentials.TwitterConsumerKey = "STRIPPED_FOR_OUTPUT"
 			}
@@ -460,11 +584,9 @@ func loadConfig() {
 			}
 			s, err := json.MarshalIndent(dupeConfig, "", "\t")
 			if err != nil {
-				log.Println(logPrefixSettings, logPrefixDebug, color.HiRedString("Failed to output...\t%s", err))
+				log.Println(lg("Debug", "loadConfig", color.HiRedString, "Failed to output...\t%s", err))
 			} else {
-				log.Println(logPrefixSettings, logPrefixDebug, color.HiYellowString("Parsed into JSON:\n\n"),
-					color.YellowString(string(s)),
-				)
+				log.Println(lg("Debug", "loadConfig", color.HiYellowString, "Parsed into JSON:\n\n%s", color.YellowString(string(s))))
 			}
 		}
 
@@ -472,17 +594,37 @@ func loadConfig() {
 		if (config.Credentials.Token == "" || config.Credentials.Token == placeholderToken) &&
 			(config.Credentials.Email == "" || config.Credentials.Email == placeholderEmail) &&
 			(config.Credentials.Password == "" || config.Credentials.Password == placeholderPassword) {
-			log.Println(logPrefixSettings, color.HiRedString("No valid discord login found. Token, Email, and Password are all invalid..."))
-			log.Println(logPrefixSettings, color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configFile))
-			log.Println(logPrefixSettings, color.MagentaString("If your credentials are already properly saved, please ensure you're following proper JSON format syntax."))
-			log.Println(logPrefixSettings, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
+			log.Println(lg("Settings", "loadConfig", color.HiRedString, "No valid discord login found..."))
+			log.Println(lg("Settings", "loadConfig", color.HiYellowString, "Please save your credentials & info into \"%s\" then restart...", configFile))
+			log.Println(lg("Settings", "loadConfig", color.MagentaString, "If your credentials are already properly saved, please ensure you're following proper JSON format syntax..."))
+			log.Println(lg("Settings", "loadConfig", color.MagentaString, "You DO NOT NEED token *AND* email/password, just one OR the other."))
 			properExit()
 		}
+
+		allString := ""
+		if config.All != nil {
+			allString = ", ALL ENABLED"
+		}
+		log.Println(lg("Settings", "", color.HiYellowString,
+			"Loaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
+			getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+			getBoundCategoriesCount(),
+			getBoundServersCount(), pluralS(getBoundServersCount()),
+			getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
+		))
+
+		// SETTINGS TO BE APPLIED IMMEDIATELY
+
+		if config.ProcessLimit > 0 {
+			runtime.GOMAXPROCS(config.ProcessLimit)
+		}
 	}
+
+	return nil
 }
 
 func createConfig() {
-	log.Println(logPrefixSetup, color.YellowString("Creating new settings file..."))
+	log.Println(lg("Settings", "create", color.YellowString, "Creating new settings file..."))
 
 	enteredBaseChannel := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
 	enteredBaseDestination := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
@@ -495,96 +637,67 @@ func createConfig() {
 			Password: placeholderPassword,
 		},
 		Admins:          []string{"REPLACE_WITH_YOUR_DISCORD_USER_ID"},
-		CommandPrefix:   cdCommandPrefix,
-		AllowSkipping:   cdAllowSkipping,
-		ScanOwnMessages: cdScanOwnMessages,
+		CommandPrefix:   defConfig_CommandPrefix,
+		ScanOwnMessages: defConfig_ScanOwnMessages,
 
-		PresenceEnabled:     cdPresenceEnabled,
-		PresenceStatus:      cdPresenceStatus,
-		PresenceType:        cdPresenceType,
-		ReactWhenDownloaded: cdReactWhenDownloaded,
+		PresenceEnabled:     defConfig_PresenceEnabled,
+		PresenceStatus:      defConfig_PresenceStatus,
+		PresenceType:        defConfig_PresenceType,
+		ReactWhenDownloaded: defConfig_ReactWhenDownloaded,
 
-		GithubUpdateChecking: cdGithubUpdateChecking,
-		DebugOutput:          cdDebugOutput,
+		GithubUpdateChecking: defConfig_GithubUpdateChecking,
+		Debug:                defConfig_Debug,
 	}
 
 	// Import old config
 	if _, err := os.Stat("config.ini"); err == nil {
-		log.Println(logPrefixSetup, color.HiGreenString("Detected config.ini from Seklfreak's discord-image-downloader-go, importing..."))
+		log.Println(lg("Settings", "create", color.HiGreenString,
+			"Detected config.ini from Seklfreak's discord-image-downloader-go, importing..."))
 		cfg, err := ini.Load("config.ini")
 		if err != nil {
-			log.Println(logPrefixSetup, color.HiRedString("Unable to read your old config file:\t%s", err))
+			log.Println(lg("Settings", "create", color.HiRedString,
+				"Unable to read your old config file:\t%s", err))
 			cfg = ini.Empty()
-		} else {
-			// Import old ini
+		} else { // Import old ini
+			importKey := func(section string, key string, outVar interface{}, outType string) bool {
+				if cfg.Section(section).HasKey(key) {
+					if outType == "string" {
+						outVar = cfg.Section(section).Key(key).String()
+					} else if outType == "int" {
+						outVar = cfg.Section(section).Key(key).MustInt()
+					} else if outType == "bool" {
+						outVar = cfg.Section(section).Key(key).MustBool()
+					}
+					log.Println(lg("Settings", "create", color.GreenString, "IMPORTED %s - %s:\t\t\t%s", section, key, outVar))
+					return true
+				}
+				return false
+			}
 
 			// Auth
-			if cfg.Section("auth").HasKey("token") {
-				defaultConfig.Credentials.Token = cfg.Section("auth").Key("token").String()
-				log.Println(color.GreenString("IMPORTED token:\t\t\t%s", defaultConfig.Credentials.Token))
-			} else {
+			if !importKey("auth", "token", &defaultConfig.Credentials.Token, "string") {
 				defaultConfig.Credentials.Token = ""
 			}
-			if cfg.Section("auth").HasKey("email") {
-				defaultConfig.Credentials.Email = cfg.Section("auth").Key("email").String()
-				log.Println(color.GreenString("IMPORTED email:\t\t\t%s", defaultConfig.Credentials.Email))
-			} else {
+			if !importKey("auth", "email", &defaultConfig.Credentials.Email, "string") {
 				defaultConfig.Credentials.Email = ""
 			}
-			if cfg.Section("auth").HasKey("password") {
-				defaultConfig.Credentials.Password = cfg.Section("auth").Key("password").String()
-				log.Println(color.GreenString("IMPORTED password:\t\t\t%s", defaultConfig.Credentials.Password))
-			} else {
+			if !importKey("auth", "password", &defaultConfig.Credentials.Password, "string") {
 				defaultConfig.Credentials.Password = ""
 			}
-			if cfg.Section("google").HasKey("client credentials json") {
-				defaultConfig.Credentials.GoogleDriveCredentialsJSON = cfg.Section("google").Key("client credentials json").String()
-				log.Println(color.GreenString("IMPORTED Google Drive Credentials:\t\t\t%s", defaultConfig.Credentials.GoogleDriveCredentialsJSON))
-			}
-			if cfg.Section("flickr").HasKey("api key") {
-				defaultConfig.Credentials.FlickrApiKey = cfg.Section("flickr").Key("api key").String()
-				log.Println(color.GreenString("IMPORTED Flickr API Key:\t\t\t%s", defaultConfig.Credentials.FlickrApiKey))
-			}
-			if cfg.Section("twitter").HasKey("consumer key") {
-				defaultConfig.Credentials.TwitterConsumerKey = cfg.Section("twitter").Key("consumer key").String()
-				log.Println(color.GreenString("IMPORTED Twitter Consumer Key:\t\t\t%s", defaultConfig.Credentials.TwitterConsumerKey))
-			}
-			if cfg.Section("twitter").HasKey("consumer secret") {
-				defaultConfig.Credentials.TwitterConsumerSecret = cfg.Section("twitter").Key("consumer secret").String()
-				log.Println(color.GreenString("IMPORTED Twitter Consumer Secret:\t\t\t%s", defaultConfig.Credentials.TwitterConsumerSecret))
-			}
-			if cfg.Section("twitter").HasKey("access token") {
-				defaultConfig.Credentials.TwitterAccessToken = cfg.Section("twitter").Key("access token").String()
-				log.Println(color.GreenString("IMPORTED Twitter Access Token:\t\t\t%s", defaultConfig.Credentials.TwitterAccessToken))
-			}
-			if cfg.Section("twitter").HasKey("access token secret") {
-				defaultConfig.Credentials.TwitterAccessTokenSecret = cfg.Section("twitter").Key("access token secret").String()
-				log.Println(color.GreenString("IMPORTED Twitter Access Token Secret:\t\t\t%s", defaultConfig.Credentials.TwitterAccessTokenSecret))
-			}
+			importKey("flickr", "api key", &defaultConfig.Credentials.FlickrApiKey, "string")
+			importKey("twitter", "consumer key", &defaultConfig.Credentials.TwitterConsumerKey, "string")
+			importKey("twitter", "consumer secret", &defaultConfig.Credentials.TwitterConsumerSecret, "string")
+			importKey("twitter", "access token", &defaultConfig.Credentials.TwitterAccessToken, "string")
+			importKey("twitter", "access token secret", &defaultConfig.Credentials.TwitterAccessTokenSecret, "string")
 
 			// General
-			if cfg.Section("general").HasKey("max download retries") {
-				defaultConfig.DownloadRetryMax = cfg.Section("general").Key("max download retries").MustInt()
-				log.Println(color.GreenString("IMPORTED Max Download Retries:\t%d", defaultConfig.DownloadRetryMax))
-			}
-			if cfg.Section("general").HasKey("download timeout") {
-				defaultConfig.DownloadTimeout = cfg.Section("general").Key("download timeout").MustInt()
-				log.Println(color.GreenString("IMPORTED Download Timeout:\t\t%d", defaultConfig.DownloadRetryMax))
-			}
+			importKey("general", "max download retries", &defaultConfig.DownloadRetryMax, "int")
+			importKey("general", "download timeout", &defaultConfig.DownloadTimeout, "int")
 
 			// Status
-			if cfg.Section("status").HasKey("status enabled") {
-				defaultConfig.PresenceEnabled = cfg.Section("status").Key("status enabled").MustBool()
-				log.Println(color.GreenString("IMPORTED Presence Enabled:\t\t%s", boolS(defaultConfig.PresenceEnabled)))
-			}
-			if cfg.Section("status").HasKey("status type") {
-				defaultConfig.PresenceStatus = cfg.Section("status").Key("status type").String()
-				log.Println(color.GreenString("IMPORTED Presence Status:\t\t%s", defaultConfig.PresenceStatus))
-			}
-			if cfg.Section("status").HasKey("status label") {
-				defaultConfig.PresenceType = discordgo.GameType(cfg.Section("status").Key("status label").MustInt())
-				log.Println(color.GreenString("IMPORTED Presence Type:\t\t%d", defaultConfig.PresenceType))
-			}
+			importKey("status", "status enabled", &defaultConfig.PresenceEnabled, "bool")
+			importKey("status", "status type", &defaultConfig.PresenceStatus, "string")
+			importKey("status", "status label", &defaultConfig.PresenceType, "int")
 
 			// Channels
 			InteractiveChannelWhitelist := cfg.Section("interactive channels").KeysHash()
@@ -592,39 +705,39 @@ func createConfig() {
 				newChannel := configurationAdminChannel{
 					ChannelID: key,
 				}
-				log.Println(color.GreenString("IMPORTED Admin Channel:\t\t%s", key))
+				log.Println(lg("Settings", "create", color.GreenString, "IMPORTED Admin Channel:\t\t%s", key))
 				defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, newChannel)
 			}
 			ChannelWhitelist := cfg.Section("channels").KeysHash()
 			for key, value := range ChannelWhitelist {
-				newChannel := configurationChannel{
+				newChannel := configurationSource{
 					ChannelID:   key,
 					Destination: value,
 				}
-				log.Println(color.GreenString("IMPORTED Channel:\t\t\t%s to \"%s\"", key, value))
+				log.Println(lg("Settings", "create", color.GreenString, "IMPORTED Channel:\t\t\t%s to \"%s\"", key, value))
 				defaultConfig.Channels = append(defaultConfig.Channels, newChannel)
 			}
 		}
-		log.Println(logPrefixSetup, color.HiGreenString("Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
+		log.Println(lg("Settings", "create", color.HiGreenString,
+			"Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
 	} else {
-		baseChannel := configurationChannel{
+		baseChannel := configurationSource{
 			ChannelID:   enteredBaseChannel,
 			Destination: enteredBaseDestination,
 
-			Enabled:           &ccdEnabled,
-			Save:              &ccdSave,
-			AllowCommands:     &ccdAllowCommands,
-			SendErrorMessages: &ccdSendErrorMessages,
-			ScanEdits:         &ccdScanEdits,
-			IgnoreBots:        &ccdIgnoreBots,
+			Enabled:           &defSource_Enabled,
+			Save:              &config.Save,
+			AllowCommands:     &config.AllowCommands,
+			SendErrorMessages: &config.SendErrorMessages,
+			ScanEdits:         &config.ScanEdits,
+			IgnoreBots:        &config.IgnoreBots,
 
-			UpdatePresence:             &ccdUpdatePresence,
-			ReactWhenDownloadedEmoji:   &ccdReactWhenDownloadedEmoji,
-			ReactWhenDownloadedHistory: &ccdReactWhenDownloadedHistory,
+			PresenceEnabled:            &config.PresenceEnabled,
+			ReactWhenDownloadedHistory: &config.ReactWhenDownloadedHistory,
 
-			DivideFoldersByType: &ccdDivideFoldersByType,
-			SaveImages:          &ccdSaveImages,
-			SaveVideos:          &ccdSaveVideos,
+			DivideByType: &config.DivideByType,
+			SaveImages:   &config.SaveImages,
+			SaveVideos:   &config.SaveVideos,
 		}
 		defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
 
@@ -634,7 +747,7 @@ func createConfig() {
 		defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
 
 		//TODO: Improve, this is very crude, I just wanted *something* for this.
-		log.Print(color.HiCyanString("Would you like to enter settings info now? [Y/N]: "))
+		log.Print(lg("Settings", "create", color.HiCyanString, "Would you like to enter settings info now? [Y/N]: "))
 		reader := bufio.NewReader(os.Stdin)
 		inputCredsYN, _ := reader.ReadString('\n')
 		inputCredsYN = strings.ReplaceAll(inputCredsYN, "\n", "")
@@ -654,7 +767,7 @@ func createConfig() {
 				if inputToken != "" {
 					defaultConfig.Credentials.Token = inputToken
 				} else {
-					log.Println(color.HiRedString("Please input token..."))
+					log.Println(lg("Settings", "create", color.HiRedString, "Please input token..."))
 					goto EnterToken
 				}
 			} else if strings.Contains(strings.ToLower(inputCreds), "login") {
@@ -673,15 +786,15 @@ func createConfig() {
 					if inputPassword != "" {
 						defaultConfig.Credentials.Password = inputPassword
 					} else {
-						log.Println(color.HiRedString("Please input password..."))
+						log.Println(lg("Settings", "create", color.HiRedString, "Please input password..."))
 						goto EnterPassword
 					}
 				} else {
-					log.Println(color.HiRedString("Please input email..."))
+					log.Println(lg("Settings", "create", color.HiRedString, "Please input email..."))
 					goto EnterEmail
 				}
 			} else {
-				log.Println(color.HiRedString("Please input \"token\" or \"login\"..."))
+				log.Println(lg("Settings", "create", color.HiRedString, "Please input \"token\" or \"login\"..."))
 				goto EnterCreds
 			}
 
@@ -693,7 +806,7 @@ func createConfig() {
 			if isNumeric(inputAdmin) {
 				defaultConfig.Admins = []string{inputAdmin}
 			} else {
-				log.Println(color.HiRedString("Please input your Discord User ID..."))
+				log.Println(lg("Settings", "create", color.HiRedString, "Please input your Discord User ID..."))
 				goto EnterAdmin
 			}
 
@@ -702,274 +815,318 @@ func createConfig() {
 		}
 	}
 
-	log.Println(logPrefixSetup, color.MagentaString("The default settings will be missing some options to avoid clutter."))
-	log.Println(logPrefixSetup, color.HiMagentaString("There are MANY MORE SETTINGS! If you would like to maximize customization, see the GitHub README for all available settings."))
+	log.Println(lg("Settings", "create", color.MagentaString,
+		"The default settings will be missing some options to avoid clutter."))
+	log.Println(lg("Settings", "create", color.HiMagentaString,
+		"There are MANY MORE SETTINGS! If you would like to maximize customization, see the GitHub README for all available settings."))
 
 	defaultJSON, err := json.MarshalIndent(defaultConfig, "", "\t")
 	if err != nil {
-		log.Println(logPrefixSetup, color.HiRedString("Failed to format new settings...\t%s", err))
+		log.Println(lg("Settings", "create", color.HiRedString, "Failed to format new settings...\t%s", err))
 	} else {
-		err := ioutil.WriteFile(configFile, defaultJSON, 0644)
+		err := os.WriteFile(configFile, defaultJSON, 0644)
 		if err != nil {
-			log.Println(logPrefixSetup, color.HiRedString("Failed to save new settings file...\t%s", err))
+			log.Println(lg("Settings", "create", color.HiRedString, "Failed to save new settings file...\t%s", err))
 		} else {
-			log.Println(logPrefixSetup, color.HiYellowString("Created new settings file..."))
-			log.Println(logPrefixSetup, color.HiYellowString("Please save your credentials & info into \"%s\" then restart...", configFile))
-			log.Println(logPrefixSetup, color.MagentaString("You DO NOT NEED `Token` *AND* `Email`+`Password`, just one OR the other."))
-			log.Println(logPrefixSetup, color.MagentaString("See README on GitHub for help and more info..."))
+			log.Println(lg("Settings", "create", color.HiYellowString, "Created new settings file..."))
+			log.Println(lg("Settings", "create", color.HiYellowString,
+				"Please save your credentials & info into \"%s\" then restart...", configFile))
+			log.Println(lg("Settings", "create", color.MagentaString,
+				"You DO NOT NEED token *AND* email/password, just one OR the other."))
+			log.Println(lg("Settings", "create", color.MagentaString,
+				"THERE ARE MANY HIDDEN SETTINGS AVAILABLE, SEE THE GITHUB README github.com/"+projectRepo))
 		}
 	}
 }
 
-func channelDefault(channel *configurationChannel) {
+func sourceDefault(channel *configurationSource) {
 	// These have to use the default variables since literal values and consts can't be set to the pointers
 
 	// Setup
 	if channel.Enabled == nil {
-		channel.Enabled = &ccdEnabled
+		channel.Enabled = &defSource_Enabled
 	}
 	if channel.Save == nil {
-		channel.Save = &ccdSave
+		channel.Save = &config.Save
 	}
 	if channel.AllowCommands == nil {
-		channel.AllowCommands = &ccdAllowCommands
+		channel.AllowCommands = &config.AllowCommands
 	}
 	if channel.SendErrorMessages == nil {
-		channel.SendErrorMessages = &ccdSendErrorMessages
+		channel.SendErrorMessages = &config.SendErrorMessages
 	}
 	if channel.ScanEdits == nil {
-		channel.ScanEdits = &ccdScanEdits
+		channel.ScanEdits = &config.ScanEdits
 	}
 	if channel.IgnoreBots == nil {
-		channel.IgnoreBots = &ccdIgnoreBots
+		channel.IgnoreBots = &config.IgnoreBots
+	}
+
+	if channel.SendErrorMessages == nil {
+		channel.SendErrorMessages = &config.SendErrorMessages
+	}
+	if channel.SendFileToChannel == nil && config.SendFileToChannel != "" {
+		channel.SendFileToChannel = &config.SendFileToChannel
+	}
+	if channel.SendFileToChannels == nil && config.SendFileToChannels != nil {
+		channel.SendFileToChannels = &config.SendFileToChannels
 	}
 	if channel.SendFileDirectly == nil {
-		channel.SendFileDirectly = &ccdSendFileDirectly
+		channel.SendFileDirectly = &config.SendFileDirectly
 	}
+	if channel.SendFileCaption == nil && config.SendFileCaption != "" {
+		channel.SendFileCaption = &config.SendFileCaption
+	}
+
+	if channel.FilenameDateFormat == nil {
+		channel.FilenameDateFormat = &config.FilenameDateFormat
+	}
+	if channel.FilenameFormat == nil {
+		channel.FilenameFormat = &config.FilenameFormat
+	}
+
 	// Appearance
-	if channel.UpdatePresence == nil {
-		channel.UpdatePresence = &ccdUpdatePresence
+	if channel.PresenceEnabled == nil {
+		channel.PresenceEnabled = &config.PresenceEnabled
 	}
-	if channel.ReactWhenDownloadedEmoji == nil {
-		channel.ReactWhenDownloadedEmoji = &ccdReactWhenDownloadedEmoji
+	if channel.ReactWhenDownloaded == nil {
+		channel.ReactWhenDownloaded = &config.ReactWhenDownloaded
+	}
+	if channel.ReactWhenDownloadedEmoji == nil && config.ReactWhenDownloadedEmoji != nil {
+		channel.ReactWhenDownloadedEmoji = config.ReactWhenDownloadedEmoji
 	}
 	if channel.ReactWhenDownloadedHistory == nil {
-		channel.ReactWhenDownloadedHistory = &ccdReactWhenDownloadedHistory
+		channel.ReactWhenDownloadedHistory = &config.ReactWhenDownloadedHistory
 	}
 	if channel.BlacklistReactEmojis == nil {
-		channel.BlacklistReactEmojis = &ccdBlacklistReactEmojis
+		channel.BlacklistReactEmojis = &[]string{}
 	}
-	if channel.TypeWhileProcessing == nil {
-		channel.TypeWhileProcessing = &ccdTypeWhileProcessing
+	if channel.HistoryTyping == nil {
+		channel.HistoryTyping = &config.HistoryTyping
 	}
+	if channel.EmbedColor == nil && config.EmbedColor != nil {
+		channel.EmbedColor = config.EmbedColor
+	}
+
+	// History
+	if channel.AutoHistory == nil {
+		channel.AutoHistory = &config.AutoHistory
+	}
+	if channel.AutoHistoryBefore == nil {
+		channel.AutoHistoryBefore = &config.AutoHistoryBefore
+	}
+	if channel.AutoHistorySince == nil {
+		channel.AutoHistorySince = &config.AutoHistorySince
+	}
+	if channel.SendAutoHistoryStatus == nil {
+		channel.SendAutoHistoryStatus = &config.SendAutoHistoryStatus
+	}
+	if channel.SendHistoryStatus == nil {
+		channel.SendHistoryStatus = &config.SendHistoryStatus
+	}
+
 	// Rules for Saving
-	if channel.DivideFoldersByServer == nil {
-		channel.DivideFoldersByServer = &ccdDivideFoldersByServer
+	if channel.DivideByYear == nil {
+		channel.DivideByYear = &config.DivideByYear
 	}
-	if channel.DivideFoldersByChannel == nil {
-		channel.DivideFoldersByChannel = &ccdDivideFoldersByChannel
+	if channel.DivideByMonth == nil {
+		channel.DivideByMonth = &config.DivideByMonth
 	}
-	if channel.DivideFoldersByUser == nil {
-		channel.DivideFoldersByUser = &ccdDivideFoldersByUser
+	if channel.DivideByServer == nil {
+		channel.DivideByServer = &config.DivideByServer
 	}
-	if channel.DivideFoldersByType == nil {
-		channel.DivideFoldersByType = &ccdDivideFoldersByType
+	if channel.DivideByChannel == nil {
+		channel.DivideByChannel = &config.DivideByChannel
+	}
+	if channel.DivideByUser == nil {
+		channel.DivideByUser = &config.DivideByUser
+	}
+	if channel.DivideByType == nil {
+		channel.DivideByType = &config.DivideByType
 	}
 	if channel.DivideFoldersUseID == nil {
-		channel.DivideFoldersUseID = &ccdDivideFoldersUseID
+		channel.DivideFoldersUseID = &config.DivideFoldersUseID
 	}
 	if channel.SaveImages == nil {
-		channel.SaveImages = &ccdSaveImages
+		channel.SaveImages = &config.SaveImages
 	}
 	if channel.SaveVideos == nil {
-		channel.SaveVideos = &ccdSaveVideos
+		channel.SaveVideos = &config.SaveVideos
 	}
 	if channel.SaveAudioFiles == nil {
-		channel.SaveAudioFiles = &ccdSaveAudioFiles
+		channel.SaveAudioFiles = &config.SaveAudioFiles
 	}
 	if channel.SaveTextFiles == nil {
-		channel.SaveTextFiles = &ccdSaveTextFiles
+		channel.SaveTextFiles = &config.SaveTextFiles
 	}
 	if channel.SaveOtherFiles == nil {
-		channel.SaveOtherFiles = &ccdSaveOtherFiles
+		channel.SaveOtherFiles = &config.SaveOtherFiles
 	}
 	if channel.SavePossibleDuplicates == nil {
-		channel.SavePossibleDuplicates = &ccdSavePossibleDuplicates
+		channel.SavePossibleDuplicates = &config.SavePossibleDuplicates
 	}
-
 	if channel.Filters == nil {
-		channel.Filters = &configurationChannelFilters{}
+		channel.Filters = &configurationSourceFilters{}
 	}
-	if channel.Filters.BlockedExtensions == nil {
-		channel.Filters.BlockedExtensions = &ccfdBlockedExtensions
+	if channel.Filters.BlockedExtensions == nil && config.Filters.BlockedExtensions != nil {
+		channel.Filters.BlockedExtensions = config.Filters.BlockedExtensions
 	}
-	if channel.Filters.BlockedPhrases == nil {
-		channel.Filters.BlockedPhrases = &ccfdBlockedPhrases
+	if channel.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
+		channel.Filters.BlockedPhrases = config.Filters.BlockedPhrases
+	}
+	if channel.Duplo == nil {
+		channel.Duplo = &config.Duplo
+	}
+	if channel.DuploThreshold == nil {
+		channel.DuploThreshold = &config.DuploThreshold
 	}
 
+	// Misc Rules
 	if channel.LogLinks == nil {
-		channel.LogLinks = &configurationChannelLog{}
+		channel.LogLinks = &configurationSourceLog{}
 	}
 	if channel.LogLinks.DestinationIsFolder == nil {
-		channel.LogLinks.DestinationIsFolder = &ccldDestinationIsFolder
+		channel.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
 	}
 	if channel.LogLinks.DivideLogsByServer == nil {
-		channel.LogLinks.DivideLogsByServer = &ccldDivideLogsByServer
+		channel.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
 	}
 	if channel.LogLinks.DivideLogsByChannel == nil {
-		channel.LogLinks.DivideLogsByChannel = &ccldDivideLogsByChannel
+		channel.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
 	}
 	if channel.LogLinks.DivideLogsByUser == nil {
-		channel.LogLinks.DivideLogsByUser = &ccldDivideLogsByUser
+		channel.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
 	}
 	if channel.LogLinks.DivideLogsByStatus == nil {
-		channel.LogLinks.DivideLogsByStatus = &ccldDivideLogsByStatus
+		channel.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
 	}
 	if channel.LogLinks.LogDownloads == nil {
-		channel.LogLinks.LogDownloads = &ccldLogDownloads
+		channel.LogLinks.LogDownloads = &defSourceLog_LogDownloads
 	}
 	if channel.LogLinks.LogFailures == nil {
-		channel.LogLinks.LogFailures = &ccldLogFailures
+		channel.LogLinks.LogFailures = &defSourceLog_LogFailures
 	}
 
 	if channel.LogMessages == nil {
-		channel.LogMessages = &configurationChannelLog{}
+		channel.LogMessages = &configurationSourceLog{}
 	}
 	if channel.LogMessages.DestinationIsFolder == nil {
-		channel.LogMessages.DestinationIsFolder = &ccldDestinationIsFolder
+		channel.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
 	}
 	if channel.LogMessages.DivideLogsByServer == nil {
-		channel.LogMessages.DivideLogsByServer = &ccldDivideLogsByServer
+		channel.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
 	}
 	if channel.LogMessages.DivideLogsByChannel == nil {
-		channel.LogMessages.DivideLogsByChannel = &ccldDivideLogsByChannel
+		channel.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
 	}
 	if channel.LogMessages.DivideLogsByUser == nil {
-		channel.LogMessages.DivideLogsByUser = &ccldDivideLogsByUser
+		channel.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
+	}
+
+	// LAZY CHECKS
+	if channel.Duplo != nil {
+		if *channel.Duplo {
+			sourceHasDuplo = true
+		}
 	}
 }
+
+var sourceHasDuplo bool = false
 
 func adminChannelDefault(channel *configurationAdminChannel) {
+	if channel.LogProgram == nil {
+		channel.LogProgram = &adefConfig_LogProgram
+	}
 	if channel.LogStatus == nil {
-		channel.LogStatus = &acdLogStatus
+		channel.LogStatus = &adefConfig_LogStatus
 	}
 	if channel.LogErrors == nil {
-		channel.LogErrors = &acdLogErrors
+		channel.LogErrors = &adefConfig_LogErrors
 	}
 	if channel.UnlockCommands == nil {
-		channel.UnlockCommands = &acdUnlockCommands
+		channel.UnlockCommands = &adefConfig_UnlockCommands
 	}
 }
 
-//#region Channel Checks/Returns
+//#endregion
 
-func isChannelRegistered(ChannelID string) bool {
-	for _, item := range config.Channels {
-		// Single Channel Config
-		if ChannelID == item.ChannelID {
-			return true
-		}
-		// Multi-Channel Config
-		if item.ChannelIDs != nil {
-			if stringInSlice(ChannelID, *item.ChannelIDs) {
-				return true
-			}
-		}
-	}
-	// Server Config
-	for _, item := range config.Servers {
-		if item.ServerID != "" {
-			guild, err := bot.State.Guild(item.ServerID)
-			if err == nil {
-				for _, channel := range guild.Channels {
-					if ChannelID == channel.ID {
-						// Channel Blacklisting within Server
-						if item.ServerBlacklist != nil {
-							if stringInSlice(ChannelID, *item.ServerBlacklist) {
-								return false
-							}
-							// Categories
-							if channel.ParentID != "" {
-								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-									return false
-								}
-							}
-						}
-						return true
-					}
-				}
-			}
-		}
-		// Multi-Server Config
-		if item.ServerIDs != nil {
-			for _, subserver := range *item.ServerIDs {
-				guild, err := bot.State.Guild(subserver)
-				if err == nil {
-					for _, channel := range guild.Channels {
-						if ChannelID == channel.ID {
-							// Channel Blacklisting within Servers
-							if item.ServerBlacklist != nil {
-								if stringInSlice(ChannelID, *item.ServerBlacklist) {
-									return false
-								}
-								// Categories
-								if channel.ParentID != "" {
-									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-										return false
-									}
-								}
-							}
-							return true
-						}
-					}
-				}
-			}
-		}
-	}
-	// All
-	if config.All != nil {
-		if config.AllBlacklistChannels != nil {
-			if stringInSlice(ChannelID, *config.AllBlacklistChannels) {
-				return false
-			}
-		}
-		if config.AllBlacklistServers != nil {
-			guild, err := bot.State.Guild(ChannelID)
-			if err == nil {
-				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
-					return false
-				}
-			} else {
-				log.Println(color.HiRedString("Error finding server info for channel:\t%s", err))
-			}
-		}
-		return true
+//#region Functions, Admin & Source
+
+func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bool {
+	if subjectMessage.ID != "" {
+		_, err := bot.State.Message(targetChannel, subjectMessage.ChannelID)
+		return err == nil
 	}
 	return false
 }
 
-func getChannelConfig(ChannelID string) configurationChannel {
+var emptyConfig configurationSource = configurationSource{}
+
+func getSource(m *discordgo.Message) configurationSource {
+
+	// Channel
 	for _, item := range config.Channels {
 		// Single Channel Config
-		if ChannelID == item.ChannelID {
+		if m.ChannelID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
 			return item
 		}
 		// Multi-Channel Config
 		if item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
-				if ChannelID == subchannel {
+				if m.ChannelID == subchannel || isNestedMessage(m, subchannel) {
 					return item
 				}
 			}
 		}
 	}
-	// Server Config
+
+	// Category Config
+	for _, item := range config.Categories {
+		if item.CategoryID != "" {
+			channel, err := bot.State.Channel(m.ChannelID)
+			if err == nil {
+				if channel.ParentID == item.CategoryID {
+					return item
+				}
+			}
+		}
+		// Multi-Category Config
+		if item.CategoryIDs != nil {
+			for _, subcategory := range *item.CategoryIDs {
+				channel, err := bot.State.Channel(m.ChannelID)
+				if err == nil {
+					if channel.ParentID == subcategory {
+						if item.CategoryBlacklist != nil {
+							if stringInSlice(channel.ParentID, *item.CategoryBlacklist) {
+								return emptyConfig
+							}
+						}
+						return item
+					}
+				}
+			}
+		}
+	}
+
+	// Server
 	for _, item := range config.Servers {
 		if item.ServerID != "" {
 			guild, err := bot.State.Guild(item.ServerID)
 			if err == nil {
 				for _, channel := range guild.Channels {
-					if ChannelID == channel.ID {
+					if m.ChannelID == channel.ID || isNestedMessage(m, channel.ID) {
+						// Channel Blacklisting within Server
+						if item.ServerBlacklist != nil {
+							if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
+								return emptyConfig
+							}
+							// Categories
+							if channel.ParentID != "" {
+								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
+									return emptyConfig
+								}
+							}
+						}
 						return item
 					}
 				}
@@ -981,7 +1138,19 @@ func getChannelConfig(ChannelID string) configurationChannel {
 				guild, err := bot.State.Guild(subserver)
 				if err == nil {
 					for _, channel := range guild.Channels {
-						if ChannelID == channel.ID {
+						if m.ChannelID == channel.ID || isNestedMessage(m, channel.ID) {
+							// Channel Blacklisting within Servers
+							if item.ServerBlacklist != nil {
+								if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
+									return emptyConfig
+								}
+								// Categories
+								if channel.ParentID != "" {
+									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
+										return emptyConfig
+									}
+								}
+							}
 							return item
 						}
 					}
@@ -989,10 +1158,53 @@ func getChannelConfig(ChannelID string) configurationChannel {
 			}
 		}
 	}
+
+	// User Config
+	for _, item := range config.Users {
+		if item.UserID != "" {
+			if m.Author.ID == item.UserID {
+				return item
+			}
+		}
+		// Multi-User Config
+		if item.UserIDs != nil {
+			for _, subuser := range *item.UserIDs {
+				if m.Author.ID == subuser {
+					return item
+				}
+			}
+		}
+	}
+
+	// All
 	if config.All != nil {
+		if config.AllBlacklistChannels != nil {
+			if stringInSlice(m.ChannelID, *config.AllBlacklistChannels) {
+				return emptyConfig
+			}
+		}
+		if config.AllBlacklistCategories != nil {
+			chinf, err := bot.State.Channel(m.ChannelID)
+			if err == nil {
+				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(m.ChannelID, *config.AllBlacklistCategories) {
+					return emptyConfig
+				}
+			}
+		}
+		if config.AllBlacklistServers != nil {
+			if stringInSlice(m.GuildID, *config.AllBlacklistServers) {
+				return emptyConfig
+			}
+		}
+		if config.AllBlacklistUsers != nil && m.Author != nil {
+			if stringInSlice(m.Author.ID, *config.AllBlacklistUsers) {
+				return emptyConfig
+			}
+		}
 		return *config.All
 	}
-	return configurationChannel{}
+
+	return emptyConfig
 }
 
 func isAdminChannelRegistered(ChannelID string) bool {
@@ -1034,10 +1246,12 @@ func getAdminChannelConfig(ChannelID string) configurationAdminChannel {
 }
 
 func isCommandableChannel(m *discordgo.Message) bool {
+	if config.AllowGeneralCommands {
+		return true
+	}
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if isChannelRegistered(m.ChannelID) {
-		channelConfig := getChannelConfig(m.ChannelID)
+	} else if channelConfig := getSource(m); channelConfig != emptyConfig {
 		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
@@ -1045,11 +1259,28 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	return false
 }
 
-func isGlobalCommandAllowed(m *discordgo.Message) bool {
-	if config.AllowGlobalCommands || isCommandableChannel(m) {
-		return true
+func getBoundUsers() []string {
+	var users []string
+	for _, item := range config.Users {
+		if item.UserID != "" {
+			if !stringInSlice(item.UserID, users) {
+				users = append(users, item.UserID)
+			}
+		} else if item.UserIDs != nil {
+			for _, subuser := range *item.UserIDs {
+				if subuser != "" {
+					if !stringInSlice(subuser, users) {
+						users = append(users, subuser)
+					}
+				}
+			}
+		}
 	}
-	return false
+	return users
+}
+
+func getBoundUsersCount() int {
+	return len(getBoundUsers())
 }
 
 func getBoundServers() []string {
@@ -1098,6 +1329,86 @@ func getBoundChannels() []string {
 
 func getBoundChannelsCount() int {
 	return len(getBoundChannels())
+}
+
+func getBoundCategories() []string {
+	var categories []string
+	for _, item := range config.Categories {
+		if item.CategoryID != "" {
+			if !stringInSlice(item.CategoryID, categories) {
+				categories = append(categories, item.CategoryID)
+			}
+		} else if item.CategoryIDs != nil {
+			for _, subcategory := range *item.CategoryIDs {
+				if subcategory != "" {
+					if !stringInSlice(subcategory, categories) {
+						categories = append(categories, subcategory)
+					}
+				}
+			}
+		}
+	}
+	return categories
+}
+
+func getBoundCategoriesCount() int {
+	return len(getBoundCategories())
+}
+
+func getAllRegisteredChannels() []string {
+	var channels []string
+	if config.All != nil { // ALL MODE
+		for _, guild := range bot.State.Guilds {
+			if config.AllBlacklistServers != nil {
+				if stringInSlice(guild.ID, *config.AllBlacklistServers) {
+					continue
+				}
+			}
+			for _, channel := range guild.Channels {
+				if r := getSource(&discordgo.Message{ChannelID: channel.ID}); r == emptyConfig { // easier than redoing it all but way less efficient, im lazy
+					continue
+				} else {
+					if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+						channels = append(channels, channel.ID)
+					}
+				}
+			}
+		}
+	} else { // STANDARD MODE
+		// Compile all config channels
+		for _, channel := range config.Channels {
+			if channel.ChannelIDs != nil {
+				channels = append(channels, *channel.ChannelIDs...)
+			} else if isNumeric(channel.ChannelID) {
+				channels = append(channels, channel.ChannelID)
+			}
+		}
+		// Compile all channels sourced from config servers
+		for _, server := range config.Servers {
+			if server.ServerIDs != nil {
+				for _, subserver := range *server.ServerIDs {
+					guild, err := bot.State.Guild(subserver)
+					if err == nil {
+						for _, channel := range guild.Channels {
+							if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+								channels = append(channels, channel.ID)
+							}
+						}
+					}
+				}
+			} else if isNumeric(server.ServerID) {
+				guild, err := bot.State.Guild(server.ServerID)
+				if err == nil {
+					for _, channel := range guild.Channels {
+						if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
+							channels = append(channels, channel.ID)
+						}
+					}
+				}
+			}
+		}
+	}
+	return channels
 }
 
 //#endregion

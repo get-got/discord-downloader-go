@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -18,31 +17,34 @@ type fileItem struct {
 	Time     time.Time
 }
 
-var (
-	skipCommands = []string{
-		"skip",
-		"ignore",
-		"don't save",
-		"no save",
-	}
-)
-
 //#region Events
 
+var lastMessageID string
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	handleMessage(m.Message, false, false)
+	if lastMessageID != m.ID {
+		handleMessage(m.Message, false, false)
+	}
+	lastMessageID = m.ID
 }
 
 func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
-	if m.EditedTimestamp != discordgo.Timestamp("") {
-		handleMessage(m.Message, true, false)
+	if lastMessageID != m.ID {
+		if m.EditedTimestamp != nil {
+			handleMessage(m.Message, true, false)
+		}
 	}
+	lastMessageID = m.ID
 }
 
-func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
+func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int64) {
 	// Ignore own messages unless told not to
-	if m.Author.ID == user.ID && !config.ScanOwnMessages {
-		return -1
+	if m.Author.ID == botUser.ID && !config.ScanOwnMessages {
+		return -1, 0
+	}
+
+	if !history && !edited {
+		timeLastMessage = time.Now()
 	}
 
 	// Admin Channel
@@ -59,22 +61,21 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
 		}
 		if edited {
-			log.Println(color.HiGreenString("[ADMIN CHANNEL] "), color.CyanString("Edited [%s]: %s", sendLabel, content))
+			log.Println(lg("Message", "ADMIN CHANNEL", color.CyanString, "Edited [%s]: %s", sendLabel, content))
 		} else {
-			log.Println(color.HiGreenString("[ADMIN CHANNEL] "), color.CyanString("Message [%s]: %s", sendLabel, content))
+			log.Println(lg("Message", "ADMIN CHANNEL", color.CyanString, "[%s]: %s", sendLabel, content))
 		}
 	}
 
 	// Registered Channel
-	if isChannelRegistered(m.ChannelID) {
-		channelConfig := getChannelConfig(m.ChannelID)
+	if channelConfig := getSource(m); channelConfig != emptyConfig {
 		// Ignore bots if told to do so
 		if m.Author.Bot && *channelConfig.IgnoreBots {
-			return -1
+			return -1, 0
 		}
 		// Ignore if told so by config
 		if (!history && !*channelConfig.Enabled) || (edited && !*channelConfig.ScanEdits) {
-			return -1
+			return -1, 0
 		}
 
 		m = fixMessage(m)
@@ -87,13 +88,20 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			)
 			content := m.Content
 			if len(m.Attachments) > 0 {
-				content = content + fmt.Sprintf(" (%d attachments)", len(m.Attachments))
+				content += fmt.Sprintf(" \t[%d attachments]", len(m.Attachments))
 			}
+			content += fmt.Sprintf(" \t<%s>", m.ID)
 
-			if edited {
-				log.Println(color.CyanString("Edited [%s]: %s", sendLabel, content))
-			} else {
-				log.Println(color.CyanString("Message [%s]: %s", sendLabel, content))
+			if !history || config.MessageOutputHistory {
+				addOut := ""
+				if history && config.MessageOutputHistory && !m.Timestamp.IsZero() {
+					addOut = fmt.Sprintf(" @ %s", m.Timestamp.String()[:19])
+				}
+				if edited {
+					log.Println(lg("Message", "", color.CyanString, "Edited [%s%s]: %s", sendLabel, addOut, content))
+				} else {
+					log.Println(lg("Message", "", color.CyanString, "[%s%s]: %s", sendLabel, addOut, content))
+				}
 			}
 		}
 
@@ -101,14 +109,14 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 		if channelConfig.LogMessages != nil {
 			if channelConfig.LogMessages.Destination != "" {
 				logPath := channelConfig.LogMessages.Destination
-				if *channelConfig.LogMessages.DestinationIsFolder == true {
+				if *channelConfig.LogMessages.DestinationIsFolder {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Messages"
-						if *channelConfig.LogMessages.DivideLogsByServer == true {
+						if *channelConfig.LogMessages.DivideLogsByServer {
 							if m.GuildID == "" {
 								ch, err := bot.State.Channel(m.ChannelID)
 								if err == nil {
@@ -126,17 +134,17 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 								logPath += " SID_" + m.GuildID
 							}
 						}
-						if *channelConfig.LogMessages.DivideLogsByChannel == true {
+						if *channelConfig.LogMessages.DivideLogsByChannel {
 							logPath += " CID_" + m.ChannelID
 						}
-						if *channelConfig.LogMessages.DivideLogsByUser == true {
+						if *channelConfig.LogMessages.DivideLogsByUser {
 							logPath += " UID_" + m.Author.ID
 						}
 					}
 					logPath += ".txt"
 				}
 				// Read
-				currentLog, err := ioutil.ReadFile(logPath)
+				currentLog, err := os.ReadFile(logPath)
 				currentLogS := ""
 				if err == nil {
 					currentLogS = string(currentLog)
@@ -155,7 +163,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					// Writer
 					f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 					if err != nil {
-						log.Println(color.RedString("[channelConfig.LogMessages] Failed to open log file:\t%s", err))
+						log.Println(lg("Message", "", color.RedString, "[channelConfig.LogMessages] Failed to open log file:\t%s", err))
 						f.Close()
 					}
 					defer f.Close()
@@ -169,7 +177,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					// More Data
 					additionalInfo := ""
 					if channelConfig.LogMessages.UserData != nil {
-						if *channelConfig.LogMessages.UserData == true {
+						if *channelConfig.LogMessages.UserData {
 							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID, m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Timestamp)
 						}
 					}
@@ -190,7 +198,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					}
 
 					if _, err = f.WriteString(newLine); err != nil {
-						log.Println(color.RedString("[channelConfig.LogMessages] Failed to append file:\t%s", err))
+						log.Println(lg("Message", "", color.RedString, "[channelConfig.LogMessages] Failed to append file:\t%s", err))
 					}
 				}
 			}
@@ -204,8 +212,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				channelConfig.Filters.AllowedUsers != nil ||
 				channelConfig.Filters.AllowedRoles != nil {
 				shouldAbort = true
-				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("Filter will be ignoring by default..."))
+				if config.Debug {
+					log.Println(lg("Debug", "Message", color.YellowString,
+						"%s Filter will be ignoring by default...",
+						color.HiMagentaString("(FILTER)")))
 				}
 			}
 
@@ -213,8 +223,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				for _, phrase := range *channelConfig.Filters.BlockedPhrases {
 					if strings.Contains(m.Content, phrase) {
 						shouldAbort = true
-						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedPhrases found \"%s\" in message, planning to abort...", phrase))
+						if config.Debug {
+							log.Println(lg("Debug", "Message", color.YellowString,
+								"%s blockedPhrases found \"%s\" in message, planning to abort...",
+								color.HiMagentaString("(FILTER)"), phrase))
 						}
 						break
 					}
@@ -224,8 +236,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 				for _, phrase := range *channelConfig.Filters.AllowedPhrases {
 					if strings.Contains(m.Content, phrase) {
 						shouldAbort = false
-						if config.DebugOutput {
-							log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedPhrases found \"%s\" in message, planning to process...", phrase))
+						if config.Debug {
+							log.Println(lg("Debug", "Message", color.YellowString,
+								"%s allowedPhrases found \"%s\" in message, planning to process...",
+								color.HiMagentaString("(FILTER)"), phrase))
 						}
 						break
 					}
@@ -235,16 +249,20 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 			if channelConfig.Filters.BlockedUsers != nil {
 				if stringInSlice(m.Author.ID, *channelConfig.Filters.BlockedUsers) {
 					shouldAbort = true
-					if config.DebugOutput {
-						log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedUsers caught %s, planning to abort...", m.Author.ID))
+					if config.Debug {
+						log.Println(lg("Debug", "Message", color.YellowString,
+							"%s blockedUsers caught %s, planning to abort...",
+							color.HiMagentaString("(FILTER)"), m.Author.ID))
 					}
 				}
 			}
 			if channelConfig.Filters.AllowedUsers != nil {
 				if stringInSlice(m.Author.ID, *channelConfig.Filters.AllowedUsers) {
 					shouldAbort = false
-					if config.DebugOutput {
-						log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedUsers caught %s, planning to process...", m.Author.ID))
+					if config.Debug {
+						log.Println(lg("Debug", "Message", color.YellowString,
+							"%s allowedUsers caught %s, planning to process...",
+							color.HiMagentaString("(FILTER)"), m.Author.ID))
 					}
 				}
 			}
@@ -258,8 +276,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					for _, role := range member.Roles {
 						if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
 							shouldAbort = true
-							if config.DebugOutput {
-								log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("blockedRoles caught %s, planning to abort...", role))
+							if config.Debug {
+								log.Println(lg("Debug", "Message", color.YellowString,
+									"%s blockedRoles caught %s, planning to abort...",
+									color.HiMagentaString("(FILTER)"), role))
 							}
 							break
 						}
@@ -275,8 +295,10 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 					for _, role := range member.Roles {
 						if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
 							shouldAbort = false
-							if config.DebugOutput {
-								log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.YellowString("allowedRoles caught %s, planning to allow...", role))
+							if config.Debug {
+								log.Println(lg("Debug", "Message", color.YellowString,
+									"%s allowedRoles caught %s, planning to allow...",
+									color.HiMagentaString("(FILTER)"), role))
 							}
 							break
 						}
@@ -286,59 +308,45 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) int64 {
 
 			// Abort
 			if shouldAbort {
-				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.HiYellowString("Filter decided to ignore message..."))
+				if config.Debug {
+					log.Println(lg("Debug", "Message", color.YellowString,
+						"%s Filter decided to ignore message...",
+						color.HiMagentaString("(FILTER)")))
 				}
-				return -1
-			} /*else {
-				if config.DebugOutput {
-					log.Println(logPrefixDebug, color.HiMagentaString("(FILTER)"), color.HiYellowString("Filter approved message..."))
-				}
-			}*/
-		}
-
-		// Skipping
-		canSkip := config.AllowSkipping
-		if channelConfig.OverwriteAllowSkipping != nil {
-			canSkip = *channelConfig.OverwriteAllowSkipping
-		}
-		if canSkip {
-			for _, cmd := range skipCommands {
-				if m.Content == cmd {
-					log.Println(color.HiYellowString("Message handling skipped due to use of skip command."))
-					return -1
-				}
+				return -1, 0
 			}
 		}
 
 		// Process Files
-		var downloadCount int64
+		var downloadCount int64 = 0
+		var totalfilesize int64 = 0
 		files := getFileLinks(m)
 		for _, file := range files {
 			if file.Link == "" {
 				continue
 			}
-			if config.DebugOutput {
-				log.Println(logPrefixDebug, color.CyanString("FOUND FILE: "+file.Link))
+			if config.Debug && (!history || config.MessageOutputHistory) {
+				log.Println(lg("Debug", "Message", color.HiCyanString, "FOUND FILE: "+file.Link+fmt.Sprintf(" \t<%s>", m.ID)))
 			}
-			status := startDownload(
-				downloadRequestStruct{
-					InputURL:   file.Link,
-					Filename:   file.Filename,
-					Path:       channelConfig.Destination,
-					Message:    m,
-					FileTime:   file.Time,
-					HistoryCmd: history,
-					EmojiCmd:   false,
-				})
+			status, filesize := downloadRequestStruct{
+				InputURL:   file.Link,
+				Filename:   file.Filename,
+				Path:       channelConfig.Destination,
+				Message:    m,
+				FileTime:   file.Time,
+				HistoryCmd: history,
+				EmojiCmd:   false,
+				StartTime:  time.Now(),
+			}.handleDownload()
 			if status.Status == downloadSuccess {
 				downloadCount++
+				totalfilesize += filesize
 			}
 		}
-		return downloadCount
+		return downloadCount, totalfilesize
 	}
 
-	return -1
+	return -1, 0
 }
 
 //#endregion

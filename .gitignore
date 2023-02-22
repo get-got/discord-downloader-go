@@ -11,9 +11,15 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Exclude subdirectories (things like database, saved images during testing)
-/**
 # Exclude build command shortcut(s)
 *.cmd
-# Exclude own settings
-settings.json
+
+# Exclude runnning dev settings
+/*.json
+/*.jsonc
+
+# Exclude program output
+*.txt
+
+# Exclude program storage
+**

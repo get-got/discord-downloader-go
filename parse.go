@@ -12,19 +12,9 @@ import (
 	"time"
 
 	"github.com/ChimeraCoder/anaconda"
-	"github.com/Jeffail/gabs"
+	"github.com/Davincible/goinsta/v3"
 	"github.com/PuerkitoBio/goquery"
-	"golang.org/x/net/html"
-	"google.golang.org/api/googleapi"
-)
-
-const (
-	imgurClientID   = "08af502a9e70d65"
-	sneakyUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
-)
-
-var (
-	twitterClient *anaconda.TwitterApi
+	"github.com/bwmarrin/discordgo"
 )
 
 //#region Twitter
@@ -32,14 +22,21 @@ var (
 func getTwitterUrls(inputURL string) (map[string]string, error) {
 	parts := strings.Split(inputURL, ":")
 	if len(parts) < 2 {
-		return nil, errors.New("Unable to parse Twitter URL")
+		return nil, errors.New("unable to parse Twitter URL")
 	}
 	return map[string]string{"https:" + parts[1] + ":orig": filenameFromURL(parts[1])}, nil
 }
 
-func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string, error) {
+func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]string, error) {
 	if twitterClient == nil {
-		return nil, errors.New("Invalid Twitter API Keys Set")
+		return nil, errors.New("invalid Twitter API credentials")
+	}
+
+	if strings.Contains(inputURL, "/photo/") {
+		inputURL = inputURL[:strings.Index(inputURL, "/photo/")]
+	}
+	if strings.Contains(inputURL, "/video/") {
+		inputURL = inputURL[:strings.Index(inputURL, "/video/")]
 	}
 
 	matches := regexUrlTwitterStatus.FindStringSubmatch(inputURL)
@@ -66,14 +63,14 @@ func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string,
 				links[lastVideoVariant.Url] = ""
 			}
 		} else {
-			foundUrls := getDownloadLinks(tweetMedia.Media_url_https, channelID)
+			foundUrls := getDownloadLinks(tweetMedia.Media_url_https, m)
 			for foundUrlKey, foundUrlValue := range foundUrls {
 				links[foundUrlKey] = foundUrlValue
 			}
 		}
 	}
 	for _, tweetUrl := range tweet.Entities.Urls {
-		foundUrls := getDownloadLinks(tweetUrl.Expanded_url, channelID)
+		foundUrls := getDownloadLinks(tweetUrl.Expanded_url, m)
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}
@@ -86,177 +83,53 @@ func getTwitterStatusUrls(inputURL string, channelID string) (map[string]string,
 
 //#region Instagram
 
-func getInstagramUrls(url string) (map[string]string, error) {
-	username, shortcode := getInstagramInfo(url)
-	filename := fmt.Sprintf("instagram %s - %s", username, shortcode)
-	// if instagram video
-	videoUrl := getInstagramVideoUrl(url)
-	if videoUrl != "" {
-		return map[string]string{videoUrl: filename + filepathExtension(videoUrl)}, nil
-	}
-	// if instagram album
-	albumUrls := getInstagramAlbumUrls(url)
-	if len(albumUrls) > 0 {
-		links := make(map[string]string)
-		for i, albumUrl := range albumUrls {
-			links[albumUrl] = filename + " " + strconv.Itoa(i+1) + filepathExtension(albumUrl)
-		}
-		return links, nil
-	}
-	// if instagram picture
-	afterLastSlash := strings.LastIndex(url, "/")
-	mediaUrl := url[:afterLastSlash]
-	mediaUrl += strings.Replace(strings.Replace(url[afterLastSlash:], "?", "&", -1), "/", "/media/?size=l", -1)
-	return map[string]string{mediaUrl: filename + ".jpg"}, nil
-}
-
-func getInstagramInfo(url string) (string, string) {
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return "unknown", "unknown"
+func getInstagramUrls(inputURL string, m *discordgo.Message) (map[string]string, error) {
+	if instagramClient == nil {
+		return nil, errors.New("invalid Instagram API credentials")
 	}
 
-	defer resp.Body.Close()
-	z := html.NewTokenizer(resp.Body)
+	links := make(map[string]string)
 
-ParseLoop:
-	for {
-		tt := z.Next()
-		switch {
-		case tt == html.ErrorToken:
-			break ParseLoop
-		}
-		if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
-			t := z.Token()
-			for _, a := range t.Attr {
-				if a.Key == "type" {
-					if a.Val == "text/javascript" {
-						z.Next()
-						content := string(z.Text())
-						if strings.Contains(content, "window._sharedData = ") {
-							content = strings.Replace(content, "window._sharedData = ", "", 1)
-							content = content[:len(content)-1]
-							jsonParsed, err := gabs.ParseJSON([]byte(content))
-							if err != nil {
-								log.Println("Error parsing instagram json:", err)
-								continue ParseLoop
-							}
-							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
-							if err != nil {
-								log.Println("Unable to find entries children:", err)
-								continue ParseLoop
-							}
-							for _, entryChild := range entryChildren {
-								shortcode := entryChild.Path("graphql.shortcode_media.shortcode").Data().(string)
-								username := entryChild.Path("graphql.shortcode_media.owner.username").Data().(string)
-								return username, shortcode
-							}
-						}
+	// fix
+	shortcode := inputURL
+	if strings.Contains(shortcode, ".com/p/") {
+		shortcode = shortcode[strings.Index(shortcode, ".com/p/")+7:]
+	}
+	if strings.Contains(shortcode, ".com/reel/") {
+		shortcode = shortcode[strings.Index(shortcode, ".com/reel/")+10:]
+	}
+	shortcode = strings.ReplaceAll(shortcode, "/", "")
+
+	// fetch
+	mediaID, err := goinsta.MediaIDFromShortID(shortcode)
+	if err == nil {
+		media, err := instagramClient.GetMedia(mediaID)
+		if err != nil {
+			return nil, err
+		} else {
+			postType := media.Items[0].MediaToString()
+			if postType == "carousel" {
+				for index, item := range media.Items[0].CarouselMedia {
+					itemType := item.MediaToString()
+					if itemType == "video" {
+						url := item.Videos[0].URL
+						links[url] = fmt.Sprintf("%s %d %s", shortcode, index, media.Items[0].User.Username)
+					} else if itemType == "photo" {
+						url := item.Images.GetBest()
+						links[url] = fmt.Sprintf("%s %d %s", shortcode, index, media.Items[0].User.Username)
 					}
 				}
+			} else if postType == "video" {
+				url := media.Items[0].Videos[0].URL
+				links[url] = fmt.Sprintf("%s %s", shortcode, media.Items[0].User.Username)
+			} else if postType == "photo" {
+				url := media.Items[0].Images.GetBest()
+				links[url] = fmt.Sprintf("%s %s", shortcode, media.Items[0].User.Username)
 			}
 		}
 	}
-	return "unknown", "unknown"
-}
 
-func getInstagramVideoUrl(url string) string {
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return ""
-	}
-
-	defer resp.Body.Close()
-	z := html.NewTokenizer(resp.Body)
-
-	for {
-		tt := z.Next()
-		switch {
-		case tt == html.ErrorToken:
-			return ""
-		}
-		if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
-			t := z.Token()
-			if t.Data == "meta" {
-				for _, a := range t.Attr {
-					if a.Key == "property" {
-						if a.Val == "og:video" || a.Val == "og:video:secure_url" {
-							for _, at := range t.Attr {
-								if at.Key == "content" {
-									return at.Val
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-func getInstagramAlbumUrls(url string) []string {
-	var links []string
-	resp, err := http.Get(url)
-
-	if err != nil {
-		return links
-	}
-
-	defer resp.Body.Close()
-	z := html.NewTokenizer(resp.Body)
-
-ParseLoop:
-	for {
-		tt := z.Next()
-		switch {
-		case tt == html.ErrorToken:
-			break ParseLoop
-		}
-		if tt == html.StartTagToken || tt == html.SelfClosingTagToken {
-			t := z.Token()
-			for _, a := range t.Attr {
-				if a.Key == "type" {
-					if a.Val == "text/javascript" {
-						z.Next()
-						content := string(z.Text())
-						if strings.Contains(content, "window._sharedData = ") {
-							content = strings.Replace(content, "window._sharedData = ", "", 1)
-							content = content[:len(content)-1]
-							jsonParsed, err := gabs.ParseJSON([]byte(content))
-							if err != nil {
-								log.Println("Error parsing instagram json: ", err)
-								continue ParseLoop
-							}
-							entryChildren, err := jsonParsed.Path("entry_data.PostPage").Children()
-							if err != nil {
-								log.Println("Unable to find entries children: ", err)
-								continue ParseLoop
-							}
-							for _, entryChild := range entryChildren {
-								albumChildren, err := entryChild.Path("graphql.shortcode_media.edge_sidecar_to_children.edges").Children()
-								if err != nil {
-									continue ParseLoop
-								}
-								for _, albumChild := range albumChildren {
-									link, ok := albumChild.Path("node.display_url").Data().(string)
-									if ok {
-										links = append(links, link)
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	if len(links) > 0 {
-		log.Printf("Found instagram album with %d images (url: %s)\n", len(links), url)
-	}
-
-	return links
+	return links, nil
 }
 
 //#endregion
@@ -323,13 +196,13 @@ func getStreamableUrls(url string) (map[string]string, error) {
 	matches := regexUrlStreamable.FindStringSubmatch(url)
 	shortcode := matches[3]
 	if shortcode == "" {
-		return nil, errors.New("Unable to get shortcode from URL")
+		return nil, errors.New("unable to get shortcode from URL")
 	}
 	reqUrl := fmt.Sprintf("https://api.streamable.com/videos/%s", shortcode)
 	streamable := new(streamableObject)
 	getJSON(reqUrl, streamable)
 	if streamable.Status != 2 || streamable.Files.Mp4.URL == "" {
-		return nil, errors.New("Streamable object has no download candidate")
+		return nil, errors.New("streamable object has no download candidate")
 	}
 	link := streamable.Files.Mp4.URL
 	if !strings.HasPrefix(link, "http") {
@@ -353,14 +226,14 @@ type gfycatObject struct {
 func getGfycatUrls(url string) (map[string]string, error) {
 	parts := strings.Split(url, "/")
 	if len(parts) < 3 {
-		return nil, errors.New("Unable to parse Gfycat URL")
+		return nil, errors.New("unable to parse Gfycat URL")
 	}
 	gfycatId := parts[len(parts)-1]
 	gfycatObject := new(gfycatObject)
 	getJSON("https://api.gfycat.com/v1/gfycats/"+gfycatId, gfycatObject)
 	gfycatUrl := gfycatObject.GfyItem.Mp4URL
 	if url == "" {
-		return nil, errors.New("Failed to read response from Gfycat")
+		return nil, errors.New("failed to read response from Gfycat")
 	}
 	return map[string]string{gfycatUrl: ""}, nil
 }
@@ -371,8 +244,8 @@ func getGfycatUrls(url string) (map[string]string, error) {
 
 type flickrPhotoSizeObject struct {
 	Label  string `json:"label"`
-	Width  int    `json:"width,int,string"`
-	Height int    `json:"height,int,string"`
+	Width  int    `json:"width"`
+	Height int    `json:"height"`
 	Source string `json:"source"`
 	URL    string `json:"url"`
 	Media  string `json:"media"`
@@ -408,12 +281,12 @@ func getFlickrUrlFromPhotoId(photoId string) string {
 
 func getFlickrPhotoUrls(url string) (map[string]string, error) {
 	if config.Credentials.FlickrApiKey == "" {
-		return nil, errors.New("Invalid Flickr API Key Set")
+		return nil, errors.New("invalid Flickr API Key Set")
 	}
 	matches := regexUrlFlickrPhoto.FindStringSubmatch(url)
 	photoId := matches[5]
 	if photoId == "" {
-		return nil, errors.New("Unable to get Photo ID from URL")
+		return nil, errors.New("unable to get Photo ID from URL")
 	}
 	return map[string]string{getFlickrUrlFromPhotoId(photoId): ""}, nil
 }
@@ -447,15 +320,15 @@ type flickrAlbumObject struct {
 
 func getFlickrAlbumUrls(url string) (map[string]string, error) {
 	if config.Credentials.FlickrApiKey == "" {
-		return nil, errors.New("Invalid Flickr API Key Set")
+		return nil, errors.New("invalid Flickr API Key Set")
 	}
 	matches := regexUrlFlickrAlbum.FindStringSubmatch(url)
 	if len(matches) < 10 || matches[9] == "" {
-		return nil, errors.New("Unable to find Flickr Album ID in URL")
+		return nil, errors.New("unable to find Flickr Album ID in URL")
 	}
 	albumId := matches[9]
 	if albumId == "" {
-		return nil, errors.New("Unable to get Album ID from URL")
+		return nil, errors.New("unable to get Album ID from URL")
 	}
 	reqUrl := fmt.Sprintf("https://www.flickr.com/services/rest/?format=json&nojsoncallback=1&method=%s&api_key=%s&photoset_id=%s&per_page=500",
 		"flickr.photosets.getPhotos", config.Credentials.FlickrApiKey, albumId)
@@ -476,61 +349,7 @@ func getFlickrAlbumShortUrls(url string) (map[string]string, error) {
 	if regexUrlFlickrAlbum.MatchString(result.Request.URL.String()) {
 		return getFlickrAlbumUrls(result.Request.URL.String())
 	}
-	return nil, errors.New("Encountered invalid URL while trying to get long URL from short Flickr Album URL")
-}
-
-//#endregion
-
-//#region Google Drive
-
-func getGoogleDriveUrls(url string) (map[string]string, error) {
-	parts := strings.Split(url, "/")
-	if len(parts) != 7 {
-		return nil, errors.New("unable to parse google drive url")
-	}
-	fileId := parts[len(parts)-2]
-	return map[string]string{"https://drive.google.com/uc?export=download&id=" + fileId: ""}, nil
-}
-
-func getGoogleDriveFolderUrls(url string) (map[string]string, error) {
-	matches := regexUrlGoogleDriveFolder.FindStringSubmatch(url)
-	if len(matches) < 4 || matches[3] == "" {
-		return nil, errors.New("unable to find google drive folder ID in link")
-	}
-	if googleDriveService.BasePath == "" {
-		return nil, errors.New("please set up google credentials")
-	}
-	googleDriveFolderID := matches[3]
-
-	links := make(map[string]string)
-
-	driveQuery := fmt.Sprintf("\"%s\" in parents", googleDriveFolderID)
-	driveFields := "nextPageToken, files(id)"
-	result, err := googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).Do()
-	if err != nil {
-		log.Println("driveQuery:", driveQuery)
-		log.Println("driveFields:", driveFields)
-		log.Println("err:", err)
-		return nil, err
-	}
-	for _, file := range result.Files {
-		fileUrl := "https://drive.google.com/uc?export=download&id=" + file.Id
-		links[fileUrl] = ""
-	}
-
-	for {
-		if result.NextPageToken == "" {
-			break
-		}
-		result, err = googleDriveService.Files.List().Q(driveQuery).Fields(googleapi.Field(driveFields)).PageSize(1000).PageToken(result.NextPageToken).Do()
-		if err != nil {
-			return nil, err
-		}
-		for _, file := range result.Files {
-			links[file.Id] = ""
-		}
-	}
-	return links, nil
+	return nil, errors.New("encountered invalid URL while trying to get long URL from short Flickr Album URL")
 }
 
 //#endregion
@@ -608,9 +427,7 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 	doc.Find(".article img, #content img, div[role=main] img, .section_blogview img").Each(func(i int, s *goquery.Selection) {
 		foundUrl, exists := s.Attr("src")
 		if exists {
-			isTistoryCdnUrl := regexUrlTistoryLegacyWithCDN.MatchString(foundUrl)
-			isTistoryUrl := regexUrlTistoryLegacy.MatchString(foundUrl)
-			if isTistoryCdnUrl == true {
+			if regexUrlTistoryLegacyWithCDN.MatchString(foundUrl) {
 				finalTistoryUrls, _ := getTistoryWithCDNUrls(foundUrl)
 				if len(finalTistoryUrls) > 0 {
 					for finalTistoryUrl := range finalTistoryUrls {
@@ -618,7 +435,7 @@ func getPossibleTistorySiteUrls(url string) (map[string]string, error) {
 						links[finalTistoryUrl] = foundFilename
 					}
 				}
-			} else if isTistoryUrl == true {
+			} else if regexUrlTistoryLegacy.MatchString(foundUrl) {
 				finalTistoryUrls, _ := getLegacyTistoryUrls(foundUrl)
 				if len(finalTistoryUrls) > 0 {
 					for finalTistoryUrl := range finalTistoryUrls {
@@ -649,13 +466,16 @@ type redditThreadObject []struct {
 }
 
 func getRedditPostUrls(link string) (map[string]string, error) {
+	if strings.Contains(link, "?") {
+		link = link[:strings.Index(link, "?")]
+	}
 	redditThread := new(redditThreadObject)
 	headers := make(map[string]string)
 	headers["Accept-Encoding"] = "identity"
 	headers["User-Agent"] = sneakyUserAgent
 	err := getJSONwithHeaders(link+".json", redditThread, headers)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to parse json from reddit post:\t%s", err)
+		return nil, fmt.Errorf("failed to parse json from reddit post:\t%s", err)
 	}
 
 	redditPost := (*redditThread)[0].Data.Children.([]interface{})[0].(map[string]interface{})
@@ -665,34 +485,6 @@ func getRedditPostUrls(link string) (map[string]string, error) {
 		filename := fmt.Sprintf("Reddit-%s_%s %s", redditPostData["subreddit"].(string), redditPostData["id"].(string), filenameFromURL(redditLink))
 		return map[string]string{redditLink: filename}, nil
 	}
-	return nil, nil
-}
-
-//#endregion
-
-//#region Mastodon
-
-func getMastodonPostUrls(link string) (map[string]string, error) {
-	var post map[string]interface{}
-	err := getJSON(link+".json", &post)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse json from mastodon post:\t%s", err)
-	}
-	// Check for returned error
-	if errmsg, exists := post["error"]; exists {
-		return nil, fmt.Errorf("Mastodon JSON returned an error:\t%s", errmsg)
-	}
-
-	// Check validity
-	if attachments, exists := post["attachment"]; exists {
-		files := make(map[string]string)
-		for _, attachmentObj := range attachments.([]interface{}) {
-			attachment := attachmentObj.(map[string]interface{})
-			files[attachment["url"].(string)] = ""
-		}
-		return files, nil
-	}
-
 	return nil, nil
 }
 

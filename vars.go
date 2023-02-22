@@ -2,14 +2,12 @@ package main
 
 import (
 	"os"
-
-	"github.com/fatih/color"
 )
 
 const (
 	projectName    = "discord-downloader-go"
-	projectLabel   = "Discord Downloader"
-	projectVersion = "1.6.9-dev"
+	projectLabel   = "Discord Downloader GO"
+	projectVersion = "2.0.0-beta.11" // follows Semantic Versioning, (http://semver.org/)
 	projectIcon    = "https://cdn.discordapp.com/icons/780985109608005703/9dc25f1b91e6d92664590254e0797fad.webp?size=256"
 
 	projectRepo          = "get-got/discord-downloader-go"
@@ -17,47 +15,27 @@ const (
 	projectReleaseURL    = projectRepoURL + "/releases/latest"
 	projectReleaseApiURL = "https://api.github.com/repos/" + projectRepo + "/releases/latest"
 
-	configFileBase   = "settings"
-	databasePath     = "database"
-	cachePath        = "cache"
-	historyCachePath = cachePath + string(os.PathSeparator) + "history"
-	imgStorePath     = cachePath + string(os.PathSeparator) + "imgStore"
-	constantsPath    = cachePath + string(os.PathSeparator) + "constants.json"
+	databasePath = "database"
+
+	cachePath          = "cache"
+	historyCachePath   = cachePath + string(os.PathSeparator) + "history"
+	historyCacheBefore = historyCachePath + string(os.PathSeparator) + "before"
+	historyCacheSince  = historyCachePath + string(os.PathSeparator) + "since"
+	duploCatalogPath   = cachePath + string(os.PathSeparator) + ".duplo"
+	instagramCachePath = cachePath + string(os.PathSeparator) + "instagram.json"
+	constantsPath      = cachePath + string(os.PathSeparator) + "constants.json"
 
 	defaultReact = "✅"
+
+	limitMsg       = 2000
+	limitEmbedDesc = 4096
 )
 
 var (
-	configFile  string
-	configFileC bool
+	configFileBase = "settings"
+	configFile     string
+	configFileC    bool
 )
-
-// Log prefixes aren't to be used for constant messages where context is obvious.
-var (
-	logPrefixSetup = color.HiGreenString("[Setup]")
-
-	logPrefixDebug = color.HiYellowString("[Debug]")
-
-	logPrefixHistory = color.HiGreenString("[History]")
-	logPrefixInfo    = color.CyanString("[Info]")
-
-	logPrefixDatabase    = color.BlueString("[Database]")
-	logPrefixSettings    = color.GreenString("[Settings]")
-	logPrefixVersion     = color.HiMagentaString("[Version]")
-	logPrefixRegex       = color.HiRedString("[Regex]")
-	logPrefixDiscord     = color.HiBlueString("[Discord]")
-	logPrefixTwitter     = color.HiCyanString("[Twitter]")
-	logPrefixGoogleDrive = color.HiGreenString("[Google Drive]")
-
-	logPrefixFileSkip = color.GreenString(">>> SKIPPING FILE:")
-)
-
-func logPrefixDebugLabel(label string) string {
-	return color.HiYellowString("[Debug: %s]", label)
-}
-func logPrefixErrorLabel(label string) string {
-	return color.HiRedString("[Error: %s]", label)
-}
 
 const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
