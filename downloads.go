@@ -85,50 +85,50 @@ func mDownloadStatus(status downloadStatus, _error ...error) downloadStatusStruc
 func getDownloadStatusString(status downloadStatus) string {
 	switch status {
 	case downloadSuccess:
-		return "Download Succeeded"
+		return "Succeeded"
 	//
 	case downloadIgnored:
-		return "Download Ignored"
+		return "Ignored"
 	//
 	case downloadSkipped:
-		return "Download Skipped"
+		return "Skipped"
 	case downloadSkippedDuplicate:
-		return "Download Skipped - Duplicate"
+		return "Skipped - Duplicate"
 	case downloadSkippedUnpermittedDomain:
-		return "Download Skipped - Unpermitted Domain"
+		return "Skipped - Unpermitted Domain"
 	case downloadSkippedUnpermittedType:
-		return "Download Skipped - Unpermitted File Type"
+		return "Skipped - Unpermitted File Type"
 	case downloadSkippedUnpermittedExtension:
-		return "Download Skipped - Unpermitted File Extension"
+		return "Skipped - Unpermitted File Extension"
 	case downloadSkippedDetectedDuplicate:
-		return "Download Skipped - Detected Duplicate"
+		return "Skipped - Detected Duplicate"
 	//
 	case downloadFailed:
-		return "Download Failed"
+		return "Failed"
 	case downloadFailedCode:
-		return "Download Failed - BAD CONNECTION"
+		return "Failed - BAD CONNECTION"
 	case downloadFailedCode403:
-		return "Download Failed - 403 UNAVAILABLE"
+		return "Failed - 403 UNAVAILABLE"
 	case downloadFailedCode404:
-		return "Download Failed - 404 NOT FOUND"
+		return "Failed - 404 NOT FOUND"
 	case downloadFailedInvalidSource:
-		return "Download Failed - Invalid Source"
+		return "Failed - Invalid Source"
 	case downloadFailedInvalidPath:
-		return "Download Failed - Invalid Path"
+		return "Failed - Invalid Path"
 	case downloadFailedCreatingFolder:
-		return "Download Failed - Error Creating Folder"
+		return "Failed - Error Creating Folder"
 	case downloadFailedRequesting:
-		return "Download Failed - Error Requesting URL Data"
+		return "Failed - Error Requesting"
 	case downloadFailedDownloadingResponse:
-		return "Download Failed - Error Downloading URL Response"
+		return "Failed - Error Downloading Data"
 	case downloadFailedReadResponse:
-		return "Download Failed - Error Reading URL Response"
+		return "Failed - Error Reading Data"
 	case downloadFailedCreatingSubfolder:
-		return "Download Failed - Error Creating Subfolder for Type"
+		return "Failed - Error Mapping Subfolder(s)"
 	case downloadFailedWritingFile:
-		return "Download Failed - Error Writing File"
+		return "Failed - Error Saving File"
 	case downloadFailedWritingDatabase:
-		return "Download Failed - Error Writing to Database"
+		return "Failed - Error Saving to Database"
 	}
 	return "Unknown Error"
 }
