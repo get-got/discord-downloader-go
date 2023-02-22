@@ -45,9 +45,10 @@ const (
 	downloadSkipped
 	downloadSkippedDuplicate
 	downloadSkippedUnpermittedDomain
-	downloadSkippedUnpermittedFilename
-	downloadSkippedUnpermittedType
 	downloadSkippedUnpermittedExtension
+	downloadSkippedUnpermittedFilename
+	downloadSkippedUnpermittedReaction
+	downloadSkippedUnpermittedType
 	downloadSkippedDetectedDuplicate
 
 	downloadFailed
@@ -97,12 +98,14 @@ func getDownloadStatusString(status downloadStatus) string {
 		return "Skipped - Duplicate"
 	case downloadSkippedUnpermittedDomain:
 		return "Skipped - Unpermitted Domain"
-	case downloadSkippedUnpermittedFilename:
-		return "Skipped - Unpermitted Filename Content"
-	case downloadSkippedUnpermittedType:
-		return "Skipped - Unpermitted File Type"
 	case downloadSkippedUnpermittedExtension:
 		return "Skipped - Unpermitted File Extension"
+	case downloadSkippedUnpermittedFilename:
+		return "Skipped - Unpermitted Filename Content"
+	case downloadSkippedUnpermittedReaction:
+		return "Skipped - Unpermitted Message Reaction"
+	case downloadSkippedUnpermittedType:
+		return "Skipped - Unpermitted File Type"
 	case downloadSkippedDetectedDuplicate:
 		return "Skipped - Detected Duplicate"
 	//
@@ -746,6 +749,38 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						"Unpermitted filename content \"%s\"", download.Filename))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedFilename), 0
+			}
+		}
+
+		// Check Reactions
+		if channelConfig.Filters.AllowedReactions != nil || channelConfig.Filters.BlockedReactions != nil {
+			shouldAbort := false
+			if channelConfig.Filters.AllowedReactions != nil {
+				shouldAbort = true
+			}
+
+			if download.Message.Reactions != nil {
+				for _, reaction := range download.Message.Reactions {
+					if channelConfig.Filters.BlockedReactions != nil {
+						if stringInSlice(reaction.Emoji.ID, *channelConfig.Filters.BlockedReactions) {
+							shouldAbort = true
+						}
+					}
+					if channelConfig.Filters.AllowedReactions != nil {
+						if stringInSlice(reaction.Emoji.ID, *channelConfig.Filters.AllowedReactions) {
+							shouldAbort = false
+						}
+					}
+				}
+			}
+
+			// Abort
+			if shouldAbort {
+				if !download.HistoryCmd {
+					log.Println(lg("Download", "Skip", color.GreenString,
+						"Did not meet reaction filter criteria"))
+				}
+				return mDownloadStatus(downloadSkippedUnpermittedReaction), 0
 			}
 		}
 

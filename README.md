@@ -377,14 +377,17 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
         "blockedRoles": [ "" ], // by Discord ID.
         "allowedRoles": [ "" ], // by Discord ID.
 
-        "blockedExtensions": [ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ],
-        "allowedExtensions": [ "" ],
-
         "blockedDomains": [ "" ],
         "allowedDomains": [ "" ],
 
+        "blockedExtensions": [ ".htm", ".html", ".php", ".exe", ".dll", ".bin", ".cmd", ".sh", ".py", ".jar" ],
+        "allowedExtensions": [ "" ],
+
         "blockedFilenames": [ "" ], // List of phrases to check for in original filename, pre-formatting.
-        "allowedFilenames": [ "" ]
+        "allowedFilenames": [ "" ],
+
+        "blockedReactions": [ "" ], // List of reactions to block or allow, by ID only.
+        "allowedReactions": [ "" ]
     },
     // duplicate image filtering
     // caching of image data is stored via a database file; it will not read all pre-existing images.
