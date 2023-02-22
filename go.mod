@@ -8,7 +8,7 @@ require (
 	github.com/Davincible/goinsta/v3 v3.2.6
 	github.com/HouzuoGuo/tiedot v0.0.0-20210905174726-ae1e16866d06
 	github.com/Necroforger/dgrouter v0.0.0-20200517224846-e66453b957c1
-	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/aidarkhanov/nanoid/v2 v2.0.5
 	github.com/bwmarrin/discordgo v0.27.0
 	github.com/dustin/go-humanize v1.0.1
@@ -20,7 +20,7 @@ require (
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0
 	github.com/rivo/duplo v0.0.0-20220703183130-751e882e6b83
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	github.com/wk8/go-ordered-map/v2 v2.1.5
+	github.com/wk8/go-ordered-map/v2 v2.1.6
 	gopkg.in/ini.v1 v1.67.0
 	mvdan.cc/xurls/v2 v2.4.0
 )
@@ -31,7 +31,7 @@ require (
 	github.com/azr/backoff v0.0.0-20160115115103-53511d3c7330 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
-	github.com/chromedp/cdproto v0.0.0-20230208104036-c3c870aa4771 // indirect
+	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9 // indirect
 	github.com/chromedp/chromedp v0.8.7 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -51,7 +51,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.1 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
