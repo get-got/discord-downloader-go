@@ -491,24 +491,20 @@ func handleCommands() *exrouter.Route {
 									"Cache folder inaccessible:\t%s", err))
 							}
 						} else {
-							deleteHistoryCache := func(dirpath string) {
-								fp := dirpath + string(os.PathSeparator) + channel
-								if _, err := os.Stat(fp); err == nil {
-									err = os.RemoveAll(fp)
-									if err != nil {
-										log.Println(lg("Debug", "History", color.HiRedString,
-											"Encountered error deleting cache file for %s:\t%s", channel, err))
-									} else {
-										log.Println(lg("Debug", "History", color.HiGreenString,
-											"Deleted cache file for %s.", channel))
-									}
+							fp := historyCachePath + string(os.PathSeparator) + channel + ".json"
+							if _, err := os.Stat(fp); err == nil {
+								err = os.RemoveAll(fp)
+								if err != nil {
+									log.Println(lg("Debug", "History", color.HiRedString,
+										"Encountered error deleting cache file for %s:\t%s", channel, err))
 								} else {
-									log.Println(lg("Command", "History", color.HiRedString,
-										"Cache folder inaccessible:\t%s", err))
+									log.Println(lg("Debug", "History", color.HiGreenString,
+										"Deleted cache file for %s.", channel))
 								}
+							} else {
+								log.Println(lg("Command", "History", color.HiRedString,
+									"Cache folder inaccessible:\t%s", err))
 							}
-							deleteHistoryCache(historyCacheBefore)
-							deleteHistoryCache(historyCacheSince)
 						}
 					}
 				}

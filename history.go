@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -77,6 +78,14 @@ var (
 	historyJobCntCompleted int
 )
 
+// TODO: cleanup
+type historyCache struct {
+	Updated        time.Time
+	Running        bool
+	RunningBefore  string // messageID for last before range attempted if interrupted
+	CompletedSince string // messageID for last message the bot has 100% assumed completion on (since start of channel)
+}
+
 func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string, before string, since string) int {
 	var err error
 
@@ -88,31 +97,30 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 	logPrefix := fmt.Sprintf("%s/%s: ", subjectChannelID, commander)
 
-	// skip?
+	// Skip?
 	if job, exists := historyJobs.Get(subjectChannelID); exists && job.Status != historyStatusWaiting {
 		log.Println(lg("History", "", color.RedString, logPrefix+"History job skipped, Status: %s", historyStatusLabel(job.Status)))
 		return -1
 	}
 
+	// Vars
 	var totalMessages int64 = 0
 	var totalDownloads int64 = 0
 	var totalFilesize int64 = 0
 	var messageRequestCount int = 0
-
 	var responseMsg *discordgo.Message = &discordgo.Message{}
 	responseMsg.ID = ""
 	responseMsg.ChannelID = subjectChannelID
 	responseMsg.GuildID = ""
+	var channelinfo *discordgo.Channel
+	if channelinfo, err = bot.State.Channel(subjectChannelID); err != nil {
+		log.Println(lg("History", "", color.HiRedString, logPrefix+"ERROR FETCHING BOT STATE FROM DISCORDGO!!!\t%s", err))
+	}
 
 	// Send Status?
 	var sendStatus bool = true
 	if (autorun && !config.SendAutoHistoryStatus) || (!autorun && !config.SendHistoryStatus) {
 		sendStatus = false
-	}
-
-	var channelinfo *discordgo.Channel
-	if channelinfo, err = bot.State.Channel(subjectChannelID); err != nil {
-		log.Println(lg("History", "", color.HiRedString, logPrefix+"ERROR FETCHING BOT STATE FROM DISCORDGO!!!\t%s", err))
 	}
 
 	// Check Read History perms
@@ -138,36 +146,50 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	//#region Cache Files
-	openHistoryCache := func(dirpath string, output *string) {
-		if f, err := os.ReadFile(dirpath + string(os.PathSeparator) + subjectChannelID); err == nil {
-			*output = string(f)
-			if !autorun && config.Debug {
-				log.Println(lg("Debug", "History", color.YellowString,
-					logPrefix+"Found a cache file, picking up where we left off before %s...", string(f)))
+
+	openHistoryCache := func() historyCache {
+		if f, err := os.ReadFile(historyCachePath + string(os.PathSeparator) + subjectChannelID + ".json"); err == nil {
+			var ret historyCache
+			if err = json.Unmarshal(f, &ret); err != nil {
+				log.Println(lg("Debug", "History", color.RedString,
+					logPrefix+"Failed to unmarshal json for cache:\t%s", err))
+			} else {
+				return ret
 			}
 		}
+		return historyCache{}
 	}
-	writeHistoryCache := func(dirpath string, ID string) {
-		if err := os.MkdirAll(dirpath, 0755); err != nil {
-			log.Println(lg("Debug", "History", color.HiRedString,
-				logPrefix+"Error while creating history cache folder \"%s\": %s", dirpath, err))
-		}
-		f, err := os.OpenFile(dirpath+string(os.PathSeparator)+subjectChannelID, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+
+	writeHistoryCache := func(cache historyCache) {
+		cacheJson, err := json.Marshal(cache)
 		if err != nil {
 			log.Println(lg("Debug", "History", color.RedString,
-				logPrefix+"Failed to open cache file:\t%s", err))
+				logPrefix+"Failed to format cache into json:\t%s", err))
+		} else {
+			if err := os.MkdirAll(historyCachePath, 0755); err != nil {
+				log.Println(lg("Debug", "History", color.HiRedString,
+					logPrefix+"Error while creating history cache folder \"%s\": %s", historyCachePath, err))
+			}
+			f, err := os.OpenFile(
+				historyCachePath+string(os.PathSeparator)+subjectChannelID+".json",
+				os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+			if err != nil {
+				log.Println(lg("Debug", "History", color.RedString,
+					logPrefix+"Failed to open cache file:\t%s", err))
+			}
+			if _, err = f.WriteString(string(cacheJson)); err != nil {
+				log.Println(lg("Debug", "History", color.RedString,
+					logPrefix+"Failed to write cache file:\t%s", err))
+			} else if !autorun && config.Debug {
+				log.Println(lg("Debug", "History", color.YellowString,
+					logPrefix+"Wrote to cache file."))
+			}
+			f.Close()
 		}
-		if _, err = f.WriteString(ID); err != nil {
-			log.Println(lg("Debug", "History", color.RedString,
-				logPrefix+"Failed to write cache file:\t%s", err))
-		} else if !autorun && config.Debug {
-			log.Println(lg("Debug", "History", color.YellowString,
-				logPrefix+"Wrote to cache file."))
-		}
-		f.Close()
 	}
-	deleteHistoryCache := func(dirpath string) {
-		fp := dirpath + string(os.PathSeparator) + subjectChannelID
+
+	deleteHistoryCache := func() {
+		fp := historyCachePath + string(os.PathSeparator) + subjectChannelID + ".json"
 		if _, err := os.Stat(fp); err == nil {
 			err = os.Remove(fp)
 			if err != nil {
@@ -179,6 +201,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 		}
 	}
+
 	//#endregion
 
 	// Date Range Vars
@@ -223,9 +246,23 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 		}
 
-		// Open Cache File?
-		openHistoryCache(historyCacheBefore, &beforeID)
-		openHistoryCache(historyCacheSince, &sinceID)
+		// Handle Cache File
+		if cache := openHistoryCache(); cache != (historyCache{}) {
+			if cache.CompletedSince != "" {
+				if config.Debug {
+					log.Println(lg("Debug", "History", color.GreenString,
+						logPrefix+"Assuming history is completed prior to "+cache.CompletedSince))
+				}
+				sinceID = cache.CompletedSince
+			}
+			if cache.Running {
+				if config.Debug {
+					log.Println(lg("Debug", "History", color.YellowString,
+						logPrefix+"Job was interrupted last run, picking up from "+beforeID))
+				}
+				beforeID = cache.RunningBefore
+			}
+		}
 
 		historyStartTime := time.Now()
 
@@ -261,12 +298,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			// Next 100
 			if beforeTime != (time.Time{}) {
 				messageRequestCount++
-				if beforeID != "" {
-					writeHistoryCache(historyCacheBefore, beforeID)
-				}
-				if sinceID != "" {
-					writeHistoryCache(historyCacheSince, sinceID)
-				}
+				writeHistoryCache(historyCache{
+					Updated:       time.Now(),
+					Running:       true,
+					RunningBefore: beforeID,
+				})
 
 				// Update Status
 				log.Println(lg("History", "", color.CyanString,
@@ -350,6 +386,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					job.Updated = time.Now()
 					historyJobs.Set(subjectChannelID, job)
 				}
+				//TODO: delete cahce or handle it differently?
 				break MessageRequestingLoop
 			} else {
 				// No More Messages
@@ -360,6 +397,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							job.Updated = time.Now()
 							historyJobs.Set(subjectChannelID, job)
 						}
+						writeHistoryCache(historyCache{
+							Updated:        time.Now(),
+							Running:        false,
+							RunningBefore:  "",
+							CompletedSince: lastMessageID,
+						})
 						break MessageRequestingLoop
 					} else { // retry to make sure no more
 						time.Sleep(10 * time.Millisecond)
@@ -385,6 +428,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							job.Status = historyStatusAbortCompleted
 							job.Updated = time.Now()
 							historyJobs.Set(subjectChannelID, job)
+							deleteHistoryCache() //TODO: Replace with different variation of writing cache?
 							break MessageRequestingLoop
 						}
 					}
@@ -401,6 +445,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 								job.Updated = time.Now()
 								historyJobs.Set(subjectChannelID, job)
 							}
+							deleteHistoryCache() //TODO: Replace with different variation of writing cache?
 							break MessageRequestingLoop
 						}
 					}
@@ -412,6 +457,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 								job.Updated = time.Now()
 								historyJobs.Set(subjectChannelID, job)
 							}
+							deleteHistoryCache() //TODO: Replace with different variation of writing cache?
 							break MessageRequestingLoop
 						}
 					}
@@ -424,14 +470,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 					totalMessages++
 				}
-			}
-		}
-
-		// Cache
-		if job, exists := historyJobs.Get(subjectChannelID); exists {
-			if job.Status == historyStatusCompletedNoMoreMessages {
-				deleteHistoryCache(historyCacheBefore)
-				writeHistoryCache(historyCacheSince, lastMessageID)
 			}
 		}
 
