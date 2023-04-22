@@ -204,34 +204,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	//#endregion
 
-	// Date Range Vars
-	var sinceID = since
-	var beforeID = before
-	var beforeTime time.Time
-
-	//#region Date Range Output
-	rangeContent := ""
-	if sinceID != "" {
-		if isDate(sinceID) {
-			sinceID = discordTimestampToSnowflake(sinceID, "2006-01-02")
-		}
-		if isNumeric(sinceID) {
-			rangeContent += fmt.Sprintf("**Since:** `%s`\n", sinceID)
-		}
-	}
-	if beforeID != "" {
-		if isDate(beforeID) {
-			beforeID = discordTimestampToSnowflake(beforeID, "2006-01-02")
-		}
-		if isNumeric(beforeID) {
-			rangeContent += fmt.Sprintf("**Before:** `%s`\n", beforeID)
-		}
-	}
-	if rangeContent != "" {
-		rangeContent += "\n\n"
-	}
-	//#endregion
-
 	if channelConfig := getSource(responseMsg); channelConfig != emptyConfig {
 
 		// Overwrite Send Status
@@ -246,6 +218,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 		}
 
+		// Date Range Vars
+		rangeContent := ""
+		var beforeTime time.Time
+		var beforeID = before
+		var sinceID = ""
+
 		// Handle Cache File
 		if cache := openHistoryCache(); cache != (historyCache{}) {
 			if cache.CompletedSince != "" {
@@ -253,7 +231,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					log.Println(lg("Debug", "History", color.GreenString,
 						logPrefix+"Assuming history is completed prior to "+cache.CompletedSince))
 				}
-				sinceID = cache.CompletedSince
+				since = cache.CompletedSince
 			}
 			if cache.Running {
 				if config.Debug {
@@ -263,6 +241,36 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				beforeID = cache.RunningBefore
 			}
 		}
+
+		//#region Date Range Output
+
+		var beforeRange = before
+		if beforeRange != "" {
+			if isDate(beforeRange) {
+				beforeRange = discordTimestampToSnowflake(beforeID, "2006-01-02")
+			}
+			if isNumeric(beforeRange) {
+				rangeContent += fmt.Sprintf("**Before:** `%s`\n", beforeRange)
+			}
+			before = beforeRange
+		}
+
+		var sinceRange = since
+		if sinceRange != "" {
+			if isDate(sinceRange) {
+				sinceRange = discordTimestampToSnowflake(sinceRange, "2006-01-02")
+			}
+			if isNumeric(sinceRange) {
+				rangeContent += fmt.Sprintf("**Since:** `%s`\n", sinceRange)
+			}
+			since = sinceRange
+		}
+
+		if rangeContent != "" {
+			rangeContent += "\n"
+		}
+
+		//#endregion
 
 		historyStartTime := time.Now()
 
@@ -410,7 +418,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 				}
 
-				// Set New Range
+				// Set New Range, this shouldn't be changed regardless of before/since filters. The bot will always go latest to oldest.
 				beforeID = messages[len(messages)-1].ID
 				beforeTime = messages[len(messages)-1].Timestamp
 				sinceID = ""
@@ -439,25 +447,19 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					message64, _ := strconv.ParseInt(message.ID, 10, 64)
 					if before != "" {
 						before64, _ := strconv.ParseInt(before, 10, 64)
-						if message64 > before64 {
-							if job, exists := historyJobs.Get(subjectChannelID); exists {
-								job.Status = historyStatusCompletedToBeforeFilter
-								job.Updated = time.Now()
-								historyJobs.Set(subjectChannelID, job)
-							}
-							deleteHistoryCache() //TODO: Replace with different variation of writing cache?
-							break MessageRequestingLoop
+						if message64 > before64 { // keep scrolling back in messages
+							continue
 						}
 					}
 					if since != "" {
 						since64, _ := strconv.ParseInt(since, 10, 64)
-						if message64 < since64 {
+						if message64 < since64 { // message too old, kill loop
 							if job, exists := historyJobs.Get(subjectChannelID); exists {
 								job.Status = historyStatusCompletedToSinceFilter
 								job.Updated = time.Now()
 								historyJobs.Set(subjectChannelID, job)
 							}
-							deleteHistoryCache() //TODO: Replace with different variation of writing cache?
+							deleteHistoryCache() // unsure of consequences of caching when using filters, so deleting to be safe for now.
 							break MessageRequestingLoop
 						}
 					}
