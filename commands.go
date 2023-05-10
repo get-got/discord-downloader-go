@@ -390,7 +390,7 @@ func handleCommands() *exrouter.Route {
 						nameGuild = getGuildName(chinfo.GuildID)
 					}
 					nameCategory := getChannelCategoryName(channel)
-					nameChannel := getChannelName(channel)
+					nameChannel := getChannelName(channel, nil)
 					nameDisplay := fmt.Sprintf("%s / %s", nameGuild, nameChannel)
 					if nameCategory != "unknown" {
 						nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)

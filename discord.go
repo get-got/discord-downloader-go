@@ -69,12 +69,17 @@ func getChannelCategoryName(channelID string) string {
 	return sourceChannelName
 }
 
-func getChannelName(channelID string) string {
+func getChannelName(channelID string, channelData *discordgo.Channel) string {
 	sourceChannelName := "unknown"
 	sourceChannel, _ := bot.State.Channel(channelID)
+	if channelData != nil {
+		sourceChannel = channelData
+	}
 	if sourceChannel != nil {
 		if sourceChannel.Name != "" {
 			sourceChannelName = sourceChannel.Name
+		} else if sourceChannel.Topic != "" {
+			sourceChannelName = sourceChannel.Topic
 		} else {
 			switch sourceChannel.Type {
 			case discordgo.ChannelTypeDM:
