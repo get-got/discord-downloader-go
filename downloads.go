@@ -158,7 +158,7 @@ func trimDuplicateLinks(fileItems []*fileItem) []*fileItem {
 
 // Trim files already downloaded and stored in database
 func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[string]string {
-	channelConfig := getSource(m)
+	channelConfig := getSource(m, nil)
 
 	newList := make(map[string]string, 0)
 	for link, filename := range linkList {
@@ -453,7 +453,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 		log.Println(lg("Download", "", color.RedString,
 			"Gave up on downloading %s after %d failed attempts...\t%s",
 			download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		if channelConfig := getSource(download.Message); channelConfig != emptyConfig {
+		if channelConfig := getSource(download.Message, nil); channelConfig != emptyConfig {
 			if !download.HistoryCmd && *channelConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -492,7 +492,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 	}
 
 	// Log Links to File
-	if channelConfig := getSource(download.Message); channelConfig != emptyConfig {
+	if channelConfig := getSource(download.Message, nil); channelConfig != emptyConfig {
 		if channelConfig.LogLinks != nil {
 			if channelConfig.LogLinks.Destination != "" {
 				logPath := channelConfig.LogLinks.Destination
@@ -623,7 +623,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 	var channelConfig configurationSource
 	sourceDefault(&channelConfig)
-	_channelConfig := getSource(download.Message)
+	_channelConfig := getSource(download.Message, nil)
 	if _channelConfig != emptyConfig {
 		channelConfig = _channelConfig
 	}

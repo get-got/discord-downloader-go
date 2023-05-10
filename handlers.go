@@ -23,7 +23,7 @@ var lastMessageID string
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if lastMessageID != m.ID {
-		handleMessage(m.Message, false, false)
+		handleMessage(m.Message, nil, false, false)
 	}
 	lastMessageID = m.ID
 }
@@ -31,13 +31,13 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	if lastMessageID != m.ID {
 		if m.EditedTimestamp != nil {
-			handleMessage(m.Message, true, false)
+			handleMessage(m.Message, nil, true, false)
 		}
 	}
 	lastMessageID = m.ID
 }
 
-func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int64) {
+func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, history bool) (int64, int64) {
 	// Ignore own messages unless told not to
 	if m.Author.ID == botUser.ID && !config.ScanOwnMessages {
 		return -1, 0
@@ -68,7 +68,7 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 	}
 
 	// Registered Channel
-	if channelConfig := getSource(m); channelConfig != emptyConfig {
+	if channelConfig := getSource(m, c); channelConfig != emptyConfig {
 		// Ignore bots if told to do so
 		if m.Author.Bot && *channelConfig.IgnoreBots {
 			return -1, 0
@@ -119,16 +119,31 @@ func handleMessage(m *discordgo.Message, edited bool, history bool) (int64, int6
 						if *channelConfig.LogMessages.DivideLogsByServer {
 							if m.GuildID == "" {
 								ch, err := bot.State.Channel(m.ChannelID)
-								if err == nil {
+								if err != nil && c != nil {
+									ch = c
+								}
+								if ch != nil {
 									if ch.Type == discordgo.ChannelTypeDM {
 										logPath += " DM"
 									} else if ch.Type == discordgo.ChannelTypeGroupDM {
 										logPath += " GroupDM"
+									} else if ch.Type == discordgo.ChannelTypeGuildText {
+										logPath += " Text"
+									} else if ch.Type == discordgo.ChannelTypeGuildCategory {
+										logPath += " Category"
+									} else if ch.Type == discordgo.ChannelTypeGuildForum {
+										logPath += " Forum"
+									} else if ch.Type == discordgo.ChannelTypeGuildPrivateThread || ch.Type == discordgo.ChannelTypeGuildPublicThread {
+										logPath += " Thread"
 									} else {
 										logPath += " Unknown"
 									}
-								} else {
-									logPath += " Unknown"
+
+									if ch.Name != "" {
+										logPath += " - " + clearPath(ch.Name) + " -"
+									} else if ch.Topic != "" {
+										logPath += " - " + clearPath(ch.Topic) + " -"
+									}
 								}
 							} else {
 								logPath += " SID_" + m.GuildID

@@ -140,7 +140,7 @@ func handleCommands() *exrouter.Route {
 					len(config.AdminChannels),
 					bot.HeartbeatLatency().Milliseconds(),
 				)
-				if sourceConfig := getSource(ctx.Msg); sourceConfig != emptyConfig {
+				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptyConfig {
 					configJson, _ := json.MarshalIndent(sourceConfig, "", "\t")
 					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
 				}
@@ -157,7 +157,7 @@ func handleCommands() *exrouter.Route {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Stats", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
-				if sourceConfig := getSource(ctx.Msg); sourceConfig != emptyConfig {
+				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptyConfig {
 					if *sourceConfig.AllowCommands {
 						content := fmt.Sprintf("• **Total Downloads —** %s\n"+
 							"• **Downloads in this Channel —** %s",

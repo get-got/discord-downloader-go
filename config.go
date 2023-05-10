@@ -1062,18 +1062,26 @@ func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bo
 
 var emptyConfig configurationSource = configurationSource{}
 
-func getSource(m *discordgo.Message) configurationSource {
+func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
+
+	subjectID := m.ChannelID
+
+	if c != nil {
+		if c.ParentID != "" {
+			subjectID = c.ParentID
+		}
+	}
 
 	// Channel
 	for _, item := range config.Channels {
 		// Single Channel Config
-		if m.ChannelID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
+		if subjectID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
 			return item
 		}
 		// Multi-Channel Config
 		if item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
-				if m.ChannelID == subchannel || isNestedMessage(m, subchannel) {
+				if subjectID == subchannel || isNestedMessage(m, subchannel) {
 					return item
 				}
 			}
@@ -1083,7 +1091,7 @@ func getSource(m *discordgo.Message) configurationSource {
 	// Category Config
 	for _, item := range config.Categories {
 		if item.CategoryID != "" {
-			channel, err := bot.State.Channel(m.ChannelID)
+			channel, err := bot.State.Channel(subjectID)
 			if err == nil {
 				if channel.ParentID == item.CategoryID {
 					return item
@@ -1093,7 +1101,7 @@ func getSource(m *discordgo.Message) configurationSource {
 		// Multi-Category Config
 		if item.CategoryIDs != nil {
 			for _, subcategory := range *item.CategoryIDs {
-				channel, err := bot.State.Channel(m.ChannelID)
+				channel, err := bot.State.Channel(subjectID)
 				if err == nil {
 					if channel.ParentID == subcategory {
 						if item.CategoryBlacklist != nil {
@@ -1114,10 +1122,10 @@ func getSource(m *discordgo.Message) configurationSource {
 			guild, err := bot.State.Guild(item.ServerID)
 			if err == nil {
 				for _, channel := range guild.Channels {
-					if m.ChannelID == channel.ID || isNestedMessage(m, channel.ID) {
+					if subjectID == channel.ID || isNestedMessage(m, channel.ID) {
 						// Channel Blacklisting within Server
 						if item.ServerBlacklist != nil {
-							if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
+							if stringInSlice(subjectID, *item.ServerBlacklist) {
 								return emptyConfig
 							}
 							// Categories
@@ -1138,10 +1146,10 @@ func getSource(m *discordgo.Message) configurationSource {
 				guild, err := bot.State.Guild(subserver)
 				if err == nil {
 					for _, channel := range guild.Channels {
-						if m.ChannelID == channel.ID || isNestedMessage(m, channel.ID) {
+						if subjectID == channel.ID || isNestedMessage(m, channel.ID) {
 							// Channel Blacklisting within Servers
 							if item.ServerBlacklist != nil {
-								if stringInSlice(m.ChannelID, *item.ServerBlacklist) {
+								if stringInSlice(subjectID, *item.ServerBlacklist) {
 									return emptyConfig
 								}
 								// Categories
@@ -1179,14 +1187,14 @@ func getSource(m *discordgo.Message) configurationSource {
 	// All
 	if config.All != nil {
 		if config.AllBlacklistChannels != nil {
-			if stringInSlice(m.ChannelID, *config.AllBlacklistChannels) {
+			if stringInSlice(subjectID, *config.AllBlacklistChannels) {
 				return emptyConfig
 			}
 		}
 		if config.AllBlacklistCategories != nil {
-			chinf, err := bot.State.Channel(m.ChannelID)
+			chinf, err := bot.State.Channel(subjectID)
 			if err == nil {
-				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(m.ChannelID, *config.AllBlacklistCategories) {
+				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(subjectID, *config.AllBlacklistCategories) {
 					return emptyConfig
 				}
 			}
@@ -1251,7 +1259,7 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	}
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if channelConfig := getSource(m); channelConfig != emptyConfig {
+	} else if channelConfig := getSource(m, nil); channelConfig != emptyConfig {
 		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
@@ -1365,7 +1373,7 @@ func getAllRegisteredChannels() []string {
 				}
 			}
 			for _, channel := range guild.Channels {
-				if r := getSource(&discordgo.Message{ChannelID: channel.ID}); r == emptyConfig { // easier than redoing it all but way less efficient, im lazy
+				if r := getSource(&discordgo.Message{ChannelID: channel.ID}, nil); r == emptyConfig { // easier than redoing it all but way less efficient, im lazy
 					continue
 				} else {
 					if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {

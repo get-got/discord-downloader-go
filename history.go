@@ -137,17 +137,16 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		subjectChannels = append(subjectChannels, *baseChannelInfo)
 		baseChannelIsForum = false
 	}
+
 	// Index Threads
 	now := time.Now()
 	if threads, err := bot.ThreadsArchived(subjectChannelID, &now, 0); err == nil {
 		for _, thread := range threads.Threads {
-			log.Printf("found archived thread: %s", thread.ID)
 			subjectChannels = append(subjectChannels, *thread)
 		}
 	}
 	if threads, err := bot.ThreadsActive(subjectChannelID); err == nil {
 		for _, thread := range threads.Threads {
-			log.Printf("found active thread: %s", thread.ID)
 			subjectChannels = append(subjectChannels, *thread)
 		}
 	}
@@ -234,21 +233,22 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	//#endregion
 
-	if channelConfig := getSource(responseMsg); channelConfig != emptyConfig {
+	for _, channel := range subjectChannels {
+		logPrefix = fmt.Sprintf("%s/%s: ", channel.ID, commander)
 
-		// Overwrite Send Status
-		if channelConfig.SendAutoHistoryStatus != nil {
-			if autorun && !*channelConfig.SendAutoHistoryStatus {
-				sendStatus = false
-			}
-		}
-		if channelConfig.SendHistoryStatus != nil {
-			if !autorun && !*channelConfig.SendHistoryStatus {
-				sendStatus = false
-			}
-		}
+		if channelConfig := getSource(responseMsg, &channel); channelConfig != emptyConfig {
 
-		for _, channel := range subjectChannels {
+			// Overwrite Send Status
+			if channelConfig.SendAutoHistoryStatus != nil {
+				if autorun && !*channelConfig.SendAutoHistoryStatus {
+					sendStatus = false
+				}
+			}
+			if channelConfig.SendHistoryStatus != nil {
+				if !autorun && !*channelConfig.SendHistoryStatus {
+					sendStatus = false
+				}
+			}
 
 			hasPermsToRespond := hasPerms(channel.ID, discordgo.PermissionSendMessages)
 			if !autorun {
@@ -501,7 +501,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						}
 
 						// Process Message
-						downloadCount, filesize := handleMessage(message, false, true)
+						downloadCount, filesize := handleMessage(message, &channel, false, true)
 						if downloadCount > 0 {
 							totalDownloads += downloadCount
 							totalFilesize += filesize
