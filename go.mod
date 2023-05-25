@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	github.com/AvraamMavridis/randomcolor v0.0.0-20180822172341-208aff70bf2c
-	github.com/ChimeraCoder/anaconda v2.0.0+incompatible
 	github.com/Davincible/goinsta/v3 v3.2.6
 	github.com/HouzuoGuo/tiedot v0.0.0-20210905174726-ae1e16866d06
 	github.com/Necroforger/dgrouter v0.0.0-20200517224846-e66453b957c1
@@ -18,6 +17,7 @@ require (
 	github.com/hashicorp/go-version v1.6.0
 	github.com/kennygrant/sanitize v1.2.4
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0
+	github.com/n0madic/twitter-scraper v0.0.0-20230520222908-ec6e8f3e190e
 	github.com/rivo/duplo v0.0.0-20220703183130-751e882e6b83
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/wk8/go-ordered-map/v2 v2.1.7
@@ -26,17 +26,12 @@ require (
 )
 
 require (
-	github.com/ChimeraCoder/tokenbucket v0.0.0-20131201223612-c5a927568de7 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
-	github.com/azr/backoff v0.0.0-20160115115103-53511d3c7330 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/chromedp/cdproto v0.0.0-20230506233603-4ea4c6dc2e5b // indirect
 	github.com/chromedp/chromedp v0.9.1 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
-	github.com/dustin/go-jsonpointer v0.0.0-20160814072949-ba0abeacc3dc // indirect
-	github.com/dustin/gojson v0.0.0-20160307161227-2e71ec9dd5ad // indirect
-	github.com/garyburd/go-oauth v0.0.0-20180319155456-bca2e7f09a17 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.2.0 // indirect

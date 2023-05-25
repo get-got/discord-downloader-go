@@ -240,30 +240,28 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 	- Facebook Videos: Previously supported but they split mp4 into separate audio and video streams
 	*/
 
-	if twitterConnected {
-		inputURL = strings.ReplaceAll(inputURL, "mobile.twitter", "twitter")
-		inputURL = strings.ReplaceAll(inputURL, "fxtwitter.com", "twitter.com")
-		inputURL = strings.ReplaceAll(inputURL, "c.vxtwitter.com", "twitter.com")
-		inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
-		if regexUrlTwitter.MatchString(inputURL) {
-			links, err := getTwitterUrls(inputURL)
-			if err != nil {
-				if !strings.Contains(err.Error(), "suspended") {
-					log.Println(lg("Download", "", color.RedString, "Twitter Media fetch failed for %s -- %s", inputURL, err))
-				}
-			} else if len(links) > 0 {
-				return trimDownloadedLinks(links, m)
+	inputURL = strings.ReplaceAll(inputURL, "mobile.twitter", "twitter")
+	inputURL = strings.ReplaceAll(inputURL, "fxtwitter.com", "twitter.com")
+	inputURL = strings.ReplaceAll(inputURL, "c.vxtwitter.com", "twitter.com")
+	inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
+	if regexUrlTwitter.MatchString(inputURL) {
+		links, err := getTwitterUrls(inputURL)
+		if err != nil {
+			if !strings.Contains(err.Error(), "suspended") {
+				log.Println(lg("Download", "", color.RedString, "Twitter Media fetch failed for %s -- %s", inputURL, err))
 			}
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, m)
 		}
-		if regexUrlTwitterStatus.MatchString(inputURL) {
-			links, err := getTwitterStatusUrls(inputURL, m)
-			if err != nil {
-				if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
-					log.Println(lg("Download", "", color.RedString, "Twitter Status fetch failed for %s -- %s", inputURL, err))
-				}
-			} else if len(links) > 0 {
-				return trimDownloadedLinks(links, m)
+	}
+	if regexUrlTwitterStatus.MatchString(inputURL) {
+		links, err := getTwitterStatusUrls(inputURL, m)
+		if err != nil {
+			if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
+				log.Println(lg("Download", "", color.RedString, "Twitter Status fetch failed for %s -- %s", inputURL, err))
 			}
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, m)
 		}
 	}
 

@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ChimeraCoder/anaconda"
 	"github.com/Davincible/goinsta/v3"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bwmarrin/discordgo"
@@ -28,10 +27,6 @@ func getTwitterUrls(inputURL string) (map[string]string, error) {
 }
 
 func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]string, error) {
-	if twitterClient == nil {
-		return nil, errors.New("invalid Twitter API credentials")
-	}
-
 	if strings.Contains(inputURL, "/photo/") {
 		inputURL = inputURL[:strings.Index(inputURL, "/photo/")]
 	}
@@ -40,37 +35,30 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 	}
 
 	matches := regexUrlTwitterStatus.FindStringSubmatch(inputURL)
-	statusId, err := strconv.ParseInt(matches[4], 10, 64)
+	_, err := strconv.ParseInt(matches[4], 10, 64)
 	if err != nil {
 		return nil, err
 	}
-
-	tweet, err := twitterClient.GetTweet(statusId, nil)
+	tweet, err := twitterScraper.GetTweet(matches[4])
 	if err != nil {
 		return nil, err
 	}
 
 	links := make(map[string]string)
-	for _, tweetMedia := range tweet.ExtendedEntities.Media {
-		if len(tweetMedia.VideoInfo.Variants) > 0 {
-			var lastVideoVariant anaconda.Variant
-			for _, videoVariant := range tweetMedia.VideoInfo.Variants {
-				if videoVariant.Bitrate >= lastVideoVariant.Bitrate {
-					lastVideoVariant = videoVariant
-				}
-			}
-			if lastVideoVariant.Url != "" {
-				links[lastVideoVariant.Url] = ""
-			}
-		} else {
-			foundUrls := getDownloadLinks(tweetMedia.Media_url_https, m)
-			for foundUrlKey, foundUrlValue := range foundUrls {
-				links[foundUrlKey] = foundUrlValue
-			}
+	for _, photo := range tweet.Photos {
+		foundUrls := getDownloadLinks(photo.URL, m)
+		for foundUrlKey, foundUrlValue := range foundUrls {
+			links[foundUrlKey] = foundUrlValue
 		}
 	}
-	for _, tweetUrl := range tweet.Entities.Urls {
-		foundUrls := getDownloadLinks(tweetUrl.Expanded_url, m)
+	for _, video := range tweet.Videos {
+		foundUrls := getDownloadLinks(video.URL, m)
+		for foundUrlKey, foundUrlValue := range foundUrls {
+			links[foundUrlKey] = foundUrlValue
+		}
+	}
+	for _, tweetUrl := range tweet.URLs {
+		foundUrls := getDownloadLinks(tweetUrl, m)
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}

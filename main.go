@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/url"
 	"os"
 	"os/signal"
 	"runtime"
@@ -14,7 +13,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ChimeraCoder/anaconda"
 	"github.com/Davincible/goinsta/v3"
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/Necroforger/dgrouter/exrouter"
@@ -22,6 +20,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
+	twitterscraper "github.com/n0madic/twitter-scraper"
 	"github.com/rivo/duplo"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
@@ -43,8 +42,7 @@ var (
 	duploCatalog *duplo.Store
 
 	// APIs
-	twitterConnected   bool = false
-	twitterClient      *anaconda.TwitterApi
+	twitterScraper     *twitterscraper.Scraper
 	instagramConnected bool = false
 	instagramClient    *goinsta.Instagram
 
@@ -535,46 +533,8 @@ func botLoad() {
 
 func botLoadAPIs() {
 	// Twitter API
-	go func() {
-		if config.Credentials.TwitterAccessToken != "" &&
-			config.Credentials.TwitterAccessTokenSecret != "" &&
-			config.Credentials.TwitterConsumerKey != "" &&
-			config.Credentials.TwitterConsumerSecret != "" {
-
-			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting to API..."))
-
-			twitterLoginCount := 0
-		do_twitter_login:
-			twitterLoginCount++
-			if twitterLoginCount > 1 {
-				time.Sleep(3 * time.Second)
-			}
-			twitterClient = anaconda.NewTwitterApiWithCredentials(
-				config.Credentials.TwitterAccessToken,
-				config.Credentials.TwitterAccessTokenSecret,
-				config.Credentials.TwitterConsumerKey,
-				config.Credentials.TwitterConsumerSecret,
-			)
-			twitterSelf, err := twitterClient.GetSelf(url.Values{})
-			if err != nil {
-				log.Println(lg("API", "Twitter", color.HiRedString, "API Login Error:\n%s", err.Error()))
-				if twitterLoginCount <= 3 {
-					goto do_twitter_login
-				} else {
-					log.Println(lg("API", "Twitter", color.HiRedString,
-						"Failed to login to Twitter API, the bot will not fetch tweet media..."))
-				}
-
-			} else {
-				log.Println(lg("API", "Twitter", color.HiMagentaString,
-					"Connected to API @%s", twitterSelf.ScreenName))
-				twitterConnected = true
-			}
-		} else {
-			log.Println(lg("API", "Twitter", color.MagentaString,
-				"API credentials missing, the bot won't use the Twitter API."))
-		}
-	}()
+	twitterScraper = twitterscraper.New()
+	//TODO: Optional Username+Password Auth
 
 	// Instagram API
 	go func() {
