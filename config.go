@@ -32,13 +32,9 @@ type configurationCredentials struct {
 	Email    string `json:"email,omitempty"`    // required for login (this or token)
 	Password string `json:"password,omitempty"` // required for login (this or token)
 	// APIs
-	TwitterAccessToken       string `json:"twitterAccessToken,omitempty"`       // optional
-	TwitterAccessTokenSecret string `json:"twitterAccessTokenSecret,omitempty"` // optional
-	TwitterConsumerKey       string `json:"twitterConsumerKey,omitempty"`       // optional
-	TwitterConsumerSecret    string `json:"twitterConsumerSecret,omitempty"`    // optional
-	InstagramUsername        string `json:"instagramUsername,omitempty"`        // optional
-	InstagramPassword        string `json:"instagramPassword,omitempty"`        // optional
-	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
+	InstagramUsername string `json:"instagramUsername,omitempty"` // optional
+	InstagramPassword string `json:"instagramPassword,omitempty"` // optional
+	FlickrApiKey      string `json:"flickrApiKey,omitempty"`      // optional
 }
 
 //#endregion
@@ -561,23 +557,11 @@ func loadConfig() error {
 			if dupeConfig.Credentials.Password != "" && dupeConfig.Credentials.Password != placeholderPassword {
 				dupeConfig.Credentials.Password = "STRIPPED_FOR_OUTPUT"
 			}
-			if dupeConfig.Credentials.TwitterAccessToken != "" {
-				dupeConfig.Credentials.TwitterAccessToken = "STRIPPED_FOR_OUTPUT"
-			}
-			if dupeConfig.Credentials.TwitterAccessTokenSecret != "" {
-				dupeConfig.Credentials.TwitterAccessTokenSecret = "STRIPPED_FOR_OUTPUT"
-			}
 			if dupeConfig.Credentials.InstagramUsername != "" {
 				dupeConfig.Credentials.InstagramUsername = "STRIPPED_FOR_OUTPUT"
 			}
 			if dupeConfig.Credentials.InstagramPassword != "" {
 				dupeConfig.Credentials.InstagramPassword = "STRIPPED_FOR_OUTPUT"
-			}
-			if dupeConfig.Credentials.TwitterConsumerKey != "" {
-				dupeConfig.Credentials.TwitterConsumerKey = "STRIPPED_FOR_OUTPUT"
-			}
-			if dupeConfig.Credentials.TwitterConsumerSecret != "" {
-				dupeConfig.Credentials.TwitterConsumerSecret = "STRIPPED_FOR_OUTPUT"
 			}
 			if dupeConfig.Credentials.FlickrApiKey != "" {
 				dupeConfig.Credentials.FlickrApiKey = "STRIPPED_FOR_OUTPUT"
@@ -685,11 +669,6 @@ func createConfig() {
 				defaultConfig.Credentials.Password = ""
 			}
 			importKey("flickr", "api key", &defaultConfig.Credentials.FlickrApiKey, "string")
-			importKey("twitter", "consumer key", &defaultConfig.Credentials.TwitterConsumerKey, "string")
-			importKey("twitter", "consumer secret", &defaultConfig.Credentials.TwitterConsumerSecret, "string")
-			importKey("twitter", "access token", &defaultConfig.Credentials.TwitterAccessToken, "string")
-			importKey("twitter", "access token secret", &defaultConfig.Credentials.TwitterAccessTokenSecret, "string")
-
 			// General
 			importKey("general", "max download retries", &defaultConfig.DownloadRetryMax, "int")
 			importKey("general", "download timeout", &defaultConfig.DownloadTimeout, "int")
