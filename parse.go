@@ -57,12 +57,6 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 			links[foundUrlKey] = foundUrlValue
 		}
 	}
-	for _, tweetUrl := range tweet.URLs {
-		foundUrls := getDownloadLinks(tweetUrl, m)
-		for foundUrlKey, foundUrlValue := range foundUrls {
-			links[foundUrlKey] = foundUrlValue
-		}
-	}
 
 	return links, nil
 }

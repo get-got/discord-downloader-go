@@ -35,6 +35,8 @@ github.com/fsnotify/fsnotify v1.6.0 h1:n+5WquG0fcWoWp6xPWfHdbskMCQaFnG6PfBrh1Ky4
 github.com/fsnotify/fsnotify v1.6.0/go.mod h1:sl3t1tCWJFWoRz9R8WJCbQihKKwmorjAbSClcnxKAGw=
 github.com/get-got/discordgo v0.27.0-gg.1 h1:JCozggRzeDExnFnPUdTN0aGg3FGa/wvRl5NkMeqWxfs=
 github.com/get-got/discordgo v0.27.0-gg.1/go.mod h1:NJZpH+1AfhIcyQsPeuBKsUtYrRnjkyu0kIVMCHkZtRY=
+github.com/get-got/twitter-scraper v0.0.0-20230525183600 h1:UKQkO6ZttVP+S1Z6nQXdrhIcmWl3XvA9QMy/e9yjQ9A=
+github.com/get-got/twitter-scraper v0.0.0-20230525183600/go.mod h1:djU2IZf0CR47FLp2b/poMx6JrOlG62v1yfFv2p8AxM0=
 github.com/gobwas/httphead v0.1.0 h1:exrUm0f4YX0L7EBwZHuCF4GDp8aJfVeBrlLQrs6NqWU=
 github.com/gobwas/httphead v0.1.0/go.mod h1:O/RXo79gxV8G+RqlR/otEwx4Q36zl9rqC5u12GKvMCM=
 github.com/gobwas/pool v0.2.1 h1:xfeeEhW7pwmX8nuLVlqbzVc7udMDrwetjEv+TZIz1og=
@@ -65,8 +67,6 @@ github.com/mattn/go-isatty v0.0.18 h1:DOKFKCQ7FNG2L1rbrmstDN4QVRdS89Nkh85u68Uwp9
 github.com/mattn/go-isatty v0.0.18/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/muhammadmuzzammil1998/jsonc v1.0.0 h1:8o5gBQn4ZA3NBA9DlTujCj2a4w0tqWrPVjDwhzkgTIs=
 github.com/muhammadmuzzammil1998/jsonc v1.0.0/go.mod h1:saF2fIVw4banK0H4+/EuqfFLpRnoy5S+ECwTOCcRcSU=
-github.com/n0madic/twitter-scraper v0.0.0-20230520222908-ec6e8f3e190e h1:lIGhS2IoR/X1mVIJhmSQngsbiT1waeZLA5BhVcM+sdo=
-github.com/n0madic/twitter-scraper v0.0.0-20230520222908-ec6e8f3e190e/go.mod h1:djU2IZf0CR47FLp2b/poMx6JrOlG62v1yfFv2p8AxM0=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 h1:zYyBkD/k9seD2A7fsi6Oo2LfFZAehjjQMERAvZLEDnQ=
 github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646/go.mod h1:jpp1/29i3P1S/RLdc7JQKbRpFeM1dOBd8T9ki5s+AY8=
 github.com/orisano/pixelmatch v0.0.0-20220722002657-fb0b55479cde h1:x0TT0RDC7UhAVbbWWBzr41ElhJx5tXPWkIHA2HWPRuw=
