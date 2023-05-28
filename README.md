@@ -296,6 +296,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "processLimit": 32, // # of concurrent tasks allowed at once.
 
     "debug": false,                 // detailed program info.
+    "backupDatabaseOnStart": false, // backup database folder to dated zip file in local "backups" folder.
     "watchSettings": true,          // update settings live if file is modified.
     "settingsOutput": true,         // display parsed settings on load.
     "messageOutput": true,          // display messages being processed in real time.
