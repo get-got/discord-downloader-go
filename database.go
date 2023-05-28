@@ -15,6 +15,9 @@ import (
 )
 
 func backupDatabase() error {
+	if err := os.MkdirAll(pathDatabaseBackups, 0755); err != nil {
+		return err
+	}
 	file, err := os.Create(pathDatabaseBackups + string(os.PathSeparator) + time.Now().Format("2006-01-02_15-04-05.000000000") + ".zip")
 	if err != nil {
 		return err
