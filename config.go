@@ -1381,14 +1381,6 @@ func getAllRegisteredChannels() []string {
 			}
 		}
 	} else { // STANDARD MODE
-		// Compile all config channels
-		for _, channel := range config.Channels {
-			if channel.ChannelIDs != nil {
-				channels = append(channels, *channel.ChannelIDs...)
-			} else if isNumeric(channel.ChannelID) {
-				channels = append(channels, channel.ChannelID)
-			}
-		}
 		// Compile all channels sourced from config servers
 		for _, server := range config.Servers {
 			if server.ServerIDs != nil {
@@ -1411,6 +1403,32 @@ func getAllRegisteredChannels() []string {
 						}
 					}
 				}
+			}
+		}
+		// Compile all config channels under categories, no practical way to poll these other than checking state.
+		for _, guild := range bot.State.Guilds {
+			for _, channel := range guild.Channels {
+				for _, source := range config.Categories {
+					if source.CategoryIDs != nil {
+						for _, category := range *source.CategoryIDs {
+							if channel.ParentID == category {
+								channels = append(channels, channel.ID)
+							}
+						}
+					} else if isNumeric(source.CategoryID) {
+						if channel.ParentID == source.CategoryID {
+							channels = append(channels, channel.ID)
+						}
+					}
+				}
+			}
+		}
+		// Compile all config channels
+		for _, channel := range config.Channels {
+			if channel.ChannelIDs != nil {
+				channels = append(channels, *channel.ChannelIDs...)
+			} else if isNumeric(channel.ChannelID) {
+				channels = append(channels, channel.ChannelID)
 			}
 		}
 	}
