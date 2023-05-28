@@ -38,6 +38,10 @@ import (
 	return &discordgo.Guild{}
 }*/
 
+const (
+	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
+)
+
 func getChannelGuildID(channelID string) string {
 	sourceChannel, _ := bot.State.Channel(channelID)
 	if sourceChannel != nil {

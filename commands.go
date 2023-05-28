@@ -453,8 +453,8 @@ func handleCommands() *exrouter.Route {
 						if all {
 							myDB.Close()
 							time.Sleep(1 * time.Second)
-							if _, err := os.Stat(databasePath); err == nil {
-								err = os.RemoveAll(databasePath)
+							if _, err := os.Stat(pathDatabase); err == nil {
+								err = os.RemoveAll(pathDatabase)
 								if err != nil {
 									log.Println(lg("Command", "History", color.HiRedString,
 										"Encountered error deleting database folder:\t%s", err))
@@ -476,8 +476,8 @@ func handleCommands() *exrouter.Route {
 					}
 					if shouldWipeCache {
 						if all {
-							if _, err := os.Stat(historyCachePath); err == nil {
-								err = os.RemoveAll(historyCachePath)
+							if _, err := os.Stat(pathCacheHistory); err == nil {
+								err = os.RemoveAll(pathCacheHistory)
 								if err != nil {
 									log.Println(lg("Command", "History", color.HiRedString,
 										"Encountered error deleting database folder:\t%s", err))
@@ -491,7 +491,7 @@ func handleCommands() *exrouter.Route {
 									"Cache folder inaccessible:\t%s", err))
 							}
 						} else {
-							fp := historyCachePath + string(os.PathSeparator) + channel + ".json"
+							fp := pathCacheHistory + string(os.PathSeparator) + channel + ".json"
 							if _, err := os.Stat(fp); err == nil {
 								err = os.RemoveAll(fp)
 								if err != nil {

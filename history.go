@@ -177,7 +177,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	//#region Cache Files
 
 	openHistoryCache := func(channel string) historyCache {
-		if f, err := os.ReadFile(historyCachePath + string(os.PathSeparator) + channel + ".json"); err == nil {
+		if f, err := os.ReadFile(pathCacheHistory + string(os.PathSeparator) + channel + ".json"); err == nil {
 			var ret historyCache
 			if err = json.Unmarshal(f, &ret); err != nil {
 				log.Println(lg("Debug", "History", color.RedString,
@@ -195,12 +195,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			log.Println(lg("Debug", "History", color.RedString,
 				logPrefix+"Failed to format cache into json:\t%s", err))
 		} else {
-			if err := os.MkdirAll(historyCachePath, 0755); err != nil {
+			if err := os.MkdirAll(pathCacheHistory, 0755); err != nil {
 				log.Println(lg("Debug", "History", color.HiRedString,
-					logPrefix+"Error while creating history cache folder \"%s\": %s", historyCachePath, err))
+					logPrefix+"Error while creating history cache folder \"%s\": %s", pathCacheHistory, err))
 			}
 			f, err := os.OpenFile(
-				historyCachePath+string(os.PathSeparator)+channel+".json",
+				pathCacheHistory+string(os.PathSeparator)+channel+".json",
 				os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 			if err != nil {
 				log.Println(lg("Debug", "History", color.RedString,
@@ -218,7 +218,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	deleteHistoryCache := func(channel string) {
-		fp := historyCachePath + string(os.PathSeparator) + channel + ".json"
+		fp := pathCacheHistory + string(os.PathSeparator) + channel + ".json"
 		if _, err := os.Stat(fp); err == nil {
 			err = os.Remove(fp)
 			if err != nil {

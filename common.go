@@ -205,11 +205,21 @@ type githubReleaseApiObject struct {
 	TagName string `json:"tag_name"`
 }
 
-func isLatestGithubRelease() bool {
+var latestGithubRelease string
+
+func getLatestGithubRelease() string {
 	githubReleaseApiObject := new(githubReleaseApiObject)
-	err := getJSON(projectReleaseApiURL, githubReleaseApiObject)
+	err := getJSON("https://api.github.com/repos/"+projectRepoBase+"/releases/latest", githubReleaseApiObject)
 	if err != nil {
 		log.Println(lg("API", "Github", color.RedString, "Error fetching current Release JSON: %s", err))
+		return ""
+	}
+	return githubReleaseApiObject.TagName
+}
+
+func isLatestGithubRelease() bool {
+	latestGithubRelease = getLatestGithubRelease()
+	if latestGithubRelease == "" {
 		return true
 	}
 
@@ -219,7 +229,7 @@ func isLatestGithubRelease() bool {
 		return true
 	}
 
-	latestVersion, err := version.NewVersion(githubReleaseApiObject.TagName)
+	latestVersion, err := version.NewVersion(latestGithubRelease)
 	if err != nil {
 		log.Println(lg("API", "Github", color.RedString, "Error parsing latest version: %s", err))
 		return true

@@ -425,6 +425,13 @@ type configurationAdminChannel struct {
 	LogStatus      *bool     `json:"logStatus,omitempty"`      // optional, defaults
 	LogErrors      *bool     `json:"logErrors,omitempty"`      // optional, defaults
 	UnlockCommands *bool     `json:"unlockCommands,omitempty"` // optional, defaults
+	/* IDEAS / TODO:
+
+	LogMessages *bool `json:"logMessages,omitempty"` // optional, defaults
+	LogLinks    *bool `json:"logLinks,omitempty"`    // optional, defaults
+	LogFiles	*bool `json:"logFiles,omitempty"`    // optional, defaults
+
+	*/
 }
 
 //#endregion
@@ -821,7 +828,7 @@ func createConfig() {
 			log.Println(lg("Settings", "create", color.MagentaString,
 				"You DO NOT NEED token *AND* email/password, just one OR the other."))
 			log.Println(lg("Settings", "create", color.MagentaString,
-				"THERE ARE MANY HIDDEN SETTINGS AVAILABLE, SEE THE GITHUB README github.com/"+projectRepo))
+				"THERE ARE MANY HIDDEN SETTINGS AVAILABLE, SEE THE GITHUB README github.com/"+projectRepoBase))
 		}
 	}
 }

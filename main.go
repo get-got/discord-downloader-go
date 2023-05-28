@@ -79,14 +79,15 @@ func versions(multiline bool) string {
 }
 
 func init() {
+	// Initialize Logging
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
 
+	// Initialize Variables
 	loop = make(chan os.Signal, 1)
 	startTime = time.Now()
 	historyJobs = orderedmap.New[string, historyJob]()
-
 	if len(os.Args) > 1 {
 		configFileBase = os.Args[1]
 	}
@@ -97,7 +98,10 @@ func init() {
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "***\tUPDATE AVAILABLE\t***"))
-			log.Println(lg("Version", "UPDATE", color.CyanString, projectReleaseURL))
+			log.Println(lg("Version", "UPDATE", color.CyanString, projectRepoURL+"/releases/latest"))
+			log.Println(lg("Version", "UPDATE", color.HiCyanString,
+				fmt.Sprintf("You are on v%s, latest is %s", projectVersion, latestGithubRelease),
+			))
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "*** See changelog for information ***"))
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "CHECK ALL CHANGELOGS SINCE YOUR LAST UPDATE"))
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "SOME SETTINGS MAY NEED TO BE UPDATED"))
@@ -428,9 +432,9 @@ func main() {
 		}
 	}
 	//--- Save constants
-	os.MkdirAll(cachePath, 0755)
-	if _, err := os.Stat(constantsPath); err == nil {
-		err = os.Remove(constantsPath)
+	os.MkdirAll(pathCache, 0755)
+	if _, err := os.Stat(pathConstants); err == nil {
+		err = os.Remove(pathConstants)
 		if err != nil {
 			log.Println(lg("Constants", "", color.HiRedString, "Encountered error deleting cache file:\t%s", err))
 		}
@@ -441,7 +445,7 @@ func main() {
 	if err != nil {
 		log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))
 	} else {
-		err := os.WriteFile(constantsPath, newJson, 0644)
+		err := os.WriteFile(pathConstants, newJson, 0644)
 		if err != nil {
 			log.Println(lg("Constants", "", color.HiRedString, "Failed to save new constants file...\t%s", err))
 		}
@@ -460,6 +464,7 @@ func main() {
 
 	sendStatusMessage(sendStatusExit) // not goroutine because we want to wait to send this before logout
 
+	// Log out of twitter if authenticated.
 	if twitterScraper.IsLoggedIn() {
 		twitterScraper.Logout()
 	}
@@ -477,7 +482,7 @@ func main() {
 func openDatabase() {
 	// Database
 	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a second...)"))
-	myDB, err = db.OpenDB(databasePath)
+	myDB, err = db.OpenDB(pathDatabase)
 	if err != nil {
 		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
 		return
@@ -511,9 +516,9 @@ func openDatabase() {
 	// Duplo
 	if config.Duplo || sourceHasDuplo {
 		duploCatalog = duplo.New()
-		if _, err := os.Stat(duploCatalogPath); err == nil {
+		if _, err := os.Stat(pathCacheDuplo); err == nil {
 			log.Println(lg("Duplo", "", color.YellowString, "Opening duplo image catalog..."))
-			storeFile, err := ioutil.ReadFile(duploCatalogPath)
+			storeFile, err := ioutil.ReadFile(pathCacheDuplo)
 			if err != nil {
 				log.Println(lg("Duplo", "", color.HiRedString, "Error opening duplo catalog:\t%s", err))
 			} else {
@@ -565,9 +570,6 @@ func botLoadAPIs() {
 					twitterLoggedIn = true
 				}
 			}
-		} else {
-			log.Println(lg("API", "Twitter", color.MagentaString,
-				"Twitter login missing, the bot won't use the Twitter library."))
 		}
 	}()
 
@@ -584,7 +586,7 @@ func botLoadAPIs() {
 			if instagramLoginCount > 1 {
 				time.Sleep(3 * time.Second)
 			}
-			if instagramClient, err = goinsta.Import(instagramCachePath); err != nil {
+			if instagramClient, err = goinsta.Import(pathCacheInstagram); err != nil {
 				instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
 				if err := instagramClient.Login(); err != nil {
 					log.Println(lg("API", "Instagram", color.HiRedString, "Login Error: %s", err.Error()))
@@ -598,7 +600,7 @@ func botLoadAPIs() {
 					log.Println(lg("API", "Instagram", color.HiMagentaString,
 						"Connected to API @%s via new login", instagramClient.Account.Username))
 					instagramConnected = true
-					defer instagramClient.Export(instagramCachePath)
+					defer instagramClient.Export(pathCacheInstagram)
 				}
 			} else {
 				log.Println(lg("API", "Instagram", color.HiMagentaString,
