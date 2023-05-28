@@ -763,18 +763,24 @@ do_discord_login:
 				for _, subchannel := range *adminChannel.ChannelIDs {
 					_, err := bot.State.Channel(subchannel)
 					if err != nil {
-						invalidAdminChannels = append(invalidAdminChannels, subchannel)
-						log.Println(lg("Discord", "Validation", color.HiRedString,
-							"Bot cannot access admin subchannel %s...\t%s", subchannel, err))
+						_, err := bot.Channel(subchannel)
+						if err != nil {
+							invalidAdminChannels = append(invalidAdminChannels, subchannel)
+							log.Println(lg("Discord", "Validation", color.HiRedString,
+								"Bot cannot access admin subchannel %s...\t%s", subchannel, err))
+						}
 					}
 				}
 
 			} else {
 				_, err := bot.State.Channel(adminChannel.ChannelID)
 				if err != nil {
-					invalidAdminChannels = append(invalidAdminChannels, adminChannel.ChannelID)
-					log.Println(lg("Discord", "Validation", color.HiRedString,
-						"Bot cannot access admin channel %s...\t%s", adminChannel.ChannelID, err))
+					_, err := bot.Channel(adminChannel.ChannelID)
+					if err != nil {
+						invalidAdminChannels = append(invalidAdminChannels, adminChannel.ChannelID)
+						log.Println(lg("Discord", "Validation", color.HiRedString,
+							"Bot cannot access admin channel %s...\t%s", adminChannel.ChannelID, err))
+					}
 				}
 			}
 		}
@@ -785,17 +791,23 @@ do_discord_login:
 			for _, subserver := range *server.ServerIDs {
 				_, err := bot.State.Guild(subserver)
 				if err != nil {
-					invalidServers = append(invalidServers, subserver)
-					log.Println(lg("Discord", "Validation", color.HiRedString,
-						"Bot cannot access subserver %s...\t%s", subserver, err))
+					_, err := bot.Guild(subserver)
+					if err != nil {
+						invalidServers = append(invalidServers, subserver)
+						log.Println(lg("Discord", "Validation", color.HiRedString,
+							"Bot cannot access subserver %s...\t%s", subserver, err))
+					}
 				}
 			}
 		} else {
 			_, err := bot.State.Guild(server.ServerID)
 			if err != nil {
-				invalidServers = append(invalidServers, server.ServerID)
-				log.Println(lg("Discord", "Validation", color.HiRedString,
-					"Bot cannot access server %s...\t%s", server.ServerID, err))
+				_, err := bot.Guild(server.ServerID)
+				if err != nil {
+					invalidServers = append(invalidServers, server.ServerID)
+					log.Println(lg("Discord", "Validation", color.HiRedString,
+						"Bot cannot access server %s...\t%s", server.ServerID, err))
+				}
 			}
 		}
 	}
@@ -804,18 +816,24 @@ do_discord_login:
 			for _, subcategory := range *category.CategoryIDs {
 				_, err := bot.State.Channel(subcategory)
 				if err != nil {
-					invalidCategories = append(invalidCategories, subcategory)
-					log.Println(lg("Discord", "Validation", color.HiRedString,
-						"Bot cannot access subcategory %s...\t%s", subcategory, err))
+					_, err := bot.Channel(subcategory)
+					if err != nil {
+						invalidCategories = append(invalidCategories, subcategory)
+						log.Println(lg("Discord", "Validation", color.HiRedString,
+							"Bot cannot access subcategory %s...\t%s", subcategory, err))
+					}
 				}
 			}
 
 		} else {
 			_, err := bot.State.Channel(category.CategoryID)
 			if err != nil {
-				invalidCategories = append(invalidCategories, category.CategoryID)
-				log.Println(lg("Discord", "Validation", color.HiRedString,
-					"Bot cannot access category %s...\t%s", category.CategoryID, err))
+				_, err := bot.Channel(category.CategoryID)
+				if err != nil {
+					invalidCategories = append(invalidCategories, category.CategoryID)
+					log.Println(lg("Discord", "Validation", color.HiRedString,
+						"Bot cannot access category %s...\t%s", category.CategoryID, err))
+				}
 			}
 		}
 	}
@@ -824,18 +842,24 @@ do_discord_login:
 			for _, subchannel := range *channel.ChannelIDs {
 				_, err := bot.State.Channel(subchannel)
 				if err != nil {
-					invalidChannels = append(invalidChannels, subchannel)
-					log.Println(lg("Discord", "Validation", color.HiRedString,
-						"Bot cannot access subchannel %s...\t%s", subchannel, err))
+					_, err := bot.Channel(subchannel)
+					if err != nil {
+						invalidChannels = append(invalidChannels, subchannel)
+						log.Println(lg("Discord", "Validation", color.HiRedString,
+							"Bot cannot access subchannel %s...\t%s", subchannel, err))
+					}
 				}
 			}
 
 		} else {
 			_, err := bot.State.Channel(channel.ChannelID)
 			if err != nil {
-				invalidChannels = append(invalidChannels, channel.ChannelID)
-				log.Println(lg("Discord", "Validation", color.HiRedString,
-					"Bot cannot access channel %s...\t%s", channel.ChannelID, err))
+				_, err := bot.Channel(channel.ChannelID)
+				if err != nil {
+					invalidChannels = append(invalidChannels, channel.ChannelID)
+					log.Println(lg("Discord", "Validation", color.HiRedString,
+						"Bot cannot access channel %s...\t%s", channel.ChannelID, err))
+				}
 			}
 		}
 	}
