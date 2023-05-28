@@ -1,14 +1,63 @@
 package main
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/fatih/color"
 )
+
+func backupDatabase() error {
+	file, err := os.Create(pathDatabaseBackups + string(os.PathSeparator) + time.Now().Format("2006-01-02_15-04-05.000000000") + ".zip")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	w := zip.NewWriter(file)
+	defer w.Close()
+
+	err = filepath.Walk(pathDatabaseBase, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		// Ensure that `path` is not absolute; it should not start with "/".
+		// This snippet happens to work because I don't use
+		// absolute paths, but ensure your real-world code
+		// transforms path into a zip-root relative path.
+		f, err := w.Create(path)
+		if err != nil {
+			return err
+		}
+
+		_, err = io.Copy(f, file)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func dbInsertDownload(download *downloadItem) error {
 	_, err := myDB.Use("Downloads").Insert(map[string]interface{}{

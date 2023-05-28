@@ -454,6 +454,16 @@ func main() {
 	}
 	//#endregion
 
+	//#region Database Backup
+
+	if config.BackupDatabaseOnStart {
+		if err = backupDatabase(); err != nil {
+			log.Println(lg("Database", "Backup", color.HiRedString, "Error backing up database:\t%s", err))
+		}
+	}
+
+	//#endregion
+
 	// ~~~ RUNNING
 
 	//#region ----------- TEST ENV / main
@@ -484,7 +494,7 @@ func main() {
 func openDatabase() {
 	// Database
 	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a second...)"))
-	myDB, err = db.OpenDB(pathDatabase)
+	myDB, err = db.OpenDB(pathDatabaseBase)
 	if err != nil {
 		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
 		return

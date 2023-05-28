@@ -12,12 +12,13 @@ const (
 	projectIcon     = "https://cdn.discordapp.com/icons/780985109608005703/9dc25f1b91e6d92664590254e0797fad.webp?size=256"
 	projectVersion  = "2.1.0-dev" // follows Semantic Versioning, (http://semver.org/)
 
-	pathCache          = "cache"
-	pathCacheHistory   = pathCache + string(os.PathSeparator) + "history"
-	pathCacheDuplo     = pathCache + string(os.PathSeparator) + ".duplo"
-	pathCacheInstagram = pathCache + string(os.PathSeparator) + "instagram.json"
-	pathConstants      = pathCache + string(os.PathSeparator) + "constants.json"
-	pathDatabase       = "database"
+	pathCache           = "cache"
+	pathCacheHistory    = pathCache + string(os.PathSeparator) + "history"
+	pathCacheDuplo      = pathCache + string(os.PathSeparator) + ".duplo"
+	pathCacheInstagram  = pathCache + string(os.PathSeparator) + "instagram.json"
+	pathConstants       = pathCache + string(os.PathSeparator) + "constants.json"
+	pathDatabaseBase    = "database"
+	pathDatabaseBackups = "backups"
 
 	defaultReact   = "✅"
 	limitMsg       = 2000

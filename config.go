@@ -89,12 +89,13 @@ func defaultConfiguration() configuration {
 		AdminChannels: []configurationAdminChannel{},
 
 		// Program Settings
-		ProcessLimit:         defConfig_ProcessLimit,
-		Debug:                defConfig_Debug,
-		WatchSettings:        true,
-		SettingsOutput:       true,
-		MessageOutput:        true,
-		MessageOutputHistory: false,
+		ProcessLimit:          defConfig_ProcessLimit,
+		Debug:                 defConfig_Debug,
+		BackupDatabaseOnStart: false,
+		WatchSettings:         true,
+		SettingsOutput:        true,
+		MessageOutput:         true,
+		MessageOutputHistory:  false,
 
 		DiscordLogLevel:      discordgo.LogError,
 		DiscordTimeout:       defConfig_DiscordTimeout,
@@ -189,12 +190,13 @@ type configuration struct {
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 
 	// Program Settings
-	ProcessLimit         int  `json:"processLimit,omitempty"`         // optional, defaults
-	Debug                bool `json:"debug,omitempty"`                // optional, defaults
-	WatchSettings        bool `json:"watchSettings,omitempty"`        // optional, defaults
-	SettingsOutput       bool `json:"settingsOutput,omitempty"`       // optional, defaults
-	MessageOutput        bool `json:"messageOutput,omitempty"`        // optional, defaults
-	MessageOutputHistory bool `json:"messageOutputHistory,omitempty"` // optional, defaults
+	ProcessLimit          int  `json:"processLimit,omitempty"`          // optional, defaults
+	Debug                 bool `json:"debug,omitempty"`                 // optional, defaults
+	BackupDatabaseOnStart bool `json:"backupDatabaseOnStart,omitempty"` // optional, defaults
+	WatchSettings         bool `json:"watchSettings,omitempty"`         // optional, defaults
+	SettingsOutput        bool `json:"settingsOutput,omitempty"`        // optional, defaults
+	MessageOutput         bool `json:"messageOutput,omitempty"`         // optional, defaults
+	MessageOutputHistory  bool `json:"messageOutputHistory,omitempty"`  // optional, defaults
 
 	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`      // optional, defaults
 	DiscordTimeout       int  `json:"discordTimeout,omitempty"`       // optional, defaults

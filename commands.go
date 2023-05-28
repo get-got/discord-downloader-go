@@ -453,8 +453,8 @@ func handleCommands() *exrouter.Route {
 						if all {
 							myDB.Close()
 							time.Sleep(1 * time.Second)
-							if _, err := os.Stat(pathDatabase); err == nil {
-								err = os.RemoveAll(pathDatabase)
+							if _, err := os.Stat(pathDatabaseBase); err == nil {
+								err = os.RemoveAll(pathDatabaseBase)
 								if err != nil {
 									log.Println(lg("Command", "History", color.HiRedString,
 										"Encountered error deleting database folder:\t%s", err))
