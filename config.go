@@ -91,6 +91,7 @@ func defaultConfiguration() configuration {
 		// Program Settings
 		ProcessLimit:         defConfig_ProcessLimit,
 		Debug:                defConfig_Debug,
+		WatchSettings:        true,
 		SettingsOutput:       true,
 		MessageOutput:        true,
 		MessageOutputHistory: false,
@@ -190,6 +191,7 @@ type configuration struct {
 	// Program Settings
 	ProcessLimit         int  `json:"processLimit,omitempty"`         // optional, defaults
 	Debug                bool `json:"debug,omitempty"`                // optional, defaults
+	WatchSettings        bool `json:"watchSettings,omitempty"`        // optional, defaults
 	SettingsOutput       bool `json:"settingsOutput,omitempty"`       // optional, defaults
 	MessageOutput        bool `json:"messageOutput,omitempty"`        // optional, defaults
 	MessageOutputHistory bool `json:"messageOutputHistory,omitempty"` // optional, defaults

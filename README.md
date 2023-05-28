@@ -296,6 +296,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "processLimit": 32, // # of concurrent tasks allowed at once.
 
     "debug": false,                 // detailed program info.
+    "watchSettings": true,          // update settings live if file is modified.
     "settingsOutput": true,         // display parsed settings on load.
     "messageOutput": true,          // display messages being processed in real time.
     "messageOutputHistory": false,  // display messages being processed while running history.

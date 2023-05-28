@@ -344,54 +344,56 @@ func main() {
 	//#endregion
 
 	//#region BG Tasks - Settings Watcher
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		log.Println(lg("Settings", "Watcher", color.HiRedString, "Error creating NewWatcher:\t%s", err))
-	}
-	defer watcher.Close()
-	if err = watcher.Add(configFile); err != nil {
-		log.Println(lg("Settings", "Watcher", color.HiRedString, "Error adding watcher for settings:\t%s", err))
-	}
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					// It double-fires the event without time check, might depend on OS but this works anyways
-					if time.Since(configReloadLastTime).Milliseconds() > 1 {
-						time.Sleep(1 * time.Second)
-						log.Println(lg("Settings", "Watcher", color.YellowString,
-							"Detected changes in \"%s\", reloading...", configFile))
-						mainWg.Add(1)
-						go loadConfig()
-						allString := ""
-						if config.All != nil {
-							allString = ", ALL ENABLED"
-						}
-						log.Println(lg("Settings", "Watcher", color.HiYellowString,
-							"Reloaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
-							getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
-							getBoundCategoriesCount(),
-							getBoundServersCount(), pluralS(getBoundServersCount()),
-							getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
-						))
-
-						go updateDiscordPresence()
-						go sendStatusMessage(sendStatusSettings)
-						configReloadLastTime = time.Now()
-					}
-				}
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				log.Println(color.HiRedString("[Watchers] Error:\t%s", err))
-			}
+	if config.WatchSettings {
+		watcher, err := fsnotify.NewWatcher()
+		if err != nil {
+			log.Println(lg("Settings", "Watcher", color.HiRedString, "Error creating NewWatcher:\t%s", err))
 		}
-	}()
+		defer watcher.Close()
+		if err = watcher.Add(configFile); err != nil {
+			log.Println(lg("Settings", "Watcher", color.HiRedString, "Error adding watcher for settings:\t%s", err))
+		}
+		go func() {
+			for {
+				select {
+				case event, ok := <-watcher.Events:
+					if !ok {
+						return
+					}
+					if event.Op&fsnotify.Write == fsnotify.Write {
+						// It double-fires the event without time check, might depend on OS but this works anyways
+						if time.Since(configReloadLastTime).Milliseconds() > 1 {
+							time.Sleep(1 * time.Second)
+							log.Println(lg("Settings", "Watcher", color.YellowString,
+								"Detected changes in \"%s\", reloading...", configFile))
+							mainWg.Add(1)
+							go loadConfig()
+							allString := ""
+							if config.All != nil {
+								allString = ", ALL ENABLED"
+							}
+							log.Println(lg("Settings", "Watcher", color.HiYellowString,
+								"Reloaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
+								getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
+								getBoundCategoriesCount(),
+								getBoundServersCount(), pluralS(getBoundServersCount()),
+								getBoundUsersCount(), pluralS(getBoundUsersCount()), allString,
+							))
+
+							go updateDiscordPresence()
+							go sendStatusMessage(sendStatusSettings)
+							configReloadLastTime = time.Now()
+						}
+					}
+				case err, ok := <-watcher.Errors:
+					if !ok {
+						return
+					}
+					log.Println(color.HiRedString("[Watchers] Error:\t%s", err))
+				}
+			}
+		}()
+	}
 	//#endregion
 
 	//#endregion
