@@ -778,7 +778,7 @@ func hasPerms(channelID string, permission int64) bool {
 				"Failed to check permissions (%d) for %s:\t%s", permission, channelID, err))
 		}
 	}
-	return false
+	return true
 }
 
 //#endregion
