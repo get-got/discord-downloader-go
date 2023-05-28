@@ -42,6 +42,7 @@ var (
 	duploCatalog *duplo.Store
 
 	// APIs
+	twitterLoggedIn    bool = false
 	twitterScraper     *twitterscraper.Scraper
 	instagramConnected bool = false
 	instagramClient    *goinsta.Instagram
@@ -459,6 +460,10 @@ func main() {
 
 	sendStatusMessage(sendStatusExit) // not goroutine because we want to wait to send this before logout
 
+	if twitterScraper.IsLoggedIn() {
+		twitterScraper.Logout()
+	}
+
 	log.Println(lg("Discord", "", color.GreenString, "Logging out of discord..."))
 	bot.Close()
 
@@ -533,8 +538,38 @@ func botLoad() {
 
 func botLoadAPIs() {
 	// Twitter API
-	twitterScraper = twitterscraper.New()
-	//TODO: Optional Username+Password Auth
+	go func() {
+		twitterScraper = twitterscraper.New()
+		if config.Credentials.TwitterUsername != "" &&
+			config.Credentials.TwitterPassword != "" {
+			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting to API..."))
+
+			twitterLoginCount := 0
+		do_twitter_login:
+			twitterLoginCount++
+			if twitterLoginCount > 1 {
+				time.Sleep(3 * time.Second)
+			}
+
+			if err := twitterScraper.Login(config.Credentials.TwitterUsername, config.Credentials.TwitterPassword); err != nil {
+				log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", err.Error()))
+				if twitterLoginCount <= 3 {
+					goto do_twitter_login
+				} else {
+					log.Println(lg("API", "Twitter", color.HiRedString,
+						"Failed to login to Twitter, the bot will not fetch media..."))
+				}
+			} else {
+				log.Println(lg("API", "Twitter", color.HiMagentaString, "Connected"))
+				if twitterScraper.IsLoggedIn() {
+					twitterLoggedIn = true
+				}
+			}
+		} else {
+			log.Println(lg("API", "Twitter", color.MagentaString,
+				"Twitter login missing, the bot won't use the Twitter library."))
+		}
+	}()
 
 	// Instagram API
 	go func() {
@@ -552,12 +587,12 @@ func botLoadAPIs() {
 			if instagramClient, err = goinsta.Import(instagramCachePath); err != nil {
 				instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
 				if err := instagramClient.Login(); err != nil {
-					log.Println(lg("API", "Instagram", color.HiRedString, "API Login Error: %s", err.Error()))
+					log.Println(lg("API", "Instagram", color.HiRedString, "Login Error: %s", err.Error()))
 					if instagramLoginCount <= 3 {
 						goto do_instagram_login
 					} else {
 						log.Println(lg("API", "Instagram", color.HiRedString,
-							"Failed to login to Instagram API, the bot will not fetch instagram media..."))
+							"Failed to login to Instagram, the bot will not fetch media..."))
 					}
 				} else {
 					log.Println(lg("API", "Instagram", color.HiMagentaString,
@@ -572,7 +607,7 @@ func botLoadAPIs() {
 			}
 		} else {
 			log.Println(lg("API", "Instagram", color.MagentaString,
-				"API credentials missing, the bot won't use the Instagram API."))
+				"Instagram login missing, the bot won't use the Instagram library."))
 		}
 	}()
 

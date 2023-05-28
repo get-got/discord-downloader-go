@@ -102,7 +102,7 @@ Now that that's out of the way...
 
 - Direct Links to Files
 - Discord File Attachments
-- Twitter _(requires API key, see config section)_
+- Twitter _(requires account login, see config section)_
 - Instagram _(requires account login, see config section)_
 - Reddit
 - Imgur
@@ -271,10 +271,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
         "token": "YOUR_USER_OR_BOT_TOKEN",        // user with 2FA or genuine Discord bot.
         "email": "YOUR_USER_EMAIL_NO_2FA",        // user without 2FA.
         "password": "YOUR_USER_PASSWORD_NO_2FA",  // user without 2FA.
-        "twitterAccessToken": "",       // Twitter v1.1 API.
-        "twitterAccessTokenSecret": "", // Twitter v1.1 API.
-        "twitterConsumerKey": "",       // Twitter v1.1 API.
-        "twitterConsumerSecret": "",    // Twitter v1.1 API.
+        "twitterUsername": "", // Twitter Account, not required but can be used for scraping private accounts.
+        "twitterPassword": "", // Twitter Account, not required but can be used for scraping private accounts.
         "instagramUsername": "", // Instagram Account, captcha required at some point(s).
         "instagramPassword": "", // Instagram Account, captcha required at some point(s).
         "flickrApiKey": ""

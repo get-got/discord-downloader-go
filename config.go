@@ -32,6 +32,8 @@ type configurationCredentials struct {
 	Email    string `json:"email,omitempty"`    // required for login (this or token)
 	Password string `json:"password,omitempty"` // required for login (this or token)
 	// APIs
+	TwitterUsername   string `json:"twitterUsername,omitempty"`   // optional
+	TwitterPassword   string `json:"twitterPassword,omitempty"`   // optional
 	InstagramUsername string `json:"instagramUsername,omitempty"` // optional
 	InstagramPassword string `json:"instagramPassword,omitempty"` // optional
 	FlickrApiKey      string `json:"flickrApiKey,omitempty"`      // optional
@@ -556,6 +558,12 @@ func loadConfig() error {
 			}
 			if dupeConfig.Credentials.Password != "" && dupeConfig.Credentials.Password != placeholderPassword {
 				dupeConfig.Credentials.Password = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.TwitterUsername != "" {
+				dupeConfig.Credentials.TwitterUsername = "STRIPPED_FOR_OUTPUT"
+			}
+			if dupeConfig.Credentials.TwitterPassword != "" {
+				dupeConfig.Credentials.TwitterPassword = "STRIPPED_FOR_OUTPUT"
 			}
 			if dupeConfig.Credentials.InstagramUsername != "" {
 				dupeConfig.Credentials.InstagramUsername = "STRIPPED_FOR_OUTPUT"
