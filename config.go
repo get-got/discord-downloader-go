@@ -1065,7 +1065,9 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	subjectID := m.ChannelID
 
 	if c != nil {
-		if c.ParentID != "" {
+		if (c.Type == discordgo.ChannelTypeGuildPublicThread ||
+			c.Type == discordgo.ChannelTypeGuildPrivateThread ||
+			c.Type == discordgo.ChannelTypeGuildNewsThread) && c.ParentID != "" {
 			subjectID = c.ParentID
 		}
 	}
@@ -1090,6 +1092,9 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	for _, item := range config.Categories {
 		if item.CategoryID != "" {
 			channel, err := bot.State.Channel(subjectID)
+			if err != nil {
+				channel, err = bot.Channel(subjectID)
+			}
 			if err == nil {
 				if channel.ParentID == item.CategoryID {
 					return item
@@ -1100,6 +1105,9 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 		if item.CategoryIDs != nil {
 			for _, subcategory := range *item.CategoryIDs {
 				channel, err := bot.State.Channel(subjectID)
+				if err != nil {
+					channel, err = bot.Channel(subjectID)
+				}
 				if err == nil {
 					if channel.ParentID == subcategory {
 						if item.CategoryBlacklist != nil {
@@ -1118,6 +1126,9 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	for _, item := range config.Servers {
 		if item.ServerID != "" {
 			guild, err := bot.State.Guild(item.ServerID)
+			if err != nil {
+				guild, err = bot.Guild(item.ServerID)
+			}
 			if err == nil {
 				for _, channel := range guild.Channels {
 					if subjectID == channel.ID || isNestedMessage(m, channel.ID) {
@@ -1142,6 +1153,9 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 		if item.ServerIDs != nil {
 			for _, subserver := range *item.ServerIDs {
 				guild, err := bot.State.Guild(subserver)
+				if err != nil {
+					guild, err = bot.Guild(subserver)
+				}
 				if err == nil {
 					for _, channel := range guild.Channels {
 						if subjectID == channel.ID || isNestedMessage(m, channel.ID) {

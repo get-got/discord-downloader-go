@@ -366,6 +366,19 @@ func handleCommands() *exrouter.Route {
 										log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
 											ch.ID, ch.Name, ch.GuildID))
 									}
+								} else {
+									// Category
+									for _, guild := range bot.State.Guilds {
+										for _, ch := range guild.Channels {
+											if ch.ParentID == target {
+												channels = append(channels, ch.ID)
+												if config.Debug {
+													log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
+														ch.ID, ch.Name, ch.GuildID))
+												}
+											}
+										}
+									}
 								}
 							}
 						} else if strings.Contains(strings.ToLower(target), "all") {

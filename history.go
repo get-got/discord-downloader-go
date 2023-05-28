@@ -116,9 +116,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	responseMsg.ChannelID = subjectChannelID
 	responseMsg.GuildID = ""
 
-	var baseChannelInfo *discordgo.Channel
-	if baseChannelInfo, err = bot.State.Channel(subjectChannelID); err != nil {
-		log.Println(lg("History", "", color.HiRedString, logPrefix+"ERROR FETCHING BOT STATE FROM DISCORDGO!!!\t%s", err))
+	baseChannelInfo, err := bot.State.Channel(subjectChannelID)
+	if err != nil {
+		baseChannelInfo, err = bot.Channel(subjectChannelID)
+		if err != nil {
+			log.Println(lg("History", "", color.HiRedString, logPrefix+"Error fetching channel data from discordgo:\t%s", err))
+		}
 	}
 
 	guildName := getGuildName(baseChannelInfo.GuildID)
@@ -236,7 +239,19 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	for _, channel := range subjectChannels {
 		logPrefix = fmt.Sprintf("%s/%s: ", channel.ID, commander)
 
-		if channelConfig := getSource(responseMsg, &channel); channelConfig != emptyConfig {
+		channelConfig := getSource(responseMsg, &channel)
+
+		// Invalid Source?
+		if channelConfig == emptyConfig {
+			log.Println(lg("History", "", color.HiRedString,
+				logPrefix+"Invalid source: "+channel.ID))
+			if job, exists := historyJobs.Get(subjectChannelID); exists {
+				job.Status = historyStatusErrorRequesting
+				job.Updated = time.Now()
+				historyJobs.Set(subjectChannelID, job)
+			}
+			continue
+		} else { // Process
 
 			// Overwrite Send Status
 			if channelConfig.SendAutoHistoryStatus != nil {

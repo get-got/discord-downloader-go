@@ -51,8 +51,11 @@ func getChannelGuildID(channelID string) string {
 }
 
 func getGuildName(guildID string) string {
-	sourceGuildName := "UNKNOWN"
-	sourceGuild, _ := bot.State.Guild(guildID)
+	sourceGuildName := "DM"
+	sourceGuild, err := bot.State.Guild(guildID)
+	if err != nil {
+		sourceGuild, _ = bot.Guild(guildID)
+	}
 	if sourceGuild != nil && sourceGuild.Name != "" {
 		sourceGuildName = sourceGuild.Name
 	}
@@ -75,7 +78,10 @@ func getChannelCategoryName(channelID string) string {
 
 func getChannelName(channelID string, channelData *discordgo.Channel) string {
 	sourceChannelName := "unknown"
-	sourceChannel, _ := bot.State.Channel(channelID)
+	sourceChannel, err := bot.State.Channel(channelID)
+	if err != nil {
+		sourceChannel, _ = bot.Channel(channelID)
+	}
 	if channelData != nil {
 		sourceChannel = channelData
 	}
@@ -87,9 +93,9 @@ func getChannelName(channelID string, channelData *discordgo.Channel) string {
 		} else {
 			switch sourceChannel.Type {
 			case discordgo.ChannelTypeDM:
-				sourceChannelName = "dm"
+				sourceChannelName = "DM"
 			case discordgo.ChannelTypeGroupDM:
-				sourceChannelName = "group-dm"
+				sourceChannelName = "Group-DM"
 			}
 		}
 	}
