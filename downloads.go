@@ -632,6 +632,39 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			return mDownloadStatus(downloadFailedInvalidSource, err), 0
 		}
 
+		// Check Domain
+		parsedURL, err := url.Parse(download.InputURL)
+		if err != nil {
+			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
+		}
+		domain := parsedURL.Hostname()
+		if channelConfig.Filters.AllowedDomains != nil || channelConfig.Filters.BlockedDomains != nil {
+			shouldAbort := false
+			if channelConfig.Filters.AllowedDomains != nil {
+				shouldAbort = true
+			}
+
+			if channelConfig.Filters.BlockedDomains != nil {
+				if stringInSlice(domain, *channelConfig.Filters.BlockedDomains) {
+					shouldAbort = true
+				}
+			}
+			if channelConfig.Filters.AllowedDomains != nil {
+				if stringInSlice(domain, *channelConfig.Filters.AllowedDomains) {
+					shouldAbort = false
+				}
+			}
+
+			// Abort
+			if shouldAbort {
+				if !download.HistoryCmd {
+					log.Println(lg("Download", "Skip", color.GreenString,
+						"Unpermitted domain (%s) found at %s", domain, download.InputURL))
+				}
+				return mDownloadStatus(downloadSkippedUnpermittedDomain), 0
+			}
+		}
+
 		// Clean/fix path
 		if download.Path == "" || download.Path == string(os.PathSeparator) {
 			log.Println(lg("Download", "", color.HiRedString, "Destination cannot be empty path..."))
@@ -844,39 +877,6 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						download.Extension, download.InputURL))
 				}
 				return mDownloadStatus(downloadSkippedUnpermittedExtension), 0
-			}
-		}
-
-		// Check Domain
-		parsedURL, err := url.Parse(download.InputURL)
-		if err != nil {
-			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
-		}
-		domain := parsedURL.Hostname()
-		if channelConfig.Filters.AllowedDomains != nil || channelConfig.Filters.BlockedDomains != nil {
-			shouldAbort := false
-			if channelConfig.Filters.AllowedDomains != nil {
-				shouldAbort = true
-			}
-
-			if channelConfig.Filters.BlockedDomains != nil {
-				if stringInSlice(domain, *channelConfig.Filters.BlockedDomains) {
-					shouldAbort = true
-				}
-			}
-			if channelConfig.Filters.AllowedDomains != nil {
-				if stringInSlice(domain, *channelConfig.Filters.AllowedDomains) {
-					shouldAbort = false
-				}
-			}
-
-			// Abort
-			if shouldAbort {
-				if !download.HistoryCmd {
-					log.Println(lg("Download", "Skip", color.GreenString,
-						"Unpermitted domain (%s) found at %s", domain, download.InputURL))
-				}
-				return mDownloadStatus(downloadSkippedUnpermittedDomain), 0
 			}
 		}
 
