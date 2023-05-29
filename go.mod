@@ -48,8 +48,6 @@ require (
 	golang.org/x/sys v0.8.0 // indirect
 )
 
-replace github.com/gorilla/websocket => github.com/gorilla/websocket v1.4.1
-
 replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.27.0-gg.1
 
 replace github.com/n0madic/twitter-scraper => github.com/get-got/twitter-scraper v0.0.0-20230525183600
