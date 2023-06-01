@@ -353,6 +353,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "sendAutoHistoryStatus": false, // send status message for auto history jobs.
     "sendHistoryStatus": true, // send status message for history jobs.
 
+    "delayHandling": 0,         // delay handling links by seconds for live messages
+    "delayHandlingHistory": 0,  // delay handling links by seconds for history messages
     "divideByYear": false,
     "divideByMonth": false,
     "divideByDay": false,
@@ -469,6 +471,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
             "sendAutoHistoryStatus": false,
             "sendHistoryStatus": true,
 
+            "delayHandling": 0,
+            "delayHandlingHistory": 0,
             "divideByYear": false,
             "divideByMonth": false,
             "divideByDay": false,

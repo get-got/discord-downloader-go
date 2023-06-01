@@ -146,6 +146,8 @@ func defaultConfiguration() configuration {
 		SendAutoHistoryStatus: false,
 
 		// Rules for Saving
+		DelayHandling:          0,
+		DelayHandlingHistory:   0,
 		DivideByYear:           false,
 		DivideByMonth:          false,
 		DivideByDay:            false,
@@ -254,6 +256,8 @@ type configuration struct {
 	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
 
 	// Rules for Saving
+	DelayHandling          int                         `json:"delayHandling,omitempty"`          // optional
+	DelayHandlingHistory   int                         `json:"delayHandlingHistory,omitempty"`   // optional
 	DivideByYear           bool                        `json:"divideByYear,omitempty"`           // defaults
 	DivideByMonth          bool                        `json:"divideByMonth,omitempty"`          // defaults
 	DivideByDay            bool                        `json:"divideByDay,omitempty"`            // optional, defaults
@@ -345,6 +349,8 @@ type configurationSource struct {
 	SendHistoryStatus     *bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
 
 	// Rules for Saving
+	DelayHandling          *int                        `json:"delayHandling,omitempty"`          // optional, defaults
+	DelayHandlingHistory   *int                        `json:"delayHandlingHistory,omitempty"`   // optional, defaults
 	DivideByYear           *bool                       `json:"divideByYear,omitempty"`           // optional, defaults
 	DivideByMonth          *bool                       `json:"divideByMonth,omitempty"`          // optional, defaults
 	DivideByDay            *bool                       `json:"divideByDay,omitempty"`            // optional, defaults
@@ -930,6 +936,12 @@ func sourceDefault(channel *configurationSource) {
 	}
 
 	// Rules for Saving
+	if channel.DelayHandling == nil {
+		channel.DelayHandling = &config.DelayHandling
+	}
+	if channel.DelayHandlingHistory == nil {
+		channel.DelayHandlingHistory = &config.DelayHandlingHistory
+	}
 	if channel.DivideByYear == nil {
 		channel.DivideByYear = &config.DivideByYear
 	}

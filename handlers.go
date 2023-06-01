@@ -332,6 +332,24 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 			}
 		}
 
+		// Delays
+		delay := 0
+		if history {
+			if channelConfig.DelayHandlingHistory != nil {
+				delay = *channelConfig.DelayHandlingHistory
+			}
+		} else {
+			if channelConfig.DelayHandling != nil {
+				delay = *channelConfig.DelayHandling
+			}
+		}
+		if delay > 0 {
+			if config.Debug {
+				log.Println(lg("Debug", "Message", color.YellowString, "Delaying for %d seconds...", delay))
+			}
+			time.Sleep(time.Duration(delay) * time.Second)
+		}
+
 		// Process Files
 		var downloadCount int64 = 0
 		var totalfilesize int64 = 0
