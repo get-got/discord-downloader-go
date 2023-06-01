@@ -948,37 +948,8 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 
+		//TODO: refac this dumpster fire into nested function
 		subfolder := ""
-		// Subfolder Division - Year Nesting
-		if *channelConfig.DivideByYear {
-			year := fmt.Sprint(time.Now().Year())
-			if download.Message.Author != nil {
-				year = fmt.Sprint(download.Message.Timestamp.Year())
-			}
-			subfolderSuffix := year + string(os.PathSeparator)
-			subfolder = subfolder + subfolderSuffix
-			// Create folder
-			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
-				log.Println(lg("Download", "", color.HiRedString,
-					"Error while creating server subfolder \"%s\": %s", download.Path, err))
-				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
-			}
-		}
-		// Subfolder Division - Month Nesting
-		if *channelConfig.DivideByMonth {
-			year := fmt.Sprintf("%02d", time.Now().Month())
-			if download.Message.Author != nil {
-				year = fmt.Sprintf("%02d", download.Message.Timestamp.Month())
-			}
-			subfolderSuffix := year + string(os.PathSeparator)
-			subfolder = subfolder + subfolderSuffix
-			// Create folder
-			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
-				log.Println(lg("Download", "", color.HiRedString,
-					"Error while creating server subfolder \"%s\": %s", download.Path, err))
-				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
-			}
-		}
 		// Subfolder Division - Server Nesting
 		if *channelConfig.DivideByServer {
 			subfolderSuffix := download.Message.GuildID
@@ -1027,6 +998,66 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						"Error while creating user subfolder \"%s\": %s", download.Path, err))
 					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 				}
+			}
+		}
+		// Subfolder Division - Year Nesting
+		if *channelConfig.DivideByYear {
+			year := fmt.Sprint(time.Now().Year())
+			if download.Message.Author != nil {
+				year = fmt.Sprint(download.Message.Timestamp.Year())
+			}
+			subfolderSuffix := year + string(os.PathSeparator)
+			subfolder = subfolder + subfolderSuffix
+			// Create folder
+			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while creating server subfolder \"%s\": %s", download.Path, err))
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
+			}
+		}
+		// Subfolder Division - Month Nesting
+		if *channelConfig.DivideByMonth {
+			month := fmt.Sprintf("%02d", time.Now().Month())
+			if download.Message.Author != nil {
+				month = fmt.Sprintf("%02d", download.Message.Timestamp.Month())
+			}
+			subfolderSuffix := month + string(os.PathSeparator)
+			subfolder = subfolder + subfolderSuffix
+			// Create folder
+			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while creating server subfolder \"%s\": %s", download.Path, err))
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
+			}
+		}
+		// Subfolder Division - Day Nesting
+		if *channelConfig.DivideByDay {
+			day := fmt.Sprintf("%02d", time.Now().Day())
+			if download.Message.Author != nil {
+				day = fmt.Sprintf("%02d", download.Message.Timestamp.Day())
+			}
+			subfolderSuffix := day + string(os.PathSeparator)
+			subfolder = subfolder + subfolderSuffix
+			// Create folder
+			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while creating server subfolder \"%s\": %s", download.Path, err))
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
+			}
+		}
+		// Subfolder Division - Hour Nesting
+		if *channelConfig.DivideByHour {
+			hour := fmt.Sprintf("%02d", time.Now().Hour())
+			if download.Message.Author != nil {
+				hour = fmt.Sprintf("%02d", download.Message.Timestamp.Hour())
+			}
+			subfolderSuffix := hour + string(os.PathSeparator)
+			subfolder = subfolder + subfolderSuffix
+			// Create folder
+			if err := os.MkdirAll(download.Path+subfolder, 0755); err != nil {
+				log.Println(lg("Download", "", color.HiRedString,
+					"Error while creating server subfolder \"%s\": %s", download.Path, err))
+				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 			}
 		}
 

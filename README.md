@@ -355,6 +355,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
     "divideByYear": false,
     "divideByMonth": false,
+    "divideByDay": false,
+    "divideByHour": false,
     "divideByServer": false,
     "divideByChannel": false,
     "divideByUser": false,
@@ -469,6 +471,8 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
 
             "divideByYear": false,
             "divideByMonth": false,
+            "divideByDay": false,
+            "divideByHour": false,
             "divideByServer": false,
             "divideByChannel": false,
             "divideByUser": false,

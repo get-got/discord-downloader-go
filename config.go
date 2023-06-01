@@ -148,6 +148,8 @@ func defaultConfiguration() configuration {
 		// Rules for Saving
 		DivideByYear:           false,
 		DivideByMonth:          false,
+		DivideByDay:            false,
+		DivideByHour:           false,
 		DivideByServer:         false,
 		DivideByChannel:        false,
 		DivideByUser:           false,
@@ -254,6 +256,8 @@ type configuration struct {
 	// Rules for Saving
 	DivideByYear           bool                        `json:"divideByYear,omitempty"`           // defaults
 	DivideByMonth          bool                        `json:"divideByMonth,omitempty"`          // defaults
+	DivideByDay            bool                        `json:"divideByDay,omitempty"`            // optional, defaults
+	DivideByHour           bool                        `json:"divideByHour,omitempty"`           // optional, defaults
 	DivideByServer         bool                        `json:"divideByServer,omitempty"`         // defaults
 	DivideByChannel        bool                        `json:"divideByChannel,omitempty"`        // defaults
 	DivideByUser           bool                        `json:"divideByUser,omitempty"`           // defaults
@@ -343,6 +347,8 @@ type configurationSource struct {
 	// Rules for Saving
 	DivideByYear           *bool                       `json:"divideByYear,omitempty"`           // optional, defaults
 	DivideByMonth          *bool                       `json:"divideByMonth,omitempty"`          // optional, defaults
+	DivideByDay            *bool                       `json:"divideByDay,omitempty"`            // optional, defaults
+	DivideByHour           *bool                       `json:"divideByHour,omitempty"`           // optional, defaults
 	DivideByServer         *bool                       `json:"divideByServer,omitempty"`         // optional, defaults
 	DivideByChannel        *bool                       `json:"divideByChannel,omitempty"`        // optional, defaults
 	DivideByUser           *bool                       `json:"divideByUser,omitempty"`           // optional, defaults
@@ -929,6 +935,12 @@ func sourceDefault(channel *configurationSource) {
 	}
 	if channel.DivideByMonth == nil {
 		channel.DivideByMonth = &config.DivideByMonth
+	}
+	if channel.DivideByDay == nil {
+		channel.DivideByDay = &config.DivideByDay
+	}
+	if channel.DivideByHour == nil {
+		channel.DivideByHour = &config.DivideByHour
 	}
 	if channel.DivideByServer == nil {
 		channel.DivideByServer = &config.DivideByServer
