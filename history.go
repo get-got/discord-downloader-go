@@ -424,7 +424,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				msg_rq_cnt := 0
 			request_messages:
 				msg_rq_cnt++
-				if messages, err := bot.ChannelMessages(channel.ID, 100, beforeID, sinceID, ""); err != nil {
+				if config.HistoryRequestDelay > 0 {
+					log.Println(lg("History", "", color.YellowString, "Delaying next batch request for %d seconds...", config.HistoryRequestDelay))
+					time.Sleep(time.Second * time.Duration(config.HistoryRequestDelay))
+				}
+				if messages, err := bot.ChannelMessages(channel.ID, config.HistoryRequestCount, beforeID, sinceID, ""); err != nil {
 					// Error requesting messages
 					if sendStatus {
 						if !hasPermsToRespond {
@@ -432,7 +436,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 								logPrefix+fmtBotSendPerm, responseMsg.ChannelID))
 						} else {
 							_, err = replyEmbed(responseMsg, "Command — History",
-								fmt.Sprintf("Encountered an error requesting messages for %s: %s", channel, err.Error()))
+								fmt.Sprintf("Encountered an error requesting messages for %s: %s", channel.ID, err.Error()))
 							if err != nil {
 								log.Println(lg("History", "", color.HiRedString,
 									logPrefix+"Failed to send error message:\t%s", err))

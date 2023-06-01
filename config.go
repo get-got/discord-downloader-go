@@ -144,6 +144,8 @@ func defaultConfiguration() configuration {
 		AutoHistorySince:      "",
 		SendHistoryStatus:     true,
 		SendAutoHistoryStatus: false,
+		HistoryRequestCount:   100,
+		HistoryRequestDelay:   0,
 
 		// Rules for Saving
 		DelayHandling:          0,
@@ -254,6 +256,8 @@ type configuration struct {
 	AutoHistorySince      string `json:"autoHistorySince,omitempty"`      // optional
 	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
 	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
+	HistoryRequestCount   int    `json:"historyRequestCount,omitempty"`   // optional, defaults
+	HistoryRequestDelay   int    `json:"historyRequestDelay,omitempty"`   // optional, defaults
 
 	// Rules for Saving
 	DelayHandling          int                         `json:"delayHandling,omitempty"`          // optional

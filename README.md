@@ -340,21 +340,23 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "presenceDetails": "{{timeSavedLong}}",       // user accounts only.
     "presenceDetails": "{{count}} files total",   // user accounts only.
 
-    "reactWhenDownloaded": false,          // react to messages downloaded from.
-    "reactWhenDownloadedEmoji": "",       // specify emoji for reactions, random otherwise.
-    "reactWhenDownloadedHistory": false,  // react to messages downloaded from in history jobs.
-    "historyTyping": true,  // show user as typing when processing history.
-    "embedColor": "",       // override embed color, role color by default.
+    "reactWhenDownloaded": false,           // react to messages downloaded from.
+    "reactWhenDownloadedEmoji": "",         // specify emoji for reactions, random otherwise.
+    "reactWhenDownloadedHistory": false,    // react to messages downloaded from in history jobs.
+    "historyTyping": true,                  // show user as typing when processing history.
+    "embedColor": "",                       // override embed color, role color by default.
 
-    "historyMaxJobs": 3,      // # of history jobs allowed to run concurrently, constrained by processLimit above.
-    "autoHistory": false,     // automatically run history on launch.
-    "autoHistoryBefore": "",  // YYYY-MM-DD for date filtering.
-    "autoHistorySince": "",   // YYYY-MM-DD for date filtering.
+    "historyMaxJobs": 3,            // # of history jobs allowed to run concurrently, constrained by processLimit above.
+    "autoHistory": false,           // automatically run history on launch.
+    "autoHistoryBefore": "",        // YYYY-MM-DD for date filtering.
+    "autoHistorySince": "",         // YYYY-MM-DD for date filtering.
     "sendAutoHistoryStatus": false, // send status message for auto history jobs.
-    "sendHistoryStatus": true, // send status message for history jobs.
+    "sendHistoryStatus": true,      // send status message for history jobs.
+    "historyRequestCount": 100,     // amount of messages to request per batch when processing history. 100 default, 100 max.
+    "historyRequestDelay": 0,       // delay by seconds for history batch requests (each message batch)
 
-    "delayHandling": 0,         // delay handling links by seconds for live messages
-    "delayHandlingHistory": 0,  // delay handling links by seconds for history messages
+    "delayHandling": 0,         // delay link handling by milliseconds for live messages
+    "delayHandlingHistory": 0,  // delay link handling by milliseconds for history messages
     "divideByYear": false,
     "divideByMonth": false,
     "divideByDay": false,
