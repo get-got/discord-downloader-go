@@ -345,9 +345,9 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		}
 		if delay > 0 {
 			if config.Debug {
-				log.Println(lg("Debug", "Message", color.YellowString, "Delaying for %d seconds...", delay))
+				log.Println(lg("Debug", "Message", color.YellowString, "Delaying for %d milliseconds...", delay))
 			}
-			time.Sleep(time.Duration(delay) * time.Second)
+			time.Sleep(time.Duration(delay) * time.Millisecond)
 		}
 
 		// Process Files
