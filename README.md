@@ -371,7 +371,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "saveAudioFiles": true,
     "saveTextFiles": false,
     "saveOtherFiles": false,
-    "savePossibleDuplicates": true, // save if exact filename already exists.
+    "savePossibleDuplicates": false, // save if exact filename already exists.
     "filters": {
       // when "allowed" options are enabled, nothing is allowed unless it meets their criteria.
         "blockedPhrases": [ "" ],
@@ -489,7 +489,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
             "saveAudioFiles": true,
             "saveTextFiles": false,
             "saveOtherFiles": false,
-            "savePossibleDuplicates": true,
+            "savePossibleDuplicates": false,
             "filters": {
                 "blockedPhrases": [ "" ],
                 "allowedPhrases": [ "" ],

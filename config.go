@@ -164,7 +164,7 @@ func defaultConfiguration() configuration {
 		SaveAudioFiles:         true,
 		SaveTextFiles:          false,
 		SaveOtherFiles:         false,
-		SavePossibleDuplicates: true,
+		SavePossibleDuplicates: false,
 		Filters: &configurationSourceFilters{
 			BlockedExtensions: &[]string{
 				".htm",
