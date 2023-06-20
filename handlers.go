@@ -236,7 +236,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 
 			if channelConfig.Filters.BlockedPhrases != nil {
 				for _, phrase := range *channelConfig.Filters.BlockedPhrases {
-					if strings.Contains(m.Content, phrase) {
+					if strings.Contains(m.Content, phrase) && phrase != "" {
 						shouldAbort = true
 						if config.Debug {
 							log.Println(lg("Debug", "Message", color.YellowString,
@@ -249,7 +249,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 			}
 			if channelConfig.Filters.AllowedPhrases != nil {
 				for _, phrase := range *channelConfig.Filters.AllowedPhrases {
-					if strings.Contains(m.Content, phrase) {
+					if strings.Contains(m.Content, phrase) && phrase != "" {
 						shouldAbort = false
 						if config.Debug {
 							log.Println(lg("Debug", "Message", color.YellowString,
