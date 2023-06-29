@@ -1117,12 +1117,17 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	}
 
 	// Category Config
+	channel, err := bot.State.Channel(subjectID)
+	if err != nil {
+		channel, err = bot.Channel(subjectID)
+	}
 	for _, item := range config.Categories {
-		if item.CategoryID != "" {
-			channel, err := bot.State.Channel(subjectID)
-			if err != nil {
-				channel, err = bot.Channel(subjectID)
+		if item.CategoryBlacklist != nil {
+			if stringInSlice(channel.ID, *item.CategoryBlacklist) {
+				return emptyConfig
 			}
+		}
+		if item.CategoryID != "" {
 			if err == nil {
 				if channel.ParentID == item.CategoryID {
 					return item
@@ -1132,17 +1137,8 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 		// Multi-Category Config
 		if item.CategoryIDs != nil {
 			for _, subcategory := range *item.CategoryIDs {
-				channel, err := bot.State.Channel(subjectID)
-				if err != nil {
-					channel, err = bot.Channel(subjectID)
-				}
 				if err == nil {
 					if channel.ParentID == subcategory {
-						if item.CategoryBlacklist != nil {
-							if stringInSlice(channel.ParentID, *item.CategoryBlacklist) {
-								return emptyConfig
-							}
-						}
 						return item
 					}
 				}
