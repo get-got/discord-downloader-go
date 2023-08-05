@@ -563,12 +563,19 @@ func buildEmbed(channelID string, title string, description string) *discordgo.M
 func replyEmbed(m *discordgo.Message, title string, description string) (*discordgo.Message, error) {
 	if m != nil {
 		if hasPerms(m.ChannelID, discordgo.PermissionSendMessages) {
+			mention := m.Author.Mention()
+			if !config.CommandTagging { // Erase mention if tagging disabled
+				mention = ""
+			}
 			if selfbot {
-				return bot.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s **%s**\n\n%s", m.Author.Mention(), title, description))
+				if mention != "" { // Add space if mentioning
+					mention += " "
+				}
+				return bot.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%s**%s**\n\n%s", mention, title, description))
 			} else {
 				return bot.ChannelMessageSendComplex(m.ChannelID,
 					&discordgo.MessageSend{
-						Content: m.Author.Mention(),
+						Content: mention,
 						Embed:   buildEmbed(m.ChannelID, title, description),
 					},
 				)

@@ -57,13 +57,19 @@ func handleCommands() *exrouter.Route {
 					latency := bot.HeartbeatLatency().Milliseconds()
 					roundtrip := afterPong.Sub(beforePong).Milliseconds()
 					mention := ctx.Msg.Author.Mention()
+					if !config.CommandTagging { // Erase mention if tagging disabled
+						mention = ""
+					}
 					content := fmt.Sprintf("**Latency:** ``%dms`` — **Roundtrip:** ``%dms``",
 						latency,
 						roundtrip,
 					)
 					if pong != nil {
 						if selfbot {
-							bot.ChannelMessageEdit(pong.ChannelID, pong.ID, fmt.Sprintf("%s **Command — Ping**\n\n%s", mention, content))
+							if mention != "" { // Add space if mentioning
+								mention += " "
+							}
+							bot.ChannelMessageEdit(pong.ChannelID, pong.ID, fmt.Sprintf("%s**Command — Ping**\n\n%s", mention, content))
 						} else {
 							bot.ChannelMessageEditComplex(&discordgo.MessageEdit{
 								ID:      pong.ID,

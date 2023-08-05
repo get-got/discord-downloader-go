@@ -310,6 +310,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "githubUpdateChecking": true, // check for program updates on launch.
 
     "commandPrefix": "ddg ",      // prefix for discord commands.
+    "commandTagging": true,       // tag when responding to commands (including history).
     "scanOwnMessages": false,     // checks messages of authenticated user, should be false if genuine bot, true if selfbot.
     "allowGeneralCommands": true, // ping/help/info/etc.
     "inflateDownloadCount": 0,    // +/- displayed download tally.

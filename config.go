@@ -105,6 +105,7 @@ func defaultConfiguration() configuration {
 		GithubUpdateChecking: defConfig_GithubUpdateChecking,
 
 		CommandPrefix:        defConfig_CommandPrefix,
+		CommandTagging:       true,
 		ScanOwnMessages:      defConfig_ScanOwnMessages,
 		AllowGeneralCommands: true,
 		InflateDownloadCount: &defConfig_InflateDownloadCount,
@@ -212,6 +213,7 @@ type configuration struct {
 	GithubUpdateChecking bool `json:"githubUpdateChecking,omitempty"` // optional, defaults
 
 	CommandPrefix        string `json:"commandPrefix,omitempty"`        // optional, defaults
+	CommandTagging       bool   `json:"commandTagging,omitempty"`       // optional, defaults
 	ScanOwnMessages      bool   `json:"scanOwnMessages,omitempty"`      // optional, defaults
 	AllowGeneralCommands bool   `json:"allowGeneralCommands,omitempty"` // optional, defaults
 	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty"` // optional, defaults to 0 if undefined
