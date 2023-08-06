@@ -555,7 +555,7 @@ func botLoadAPIs() {
 		twitterScraper = twitterscraper.New()
 		if config.Credentials.TwitterUsername != "" &&
 			config.Credentials.TwitterPassword != "" {
-			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting to API..."))
+			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting..."))
 
 			twitterLoginCount := 0
 		do_twitter_login:
@@ -570,14 +570,20 @@ func botLoadAPIs() {
 					goto do_twitter_login
 				} else {
 					log.Println(lg("API", "Twitter", color.HiRedString,
-						"Failed to login to Twitter, the bot will not fetch media..."))
+						"Failed to login to Twitter (X), the bot will not fetch this media..."))
 				}
 			} else {
-				log.Println(lg("API", "Twitter", color.HiMagentaString, "Connected"))
 				if twitterScraper.IsLoggedIn() {
+					log.Println(lg("API", "Twitter", color.HiMagentaString, "Connected to @"+config.Credentials.TwitterUsername))
 					twitterLoggedIn = true
+				} else {
+					log.Println(lg("API", "Twitter", color.HiRedString,
+						"Scraper login seemed successful but bot is not logged in, Twitter (X) parsing may not work..."))
 				}
 			}
+		} else {
+			log.Println(lg("API", "Twitter", color.MagentaString,
+				"Twitter (X) login missing, the bot will not fetch this media..."))
 		}
 	}()
 
@@ -586,7 +592,7 @@ func botLoadAPIs() {
 		if config.Credentials.InstagramUsername != "" &&
 			config.Credentials.InstagramPassword != "" {
 
-			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting to API..."))
+			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting..."))
 
 			instagramLoginCount := 0
 		do_instagram_login:
@@ -602,22 +608,22 @@ func botLoadAPIs() {
 						goto do_instagram_login
 					} else {
 						log.Println(lg("API", "Instagram", color.HiRedString,
-							"Failed to login to Instagram, the bot will not fetch media..."))
+							"Failed to login to Instagram, the bot will not fetch this media..."))
 					}
 				} else {
 					log.Println(lg("API", "Instagram", color.HiMagentaString,
-						"Connected to API @%s via new login", instagramClient.Account.Username))
+						"Connected to @%s via new login", instagramClient.Account.Username))
 					instagramConnected = true
 					defer instagramClient.Export(pathCacheInstagram)
 				}
 			} else {
 				log.Println(lg("API", "Instagram", color.HiMagentaString,
-					"Connected to API @%s via cache", instagramClient.Account.Username))
+					"Connected to @%s via cache", instagramClient.Account.Username))
 				instagramConnected = true
 			}
 		} else {
 			log.Println(lg("API", "Instagram", color.MagentaString,
-				"Instagram login missing, the bot won't use the Instagram library."))
+				"Instagram login missing, the bot will not fetch this media..."))
 		}
 	}()
 
