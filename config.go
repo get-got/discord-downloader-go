@@ -33,11 +33,15 @@ type configurationCredentials struct {
 	Email    string `json:"email,omitempty"`    // required for login (this or token)
 	Password string `json:"password,omitempty"` // required for login (this or token)
 	// APIs
-	TwitterUsername   string `json:"twitterUsername,omitempty"`   // optional
-	TwitterPassword   string `json:"twitterPassword,omitempty"`   // optional
-	InstagramUsername string `json:"instagramUsername,omitempty"` // optional
-	InstagramPassword string `json:"instagramPassword,omitempty"` // optional
-	FlickrApiKey      string `json:"flickrApiKey,omitempty"`      // optional
+	TwitterUsername          string `json:"twitterUsername,omitempty"`          // optional
+	TwitterPassword          string `json:"twitterPassword,omitempty"`          // optional
+	TwitterProxy             string `json:"twitterProxy,omitempty"`             // optional
+	InstagramUsername        string `json:"instagramUsername,omitempty"`        // optional
+	InstagramPassword        string `json:"instagramPassword,omitempty"`        // optional
+	InstagramProxy           string `json:"instagramProxy,omitempty"`           // optional
+	InstagramProxyInsecure   *bool  `json:"instagramProxyInsecure,omitempty"`   // optional
+	InstagramProxyForceHTTP2 *bool  `json:"instagramProxyForceHTTP2,omitempty"` // optional
+	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
 }
 
 //#endregion

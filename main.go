@@ -42,7 +42,7 @@ var (
 	duploCatalog *duplo.Store
 
 	// APIs
-	twitterLoggedIn    bool = false
+	twitterConnected   bool = false
 	twitterScraper     *twitterscraper.Scraper
 	instagramConnected bool = false
 	instagramClient    *goinsta.Instagram
@@ -557,6 +557,17 @@ func botLoadAPIs() {
 			config.Credentials.TwitterPassword != "" {
 			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting..."))
 
+			// Proxy
+			if config.Credentials.TwitterProxy != "" {
+				err := twitterScraper.SetProxy(config.Credentials.TwitterProxy)
+				if err != nil {
+					log.Println(lg("API", "Twitter", color.HiRedString, "Error setting proxy: %s", err.Error()))
+				} else {
+					log.Println(lg("API", "Twitter", color.HiMagentaString, "Proxy set to "+config.Credentials.TwitterProxy))
+				}
+			}
+
+			// Login Loop
 			twitterLoginCount := 0
 		do_twitter_login:
 			twitterLoginCount++
@@ -575,7 +586,7 @@ func botLoadAPIs() {
 			} else {
 				if twitterScraper.IsLoggedIn() {
 					log.Println(lg("API", "Twitter", color.HiMagentaString, "Connected to @"+config.Credentials.TwitterUsername))
-					twitterLoggedIn = true
+					twitterConnected = true
 				} else {
 					log.Println(lg("API", "Twitter", color.HiRedString,
 						"Scraper login seemed successful but bot is not logged in, Twitter (X) parsing may not work..."))
@@ -591,9 +602,27 @@ func botLoadAPIs() {
 	go func() {
 		if config.Credentials.InstagramUsername != "" &&
 			config.Credentials.InstagramPassword != "" {
-
 			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting..."))
 
+			// Proxy
+			if config.Credentials.InstagramProxy != "" {
+				insecure := false
+				if config.Credentials.InstagramProxyInsecure != nil {
+					insecure = *config.Credentials.InstagramProxyInsecure
+				}
+				forceHTTP2 := false
+				if config.Credentials.InstagramProxyForceHTTP2 != nil {
+					forceHTTP2 = *config.Credentials.InstagramProxyForceHTTP2
+				}
+				err := instagramClient.SetProxy(config.Credentials.InstagramProxy, insecure, forceHTTP2)
+				if err != nil {
+					log.Println(lg("API", "Instagram", color.HiRedString, "Error setting proxy: %s", err.Error()))
+				} else {
+					log.Println(lg("API", "Instagram", color.HiMagentaString, "Proxy set to "+config.Credentials.InstagramProxy))
+				}
+			}
+
+			// Login Loop
 			instagramLoginCount := 0
 		do_instagram_login:
 			instagramLoginCount++
