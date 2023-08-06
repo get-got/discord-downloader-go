@@ -585,6 +585,10 @@ func botLoadAPIs() {
 				}
 				twitterScraper.SetCookies(cookies)
 				twitterScraper.IsLoggedIn()
+				_, err = twitterScraper.GetProfile("x")
+				if err != nil {
+					return err
+				}
 				return nil
 			}
 
@@ -611,6 +615,7 @@ func botLoadAPIs() {
 			}
 
 			if twitterImport() != nil {
+				twitterScraper.ClearCookies()
 				if err := twitterScraper.Login(config.Credentials.TwitterUsername, config.Credentials.TwitterPassword); err != nil {
 					log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", err.Error()))
 					if twitterLoginCount <= 3 {
