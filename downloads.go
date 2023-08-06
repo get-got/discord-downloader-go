@@ -583,8 +583,8 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 						if *channelConfig.LogLinks.UserData {
 							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
 								download.Message.GuildID, download.Message.ChannelID,
-								download.Message.Author.Username, download.Message.Author.Discriminator,
-								download.Message.Author.ID, download.Message.Timestamp)
+								download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID,
+								download.Message.Timestamp.Local().String())
 						}
 					}
 					// Append

@@ -95,7 +95,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 			if !history || config.MessageOutputHistory {
 				addOut := ""
 				if history && config.MessageOutputHistory && !m.Timestamp.IsZero() {
-					addOut = fmt.Sprintf(" @ %s", m.Timestamp.String()[:19])
+					addOut = fmt.Sprintf(" @ %s", m.Timestamp.Local().String()[:19])
 				}
 				if edited {
 					log.Println(lg("Message", "", color.CyanString, "Edited [%s%s]: %s", sendLabel, addOut, content))
@@ -193,7 +193,9 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					additionalInfo := ""
 					if channelConfig.LogMessages.UserData != nil {
 						if *channelConfig.LogMessages.UserData {
-							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID, m.Author.Username, m.Author.Discriminator, m.Author.ID, m.Timestamp)
+							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID,
+								m.Author.Username, m.Author.Discriminator, m.Author.ID,
+								m.Timestamp.Local().String())
 						}
 					}
 					if len(m.Attachments) > 0 {
