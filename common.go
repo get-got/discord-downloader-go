@@ -419,7 +419,11 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 	if colorPrefix != "" {
 		colorPrefix += " "
 	}
-	return "\t" + pp + colorPrefix + colorFunc(line, p...)
+	tabPrefix := ""
+	if config.LogIndent {
+		tabPrefix = "\t"
+	}
+	return tabPrefix + pp + colorPrefix + colorFunc(line, p...)
 }
 
 //#endregion

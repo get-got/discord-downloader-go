@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"io"
 	"log"
 	"os"
 	"runtime"
@@ -89,6 +90,7 @@ func defaultConfiguration() configuration {
 		AdminChannels: []configurationAdminChannel{},
 
 		// Program Settings
+		LogIndent:             true,
 		ProcessLimit:          defConfig_ProcessLimit,
 		Debug:                 defConfig_Debug,
 		BackupDatabaseOnStart: false,
@@ -197,13 +199,15 @@ type configuration struct {
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 
 	// Program Settings
-	ProcessLimit          int  `json:"processLimit,omitempty"`          // optional, defaults
-	Debug                 bool `json:"debug,omitempty"`                 // optional, defaults
-	BackupDatabaseOnStart bool `json:"backupDatabaseOnStart,omitempty"` // optional, defaults
-	WatchSettings         bool `json:"watchSettings,omitempty"`         // optional, defaults
-	SettingsOutput        bool `json:"settingsOutput,omitempty"`        // optional, defaults
-	MessageOutput         bool `json:"messageOutput,omitempty"`         // optional, defaults
-	MessageOutputHistory  bool `json:"messageOutputHistory,omitempty"`  // optional, defaults
+	LogOutput             string `json:"logOutput,omitempty"`             // optional, defaults
+	LogIndent             bool   `json:"logIndent,omitempty"`             // optional, defaults
+	ProcessLimit          int    `json:"processLimit,omitempty"`          // optional, defaults
+	Debug                 bool   `json:"debug,omitempty"`                 // optional, defaults
+	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart,omitempty"` // optional, defaults
+	WatchSettings         bool   `json:"watchSettings,omitempty"`         // optional, defaults
+	SettingsOutput        bool   `json:"settingsOutput,omitempty"`        // optional, defaults
+	MessageOutput         bool   `json:"messageOutput,omitempty"`         // optional, defaults
+	MessageOutputHistory  bool   `json:"messageOutputHistory,omitempty"`  // optional, defaults
 
 	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`      // optional, defaults
 	DiscordTimeout       int  `json:"discordTimeout,omitempty"`       // optional, defaults
@@ -574,6 +578,16 @@ func loadConfig() error {
 		}
 		if config.HistoryMaxJobs < 1 {
 			config.HistoryMaxJobs = defConfig_HistoryMaxJobs
+		}
+
+		// Log to File
+		if config.LogOutput != "" {
+			f, err := os.OpenFile(config.LogOutput, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+			if err != nil {
+				log.Println(lg("Settings", "loadConfig", color.HiRedString, "Failed to open LogOutput file...\t%s", err))
+			} else {
+				log.SetOutput(io.MultiWriter(color.Output, f))
+			}
 		}
 
 		// Settings Output
