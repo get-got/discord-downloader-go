@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
@@ -558,13 +559,47 @@ func botLoadAPIs() {
 			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting..."))
 
 			// Proxy
-			if config.Credentials.TwitterProxy != "" {
-				err := twitterScraper.SetProxy(config.Credentials.TwitterProxy)
-				if err != nil {
-					log.Println(lg("API", "Twitter", color.HiRedString, "Error setting proxy: %s", err.Error()))
-				} else {
-					log.Println(lg("API", "Twitter", color.HiMagentaString, "Proxy set to "+config.Credentials.TwitterProxy))
+			twitterProxy := func(logIt bool) {
+				if config.Credentials.TwitterProxy != "" {
+					err := twitterScraper.SetProxy(config.Credentials.TwitterProxy)
+					if logIt {
+						if err != nil {
+							log.Println(lg("API", "Twitter", color.HiRedString, "Error setting proxy: %s", err.Error()))
+						} else {
+							log.Println(lg("API", "Twitter", color.HiMagentaString, "Proxy set to "+config.Credentials.TwitterProxy))
+						}
+					}
 				}
+			}
+			twitterProxy(true)
+
+			twitterImport := func() error {
+				f, err := os.Open(pathCacheTwitter)
+				if err != nil {
+					return err
+				}
+				var cookies []*http.Cookie
+				err = json.NewDecoder(f).Decode(&cookies)
+				if err != nil {
+					return err
+				}
+				twitterScraper.SetCookies(cookies)
+				twitterScraper.IsLoggedIn()
+				return nil
+			}
+
+			twitterExport := func() error {
+				cookies := twitterScraper.GetCookies()
+				js, err := json.Marshal(cookies)
+				if err != nil {
+					return err
+				}
+				f, err := os.Create(pathCacheTwitter)
+				if err != nil {
+					return err
+				}
+				f.Write(js)
+				return nil
 			}
 
 			// Login Loop
@@ -575,22 +610,33 @@ func botLoadAPIs() {
 				time.Sleep(3 * time.Second)
 			}
 
-			if err := twitterScraper.Login(config.Credentials.TwitterUsername, config.Credentials.TwitterPassword); err != nil {
-				log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", err.Error()))
-				if twitterLoginCount <= 3 {
-					goto do_twitter_login
+			if twitterImport() != nil {
+				if err := twitterScraper.Login(config.Credentials.TwitterUsername, config.Credentials.TwitterPassword); err != nil {
+					log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", err.Error()))
+					if twitterLoginCount <= 3 {
+						goto do_twitter_login
+					} else {
+						log.Println(lg("API", "Twitter", color.HiRedString,
+							"Failed to login to Twitter (X), the bot will not fetch this media..."))
+					}
 				} else {
-					log.Println(lg("API", "Twitter", color.HiRedString,
-						"Failed to login to Twitter (X), the bot will not fetch this media..."))
+					twitterConnected = true
+					defer twitterExport()
+					if twitterScraper.IsLoggedIn() {
+						log.Println(lg("API", "Twitter", color.HiMagentaString, fmt.Sprintf("Connected to @%s via new login", config.Credentials.TwitterUsername)))
+					} else {
+						log.Println(lg("API", "Twitter", color.HiRedString,
+							"Scraper login seemed successful but bot is not logged in, Twitter (X) parsing may not work..."))
+					}
 				}
 			} else {
-				if twitterScraper.IsLoggedIn() {
-					log.Println(lg("API", "Twitter", color.HiMagentaString, "Connected to @"+config.Credentials.TwitterUsername))
-					twitterConnected = true
-				} else {
-					log.Println(lg("API", "Twitter", color.HiRedString,
-						"Scraper login seemed successful but bot is not logged in, Twitter (X) parsing may not work..."))
-				}
+				log.Println(lg("API", "Twitter", color.HiMagentaString,
+					"Connected to @%s via cache", config.Credentials.TwitterUsername))
+				twitterConnected = true
+			}
+
+			if twitterConnected {
+				twitterProxy(false)
 			}
 		} else {
 			log.Println(lg("API", "Twitter", color.MagentaString,
@@ -605,22 +651,25 @@ func botLoadAPIs() {
 			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting..."))
 
 			// Proxy
-			if config.Credentials.InstagramProxy != "" {
-				insecure := false
-				if config.Credentials.InstagramProxyInsecure != nil {
-					insecure = *config.Credentials.InstagramProxyInsecure
-				}
-				forceHTTP2 := false
-				if config.Credentials.InstagramProxyForceHTTP2 != nil {
-					forceHTTP2 = *config.Credentials.InstagramProxyForceHTTP2
-				}
-				err := instagramClient.SetProxy(config.Credentials.InstagramProxy, insecure, forceHTTP2)
-				if err != nil {
-					log.Println(lg("API", "Instagram", color.HiRedString, "Error setting proxy: %s", err.Error()))
-				} else {
-					log.Println(lg("API", "Instagram", color.HiMagentaString, "Proxy set to "+config.Credentials.InstagramProxy))
+			instagramProxy := func(logIt bool) {
+				if config.Credentials.InstagramProxy != "" {
+					insecure := false
+					if config.Credentials.InstagramProxyInsecure != nil {
+						insecure = *config.Credentials.InstagramProxyInsecure
+					}
+					forceHTTP2 := false
+					if config.Credentials.InstagramProxyForceHTTP2 != nil {
+						forceHTTP2 = *config.Credentials.InstagramProxyForceHTTP2
+					}
+					err := instagramClient.SetProxy(config.Credentials.InstagramProxy, insecure, forceHTTP2)
+					if err != nil {
+						log.Println(lg("API", "Instagram", color.HiRedString, "Error setting proxy: %s", err.Error()))
+					} else {
+						log.Println(lg("API", "Instagram", color.HiMagentaString, "Proxy set to "+config.Credentials.InstagramProxy))
+					}
 				}
 			}
+			instagramProxy(true)
 
 			// Login Loop
 			instagramLoginCount := 0
@@ -649,6 +698,9 @@ func botLoadAPIs() {
 				log.Println(lg("API", "Instagram", color.HiMagentaString,
 					"Connected to @%s via cache", instagramClient.Account.Username))
 				instagramConnected = true
+			}
+			if instagramConnected {
+				instagramProxy(false)
 			}
 		} else {
 			log.Println(lg("API", "Instagram", color.MagentaString,

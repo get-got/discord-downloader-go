@@ -15,6 +15,7 @@ const (
 	pathCache           = "cache"
 	pathCacheHistory    = pathCache + string(os.PathSeparator) + "history"
 	pathCacheDuplo      = pathCache + string(os.PathSeparator) + ".duplo"
+	pathCacheTwitter    = pathCache + string(os.PathSeparator) + "twitter.json"
 	pathCacheInstagram  = pathCache + string(os.PathSeparator) + "instagram.json"
 	pathConstants       = pathCache + string(os.PathSeparator) + "constants.json"
 	pathDatabaseBase    = "database"
