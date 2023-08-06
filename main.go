@@ -63,11 +63,6 @@ var (
 	invalidServers       []string
 )
 
-const (
-	imgurClientID   = "08af502a9e70d65"
-	sneakyUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
-)
-
 func versions(multiline bool) string {
 	if multiline {
 		return fmt.Sprintf("%s/%s / %s\ndiscordgo v%s (API v%s)",
@@ -79,6 +74,7 @@ func versions(multiline bool) string {
 }
 
 func init() {
+
 	// Initialize Logging
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
@@ -559,7 +555,7 @@ func botLoadAPIs() {
 		twitterScraper = twitterscraper.New()
 		if config.Credentials.TwitterUsername != "" &&
 			config.Credentials.TwitterPassword != "" {
-			log.Println(lg("API", "Instagram", color.MagentaString, "Connecting to API..."))
+			log.Println(lg("API", "Twitter", color.MagentaString, "Connecting to API..."))
 
 			twitterLoginCount := 0
 		do_twitter_login:

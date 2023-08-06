@@ -16,6 +16,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+const (
+	imgurClientID   = "08af502a9e70d65"
+	sneakyUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
+)
+
 //#region Twitter
 
 func getTwitterUrls(inputURL string) (map[string]string, error) {
