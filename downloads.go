@@ -584,7 +584,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
 								download.Message.GuildID, download.Message.ChannelID,
 								download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID,
-								download.Message.Timestamp.Local().String())
+								discordSnowflakeToTimestamp(download.Message.ID, "2006-01-02 15-04-05"))
 						}
 					}
 					// Append
