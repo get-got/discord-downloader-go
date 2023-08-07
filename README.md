@@ -297,6 +297,15 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
         }
     ],
 
+    "overwriteCachePath": "",               // "cache" by default
+    "overwriteHistoryPath": "",             // "cache/history" by default
+    "overwriteDuploPath": "",               // "cache/.duplo" by default
+    "overwriteTwitterPath": "",             // "cache/twitter.json" by default
+    "overwriteInstagramPath": "",           // "cache/instagram.json" by default
+    "overwriteConstantsPath": "",           // "cache/constants.json" by default
+    "overwriteDatabasePath": "",            // "database" by default
+    "overwriteDatabaseBackupsPath": "",     // "backups" by default
+
     "processLimit": 32, // # of concurrent tasks allowed at once.
 
     "debug": false,                 // detailed program info.

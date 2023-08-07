@@ -202,6 +202,16 @@ type configuration struct {
 	Admins        []string                    `json:"admins"`        // optional
 	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
 
+	// Path Overwrites
+	OverwriteCachePath           string `json:"overwriteCachePath,omitempty"`           // optional
+	OverwriteHistoryPath         string `json:"overwriteHistoryPath,omitempty"`         // optional
+	OverwriteDuploPath           string `json:"overwriteDuploPath,omitempty"`           // optional
+	OverwriteTwitterPath         string `json:"overwriteTwitterPath,omitempty"`         // optional
+	OverwriteInstagramPath       string `json:"overwriteInstagramPath,omitempty"`       // optional
+	OverwriteConstantsPath       string `json:"overwriteConstantsPath,omitempty"`       // optional
+	OverwriteDatabasePath        string `json:"overwriteDatabasePath,omitempty"`        // optional
+	OverwriteDatabaseBackupsPath string `json:"overwriteDatabaseBackupsPath,omitempty"` // optional
+
 	// Program Settings
 	LogOutput             string `json:"logOutput,omitempty"`             // optional, defaults
 	LogIndent             bool   `json:"logIndent,omitempty"`             // optional, defaults
@@ -592,6 +602,32 @@ func loadConfig() error {
 			} else {
 				log.SetOutput(io.MultiWriter(color.Output, f))
 			}
+		}
+
+		// Overwrite Paths
+		if config.OverwriteCachePath != "" {
+			pathCache = config.OverwriteCachePath
+		}
+		if config.OverwriteHistoryPath != "" {
+			pathCacheHistory = config.OverwriteHistoryPath
+		}
+		if config.OverwriteDuploPath != "" {
+			pathCacheDuplo = config.OverwriteDuploPath
+		}
+		if config.OverwriteTwitterPath != "" {
+			pathCacheTwitter = config.OverwriteTwitterPath
+		}
+		if config.OverwriteInstagramPath != "" {
+			pathCacheInstagram = config.OverwriteInstagramPath
+		}
+		if config.OverwriteConstantsPath != "" {
+			pathConstants = config.OverwriteConstantsPath
+		}
+		if config.OverwriteDatabasePath != "" {
+			pathDatabaseBase = config.OverwriteDatabasePath
+		}
+		if config.OverwriteDatabaseBackupsPath != "" {
+			pathDatabaseBackups = config.OverwriteDatabaseBackupsPath
 		}
 
 		// Settings Output

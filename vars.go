@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-const (
+var (
 	projectName     = "discord-downloader-go"
 	projectLabel    = "Discord Downloader GO"
 	projectRepoBase = "get-got/discord-downloader-go"
