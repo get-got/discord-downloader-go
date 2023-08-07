@@ -306,6 +306,9 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "overwriteDatabasePath": "",            // "database" by default
     "overwriteDatabaseBackupsPath": "",     // "backups" by default
 
+    "logOutput": "", // optional filepath to log console output to.
+    "logIndent": true, // indentation between log timestamp/prefix and log content.
+
     "processLimit": 32, // # of concurrent tasks allowed at once.
 
     "debug": false,                 // detailed program info.
