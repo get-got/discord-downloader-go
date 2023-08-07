@@ -360,6 +360,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
     "reactWhenDownloaded": false,           // react to messages downloaded from.
     "reactWhenDownloadedEmoji": "",         // specify emoji for reactions, random otherwise.
     "reactWhenDownloadedHistory": false,    // react to messages downloaded from in history jobs.
+    "overwriteDefaultReaction": "",         // "✅" by default.
     "historyTyping": true,                  // show user as typing when processing history.
     "embedColor": "",                       // override embed color, role color by default.
 

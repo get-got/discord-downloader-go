@@ -266,6 +266,7 @@ type configuration struct {
 	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
 	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji,omitempty"`   // optional
 	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults
+	OverwriteDefaultReaction   *string            `json:"overwriteDefaultReaction,omitempty"`   // optional
 	HistoryTyping              bool               `json:"historyTyping,omitempty"`              // optional, defaults
 	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
 
@@ -628,6 +629,11 @@ func loadConfig() error {
 		}
 		if config.OverwriteDatabaseBackupsPath != "" {
 			pathDatabaseBackups = config.OverwriteDatabaseBackupsPath
+		}
+
+		// Overwrite Default Reaction
+		if config.OverwriteDefaultReaction != nil {
+			defaultReact = *config.OverwriteDefaultReaction
 		}
 
 		// Settings Output
