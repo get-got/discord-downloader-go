@@ -244,6 +244,8 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 	inputURL = strings.ReplaceAll(inputURL, "fxtwitter.com", "twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, "c.vxtwitter.com", "twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
+	inputURL = strings.ReplaceAll(inputURL, "//x.com", "//twitter.com")
+	inputURL = strings.ReplaceAll(inputURL, ".x.com", ".twitter.com")
 	if regexUrlTwitter.MatchString(inputURL) {
 		links, err := getTwitterUrls(inputURL)
 		if err != nil {
