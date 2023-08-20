@@ -41,7 +41,7 @@
 | -----------------:|:----------------------------------------------- |
 | Windows           | **amd64**, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
 | Linux             | **amd64**, **arm64**, **armv7/6/5**,<br/>risc-v64 _(?)_, mips64/64le _(?)_, s390x _(?)_, 386 _(?)_
-| Darwin (Mac)      | amd64 _(?)_, arm64 _(?)_
+| Darwin (Mac)      | **amd64**, arm64 _(?)_
 | FreeBSD           | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
 | OpenBSD           | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
 | NetBSD            | amd64 _(?)_, arm64 _(?)_, armv7/6/5 _(?)_, 386 _(?)_
@@ -102,7 +102,7 @@ Now that that's out of the way...
 
 - Direct Links to Files
 - Discord File Attachments
-- Twitter _(requires account login, see config section)_
+- Twitter / X _(requires account login, see config section)_
 - Instagram _(requires account login, see config section)_
 - Reddit
 - Imgur
