@@ -246,25 +246,29 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 	inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, "//x.com", "//twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, ".x.com", ".twitter.com")
-	if regexUrlTwitter.MatchString(inputURL) {
-		links, err := getTwitterUrls(inputURL)
-		if err != nil {
-			if !strings.Contains(err.Error(), "suspended") {
-				log.Println(lg("Download", "", color.RedString, "Twitter Media fetch failed for %s -- %s", inputURL, err))
+	if twitterConnected {
+		if regexUrlTwitter.MatchString(inputURL) {
+			links, err := getTwitterUrls(inputURL)
+			if err != nil {
+				if !strings.Contains(err.Error(), "suspended") {
+					log.Println(lg("Download", "", color.RedString, "Twitter Media fetch failed for %s -- %s", inputURL, err))
+				}
+			} else if len(links) > 0 {
+				return trimDownloadedLinks(links, m)
 			}
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, m)
 		}
-	}
-	if regexUrlTwitterStatus.MatchString(inputURL) {
-		links, err := getTwitterStatusUrls(inputURL, m)
-		if err != nil {
-			if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
-				log.Println(lg("Download", "", color.RedString, "Twitter Status fetch failed for %s -- %s", inputURL, err))
+		if regexUrlTwitterStatus.MatchString(inputURL) {
+			links, err := getTwitterStatusUrls(inputURL, m)
+			if err != nil {
+				if !strings.Contains(err.Error(), "suspended") && !strings.Contains(err.Error(), "No status found") {
+					log.Println(lg("Download", "", color.RedString, "Twitter Status fetch failed for %s -- %s", inputURL, err))
+				}
+			} else if len(links) > 0 {
+				return trimDownloadedLinks(links, m)
 			}
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, m)
 		}
+	} else if strings.Contains(inputURL, "twitter.com") {
+		return trimDownloadedLinks(map[string]string{inputURL: ""}, m)
 	}
 
 	if instagramConnected {
