@@ -306,8 +306,8 @@ The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
     "overwriteDatabasePath": "",            // "database" by default
     "overwriteDatabaseBackupsPath": "",     // "backups" by default
 
-    "logOutput": "", // optional filepath to log console output to.
-    "logIndent": true, // indentation between log timestamp/prefix and log content.
+    "logOutput": "",    // optional filepath to log console output to, include extension.
+    "logIndent": true,  // indentation between log timestamp/prefix and log content.
 
     "processLimit": 32, // # of concurrent tasks allowed at once.
 
@@ -341,20 +341,20 @@ The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
     "scanEdits": true,
     "ignoreBots": true,
 
-    "sendErrorMessages": false,
+    "sendErrorMessages": false,   // Send error replies in Discord.
     "sendFileToChannel": "",      // Forward detected media to channel.
     "sendFileToChannels": [ "" ], // ^.
     "sendFileDirectly": true,     // Send direct file as attachment or embed in message.
     "sendFileCaption": "",        // Caption to accompany media.
 
     "filenameDateFormat": "2006-01-02_15-04-05",  // Format for {{date}}.
-    "filenameFormat": "{{date}} {{file}}",
+    "filenameFormat": "{{date}} {{file}}", // Default would be "2020-01-02_03-04-05 original_filename.png"
 
-    "presenceEnabled": true,
+    "presenceEnabled": true,    // Display Discord presence
     "presenceStatus": "idle", // "online" or "idle" or "dnd" or "invisible".
     "presenceType": 0,        // 0 = Playing, 1 = Streaming, 2 = Listening, 3 = Watching.
     "presenceLabel": "{{timeSavedShort}} - {{countShort}} files",
-    "presenceDetails": "{{timeSavedLong}}",       // user accounts only.
+    "presenceDetails": "{{timeSavedLong}}",       // user accounts only - "3:04:05pm MST - January 2, 2006" by default.
     "presenceDetails": "{{count}} files total",   // user accounts only.
 
     "reactWhenDownloaded": false,           // react to messages downloaded from.
@@ -390,6 +390,7 @@ The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
     "saveTextFiles": false,
     "saveOtherFiles": false,
     "savePossibleDuplicates": false, // save if exact filename already exists.
+    
     "filters": {
       // when "allowed" options are enabled, nothing is allowed unless it meets their criteria.
         "blockedPhrases": [ "" ],
@@ -413,6 +414,7 @@ The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
         "blockedReactions": [ "" ], // List of reactions to block or allow, by ID only.
         "allowedReactions": [ "" ]
     },
+
     // duplicate image filtering
     // caching of image data is stored via a database file; it will not read all pre-existing images.
     "duplo": false,
@@ -508,7 +510,7 @@ The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
             "saveTextFiles": false,
             "saveOtherFiles": false,
             "savePossibleDuplicates": false,
-            
+
             "filters": {
                 "blockedPhrases": [ "" ],
                 "allowedPhrases": [ "" ],
