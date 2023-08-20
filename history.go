@@ -371,7 +371,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
 					if sendStatus {
 						status := fmt.Sprintf(
-							"``%s:`` **%s files downloaded...** `(%s so far, avg %1.1f MB/s)`\n``"+
+							"``%s:`` **%s files downloaded...** `(%s so far, avg %1.1f MB/s)`\n"+
 								"_%s messages processed, avg %d msg/s_\n\n"+
 								"%s\n\n"+
 								"%s`(%d)` _Processing more messages, please wait..._\n",
