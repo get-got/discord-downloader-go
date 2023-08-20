@@ -257,13 +257,19 @@ When initially launching the bot it will create a default settings file if you d
 
 **If you have a ``config.ini`` from _Seklfreak's discord-image-downloader-go_, it will import settings if it's in the same folder as the program.**
 
-The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
+The bot accepts `.json` or **`.jsonc` for comment-friendly json,** as well as `.yaml`.
+
+If you are using `.json`/`.jsonc`, the bot will convert to YAML and store in `cache/settings.yaml` upon launch, for help with conversion if you wish to use YAML.
+
+Alternatively, if you are using `.yaml`, the bot will convert to JSON and store in `cache/settings.json` upon launch, for help with conversion if you wish to use JSON.
 
 ---
 
 ### EXAMPLE: ALL WITH DEFAULT VALUES
 
-**DO NOT LEAVE COMMAS `,` AFTER THE LAST ITEM IN A SECTION. JSON DOES NOT LIKE THIS, IT WILL ERROR.**
+**FOR JSON DO NOT LEAVE COMMAS `,` AFTER THE LAST ITEM IN A SECTION, IT WILL ERROR.**
+
+**FOR HELP WITH JSON FORMATTING, SEE BELOW EXAMPLES.**
 
 ```json
 {
@@ -390,7 +396,7 @@ The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
     "saveTextFiles": false,
     "saveOtherFiles": false,
     "savePossibleDuplicates": false, // save if exact filename already exists.
-    
+
     "filters": {
       // when "allowed" options are enabled, nothing is allowed unless it meets their criteria.
         "blockedPhrases": [ "" ],

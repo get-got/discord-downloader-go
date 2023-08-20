@@ -13,6 +13,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/muhammadmuzzammil1998/jsonc"
 	"gopkg.in/ini.v1"
+	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -29,19 +30,19 @@ var (
 
 type configurationCredentials struct {
 	// Login
-	Token    string `json:"token,omitempty"`    // required for bot token (this or login)
-	Email    string `json:"email,omitempty"`    // required for login (this or token)
-	Password string `json:"password,omitempty"` // required for login (this or token)
+	Token    string `json:"token,omitempty" yaml:"token,omitempty"`       // required for bot token (this or login)
+	Email    string `json:"email,omitempty" yaml:"email,omitempty"`       // required for login (this or token)
+	Password string `json:"password,omitempty" yaml:"password,omitempty"` // required for login (this or token)
 	// APIs
-	TwitterUsername          string `json:"twitterUsername,omitempty"`          // optional
-	TwitterPassword          string `json:"twitterPassword,omitempty"`          // optional
-	TwitterProxy             string `json:"twitterProxy,omitempty"`             // optional
-	InstagramUsername        string `json:"instagramUsername,omitempty"`        // optional
-	InstagramPassword        string `json:"instagramPassword,omitempty"`        // optional
-	InstagramProxy           string `json:"instagramProxy,omitempty"`           // optional
-	InstagramProxyInsecure   *bool  `json:"instagramProxyInsecure,omitempty"`   // optional
-	InstagramProxyForceHTTP2 *bool  `json:"instagramProxyForceHTTP2,omitempty"` // optional
-	FlickrApiKey             string `json:"flickrApiKey,omitempty"`             // optional
+	TwitterUsername          string `json:"twitterUsername,omitempty" yaml:"twitterUsername,omitempty"`
+	TwitterPassword          string `json:"twitterPassword,omitempty" yaml:"twitterPassword,omitempty"`
+	TwitterProxy             string `json:"twitterProxy,omitempty" yaml:"twitterProxy,omitempty"`
+	InstagramUsername        string `json:"instagramUsername,omitempty" yaml:"instagramUsername,omitempty"`
+	InstagramPassword        string `json:"instagramPassword,omitempty" yaml:"instagramPassword,omitempty"`
+	InstagramProxy           string `json:"instagramProxy,omitempty" yaml:"instagramProxy,omitempty"`
+	InstagramProxyInsecure   *bool  `json:"instagramProxyInsecure,omitempty" yaml:"instagramProxyInsecure,omitempty"`
+	InstagramProxyForceHTTP2 *bool  `json:"instagramProxyForceHTTP2,omitempty" yaml:"instagramProxyForceHTTP2,omitempty"`
+	FlickrApiKey             string `json:"flickrApiKey,omitempty" yaml:"flickrApiKey,omitempty"`
 }
 
 //#endregion
@@ -185,7 +186,6 @@ func defaultConfiguration() configuration {
 				".py",
 				".jar",
 			},
-			BlockedPhrases: &[]string{},
 		},
 		Duplo:          false,
 		DuploThreshold: 0,
@@ -193,129 +193,129 @@ func defaultConfiguration() configuration {
 }
 
 type configuration struct {
-	Constants map[string]string `json:"_constants,omitempty"`
+	Constants map[string]string `json:"_constants,omitempty" yaml:"_constants,omitempty"`
 
 	// Logins
-	Credentials configurationCredentials `json:"credentials"` // required
+	Credentials configurationCredentials `json:"credentials" yaml:"credentials"`
 
 	// Owner Settings
-	Admins        []string                    `json:"admins"`        // optional
-	AdminChannels []configurationAdminChannel `json:"adminChannels"` // optional
+	Admins        []string                    `json:"admins" yaml:"admins"`
+	AdminChannels []configurationAdminChannel `json:"adminChannels" yaml:"adminChannels"`
 
 	// Path Overwrites
-	OverwriteCachePath           string `json:"overwriteCachePath,omitempty"`           // optional
-	OverwriteHistoryPath         string `json:"overwriteHistoryPath,omitempty"`         // optional
-	OverwriteDuploPath           string `json:"overwriteDuploPath,omitempty"`           // optional
-	OverwriteTwitterPath         string `json:"overwriteTwitterPath,omitempty"`         // optional
-	OverwriteInstagramPath       string `json:"overwriteInstagramPath,omitempty"`       // optional
-	OverwriteConstantsPath       string `json:"overwriteConstantsPath,omitempty"`       // optional
-	OverwriteDatabasePath        string `json:"overwriteDatabasePath,omitempty"`        // optional
-	OverwriteDatabaseBackupsPath string `json:"overwriteDatabaseBackupsPath,omitempty"` // optional
+	OverwriteCachePath           string `json:"overwriteCachePath,omitempty" yaml:"overwriteCachePath,omitempty"`
+	OverwriteHistoryPath         string `json:"overwriteHistoryPath,omitempty" yaml:"overwriteHistoryPath,omitempty"`
+	OverwriteDuploPath           string `json:"overwriteDuploPath,omitempty" yaml:"overwriteDuploPath,omitempty"`
+	OverwriteTwitterPath         string `json:"overwriteTwitterPath,omitempty" yaml:"overwriteTwitterPath,omitempty"`
+	OverwriteInstagramPath       string `json:"overwriteInstagramPath,omitempty" yaml:"overwriteInstagramPath,omitempty"`
+	OverwriteConstantsPath       string `json:"overwriteConstantsPath,omitempty" yaml:"overwriteConstantsPath,omitempty"`
+	OverwriteDatabasePath        string `json:"overwriteDatabasePath,omitempty" yaml:"overwriteDatabasePath,omitempty"`
+	OverwriteDatabaseBackupsPath string `json:"overwriteDatabaseBackupsPath,omitempty" yaml:"overwriteDatabaseBackupsPath,omitempty"`
 
 	// Program Settings
-	LogOutput             string `json:"logOutput,omitempty"`             // optional, defaults
-	LogIndent             bool   `json:"logIndent,omitempty"`             // optional, defaults
-	ProcessLimit          int    `json:"processLimit,omitempty"`          // optional, defaults
-	Debug                 bool   `json:"debug,omitempty"`                 // optional, defaults
-	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart,omitempty"` // optional, defaults
-	WatchSettings         bool   `json:"watchSettings,omitempty"`         // optional, defaults
-	SettingsOutput        bool   `json:"settingsOutput,omitempty"`        // optional, defaults
-	MessageOutput         bool   `json:"messageOutput,omitempty"`         // optional, defaults
-	MessageOutputHistory  bool   `json:"messageOutputHistory,omitempty"`  // optional, defaults
+	LogOutput             string `json:"logOutput,omitempty" yaml:"logOutput,omitempty"`
+	LogIndent             bool   `json:"logIndent,omitempty" yaml:"logIndent,omitempty"`
+	ProcessLimit          int    `json:"processLimit,omitempty" yaml:"processLimit,omitempty"`
+	Debug                 bool   `json:"debug,omitempty" yaml:"debug,omitempty"`
+	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart,omitempty" yaml:"backupDatabaseOnStart,omitempty"`
+	WatchSettings         bool   `json:"watchSettings,omitempty" yaml:"watchSettings,omitempty"`
+	SettingsOutput        bool   `json:"settingsOutput,omitempty" yaml:"settingsOutput,omitempty"`
+	MessageOutput         bool   `json:"messageOutput,omitempty" yaml:"messageOutput,omitempty"`
+	MessageOutputHistory  bool   `json:"messageOutputHistory,omitempty" yaml:"messageOutputHistory,omitempty"`
 
-	DiscordLogLevel      int  `json:"discordLogLevel,omitempty"`      // optional, defaults
-	DiscordTimeout       int  `json:"discordTimeout,omitempty"`       // optional, defaults
-	DownloadTimeout      int  `json:"downloadTimeout,omitempty"`      // optional, defaults
-	DownloadRetryMax     int  `json:"downloadRetryMax,omitempty"`     // optional, defaults
-	ExitOnBadConnection  bool `json:"exitOnBadConnection,omitempty"`  // optional, defaults
-	GithubUpdateChecking bool `json:"githubUpdateChecking,omitempty"` // optional, defaults
+	DiscordLogLevel      int  `json:"discordLogLevel,omitempty" yaml:"discordLogLevel,omitempty"`
+	DiscordTimeout       int  `json:"discordTimeout,omitempty" yaml:"discordTimeout,omitempty"`
+	DownloadTimeout      int  `json:"downloadTimeout,omitempty" yaml:"downloadTimeout,omitempty"`
+	DownloadRetryMax     int  `json:"downloadRetryMax,omitempty" yaml:"downloadRetryMax,omitempty"`
+	ExitOnBadConnection  bool `json:"exitOnBadConnection,omitempty" yaml:"exitOnBadConnection,omitempty"`
+	GithubUpdateChecking bool `json:"githubUpdateChecking,omitempty" yaml:"githubUpdateChecking,omitempty"`
 
-	CommandPrefix        string `json:"commandPrefix,omitempty"`        // optional, defaults
-	CommandTagging       bool   `json:"commandTagging,omitempty"`       // optional, defaults
-	ScanOwnMessages      bool   `json:"scanOwnMessages,omitempty"`      // optional, defaults
-	AllowGeneralCommands bool   `json:"allowGeneralCommands,omitempty"` // optional, defaults
-	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty"` // optional, defaults to 0 if undefined
-	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty"`      // optional, defaults
+	CommandPrefix        string `json:"commandPrefix,omitempty" yaml:"commandPrefix,omitempty"`
+	CommandTagging       bool   `json:"commandTagging,omitempty" yaml:"commandTagging,omitempty"`
+	ScanOwnMessages      bool   `json:"scanOwnMessages,omitempty" yaml:"scanOwnMessages,omitempty"`
+	AllowGeneralCommands bool   `json:"allowGeneralCommands,omitempty" yaml:"allowGeneralCommands,omitempty"`
+	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty" yaml:"inflateDownloadCount,omitempty"`
+	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty" yaml:"europeanNumbers,omitempty"`
 
-	CheckupRate         int `json:"checkupRate,omitempty"`         // optional, defaults
-	ConnectionCheckRate int `json:"connectionCheckRate,omitempty"` // optional, defaults
-	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty"` // optional, defaults
+	CheckupRate         int `json:"checkupRate,omitempty" yaml:"checkupRate,omitempty"`
+	ConnectionCheckRate int `json:"connectionCheckRate,omitempty" yaml:"connectionCheckRate,omitempty"`
+	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty" yaml:"presenceRefreshRate,omitempty"`
 
 	// Source Setup Defaults
-	Save          bool `json:"save,omitempty"`          // optional, defaults
-	AllowCommands bool `json:"allowCommands,omitempty"` // optional, defaults
-	ScanEdits     bool `json:"scanEdits,omitempty"`     // optional, defaults
-	IgnoreBots    bool `json:"ignoreBots,omitempty"`    // optional, defaults
+	Save          bool `json:"save,omitempty" yaml:"save,omitempty"`
+	AllowCommands bool `json:"allowCommands,omitempty" yaml:"allowCommands,omitempty"`
+	ScanEdits     bool `json:"scanEdits,omitempty" yaml:"scanEdits,omitempty"`
+	IgnoreBots    bool `json:"ignoreBots,omitempty" yaml:"ignoreBots,omitempty"`
 
-	SendErrorMessages  bool     `json:"sendErrorMessages,omitempty"`  // optional, defaults
-	SendFileToChannel  string   `json:"sendFileToChannel,omitempty"`  // optional, defaults
-	SendFileToChannels []string `json:"sendFileToChannels,omitempty"` // optional, defaults
-	SendFileDirectly   bool     `json:"sendFileDirectly,omitempty"`   // optional, defaults
-	SendFileCaption    string   `json:"sendFileCaption,omitempty"`    // optional
+	SendErrorMessages  bool     `json:"sendErrorMessages,omitempty" yaml:"sendErrorMessages,omitempty"`
+	SendFileToChannel  string   `json:"sendFileToChannel,omitempty" yaml:"sendFileToChannel,omitempty"`
+	SendFileToChannels []string `json:"sendFileToChannels,omitempty" yaml:"sendFileToChannels,omitempty"`
+	SendFileDirectly   bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
+	SendFileCaption    string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
 
-	FilenameDateFormat string `json:"filenameDateFormat,omitempty"` // optional, defaults
-	FilenameFormat     string `json:"filenameFormat,omitempty"`     // optional, defaults
+	FilenameDateFormat string `json:"filenameDateFormat,omitempty" yaml:"filenameDateFormat,omitempty"`
+	FilenameFormat     string `json:"filenameFormat,omitempty" yaml:"filenameFormat,omitempty"`
 
 	// Appearance
-	PresenceEnabled            bool               `json:"presenceEnabled,omitempty"`            // optional, defaults
-	PresenceStatus             string             `json:"presenceStatus,omitempty"`             // optional, defaults
-	PresenceType               discordgo.GameType `json:"presenceType,omitempty"`               // optional, defaults
-	PresenceLabel              *string            `json:"presenceLabel,omitempty"`              // optional, unused if undefined
-	PresenceDetails            *string            `json:"presenceDetails,omitempty"`            // optional, unused if undefined
-	PresenceState              *string            `json:"presenceState,omitempty"`              // optional, unused if undefined
-	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
-	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji,omitempty"`   // optional
-	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults
-	OverwriteDefaultReaction   *string            `json:"overwriteDefaultReaction,omitempty"`   // optional
-	HistoryTyping              bool               `json:"historyTyping,omitempty"`              // optional, defaults
-	EmbedColor                 *string            `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
+	PresenceEnabled            bool               `json:"presenceEnabled,omitempty" yaml:"presenceEnabled,omitempty"`
+	PresenceStatus             string             `json:"presenceStatus,omitempty" yaml:"presenceStatus,omitempty"`
+	PresenceType               discordgo.GameType `json:"presenceType,omitempty" yaml:"presenceType,omitempty"`
+	PresenceLabel              *string            `json:"presenceLabel,omitempty" yaml:"presenceLabel,omitempty"`
+	PresenceDetails            *string            `json:"presenceDetails,omitempty" yaml:"presenceDetails,omitempty"`
+	PresenceState              *string            `json:"presenceState,omitempty" yaml:"presenceState,omitempty"`
+	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty" yaml:"reactWhenDownloaded,omitempty"`
+	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji,omitempty" yaml:"reactWhenDownloadedEmoji,omitempty"`
+	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty" yaml:"reactWhenDownloadedHistory,omitempty"`
+	OverwriteDefaultReaction   *string            `json:"overwriteDefaultReaction,omitempty" yaml:"overwriteDefaultReaction,omitempty"`
+	HistoryTyping              bool               `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
+	EmbedColor                 *string            `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
 
 	// History
-	HistoryMaxJobs        int    `json:"historyMaxJobs,omitempty"`        // optional, defaults
-	AutoHistory           bool   `json:"autoHistory,omitempty"`           // optional, defaults
-	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty"`     // optional
-	AutoHistorySince      string `json:"autoHistorySince,omitempty"`      // optional
-	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
-	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
-	HistoryRequestCount   int    `json:"historyRequestCount,omitempty"`   // optional, defaults
-	HistoryRequestDelay   int    `json:"historyRequestDelay,omitempty"`   // optional, defaults
+	HistoryMaxJobs        int    `json:"historyMaxJobs,omitempty" yaml:"historyMaxJobs,omitempty"`
+	AutoHistory           bool   `json:"autoHistory,omitempty" yaml:"autoHistory,omitempty"`
+	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty" yaml:"autoHistoryBefore,omitempty"`
+	AutoHistorySince      string `json:"autoHistorySince,omitempty" yaml:"autoHistorySince,omitempty"`
+	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus,omitempty" yaml:"sendAutoHistoryStatus,omitempty"`
+	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty" yaml:"sendHistoryStatus,omitempty"`
+	HistoryRequestCount   int    `json:"historyRequestCount,omitempty" yaml:"historyRequestCount,omitempty"`
+	HistoryRequestDelay   int    `json:"historyRequestDelay,omitempty" yaml:"historyRequestDelay,omitempty"`
 
 	// Rules for Saving
-	DelayHandling          int                         `json:"delayHandling,omitempty"`          // optional
-	DelayHandlingHistory   int                         `json:"delayHandlingHistory,omitempty"`   // optional
-	DivideByYear           bool                        `json:"divideByYear,omitempty"`           // defaults
-	DivideByMonth          bool                        `json:"divideByMonth,omitempty"`          // defaults
-	DivideByDay            bool                        `json:"divideByDay,omitempty"`            // optional, defaults
-	DivideByHour           bool                        `json:"divideByHour,omitempty"`           // optional, defaults
-	DivideByServer         bool                        `json:"divideByServer,omitempty"`         // defaults
-	DivideByChannel        bool                        `json:"divideByChannel,omitempty"`        // defaults
-	DivideByUser           bool                        `json:"divideByUser,omitempty"`           // defaults
-	DivideByType           bool                        `json:"divideByType,omitempty"`           // defaults
-	DivideFoldersUseID     bool                        `json:"divideFoldersUseID,omitempty"`     // defaults
-	SaveImages             bool                        `json:"saveImages,omitempty"`             // defaults
-	SaveVideos             bool                        `json:"saveVideos,omitempty"`             // defaults
-	SaveAudioFiles         bool                        `json:"saveAudioFiles,omitempty"`         // defaults
-	SaveTextFiles          bool                        `json:"saveTextFiles,omitempty"`          // defaults
-	SaveOtherFiles         bool                        `json:"saveOtherFiles,omitempty"`         // defaults
-	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates,omitempty"` // defaults
-	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
-	Duplo                  bool                        `json:"duplo,omitempty"`                  // optional, defaults
-	DuploThreshold         float64                     `json:"duploThreshold,omitempty"`         // optional, defaults
+	DelayHandling          int                         `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory   int                         `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
+	DivideByYear           bool                        `json:"divideByYear,omitempty" yaml:"divideByYear,omitempty"`
+	DivideByMonth          bool                        `json:"divideByMonth,omitempty" yaml:"divideByMonth,omitempty"`
+	DivideByDay            bool                        `json:"divideByDay,omitempty" yaml:"divideByDay,omitempty"`
+	DivideByHour           bool                        `json:"divideByHour,omitempty" yaml:"divideByHour,omitempty"`
+	DivideByServer         bool                        `json:"divideByServer,omitempty" yaml:"divideByServer,omitempty"`
+	DivideByChannel        bool                        `json:"divideByChannel,omitempty" yaml:"divideByChannel,omitempty"`
+	DivideByUser           bool                        `json:"divideByUser,omitempty" yaml:"divideByUser,omitempty"`
+	DivideByType           bool                        `json:"divideByType,omitempty" yaml:"divideByType,omitempty"`
+	DivideFoldersUseID     bool                        `json:"divideFoldersUseID,omitempty" yaml:"divideFoldersUseID,omitempty"`
+	SaveImages             bool                        `json:"saveImages,omitempty" yaml:"saveImages,omitempty"`
+	SaveVideos             bool                        `json:"saveVideos,omitempty" yaml:"saveVideos,omitempty"`
+	SaveAudioFiles         bool                        `json:"saveAudioFiles,omitempty" yaml:"saveAudioFiles,omitempty"`
+	SaveTextFiles          bool                        `json:"saveTextFiles,omitempty" yaml:"saveTextFiles,omitempty"`
+	SaveOtherFiles         bool                        `json:"saveOtherFiles,omitempty" yaml:"saveOtherFiles,omitempty"`
+	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates,omitempty" yaml:"savePossibleDuplicates,omitempty"`
+	Filters                *configurationSourceFilters `json:"filters,omitempty" yaml:"filters,omitempty"`
+	Duplo                  bool                        `json:"duplo,omitempty" yaml:"duplo,omitempty"`
+	DuploThreshold         float64                     `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Sources
-	All                    *configurationSource  `json:"all,omitempty"`
-	AllBlacklistUsers      *[]string             `json:"allBlacklistUsers,omitempty"`
-	AllBlacklistServers    *[]string             `json:"allBlacklistServers,omitempty"`
-	AllBlacklistCategories *[]string             `json:"allBlacklistCategories,omitempty"`
-	AllBlacklistChannels   *[]string             `json:"allBlacklistChannels,omitempty"`
-	Users                  []configurationSource `json:"users,omitempty"`
-	Servers                []configurationSource `json:"servers,omitempty"`
-	Categories             []configurationSource `json:"categories,omitempty"`
-	Channels               []configurationSource `json:"channels,omitempty"`
+	All                    *configurationSource  `json:"all,omitempty" yaml:"all,omitempty"`
+	AllBlacklistUsers      *[]string             `json:"allBlacklistUsers,omitempty" yaml:"allBlacklistUsers,omitempty"`
+	AllBlacklistServers    *[]string             `json:"allBlacklistServers,omitempty" yaml:"allBlacklistServers,omitempty"`
+	AllBlacklistCategories *[]string             `json:"allBlacklistCategories,omitempty" yaml:"allBlacklistCategories,omitempty"`
+	AllBlacklistChannels   *[]string             `json:"allBlacklistChannels,omitempty" yaml:"allBlacklistChannels,omitempty"`
+	Users                  []configurationSource `json:"users,omitempty" yaml:"users,omitempty"`
+	Servers                []configurationSource `json:"servers,omitempty" yaml:"servers,omitempty"`
+	Categories             []configurationSource `json:"categories,omitempty" yaml:"categories,omitempty"`
+	Channels               []configurationSource `json:"channels,omitempty" yaml:"channels,omitempty"`
 }
 
 type constStruct struct {
-	Constants map[string]string `json:"_constants,omitempty"`
+	Constants map[string]string `json:"_constants,omitempty" yaml:"_constants,omitempty"`
 }
 
 //#endregion
@@ -329,98 +329,98 @@ var (
 
 type configurationSource struct {
 	// ~
-	UserID            string    `json:"user,omitempty"`              // used for config.Users
-	UserIDs           *[]string `json:"users,omitempty"`             // ---> alternative to UserID
-	ServerID          string    `json:"server,omitempty"`            // used for config.Servers
-	ServerIDs         *[]string `json:"servers,omitempty"`           // ---> alternative to ServerID
-	ServerBlacklist   *[]string `json:"serverBlacklist,omitempty"`   // for server.ServerID & server.ServerIDs
-	CategoryID        string    `json:"category,omitempty"`          // used for config.Categories
-	CategoryIDs       *[]string `json:"categories,omitempty"`        // ---> alternative to CategoryID
-	CategoryBlacklist *[]string `json:"categoryBlacklist,omitempty"` // for server.CategoryID & server.CategoryIDs
-	ChannelID         string    `json:"channel,omitempty"`           // used for config.Channels
-	ChannelIDs        *[]string `json:"channels,omitempty"`          // ---> alternative to ChannelID
-	Destination       string    `json:"destination"`                 // required
+	UserID            string    `json:"user,omitempty" yaml:"user,omitempty"`
+	UserIDs           *[]string `json:"users,omitempty" yaml:"users,omitempty"`
+	ServerID          string    `json:"server,omitempty" yaml:"server,omitempty"`
+	ServerIDs         *[]string `json:"servers,omitempty" yaml:"servers,omitempty"`
+	ServerBlacklist   *[]string `json:"serverBlacklist,omitempty" yaml:"serverBlacklist,omitempty"`
+	CategoryID        string    `json:"category,omitempty" yaml:"category,omitempty"`
+	CategoryIDs       *[]string `json:"categories,omitempty" yaml:"categories,omitempty"`
+	CategoryBlacklist *[]string `json:"categoryBlacklist,omitempty" yaml:"categoryBlacklist,omitempty"`
+	ChannelID         string    `json:"channel,omitempty" yaml:"channel,omitempty"`
+	ChannelIDs        *[]string `json:"channels,omitempty" yaml:"channels,omitempty"`
+	Destination       string    `json:"destination" yaml:"destination"`
 
 	// Setup
-	Enabled       *bool `json:"enabled"`                 // optional, defaults
-	Save          *bool `json:"save"`                    // optional, defaults
-	AllowCommands *bool `json:"allowCommands,omitempty"` // optional, defaults
-	ScanEdits     *bool `json:"scanEdits,omitempty"`     // optional, defaults
-	IgnoreBots    *bool `json:"ignoreBots,omitempty"`    // optional, defaults
+	Enabled       *bool `json:"enabled" yaml:"enabled"`
+	Save          *bool `json:"save" yaml:"save"`
+	AllowCommands *bool `json:"allowCommands,omitempty" yaml:"allowCommands,omitempty"`
+	ScanEdits     *bool `json:"scanEdits,omitempty" yaml:"scanEdits,omitempty"`
+	IgnoreBots    *bool `json:"ignoreBots,omitempty" yaml:"ignoreBots,omitempty"`
 
-	SendErrorMessages  *bool     `json:"sendErrorMessages,omitempty"`  // optional, defaults
-	SendFileToChannel  *string   `json:"sendFileToChannel,omitempty"`  // optional, defaults
-	SendFileToChannels *[]string `json:"sendFileToChannels,omitempty"` // optional, defaults
-	SendFileDirectly   *bool     `json:"sendFileDirectly,omitempty"`   // optional, defaults
-	SendFileCaption    *string   `json:"sendFileCaption,omitempty"`    // optional
+	SendErrorMessages  *bool     `json:"sendErrorMessages,omitempty" yaml:"sendErrorMessages,omitempty"`
+	SendFileToChannel  *string   `json:"sendFileToChannel,omitempty" yaml:"sendFileToChannel,omitempty"`
+	SendFileToChannels *[]string `json:"sendFileToChannels,omitempty" yaml:"sendFileToChannels,omitempty"`
+	SendFileDirectly   *bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
+	SendFileCaption    *string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
 
-	FilenameDateFormat *string `json:"filenameDateFormat,omitempty"` // optional
-	FilenameFormat     *string `json:"filenameFormat,omitempty"`     // optional
+	FilenameDateFormat *string `json:"filenameDateFormat,omitempty" yaml:"filenameDateFormat,omitempty"`
+	FilenameFormat     *string `json:"filenameFormat,omitempty" yaml:"filenameFormat,omitempty"`
 
 	// Appearance
-	PresenceEnabled            *bool     `json:"presenceEnabled,omitempty"`            // optional, defaults
-	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty"`        // optional, defaults
-	ReactWhenDownloadedEmoji   *string   `json:"reactWhenDownloadedEmoji,omitempty"`   // optional, defaults
-	ReactWhenDownloadedHistory *bool     `json:"reactWhenDownloadedHistory,omitempty"` // optional, defaults
-	BlacklistReactEmojis       *[]string `json:"blacklistReactEmojis,omitempty"`       // optional
-	HistoryTyping              *bool     `json:"historyTyping,omitempty"`              // optional, defaults
-	EmbedColor                 *string   `json:"embedColor,omitempty"`                 // optional, defaults to role if undefined, then defaults random if no role color
+	PresenceEnabled            *bool     `json:"presenceEnabled,omitempty" yaml:"presenceEnabled,omitempty"`
+	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty" yaml:"reactWhenDownloaded,omitempty"`
+	ReactWhenDownloadedEmoji   *string   `json:"reactWhenDownloadedEmoji,omitempty" yaml:"reactWhenDownloadedEmoji,omitempty"`
+	ReactWhenDownloadedHistory *bool     `json:"reactWhenDownloadedHistory,omitempty" yaml:"reactWhenDownloadedHistory,omitempty"`
+	BlacklistReactEmojis       *[]string `json:"blacklistReactEmojis,omitempty" yaml:"blacklistReactEmojis,omitempty"`
+	HistoryTyping              *bool     `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
+	EmbedColor                 *string   `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
 
 	// History
-	AutoHistory           *bool   `json:"autoHistory,omitempty"`           // optional
-	AutoHistoryBefore     *string `json:"autoHistoryBefore,omitempty"`     // optional
-	AutoHistorySince      *string `json:"autoHistorySince,omitempty"`      // optional
-	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus,omitempty"` // optional, defaults
-	SendHistoryStatus     *bool   `json:"sendHistoryStatus,omitempty"`     // optional, defaults
+	AutoHistory           *bool   `json:"autoHistory,omitempty" yaml:"autoHistory,omitempty"`
+	AutoHistoryBefore     *string `json:"autoHistoryBefore,omitempty" yaml:"autoHistoryBefore,omitempty"`
+	AutoHistorySince      *string `json:"autoHistorySince,omitempty" yaml:"autoHistorySince,omitempty"`
+	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus,omitempty" yaml:"sendAutoHistoryStatus,omitempty"`
+	SendHistoryStatus     *bool   `json:"sendHistoryStatus,omitempty" yaml:"sendHistoryStatus,omitempty"`
 
 	// Rules for Saving
-	DelayHandling          *int                        `json:"delayHandling,omitempty"`          // optional, defaults
-	DelayHandlingHistory   *int                        `json:"delayHandlingHistory,omitempty"`   // optional, defaults
-	DivideByYear           *bool                       `json:"divideByYear,omitempty"`           // optional, defaults
-	DivideByMonth          *bool                       `json:"divideByMonth,omitempty"`          // optional, defaults
-	DivideByDay            *bool                       `json:"divideByDay,omitempty"`            // optional, defaults
-	DivideByHour           *bool                       `json:"divideByHour,omitempty"`           // optional, defaults
-	DivideByServer         *bool                       `json:"divideByServer,omitempty"`         // optional, defaults
-	DivideByChannel        *bool                       `json:"divideByChannel,omitempty"`        // optional, defaults
-	DivideByUser           *bool                       `json:"divideByUser,omitempty"`           // optional, defaults
-	DivideByType           *bool                       `json:"divideByType,omitempty"`           // optional, defaults
-	DivideFoldersUseID     *bool                       `json:"divideFoldersUseID,omitempty"`     // optional, defaults
-	SaveImages             *bool                       `json:"saveImages,omitempty"`             // optional, defaults
-	SaveVideos             *bool                       `json:"saveVideos,omitempty"`             // optional, defaults
-	SaveAudioFiles         *bool                       `json:"saveAudioFiles,omitempty"`         // optional, defaults
-	SaveTextFiles          *bool                       `json:"saveTextFiles,omitempty"`          // optional, defaults
-	SaveOtherFiles         *bool                       `json:"saveOtherFiles,omitempty"`         // optional, defaults
-	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates,omitempty"` // optional, defaults
-	Filters                *configurationSourceFilters `json:"filters,omitempty"`                // optional
-	Duplo                  *bool                       `json:"duplo,omitempty"`                  // optional, defaults
-	DuploThreshold         *float64                    `json:"duploThreshold,omitempty"`         // optional, defaults
+	DelayHandling          *int                        `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory   *int                        `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
+	DivideByYear           *bool                       `json:"divideByYear,omitempty" yaml:"divideByYear,omitempty"`
+	DivideByMonth          *bool                       `json:"divideByMonth,omitempty" yaml:"divideByMonth,omitempty"`
+	DivideByDay            *bool                       `json:"divideByDay,omitempty" yaml:"divideByDay,omitempty"`
+	DivideByHour           *bool                       `json:"divideByHour,omitempty" yaml:"divideByHour,omitempty"`
+	DivideByServer         *bool                       `json:"divideByServer,omitempty" yaml:"divideByServer,omitempty"`
+	DivideByChannel        *bool                       `json:"divideByChannel,omitempty" yaml:"divideByChannel,omitempty"`
+	DivideByUser           *bool                       `json:"divideByUser,omitempty" yaml:"divideByUser,omitempty"`
+	DivideByType           *bool                       `json:"divideByType,omitempty" yaml:"divideByType,omitempty"`
+	DivideFoldersUseID     *bool                       `json:"divideFoldersUseID,omitempty" yaml:"divideFoldersUseID,omitempty"`
+	SaveImages             *bool                       `json:"saveImages,omitempty" yaml:"saveImages,omitempty"`
+	SaveVideos             *bool                       `json:"saveVideos,omitempty" yaml:"saveVideos,omitempty"`
+	SaveAudioFiles         *bool                       `json:"saveAudioFiles,omitempty" yaml:"saveAudioFiles,omitempty"`
+	SaveTextFiles          *bool                       `json:"saveTextFiles,omitempty" yaml:"saveTextFiles,omitempty"`
+	SaveOtherFiles         *bool                       `json:"saveOtherFiles,omitempty" yaml:"saveOtherFiles,omitempty"`
+	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates,omitempty" yaml:"savePossibleDuplicates,omitempty"`
+	Filters                *configurationSourceFilters `json:"filters,omitempty" yaml:"filters,omitempty"`
+	Duplo                  *bool                       `json:"duplo,omitempty" yaml:"duplo,omitempty"`
+	DuploThreshold         *float64                    `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Misc Rules
-	LogLinks    *configurationSourceLog `json:"logLinks,omitempty"`    // optional
-	LogMessages *configurationSourceLog `json:"logMessages,omitempty"` // optional
+	LogLinks    *configurationSourceLog `json:"logLinks,omitempty" yaml:"logLinks,omitempty"`
+	LogMessages *configurationSourceLog `json:"logMessages,omitempty" yaml:"logMessages,omitempty"`
 }
 
 type configurationSourceFilters struct {
-	BlockedPhrases *[]string `json:"blockedPhrases,omitempty"` // optional
-	AllowedPhrases *[]string `json:"allowedPhrases,omitempty"` // optional
+	BlockedPhrases *[]string `json:"blockedPhrases,omitempty" yaml:"blockedPhrases,omitempty"`
+	AllowedPhrases *[]string `json:"allowedPhrases,omitempty" yaml:"allowedPhrases,omitempty"`
 
-	BlockedUsers *[]string `json:"blockedUsers,omitempty"` // optional
-	AllowedUsers *[]string `json:"allowedUsers,omitempty"` // optional
+	BlockedUsers *[]string `json:"blockedUsers,omitempty" yaml:"blockedUsers,omitempty"`
+	AllowedUsers *[]string `json:"allowedUsers,omitempty" yaml:"allowedUsers,omitempty"`
 
-	BlockedRoles *[]string `json:"blockedRoles,omitempty"` // optional
-	AllowedRoles *[]string `json:"allowedRoles,omitempty"` // optional
+	BlockedRoles *[]string `json:"blockedRoles,omitempty" yaml:"blockedRoles,omitempty"`
+	AllowedRoles *[]string `json:"allowedRoles,omitempty" yaml:"allowedRoles,omitempty"`
 
-	BlockedDomains *[]string `json:"blockedDomains,omitempty"` // optional
-	AllowedDomains *[]string `json:"allowedDomains,omitempty"` // optional
+	BlockedDomains *[]string `json:"blockedDomains,omitempty" yaml:"blockedDomains,omitempty"`
+	AllowedDomains *[]string `json:"allowedDomains,omitempty" yaml:"allowedDomains,omitempty"`
 
-	BlockedExtensions *[]string `json:"blockedExtensions,omitempty"` // optional
-	AllowedExtensions *[]string `json:"allowedExtensions,omitempty"` // optional
+	BlockedExtensions *[]string `json:"blockedExtensions,omitempty" yaml:"blockedExtensions,omitempty"`
+	AllowedExtensions *[]string `json:"allowedExtensions,omitempty" yaml:"allowedExtensions,omitempty"`
 
-	BlockedFilenames *[]string `json:"blockedFilenames,omitempty"` // optional
-	AllowedFilenames *[]string `json:"allowedFilenames,omitempty"` // optional
+	BlockedFilenames *[]string `json:"blockedFilenames,omitempty" yaml:"blockedFilenames,omitempty"`
+	AllowedFilenames *[]string `json:"allowedFilenames,omitempty" yaml:"allowedFilenames,omitempty"`
 
-	BlockedReactions *[]string `json:"blockedReactions,omitempty"` // optional
-	AllowedReactions *[]string `json:"allowedReactions,omitempty"` // optional
+	BlockedReactions *[]string `json:"blockedReactions,omitempty" yaml:"blockedReactions,omitempty"`
+	AllowedReactions *[]string `json:"allowedReactions,omitempty" yaml:"allowedReactions,omitempty"`
 }
 
 var (
@@ -434,18 +434,18 @@ var (
 )
 
 type configurationSourceLog struct {
-	Destination         string  `json:"destination"`                   // required
-	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty"` // optional, defaults
-	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty"`  // optional, defaults
-	DivideLogsByChannel *bool   `json:"divideLogsByChannel,omitempty"` // optional, defaults
-	DivideLogsByUser    *bool   `json:"divideLogsByUser,omitempty"`    // optional, defaults
-	DivideLogsByStatus  *bool   `json:"divideLogsByStatus,omitempty"`  // optional, defaults
-	LogDownloads        *bool   `json:"logDownloads,omitempty"`        // optional, defaults
-	LogFailures         *bool   `json:"logFailures,omitempty"`         // optional, defaults
-	FilterDuplicates    *bool   `json:"filterDuplicates,omitempty"`    // optional, defaults
-	Prefix              *string `json:"prefix,omitempty"`              // optional
-	Suffix              *string `json:"suffix,omitempty"`              // optional
-	UserData            *bool   `json:"userData,omitempty"`            // optional, defaults
+	Destination         string  `json:"destination" yaml:"destination"`
+	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty" yaml:"destinationIsFolder,omitempty"`
+	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty" yaml:"divideLogsByServer,omitempty"`
+	DivideLogsByChannel *bool   `json:"divideLogsByChannel,omitempty" yaml:"divideLogsByChannel,omitempty"`
+	DivideLogsByUser    *bool   `json:"divideLogsByUser,omitempty" yaml:"divideLogsByUser,omitempty"`
+	DivideLogsByStatus  *bool   `json:"divideLogsByStatus,omitempty" yaml:"divideLogsByStatus,omitempty"`
+	LogDownloads        *bool   `json:"logDownloads,omitempty" yaml:"logDownloads,omitempty"`
+	LogFailures         *bool   `json:"logFailures,omitempty" yaml:"logFailures,omitempty"`
+	FilterDuplicates    *bool   `json:"filterDuplicates,omitempty" yaml:"filterDuplicates,omitempty"`
+	Prefix              *string `json:"prefix,omitempty" yaml:"prefix,omitempty"`
+	Suffix              *string `json:"suffix,omitempty" yaml:"suffix,omitempty"`
+	UserData            *bool   `json:"userData,omitempty" yaml:"userData,omitempty"`
 }
 
 //#endregion
@@ -460,19 +460,12 @@ var (
 )
 
 type configurationAdminChannel struct {
-	ChannelID      string    `json:"channel"`                  // required
-	ChannelIDs     *[]string `json:"channels,omitempty"`       // ---> alternative to ChannelID
-	LogProgram     *bool     `json:"logProgram,omitempty"`     // optional, defaults
-	LogStatus      *bool     `json:"logStatus,omitempty"`      // optional, defaults
-	LogErrors      *bool     `json:"logErrors,omitempty"`      // optional, defaults
-	UnlockCommands *bool     `json:"unlockCommands,omitempty"` // optional, defaults
-	/* IDEAS / TODO:
-
-	LogMessages *bool `json:"logMessages,omitempty"` // optional, defaults
-	LogLinks    *bool `json:"logLinks,omitempty"`    // optional, defaults
-	LogFiles	*bool `json:"logFiles,omitempty"`    // optional, defaults
-
-	*/
+	ChannelID      string    `json:"channel" yaml:"channel"`
+	ChannelIDs     *[]string `json:"channels,omitempty" yaml:"channels,omitempty"`
+	LogProgram     *bool     `json:"logProgram,omitempty" yaml:"logProgram,omitempty"`
+	LogStatus      *bool     `json:"logStatus,omitempty" yaml:"logStatus,omitempty"`
+	LogErrors      *bool     `json:"logErrors,omitempty" yaml:"logErrors,omitempty"`
+	UnlockCommands *bool     `json:"unlockCommands,omitempty" yaml:"unlockCommands,omitempty"`
 }
 
 //#endregion
@@ -480,8 +473,11 @@ type configurationAdminChannel struct {
 //#region Management
 
 func loadConfig() error {
-	// Determine json type
-	if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
+	// Determine config type
+	if _, err := os.Stat(configFileBase + ".yaml"); err == nil {
+		configFile = configFileBase + ".yaml"
+		configFileYaml = true
+	} else if _, err := os.Stat(configFileBase + ".jsonc"); err == nil {
 		configFile = configFileBase + ".jsonc"
 		configFileC = true
 	} else {
@@ -508,7 +504,9 @@ func loadConfig() error {
 
 		// Parse
 		newConfig := defaultConfiguration()
-		if configFileC {
+		if configFileYaml {
+			err = yaml.Unmarshal([]byte(fixed), &newConfig)
+		} else if configFileC {
 			err = jsonc.Unmarshal([]byte(fixed), &newConfig)
 		} else {
 			err = json.Unmarshal([]byte(fixed), &newConfig)
@@ -527,7 +525,9 @@ func loadConfig() error {
 			}
 			// Re-parse
 			newConfig = defaultConfiguration()
-			if configFileC {
+			if configFileYaml {
+				err = yaml.Unmarshal([]byte(fixed), &newConfig)
+			} else if configFileC {
 				err = jsonc.Unmarshal([]byte(fixed), &newConfig)
 			} else {
 				err = json.Unmarshal([]byte(fixed), &newConfig)
@@ -698,6 +698,19 @@ func loadConfig() error {
 
 		if config.ProcessLimit > 0 {
 			runtime.GOMAXPROCS(config.ProcessLimit)
+		}
+
+		// Convert and cache
+		if !configFileYaml {
+			d, err := yaml.Marshal(&config)
+			if err == nil {
+				os.WriteFile(pathCacheSettingsYAML, d, 0644)
+			}
+		} else {
+			d, err := json.Marshal(&config)
+			if err == nil {
+				os.WriteFile(pathCacheSettingsJSON, d, 0644)
+			}
 		}
 	}
 
