@@ -91,6 +91,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	historyStartTime := time.Now()
 
+	var historyDownloadDuration time.Duration
+
 	// Log Prefix
 	var commander string = "AUTORUN"
 	var autorun bool = true
@@ -370,13 +372,14 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if sendStatus {
 						status := fmt.Sprintf(
 							"``%s:`` **%s files downloaded...** `(%s so far, avg %1.1f MB/s)`\n``"+
-								"%s messages processed...``\n\n"+
+								"_%s messages processed, avg %d msg/s_\n\n"+
 								"%s\n\n"+
-								"%s`(%d)` _Processing more messages, please wait..._",
+								"%s`(%d)` _Processing more messages, please wait..._\n",
 							shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()), formatNumber(totalDownloads),
-							humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/time.Since(historyStartTime).Seconds(),
-							formatNumber(totalMessages),
-							msgSourceDisplay, rangeContent, messageRequestCount)
+							humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
+							formatNumber(totalMessages), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
+							msgSourceDisplay, rangeContent, messageRequestCount,
+						)
 						if responseMsg == nil {
 							log.Println(lg("History", "", color.RedString,
 								logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
@@ -520,10 +523,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						}
 
 						// Process Message
+						timeStartingDownload := time.Now()
 						downloadCount, filesize := handleMessage(message, &channel, false, true)
 						if downloadCount > 0 {
 							totalDownloads += downloadCount
 							totalFilesize += filesize
+							historyDownloadDuration += time.Since(timeStartingDownload)
 						}
 						totalMessages++
 					}
@@ -541,14 +546,14 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				}
 				status := fmt.Sprintf(
 					"``%s:`` **%s total files downloaded!** `%s total, avg %1.1f MB/s`\n"+
-						"``%s total messages processed``\n\n"+
+						"_%s total messages processed, avg %d msg/s_\n\n"+
 						"%s\n\n"+ // msgSourceDisplay^
 						"**DONE!** - %s\n"+
 						"Ran ``%d`` message history requests\n\n"+
 						"%s_Duration was %s_",
 					durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
-					humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/time.Since(historyStartTime).Seconds(),
-					formatNumber(int64(totalMessages)),
+					humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
+					formatNumber(int64(totalMessages)), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
 					msgSourceDisplay,
 					jobStatus,
 					messageRequestCount,
