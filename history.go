@@ -370,16 +370,29 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						logPrefix+"Requesting more, \t%d downloaded (%s), \t%d processed, \tsearching before %s ago (%s)",
 						totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
 					if sendStatus {
-						status := fmt.Sprintf(
-							"``%s:`` **%s files downloaded...**\n`%s so far, avg %1.1f MB/s`\n"+
-								"_%s messages processed, avg %d msg/s_\n\n"+
-								"%s\n\n"+
-								"%s`(%d)` _Processing more messages, please wait..._\n",
-							shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()), formatNumber(totalDownloads),
-							humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
-							formatNumber(totalMessages), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
-							msgSourceDisplay, rangeContent, messageRequestCount,
-						)
+						var status string
+						if totalDownloads == 0 {
+							status = fmt.Sprintf(
+								"``%s:`` **No files downloaded...**\n"+
+									"_%s messages processed, avg %d msg/s_\n\n"+
+									"%s\n\n"+
+									"%s`(%d)` _Processing more messages, please wait..._\n",
+								shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()),
+								formatNumber(totalMessages), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
+								msgSourceDisplay, rangeContent, messageRequestCount,
+							)
+						} else {
+							status = fmt.Sprintf(
+								"``%s:`` **%s files downloaded...**\n`%s so far, avg %1.1f MB/s`\n"+
+									"_%s messages processed, avg %d msg/s_\n\n"+
+									"%s\n\n"+
+									"%s`(%d)` _Processing more messages, please wait..._\n",
+								shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()), formatNumber(totalDownloads),
+								humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
+								formatNumber(totalMessages), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
+								msgSourceDisplay, rangeContent, messageRequestCount,
+							)
+						}
 						if responseMsg == nil {
 							log.Println(lg("History", "", color.RedString,
 								logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
@@ -524,10 +537,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 						// Process Message
 						timeStartingDownload := time.Now()
-						downloadCount, filesize := handleMessage(message, &channel, false, true)
-						if downloadCount > 0 {
-							totalDownloads += downloadCount
-							totalFilesize += filesize
+						downloadedFiles := handleMessage(message, &channel, false, true)
+						if len(downloadedFiles) > 0 {
+							totalDownloads += int64(len(downloadedFiles))
+							for _, file := range downloadedFiles {
+								totalFilesize += file.Filesize
+							}
 							historyDownloadDuration += time.Since(timeStartingDownload)
 						}
 						totalMessages++
@@ -544,21 +559,39 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 				if job, exists := historyJobs.Get(subjectChannelID); exists {
 					jobStatus = historyStatusLabel(job.Status)
 				}
-				status := fmt.Sprintf(
-					"``%s:`` **%s total files downloaded!**\n`%s total, avg %1.1f MB/s`\n"+
-						"_%s total messages processed, avg %d msg/s_\n\n"+
-						"%s\n\n"+ // msgSourceDisplay^
-						"**DONE!** - %s\n"+
-						"Ran ``%d`` message history requests\n\n"+
-						"%s_Duration was %s_",
-					durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
-					humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
-					formatNumber(int64(totalMessages)), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
-					msgSourceDisplay,
-					jobStatus,
-					messageRequestCount,
-					rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
-				)
+				var status string
+				if totalDownloads == 0 {
+					status = fmt.Sprintf(
+						"``%s:`` **No files found...**\n"+
+							"_%s total messages processed, avg %d msg/s_\n\n"+
+							"%s\n\n"+ // msgSourceDisplay^
+							"**DONE!** - %s\n"+
+							"Ran ``%d`` message history requests\n\n"+
+							"%s_Duration was %s_",
+						durafmt.ParseShort(time.Since(historyStartTime)).String(),
+						formatNumber(int64(totalMessages)), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
+						msgSourceDisplay,
+						jobStatus,
+						messageRequestCount,
+						rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
+					)
+				} else {
+					status = fmt.Sprintf(
+						"``%s:`` **%s total files downloaded!**\n`%s total, avg %1.1f MB/s`\n"+
+							"_%s total messages processed, avg %d msg/s_\n\n"+
+							"%s\n\n"+ // msgSourceDisplay^
+							"**DONE!** - %s\n"+
+							"Ran ``%d`` message history requests\n\n"+
+							"%s_Duration was %s_",
+						durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
+						humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
+						formatNumber(int64(totalMessages)), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
+						msgSourceDisplay,
+						jobStatus,
+						messageRequestCount,
+						rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
+					)
+				}
 				if !hasPermsToRespond {
 					log.Println(lg("History", "", color.HiRedString, logPrefix+fmtBotSendPerm, responseMsg.ChannelID))
 				} else {

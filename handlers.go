@@ -37,10 +37,10 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 	lastMessageID = m.ID
 }
 
-func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, history bool) (int64, int64) {
+func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, history bool) []downloadedItem {
 	// Ignore own messages unless told not to
 	if m.Author.ID == botUser.ID && !config.ScanOwnMessages {
-		return -1, 0
+		return nil
 	}
 
 	if !history && !edited {
@@ -71,11 +71,11 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 	if channelConfig := getSource(m, c); channelConfig != emptyConfig {
 		// Ignore bots if told to do so
 		if m.Author.Bot && *channelConfig.IgnoreBots {
-			return -1, 0
+			return nil
 		}
 		// Ignore if told so by config
 		if (!history && !*channelConfig.Enabled) || (edited && !*channelConfig.ScanEdits) {
-			return -1, 0
+			return nil
 		}
 
 		m = fixMessage(m)
@@ -330,7 +330,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						"%s Filter decided to ignore message...",
 						color.HiMagentaString("(FILTER)")))
 				}
-				return -1, 0
+				return nil
 			}
 		}
 
@@ -353,8 +353,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		}
 
 		// Process Files
-		var downloadCount int64 = 0
-		var totalfilesize int64 = 0
+		var downloadedItems []downloadedItem
 		files := getFileLinks(m)
 		for _, file := range files {
 			if file.Link == "" {
@@ -374,14 +373,18 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				StartTime:  time.Now(),
 			}.handleDownload()
 			if status.Status == downloadSuccess {
-				downloadCount++
-				totalfilesize += filesize
+				domain, _ := getDomain(file.Link)
+				downloadedItems = append(downloadedItems, downloadedItem{
+					URL:      file.Link,
+					Domain:   domain,
+					Filesize: filesize,
+				})
 			}
 		}
-		return downloadCount, totalfilesize
+		return downloadedItems
 	}
 
-	return -1, 0
+	return nil
 }
 
 //#endregion

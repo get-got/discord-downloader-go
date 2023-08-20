@@ -26,6 +26,14 @@ import (
 	"mvdan.cc/xurls/v2"
 )
 
+type downloadedItem struct {
+	MessageID   string
+	URL         string
+	Destination string
+	Domain      string
+	Filesize    int64
+}
+
 type downloadItem struct {
 	URL         string
 	Time        time.Time

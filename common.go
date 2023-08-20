@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"regexp"
@@ -427,3 +428,11 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 }
 
 //#endregion
+
+func getDomain(URL string) (string, error) {
+	parsedURL, err := url.Parse(URL)
+	if err != nil {
+		return parsedURL.Hostname(), nil
+	}
+	return "UNKNOWN", err
+}
