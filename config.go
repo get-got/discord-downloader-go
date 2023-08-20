@@ -68,7 +68,7 @@ var (
 
 	defConfig_DiscordTimeout   int = 180
 	defConfig_DownloadTimeout  int = 60
-	defConfig_DownloadRetryMax int = 3
+	defConfig_DownloadRetryMax int = 2
 
 	defConfig_CheckupRate         int = 30
 	defConfig_ConnectionCheckRate int = 5
