@@ -257,7 +257,7 @@ When initially launching the bot it will create a default settings file if you d
 
 **If you have a ``config.ini`` from _Seklfreak's discord-image-downloader-go_, it will import settings if it's in the same folder as the program.**
 
-The bot accepts `.json` or `.jsonc` for comment-friendly json.
+The bot accepts `.json` or **`.jsonc` for comment-friendly json.**
 
 ---
 
@@ -271,14 +271,14 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
         "token": "YOUR_USER_OR_BOT_TOKEN",        // user with 2FA or genuine Discord bot.
         "email": "YOUR_USER_EMAIL_NO_2FA",        // user without 2FA.
         "password": "YOUR_USER_PASSWORD_NO_2FA",  // user without 2FA.
-        "twitterUsername": "", // Twitter Account, not required but can be used for scraping private accounts.
-        "twitterPassword": "", // Twitter Account, not required but can be used for scraping private accounts.
-        "twitterProxy": "", // OPTIONAL - Connect to Twitter via Proxy; Supports HTTP(s) and SOCKS5.
-        "instagramUsername": "", // Instagram Account, captcha required at some point(s).
-        "instagramPassword": "", // Instagram Account, captcha required at some point(s).
-        "instagramProxy": "", // OPTIONAL - Connect to Instagram via Proxy; Supports HTTP(s) and SOCKS5.
-        "instagramProxyInsecure": false, // OPTIONAL - Define if proxy is insecure connection.
-        "instagramProxyForceHTTP2": false, // OPTIONAL - Define if proxy client should force HTTP2.
+        "twitterUsername": "",          // Twitter Account, not required but can be used for scraping private accounts.
+        "twitterPassword": "",          // Twitter Account, not required but can be used for scraping private accounts.
+        "twitterProxy": "",             // OPTIONAL - Connect to Twitter via Proxy; Supports HTTP(s) and SOCKS5.
+        "instagramUsername": "",        // Instagram Account, captcha required at some point(s).
+        "instagramPassword": "",        // Instagram Account, captcha required at some point(s).
+        "instagramProxy": "",           // OPTIONAL - Connect to Instagram via Proxy; Supports HTTP(s) and SOCKS5.
+        "instagramProxyInsecure": false,    // OPTIONAL - Define if proxy is insecure connection.
+        "instagramProxyForceHTTP2": false,  // OPTIONAL - Define if proxy client should force HTTP2.
         "flickrApiKey": ""
     },
 
@@ -508,6 +508,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
             "saveTextFiles": false,
             "saveOtherFiles": false,
             "savePossibleDuplicates": false,
+            
             "filters": {
                 "blockedPhrases": [ "" ],
                 "allowedPhrases": [ "" ],
@@ -524,6 +525,7 @@ The bot accepts `.json` or `.jsonc` for comment-friendly json.
                 "blockedDomains": [ "" ],
                 "allowedDomains": [ "" ]
             },
+
             "duplo": false,
             "duploThreshold": 0,
 
