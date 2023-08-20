@@ -431,7 +431,6 @@ func main() {
 		}
 	}
 	//--- Save constants
-	os.MkdirAll(pathCache, 0755)
 	if _, err := os.Stat(pathConstants); err == nil {
 		err = os.Remove(pathConstants)
 		if err != nil {

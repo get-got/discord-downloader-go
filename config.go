@@ -700,6 +700,9 @@ func loadConfig() error {
 			runtime.GOMAXPROCS(config.ProcessLimit)
 		}
 
+		// Make cache path
+		os.MkdirAll(pathCache, 0755)
+
 		// Convert and cache
 		if !configFileYaml {
 			d, err := yaml.Marshal(&config)
