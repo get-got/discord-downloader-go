@@ -75,6 +75,7 @@ var (
 	defConfig_DownloadTimeout  int = 60
 	defConfig_DownloadRetryMax int = 2
 
+	defConfig_HistoryManagerRate  int = 5
 	defConfig_CheckupRate         int = 30
 	defConfig_ConnectionCheckRate int = 5
 	defConfig_PresenceRefreshRate int = 3
@@ -125,6 +126,7 @@ func defaultConfiguration() configuration {
 		InflateDownloadCount: &defConfig_InflateDownloadCount,
 		EuropeanNumbers:      false,
 
+		HistoryManagerRate:  defConfig_HistoryManagerRate,
 		CheckupRate:         defConfig_CheckupRate,
 		ConnectionCheckRate: defConfig_ConnectionCheckRate,
 		PresenceRefreshRate: defConfig_PresenceRefreshRate,
@@ -244,6 +246,7 @@ type configuration struct {
 	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty" yaml:"inflateDownloadCount,omitempty"`
 	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty" yaml:"europeanNumbers,omitempty"`
 
+	HistoryManagerRate  int `json:"historyManagerRate,omitempty" yaml:"historyManagerRate,omitempty"`
 	CheckupRate         int `json:"checkupRate,omitempty" yaml:"checkupRate,omitempty"`
 	ConnectionCheckRate int `json:"connectionCheckRate,omitempty" yaml:"connectionCheckRate,omitempty"`
 	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty" yaml:"presenceRefreshRate,omitempty"`

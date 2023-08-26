@@ -340,6 +340,7 @@ Alternatively, if you are using `.yaml`, the bot will convert to JSON and store 
     "inflateDownloadCount": 0,    // +/- displayed download tally.
     "europeanNumbers": false,     // 1.000.000,00 (disgusting) versus 1,000,000.00 (normal).
 
+    "historyManagerRate": 5,  // seconds between reprocessing history queue.
     "checkupRate": 30,        // minutes to print checkup line in program.
     "connectionCheckRate": 5, // minutes to check Discord connection for failure.
     "presenceRefreshRate": 3, // minutes to refresh Discord presence, sometimes it randomly goes blank.

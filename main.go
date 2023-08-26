@@ -197,8 +197,8 @@ func main() {
 			historyJobCntErrored = nhistoryJobCntErrored
 			historyJobCntCompleted = nhistoryJobCntCompleted
 
-			//~ optional setting?
-			time.Sleep(5 * time.Second)
+			// Wait before checking again
+			time.Sleep(time.Duration(config.HistoryManagerRate) * time.Second)
 		}
 	}()
 	//#endregion
