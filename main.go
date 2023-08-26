@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -20,7 +19,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
-	"github.com/hako/durafmt"
 	twitterscraper "github.com/n0madic/twitter-scraper"
 	"github.com/rivo/duplo"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
@@ -171,15 +169,15 @@ func main() {
 					}
 					str := fmt.Sprintf("... %dms latency,\t\tlast discord heartbeat %s ago,\t\t%s uptime",
 						bot.HeartbeatLatency().Milliseconds(),
-						shortenTime(durafmt.ParseShort(time.Since(bot.LastHeartbeatSent)).String()),
-						shortenTime(durafmt.ParseShort(time.Since(startTime)).String()))
+						timeSinceShort(bot.LastHeartbeatSent),
+						timeSinceShort(startTime))
 					if !timeLastMessage.IsZero() {
 						str += fmt.Sprintf(",\tlast message %s ago",
-							shortenTime(durafmt.ParseShort(time.Since(timeLastMessage)).String()))
+							timeSinceShort(timeLastMessage))
 					}
 					if !timeLastDownload.IsZero() {
 						str += fmt.Sprintf(",\tlast download %s ago",
-							shortenTime(durafmt.ParseShort(time.Since(timeLastDownload)).String()))
+							timeSinceShort(timeLastDownload))
 					}
 					if historyJobsWaiting > 0 {
 						str += fmt.Sprintf(",\t%d history jobs waiting", historyJobsWaiting)
@@ -488,8 +486,10 @@ func main() {
 }
 
 func openDatabase() {
+	var tt time.Time
 	// Database
 	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a second...)"))
+	tt = time.Now()
 	myDB, err = db.OpenDB(pathDatabaseBase)
 	if err != nil {
 		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
@@ -497,12 +497,14 @@ func openDatabase() {
 	}
 	if myDB.Use("Downloads") == nil {
 		log.Println(lg("Database", "Setup", color.YellowString, "Creating database, please wait..."))
+		tt = time.Now()
 		if err := myDB.Create("Downloads"); err != nil {
 			log.Println(lg("Database", "Setup", color.HiRedString, "Error while trying to create database: %s", err))
 			return
 		}
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database..."))
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database...\t(took %s)", timeSinceShort(tt)))
 		log.Println(lg("Database", "Setup", color.YellowString, "Indexing database, please wait..."))
+		tt = time.Now()
 		if err := myDB.Use("Downloads").Index([]string{"URL"}); err != nil {
 			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for URL: %s", err))
 			return
@@ -515,18 +517,19 @@ func openDatabase() {
 			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for UserID: %s", err))
 			return
 		}
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes..."))
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes...\t(took %s)", timeSinceShort(tt)))
 	}
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
-	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...", cachedDownloadID))
+	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...\t(took %s)", cachedDownloadID, timeSinceShort(tt)))
 
 	// Duplo
 	if config.Duplo || sourceHasDuplo {
 		duploCatalog = duplo.New()
 		if _, err := os.Stat(pathCacheDuplo); err == nil {
 			log.Println(lg("Duplo", "", color.YellowString, "Opening duplo image catalog..."))
-			storeFile, err := ioutil.ReadFile(pathCacheDuplo)
+			tt = time.Now()
+			storeFile, err := os.ReadFile(pathCacheDuplo)
 			if err != nil {
 				log.Println(lg("Duplo", "", color.HiRedString, "Error opening duplo catalog:\t%s", err))
 			} else {
@@ -535,7 +538,7 @@ func openDatabase() {
 					log.Println(lg("Duplo", "", color.HiRedString, "Error decoding duplo catalog:\t%s", err))
 				}
 				if duploCatalog != nil {
-					log.Println(lg("Duplo", "", color.HiYellowString, "Duplo catalog opened (%d)", duploCatalog.Size()))
+					log.Println(lg("Duplo", "", color.HiYellowString, "Duplo catalog opened (%d)\t(%s)", duploCatalog.Size(), timeSinceShort(tt)))
 				}
 			}
 		}

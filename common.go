@@ -188,6 +188,14 @@ func shortenTime(input string) string {
 	return input
 }
 
+func timeSince(input time.Time) string {
+	return durafmt.Parse(time.Since(input)).String()
+}
+
+func timeSinceShort(input time.Time) string {
+	return shortenTime(durafmt.ParseShort(time.Since(input)).String())
+}
+
 /*func condenseString(input string, length int) string {
 	filler := "....."
 	ret := input

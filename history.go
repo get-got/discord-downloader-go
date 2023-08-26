@@ -377,7 +377,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 									"_%s messages processed, avg %d msg/s_\n\n"+
 									"%s\n\n"+
 									"%s`(%d)` _Processing more messages, please wait..._\n",
-								shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()),
+								timeSinceShort(historyStartTime),
 								formatNumber(totalMessages), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
 								msgSourceDisplay, rangeContent, messageRequestCount,
 							)
@@ -387,7 +387,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 									"_%s messages processed, avg %d msg/s_\n\n"+
 									"%s\n\n"+
 									"%s`(%d)` _Processing more messages, please wait..._\n",
-								shortenTime(durafmt.ParseShort(time.Since(historyStartTime)).String()), formatNumber(totalDownloads),
+								timeSinceShort(historyStartTime), formatNumber(totalDownloads),
 								humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
 								formatNumber(totalMessages), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
 								msgSourceDisplay, rangeContent, messageRequestCount,

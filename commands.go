@@ -298,8 +298,8 @@ func handleCommands() *exrouter.Route {
 
 						newline := fmt.Sprintf("• _%s_ (%s) `%s - %s`, `updated %s ago, added %s ago`\n",
 							historyStatusLabel(job.Status), job.OriginUser, jobSourceName, jobChannelName,
-							shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()),
-							shortenTime(durafmt.ParseShort(time.Since(job.Added)).String()))
+							timeSinceShort(job.Updated),
+							timeSinceShort(job.Added))
 					redothismath: // bad way but dont care right now
 						if len(output)+len(newline) > limitMsg {
 							// send batch
@@ -311,8 +311,8 @@ func handleCommands() *exrouter.Route {
 						log.Println(lg("Command", "History", color.HiCyanString,
 							fmt.Sprintf("%s (%s) %s - %s, updated %s ago, added %s ago",
 								historyStatusLabel(job.Status), job.OriginUser, jobSourceName, jobChannelName,
-								shortenTime(durafmt.ParseShort(time.Since(job.Updated)).String()),
-								shortenTime(durafmt.ParseShort(time.Since(job.Added)).String())))) // no batching
+								timeSinceShort(job.Updated),
+								timeSinceShort(job.Added)))) // no batching
 					}
 					// finish off
 					if output != "" {

@@ -290,7 +290,7 @@ func dataKeyReplacement(input string) string {
 			{"{{timeNowLong24}}",
 				timeNow.Format("15:04:05 MST - 2 January, 2006")},
 			{"{{uptime}}",
-				shortenTime(durafmt.ParseShort(time.Since(startTime)).String())},
+				timeSinceShort(startTime)},
 		}
 		for _, key := range keys {
 			if strings.Contains(input, key[0]) {
@@ -399,7 +399,7 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{serverName}}", guildName},
 			{"{{message}}", clearPath(download.Message.Content)},
-			{"{{downloadTime}}", shortenTime(durafmt.ParseShort(time.Since(download.StartTime)).String())},
+			{"{{downloadTime}}", timeSinceShort(download.StartTime)},
 			{"{{downloadTimeLong}}", durafmt.Parse(time.Since(download.StartTime)).String()},
 			{"{{url}}", clearPath(download.InputURL)},
 			{"{{domain}}", domain},

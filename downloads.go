@@ -21,7 +21,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
-	"github.com/hako/durafmt"
 	"github.com/rivo/duplo"
 	"mvdan.cc/xurls/v2"
 )
@@ -1168,7 +1167,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 				color.HiYellowString("\"%s / %s\" (%s, %s)", sourceName, sourceChannelName, download.Message.ChannelID, download.Message.ID),
 				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
 					color.WhiteString("(%s, %s, %0.1f %s)",
-						filesize, shortenTime(durafmt.ParseShort(time.Since(download.StartTime)).String()), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
+						filesize, timeSinceShort(download.StartTime), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
 		} else {
 			log.Println(lg("Download", "", color.GreenString,
 				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
