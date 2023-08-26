@@ -109,10 +109,20 @@ func init() {
 
 func main() {
 
+	//#region Critical to functionality
 	loadConfig()
 	openDatabase()
+	//#endregion
 
-	// Regex
+	mainWg.Wait() // wait because credentials from json
+
+	//#region Connections
+	mainWg.Add(2)
+	go botLoadAPIs()
+	go botLoadDiscord()
+	//#endregion
+
+	//#region Initialize Regex
 	mainWg.Add(1)
 	go func() {
 		if err = compileRegex(); err != nil {
@@ -121,16 +131,81 @@ func main() {
 		}
 		mainWg.Done()
 	}()
+	//#endregion
 
-	mainWg.Wait() // wait because credentials from json
+	//#region [Loops] History Job Processing
+	go func() {
+		for {
+			// Empty Local Cache
+			nhistoryJobCnt,
+				nhistoryJobCntWaiting,
+				nhistoryJobCntRunning,
+				nhistoryJobCntAborted,
+				nhistoryJobCntErrored,
+				nhistoryJobCntCompleted := historyJobs.Len(), 0, 0, 0, 0, 0
 
-	mainWg.Add(2)
-	go botLoadAPIs()
-	go botLoadDiscord()
+			//MARKER: history jobs launch
+			// do we even bother?
+			if nhistoryJobCnt > 0 {
+				// New Cache
+				for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
+					job := pair.Value
+					if job.Status == historyStatusWaiting {
+						nhistoryJobCntWaiting++
+					} else if job.Status == historyStatusRunning {
+						nhistoryJobCntRunning++
+					} else if job.Status == historyStatusAbortRequested || job.Status == historyStatusAbortCompleted {
+						nhistoryJobCntAborted++
+					} else if job.Status == historyStatusErrorReadMessageHistoryPerms || job.Status == historyStatusErrorRequesting {
+						nhistoryJobCntErrored++
+					} else if job.Status >= historyStatusCompletedNoMoreMessages {
+						nhistoryJobCntCompleted++
+					}
+				}
 
-	mainWg.Wait()
+				// Should Start New Job(s)?
+				if nhistoryJobCntRunning < config.HistoryMaxJobs || config.HistoryMaxJobs < 1 {
+					openSlots := config.HistoryMaxJobs - nhistoryJobCntRunning
+					newJobs := make([]historyJob, openSlots)
+					filledSlots := 0
+					// Find Jobs
+					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
+						if filledSlots == openSlots {
+							break
+						}
+						if pair.Value.Status == historyStatusWaiting {
+							newJobs = append(newJobs, pair.Value)
+							filledSlots++
+						}
+					}
+					// Start Jobs
+					if len(newJobs) > 0 {
+						for _, job := range newJobs {
+							if job != (historyJob{}) {
+								go handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
+							}
+						}
+					}
+				}
+			}
 
-	//#region MAIN STARTUP COMPLETE
+			// Update Cache
+			historyJobCnt = nhistoryJobCnt
+			historyJobCntWaiting = nhistoryJobCntWaiting
+			historyJobCntRunning = nhistoryJobCntRunning
+			historyJobCntAborted = nhistoryJobCntAborted
+			historyJobCntErrored = nhistoryJobCntErrored
+			historyJobCntCompleted = nhistoryJobCntCompleted
+
+			//~ optional setting?
+			time.Sleep(5 * time.Second)
+		}
+	}()
+	//#endregion
+
+	mainWg.Wait() // Once complete, bot is functional
+
+	//#region MAIN STARTUP COMPLETE, BOT IS FUNCTIONAL
 
 	if config.Debug {
 		log.Println(lg("Main", "", color.YellowString, "Startup finished, took %s...", uptime()))
@@ -145,9 +220,51 @@ func main() {
 
 	//#endregion
 
-	//#region BG Tasks
+	//#region Autorun History
+	type arh struct{ channel, before, since string }
+	var autoHistoryChannels []arh
+	// Compile list of channels to autorun history
+	for _, channel := range getAllRegisteredChannels() {
+		channelConfig := getSource(&discordgo.Message{ChannelID: channel}, nil)
+		if channelConfig.AutoHistory != nil {
+			if *channelConfig.AutoHistory {
+				var autoHistoryChannel arh
+				autoHistoryChannel.channel = channel
+				autoHistoryChannel.before = *channelConfig.AutoHistoryBefore
+				autoHistoryChannel.since = *channelConfig.AutoHistorySince
+				autoHistoryChannels = append(autoHistoryChannels, autoHistoryChannel)
+			}
+			continue
+		}
+	}
+	// Process auto history
+	for _, ah := range autoHistoryChannels {
+		//MARKER: history jobs queued from auto
+		if job, exists := historyJobs.Get(ah.channel); !exists ||
+			(job.Status != historyStatusRunning && job.Status != historyStatusAbortRequested) {
+			job.Status = historyStatusWaiting
+			job.OriginChannel = "AUTORUN"
+			job.OriginUser = "AUTORUN"
+			job.TargetCommandingMessage = nil
+			job.TargetChannelID = ah.channel
+			job.TargetBefore = ah.before
+			job.TargetSince = ah.since
+			job.Updated = time.Now()
+			job.Added = time.Now()
+			historyJobs.Set(ah.channel, job)
+			//TODO: signals for this and typical history cmd??
+		}
+	}
+	if len(autoHistoryChannels) > 0 {
+		log.Println(lg("History", "Autorun", color.HiYellowString,
+			"History Autoruns completed (for %d channel%s)",
+			len(autoHistoryChannels), pluralS(len(autoHistoryChannels))))
+		log.Println(lg("History", "Autorun", color.CyanString,
+			"Waiting for something else to do..."))
+	}
+	//#endregion
 
-	//#region BG Tasks - Tickers
+	//#region [Loops] Tickers
 	tickerCheckup := time.NewTicker(time.Duration(config.CheckupRate) * time.Minute)
 	tickerPresence := time.NewTicker(time.Duration(config.PresenceRefreshRate) * time.Minute)
 	tickerConnection := time.NewTicker(time.Duration(config.ConnectionCheckRate) * time.Minute)
@@ -224,121 +341,7 @@ func main() {
 	}()
 	//#endregion
 
-	//#region BG Tasks - Autorun History
-	type arh struct{ channel, before, since string }
-	var autoHistoryChannels []arh
-	// Compile list of channels to autorun history
-	for _, channel := range getAllRegisteredChannels() {
-		channelConfig := getSource(&discordgo.Message{ChannelID: channel}, nil)
-		if channelConfig.AutoHistory != nil {
-			if *channelConfig.AutoHistory {
-				var autoHistoryChannel arh
-				autoHistoryChannel.channel = channel
-				autoHistoryChannel.before = *channelConfig.AutoHistoryBefore
-				autoHistoryChannel.since = *channelConfig.AutoHistorySince
-				autoHistoryChannels = append(autoHistoryChannels, autoHistoryChannel)
-			}
-			continue
-		}
-	}
-	// Process auto history
-	for _, ah := range autoHistoryChannels {
-		//MARKER: history jobs queued from auto
-		if job, exists := historyJobs.Get(ah.channel); !exists ||
-			(job.Status != historyStatusRunning && job.Status != historyStatusAbortRequested) {
-			job.Status = historyStatusWaiting
-			job.OriginChannel = "AUTORUN"
-			job.OriginUser = "AUTORUN"
-			job.TargetCommandingMessage = nil
-			job.TargetChannelID = ah.channel
-			job.TargetBefore = ah.before
-			job.TargetSince = ah.since
-			job.Updated = time.Now()
-			job.Added = time.Now()
-			historyJobs.Set(ah.channel, job)
-			//TODO: signals for this and typical history cmd??
-		}
-	}
-	if len(autoHistoryChannels) > 0 {
-		log.Println(lg("History", "Autorun", color.HiYellowString,
-			"History Autoruns completed (for %d channel%s)",
-			len(autoHistoryChannels), pluralS(len(autoHistoryChannels))))
-		log.Println(lg("History", "Autorun", color.CyanString,
-			"Waiting for something else to do..."))
-	}
-	//#endregion
-
-	//#region BG Tasks - History Job Processing
-	go func() {
-		for {
-			// Empty Local Cache
-			nhistoryJobCnt,
-				nhistoryJobCntWaiting,
-				nhistoryJobCntRunning,
-				nhistoryJobCntAborted,
-				nhistoryJobCntErrored,
-				nhistoryJobCntCompleted := historyJobs.Len(), 0, 0, 0, 0, 0
-
-			//MARKER: history jobs launch
-			// do we even bother?
-			if nhistoryJobCnt > 0 {
-				// New Cache
-				for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
-					job := pair.Value
-					if job.Status == historyStatusWaiting {
-						nhistoryJobCntWaiting++
-					} else if job.Status == historyStatusRunning {
-						nhistoryJobCntRunning++
-					} else if job.Status == historyStatusAbortRequested || job.Status == historyStatusAbortCompleted {
-						nhistoryJobCntAborted++
-					} else if job.Status == historyStatusErrorReadMessageHistoryPerms || job.Status == historyStatusErrorRequesting {
-						nhistoryJobCntErrored++
-					} else if job.Status >= historyStatusCompletedNoMoreMessages {
-						nhistoryJobCntCompleted++
-					}
-				}
-
-				// Should Start New Job(s)?
-				if nhistoryJobCntRunning < config.HistoryMaxJobs || config.HistoryMaxJobs < 1 {
-					openSlots := config.HistoryMaxJobs - nhistoryJobCntRunning
-					newJobs := make([]historyJob, openSlots)
-					filledSlots := 0
-					// Find Jobs
-					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
-						if filledSlots == openSlots {
-							break
-						}
-						if pair.Value.Status == historyStatusWaiting {
-							newJobs = append(newJobs, pair.Value)
-							filledSlots++
-						}
-					}
-					// Start Jobs
-					if len(newJobs) > 0 {
-						for _, job := range newJobs {
-							if job != (historyJob{}) {
-								go handleHistory(job.TargetCommandingMessage, job.TargetChannelID, job.TargetBefore, job.TargetSince)
-							}
-						}
-					}
-				}
-			}
-
-			// Update Cache
-			historyJobCnt = nhistoryJobCnt
-			historyJobCntWaiting = nhistoryJobCntWaiting
-			historyJobCntRunning = nhistoryJobCntRunning
-			historyJobCntAborted = nhistoryJobCntAborted
-			historyJobCntErrored = nhistoryJobCntErrored
-			historyJobCntCompleted = nhistoryJobCntCompleted
-
-			//~ optional setting?
-			time.Sleep(5 * time.Second)
-		}
-	}()
-	//#endregion
-
-	//#region BG Tasks - Settings Watcher
+	//#region [Loop] Settings Watcher
 	if config.WatchSettings {
 		watcher, err := fsnotify.NewWatcher()
 		if err != nil {
@@ -390,6 +393,14 @@ func main() {
 		}()
 	}
 	//#endregion
+
+	//#region Database Backup
+
+	if config.BackupDatabaseOnStart {
+		if err = backupDatabase(); err != nil {
+			log.Println(lg("Database", "Backup", color.HiRedString, "Error backing up database:\t%s", err))
+		}
+	}
 
 	//#endregion
 
@@ -448,17 +459,15 @@ func main() {
 	}
 	//#endregion
 
-	//#region Database Backup
+	//#region BG STARTUP COMPLETE
 
-	if config.BackupDatabaseOnStart {
-		if err = backupDatabase(); err != nil {
-			log.Println(lg("Database", "Backup", color.HiRedString, "Error backing up database:\t%s", err))
-		}
+	if config.Debug {
+		log.Println(lg("Main", "", color.YellowString, "Background startup tasks finished, took %s...", uptime()))
 	}
 
 	//#endregion
 
-	// ~~~ RUNNING
+	// ~~~ RUNNING ~~~
 
 	//#region ----------- TEST ENV / main
 
@@ -483,6 +492,7 @@ func main() {
 
 	log.Println(lg("Main", "", color.HiRedString, "Exiting... "))
 	//#endregion
+
 }
 
 func openDatabase() {
@@ -503,20 +513,18 @@ func openDatabase() {
 			return
 		}
 		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database...\t(took %s)", timeSinceShort(tt)))
+		//
 		log.Println(lg("Database", "Setup", color.YellowString, "Indexing database, please wait..."))
 		tt = time.Now()
-		if err := myDB.Use("Downloads").Index([]string{"URL"}); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for URL: %s", err))
-			return
+		indexColumn := func(col string) {
+			if err := myDB.Use("Downloads").Index([]string{col}); err != nil {
+				log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create index for %s: %s", col, err))
+				return
+			}
 		}
-		if err := myDB.Use("Downloads").Index([]string{"ChannelID"}); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for ChannelID: %s", err))
-			return
-		}
-		if err := myDB.Use("Downloads").Index([]string{"UserID"}); err != nil {
-			log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create database index for UserID: %s", err))
-			return
-		}
+		indexColumn("URL")
+		indexColumn("ChannelID")
+		indexColumn("UserID")
 		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes...\t(took %s)", timeSinceShort(tt)))
 	}
 	// Cache download tally
@@ -548,6 +556,7 @@ func openDatabase() {
 func botLoad() {
 	mainWg.Add(1)
 	botLoadAPIs()
+
 	mainWg.Add(1)
 	botLoadDiscord()
 }
