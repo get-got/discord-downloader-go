@@ -30,21 +30,21 @@ var (
 
 type configurationCredentials struct {
 	// Login
-	Token    string `json:"token,omitempty" yaml:"token,omitempty"`       // required for bot token (this or login)
-	Email    string `json:"email,omitempty" yaml:"email,omitempty"`       // required for login (this or token)
-	Password string `json:"password,omitempty" yaml:"password,omitempty"` // required for login (this or token)
+	Token    string `json:"token" yaml:"token"`       // required for bot token (this or login)
+	Email    string `json:"email" yaml:"email"`       // required for login (this or token)
+	Password string `json:"password" yaml:"password"` // required for login (this or token)
 	// APIs
-	TwitterAuthEnabled       *bool  `json:"twitterEnabled,omitempty" yaml:"twitterEnabled,omitempty"`
-	TwitterUsername          string `json:"twitterUsername,omitempty" yaml:"twitterUsername,omitempty"`
-	TwitterPassword          string `json:"twitterPassword,omitempty" yaml:"twitterPassword,omitempty"`
+	TwitterAuthEnabled       *bool  `json:"twitterEnabled" yaml:"twitterEnabled"`
+	TwitterUsername          string `json:"twitterUsername" yaml:"twitterUsername"`
+	TwitterPassword          string `json:"twitterPassword" yaml:"twitterPassword"`
 	TwitterProxy             string `json:"twitterProxy,omitempty" yaml:"twitterProxy,omitempty"`
-	InstagramAuthEnabled     *bool  `json:"instagramEnabled,omitempty" yaml:"instagramEnabled,omitempty"`
-	InstagramUsername        string `json:"instagramUsername,omitempty" yaml:"instagramUsername,omitempty"`
-	InstagramPassword        string `json:"instagramPassword,omitempty" yaml:"instagramPassword,omitempty"`
+	InstagramAuthEnabled     *bool  `json:"instagramEnabled" yaml:"instagramEnabled"`
+	InstagramUsername        string `json:"instagramUsername" yaml:"instagramUsername"`
+	InstagramPassword        string `json:"instagramPassword" yaml:"instagramPassword"`
 	InstagramProxy           string `json:"instagramProxy,omitempty" yaml:"instagramProxy,omitempty"`
 	InstagramProxyInsecure   *bool  `json:"instagramProxyInsecure,omitempty" yaml:"instagramProxyInsecure,omitempty"`
 	InstagramProxyForceHTTP2 *bool  `json:"instagramProxyForceHTTP2,omitempty" yaml:"instagramProxyForceHTTP2,omitempty"`
-	FlickrApiKey             string `json:"flickrApiKey,omitempty" yaml:"flickrApiKey,omitempty"`
+	FlickrApiKey             string `json:"flickrApiKey" yaml:"flickrApiKey"`
 }
 
 //#endregion
@@ -137,11 +137,10 @@ func defaultConfiguration() configuration {
 		ScanEdits:     true,
 		IgnoreBots:    true,
 
-		SendErrorMessages:  false,
-		SendFileToChannel:  "",
-		SendFileToChannels: []string{},
-		SendFileDirectly:   true,
-		SendFileCaption:    "",
+		SendErrorMessages: false,
+		SendFileToChannel: "",
+		SendFileDirectly:  true,
+		SendFileCaption:   "",
 
 		FilenameDateFormat: defConfig_FilenameDateFormat,
 		FilenameFormat:     defConfig_FilenameFormat,
@@ -202,7 +201,7 @@ func defaultConfiguration() configuration {
 }
 
 type configuration struct {
-	Constants map[string]string `json:"_constants,omitempty" yaml:"_constants,omitempty"`
+	Constants map[string]string `json:"_constants" yaml:"_constants"`
 
 	// Logins
 	Credentials configurationCredentials `json:"credentials" yaml:"credentials"`
@@ -223,26 +222,26 @@ type configuration struct {
 
 	// Program Settings
 	LogOutput             string `json:"logOutput,omitempty" yaml:"logOutput,omitempty"`
-	LogIndent             bool   `json:"logIndent,omitempty" yaml:"logIndent,omitempty"`
-	ProcessLimit          int    `json:"processLimit,omitempty" yaml:"processLimit,omitempty"`
-	Debug                 bool   `json:"debug,omitempty" yaml:"debug,omitempty"`
-	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart,omitempty" yaml:"backupDatabaseOnStart,omitempty"`
-	WatchSettings         bool   `json:"watchSettings,omitempty" yaml:"watchSettings,omitempty"`
-	SettingsOutput        bool   `json:"settingsOutput,omitempty" yaml:"settingsOutput,omitempty"`
-	MessageOutput         bool   `json:"messageOutput,omitempty" yaml:"messageOutput,omitempty"`
-	MessageOutputHistory  bool   `json:"messageOutputHistory,omitempty" yaml:"messageOutputHistory,omitempty"`
+	LogIndent             bool   `json:"logIndent" yaml:"logIndent"`
+	ProcessLimit          int    `json:"processLimit" yaml:"processLimit"`
+	Debug                 bool   `json:"debug" yaml:"debug"`
+	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart" yaml:"backupDatabaseOnStart"`
+	WatchSettings         bool   `json:"watchSettings" yaml:"watchSettings"`
+	SettingsOutput        bool   `json:"settingsOutput" yaml:"settingsOutput"`
+	MessageOutput         bool   `json:"messageOutput" yaml:"messageOutput"`
+	MessageOutputHistory  bool   `json:"messageOutputHistory" yaml:"messageOutputHistory"`
 
-	DiscordLogLevel      int  `json:"discordLogLevel,omitempty" yaml:"discordLogLevel,omitempty"`
-	DiscordTimeout       int  `json:"discordTimeout,omitempty" yaml:"discordTimeout,omitempty"`
-	DownloadTimeout      int  `json:"downloadTimeout,omitempty" yaml:"downloadTimeout,omitempty"`
-	DownloadRetryMax     int  `json:"downloadRetryMax,omitempty" yaml:"downloadRetryMax,omitempty"`
-	ExitOnBadConnection  bool `json:"exitOnBadConnection,omitempty" yaml:"exitOnBadConnection,omitempty"`
-	GithubUpdateChecking bool `json:"githubUpdateChecking,omitempty" yaml:"githubUpdateChecking,omitempty"`
+	DiscordLogLevel      int  `json:"discordLogLevel" yaml:"discordLogLevel"`
+	DiscordTimeout       int  `json:"discordTimeout" yaml:"discordTimeout"`
+	DownloadTimeout      int  `json:"downloadTimeout" yaml:"downloadTimeout"`
+	DownloadRetryMax     int  `json:"downloadRetryMax" yaml:"downloadRetryMax"`
+	ExitOnBadConnection  bool `json:"exitOnBadConnection" yaml:"exitOnBadConnection"`
+	GithubUpdateChecking bool `json:"githubUpdateChecking" yaml:"githubUpdateChecking"`
 
-	CommandPrefix        string `json:"commandPrefix,omitempty" yaml:"commandPrefix,omitempty"`
-	CommandTagging       bool   `json:"commandTagging,omitempty" yaml:"commandTagging,omitempty"`
-	ScanOwnMessages      bool   `json:"scanOwnMessages,omitempty" yaml:"scanOwnMessages,omitempty"`
-	AllowGeneralCommands bool   `json:"allowGeneralCommands,omitempty" yaml:"allowGeneralCommands,omitempty"`
+	CommandPrefix        string `json:"commandPrefix" yaml:"commandPrefix"`
+	CommandTagging       bool   `json:"commandTagging" yaml:"commandTagging"`
+	ScanOwnMessages      bool   `json:"scanOwnMessages" yaml:"scanOwnMessages"`
+	AllowGeneralCommands bool   `json:"allowGeneralCommands" yaml:"allowGeneralCommands"`
 	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty" yaml:"inflateDownloadCount,omitempty"`
 	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty" yaml:"europeanNumbers,omitempty"`
 
@@ -252,63 +251,63 @@ type configuration struct {
 	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty" yaml:"presenceRefreshRate,omitempty"`
 
 	// Source Setup Defaults
-	Save          bool `json:"save,omitempty" yaml:"save,omitempty"`
-	AllowCommands bool `json:"allowCommands,omitempty" yaml:"allowCommands,omitempty"`
-	ScanEdits     bool `json:"scanEdits,omitempty" yaml:"scanEdits,omitempty"`
-	IgnoreBots    bool `json:"ignoreBots,omitempty" yaml:"ignoreBots,omitempty"`
+	Save          bool `json:"save" yaml:"save"`
+	AllowCommands bool `json:"allowCommands" yaml:"allowCommands"`
+	ScanEdits     bool `json:"scanEdits" yaml:"scanEdits"`
+	IgnoreBots    bool `json:"ignoreBots" yaml:"ignoreBots"`
 
-	SendErrorMessages  bool     `json:"sendErrorMessages,omitempty" yaml:"sendErrorMessages,omitempty"`
-	SendFileToChannel  string   `json:"sendFileToChannel,omitempty" yaml:"sendFileToChannel,omitempty"`
+	SendErrorMessages  bool     `json:"sendErrorMessages" yaml:"sendErrorMessages"`
+	SendFileToChannel  string   `json:"sendFileToChannel" yaml:"sendFileToChannel"`
 	SendFileToChannels []string `json:"sendFileToChannels,omitempty" yaml:"sendFileToChannels,omitempty"`
 	SendFileDirectly   bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
 	SendFileCaption    string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
 
-	FilenameDateFormat string `json:"filenameDateFormat,omitempty" yaml:"filenameDateFormat,omitempty"`
-	FilenameFormat     string `json:"filenameFormat,omitempty" yaml:"filenameFormat,omitempty"`
+	FilenameDateFormat string `json:"filenameDateFormat" yaml:"filenameDateFormat"`
+	FilenameFormat     string `json:"filenameFormat" yaml:"filenameFormat"`
 
 	// Appearance
-	PresenceEnabled            bool               `json:"presenceEnabled,omitempty" yaml:"presenceEnabled,omitempty"`
-	PresenceStatus             string             `json:"presenceStatus,omitempty" yaml:"presenceStatus,omitempty"`
-	PresenceType               discordgo.GameType `json:"presenceType,omitempty" yaml:"presenceType,omitempty"`
-	PresenceLabel              *string            `json:"presenceLabel,omitempty" yaml:"presenceLabel,omitempty"`
-	PresenceDetails            *string            `json:"presenceDetails,omitempty" yaml:"presenceDetails,omitempty"`
-	PresenceState              *string            `json:"presenceState,omitempty" yaml:"presenceState,omitempty"`
-	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded,omitempty" yaml:"reactWhenDownloaded,omitempty"`
-	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji,omitempty" yaml:"reactWhenDownloadedEmoji,omitempty"`
-	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory,omitempty" yaml:"reactWhenDownloadedHistory,omitempty"`
+	PresenceEnabled            bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
+	PresenceStatus             string             `json:"presenceStatus" yaml:"presenceStatus"`
+	PresenceType               discordgo.GameType `json:"presenceType" yaml:"presenceType"`
+	PresenceLabel              *string            `json:"presenceLabel" yaml:"presenceLabel"`
+	PresenceDetails            *string            `json:"presenceDetails" yaml:"presenceDetails"`
+	PresenceState              *string            `json:"presenceState" yaml:"presenceState"`
+	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
+	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
+	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
 	OverwriteDefaultReaction   *string            `json:"overwriteDefaultReaction,omitempty" yaml:"overwriteDefaultReaction,omitempty"`
 	HistoryTyping              bool               `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
 	EmbedColor                 *string            `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
 
 	// History
-	HistoryMaxJobs        int    `json:"historyMaxJobs,omitempty" yaml:"historyMaxJobs,omitempty"`
-	AutoHistory           bool   `json:"autoHistory,omitempty" yaml:"autoHistory,omitempty"`
-	AutoHistoryBefore     string `json:"autoHistoryBefore,omitempty" yaml:"autoHistoryBefore,omitempty"`
-	AutoHistorySince      string `json:"autoHistorySince,omitempty" yaml:"autoHistorySince,omitempty"`
-	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus,omitempty" yaml:"sendAutoHistoryStatus,omitempty"`
-	SendHistoryStatus     bool   `json:"sendHistoryStatus,omitempty" yaml:"sendHistoryStatus,omitempty"`
-	HistoryRequestCount   int    `json:"historyRequestCount,omitempty" yaml:"historyRequestCount,omitempty"`
-	HistoryRequestDelay   int    `json:"historyRequestDelay,omitempty" yaml:"historyRequestDelay,omitempty"`
+	HistoryMaxJobs        int    `json:"historyMaxJobs" yaml:"historyMaxJobs"`
+	AutoHistory           bool   `json:"autoHistory" yaml:"autoHistory"`
+	AutoHistoryBefore     string `json:"autoHistoryBefore" yaml:"autoHistoryBefore"`
+	AutoHistorySince      string `json:"autoHistorySince" yaml:"autoHistorySince"`
+	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus" yaml:"sendAutoHistoryStatus"`
+	SendHistoryStatus     bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
+	HistoryRequestCount   int    `json:"historyRequestCount" yaml:"historyRequestCount"`
+	HistoryRequestDelay   int    `json:"historyRequestDelay" yaml:"historyRequestDelay"`
 
 	// Rules for Saving
 	DelayHandling          int                         `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
 	DelayHandlingHistory   int                         `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-	DivideByYear           bool                        `json:"divideByYear,omitempty" yaml:"divideByYear,omitempty"`
-	DivideByMonth          bool                        `json:"divideByMonth,omitempty" yaml:"divideByMonth,omitempty"`
-	DivideByDay            bool                        `json:"divideByDay,omitempty" yaml:"divideByDay,omitempty"`
-	DivideByHour           bool                        `json:"divideByHour,omitempty" yaml:"divideByHour,omitempty"`
-	DivideByServer         bool                        `json:"divideByServer,omitempty" yaml:"divideByServer,omitempty"`
-	DivideByChannel        bool                        `json:"divideByChannel,omitempty" yaml:"divideByChannel,omitempty"`
-	DivideByUser           bool                        `json:"divideByUser,omitempty" yaml:"divideByUser,omitempty"`
-	DivideByType           bool                        `json:"divideByType,omitempty" yaml:"divideByType,omitempty"`
+	DivideByYear           bool                        `json:"divideByYear" yaml:"divideByYear"`
+	DivideByMonth          bool                        `json:"divideByMonth" yaml:"divideByMonth"`
+	DivideByDay            bool                        `json:"divideByDay" yaml:"divideByDay"`
+	DivideByHour           bool                        `json:"divideByHour" yaml:"divideByHour"`
+	DivideByServer         bool                        `json:"divideByServer" yaml:"divideByServer"`
+	DivideByChannel        bool                        `json:"divideByChannel" yaml:"divideByChannel"`
+	DivideByUser           bool                        `json:"divideByUser" yaml:"divideByUser"`
+	DivideByType           bool                        `json:"divideByType" yaml:"divideByType"`
 	DivideFoldersUseID     bool                        `json:"divideFoldersUseID,omitempty" yaml:"divideFoldersUseID,omitempty"`
-	SaveImages             bool                        `json:"saveImages,omitempty" yaml:"saveImages,omitempty"`
-	SaveVideos             bool                        `json:"saveVideos,omitempty" yaml:"saveVideos,omitempty"`
-	SaveAudioFiles         bool                        `json:"saveAudioFiles,omitempty" yaml:"saveAudioFiles,omitempty"`
-	SaveTextFiles          bool                        `json:"saveTextFiles,omitempty" yaml:"saveTextFiles,omitempty"`
-	SaveOtherFiles         bool                        `json:"saveOtherFiles,omitempty" yaml:"saveOtherFiles,omitempty"`
-	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates,omitempty" yaml:"savePossibleDuplicates,omitempty"`
-	Filters                *configurationSourceFilters `json:"filters,omitempty" yaml:"filters,omitempty"`
+	SaveImages             bool                        `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             bool                        `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         bool                        `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          bool                        `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         bool                        `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	Filters                *configurationSourceFilters `json:"filters" yaml:"filters"`
 	Duplo                  bool                        `json:"duplo,omitempty" yaml:"duplo,omitempty"`
 	DuploThreshold         float64                     `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
@@ -325,7 +324,7 @@ type configuration struct {
 }
 
 type constStruct struct {
-	Constants map[string]string `json:"_constants,omitempty" yaml:"_constants,omitempty"`
+	Constants map[string]string `json:"_constants" yaml:"_constants"`
 }
 
 //#endregion
@@ -354,54 +353,54 @@ type configurationSource struct {
 	// Setup
 	Enabled       *bool `json:"enabled" yaml:"enabled"`
 	Save          *bool `json:"save" yaml:"save"`
-	AllowCommands *bool `json:"allowCommands,omitempty" yaml:"allowCommands,omitempty"`
-	ScanEdits     *bool `json:"scanEdits,omitempty" yaml:"scanEdits,omitempty"`
-	IgnoreBots    *bool `json:"ignoreBots,omitempty" yaml:"ignoreBots,omitempty"`
+	AllowCommands *bool `json:"allowCommands" yaml:"allowCommands"`
+	ScanEdits     *bool `json:"scanEdits" yaml:"scanEdits"`
+	IgnoreBots    *bool `json:"ignoreBots" yaml:"ignoreBots"`
 
-	SendErrorMessages  *bool     `json:"sendErrorMessages,omitempty" yaml:"sendErrorMessages,omitempty"`
-	SendFileToChannel  *string   `json:"sendFileToChannel,omitempty" yaml:"sendFileToChannel,omitempty"`
+	SendErrorMessages  *bool     `json:"sendErrorMessages" yaml:"sendErrorMessages"`
+	SendFileToChannel  *string   `json:"sendFileToChannel" yaml:"sendFileToChannel"`
 	SendFileToChannels *[]string `json:"sendFileToChannels,omitempty" yaml:"sendFileToChannels,omitempty"`
 	SendFileDirectly   *bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
 	SendFileCaption    *string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
 
-	FilenameDateFormat *string `json:"filenameDateFormat,omitempty" yaml:"filenameDateFormat,omitempty"`
-	FilenameFormat     *string `json:"filenameFormat,omitempty" yaml:"filenameFormat,omitempty"`
+	FilenameDateFormat *string `json:"filenameDateFormat" yaml:"filenameDateFormat"`
+	FilenameFormat     *string `json:"filenameFormat" yaml:"filenameFormat"`
 
 	// Appearance
-	PresenceEnabled            *bool     `json:"presenceEnabled,omitempty" yaml:"presenceEnabled,omitempty"`
-	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded,omitempty" yaml:"reactWhenDownloaded,omitempty"`
-	ReactWhenDownloadedEmoji   *string   `json:"reactWhenDownloadedEmoji,omitempty" yaml:"reactWhenDownloadedEmoji,omitempty"`
-	ReactWhenDownloadedHistory *bool     `json:"reactWhenDownloadedHistory,omitempty" yaml:"reactWhenDownloadedHistory,omitempty"`
+	PresenceEnabled            *bool     `json:"presenceEnabled" yaml:"presenceEnabled"`
+	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
+	ReactWhenDownloadedEmoji   *string   `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
+	ReactWhenDownloadedHistory *bool     `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
 	BlacklistReactEmojis       *[]string `json:"blacklistReactEmojis,omitempty" yaml:"blacklistReactEmojis,omitempty"`
 	HistoryTyping              *bool     `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
 	EmbedColor                 *string   `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
 
 	// History
-	AutoHistory           *bool   `json:"autoHistory,omitempty" yaml:"autoHistory,omitempty"`
-	AutoHistoryBefore     *string `json:"autoHistoryBefore,omitempty" yaml:"autoHistoryBefore,omitempty"`
-	AutoHistorySince      *string `json:"autoHistorySince,omitempty" yaml:"autoHistorySince,omitempty"`
-	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus,omitempty" yaml:"sendAutoHistoryStatus,omitempty"`
-	SendHistoryStatus     *bool   `json:"sendHistoryStatus,omitempty" yaml:"sendHistoryStatus,omitempty"`
+	AutoHistory           *bool   `json:"autoHistory" yaml:"autoHistory"`
+	AutoHistoryBefore     *string `json:"autoHistoryBefore" yaml:"autoHistoryBefore"`
+	AutoHistorySince      *string `json:"autoHistorySince" yaml:"autoHistorySince"`
+	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus" yaml:"sendAutoHistoryStatus"`
+	SendHistoryStatus     *bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
 
 	// Rules for Saving
 	DelayHandling          *int                        `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
 	DelayHandlingHistory   *int                        `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-	DivideByYear           *bool                       `json:"divideByYear,omitempty" yaml:"divideByYear,omitempty"`
-	DivideByMonth          *bool                       `json:"divideByMonth,omitempty" yaml:"divideByMonth,omitempty"`
-	DivideByDay            *bool                       `json:"divideByDay,omitempty" yaml:"divideByDay,omitempty"`
-	DivideByHour           *bool                       `json:"divideByHour,omitempty" yaml:"divideByHour,omitempty"`
-	DivideByServer         *bool                       `json:"divideByServer,omitempty" yaml:"divideByServer,omitempty"`
-	DivideByChannel        *bool                       `json:"divideByChannel,omitempty" yaml:"divideByChannel,omitempty"`
-	DivideByUser           *bool                       `json:"divideByUser,omitempty" yaml:"divideByUser,omitempty"`
-	DivideByType           *bool                       `json:"divideByType,omitempty" yaml:"divideByType,omitempty"`
+	DivideByYear           *bool                       `json:"divideByYear" yaml:"divideByYear"`
+	DivideByMonth          *bool                       `json:"divideByMonth" yaml:"divideByMonth"`
+	DivideByDay            *bool                       `json:"divideByDay" yaml:"divideByDay"`
+	DivideByHour           *bool                       `json:"divideByHour" yaml:"divideByHour"`
+	DivideByServer         *bool                       `json:"divideByServer" yaml:"divideByServer"`
+	DivideByChannel        *bool                       `json:"divideByChannel" yaml:"divideByChannel"`
+	DivideByUser           *bool                       `json:"divideByUser" yaml:"divideByUser"`
+	DivideByType           *bool                       `json:"divideByType" yaml:"divideByType"`
 	DivideFoldersUseID     *bool                       `json:"divideFoldersUseID,omitempty" yaml:"divideFoldersUseID,omitempty"`
-	SaveImages             *bool                       `json:"saveImages,omitempty" yaml:"saveImages,omitempty"`
-	SaveVideos             *bool                       `json:"saveVideos,omitempty" yaml:"saveVideos,omitempty"`
-	SaveAudioFiles         *bool                       `json:"saveAudioFiles,omitempty" yaml:"saveAudioFiles,omitempty"`
-	SaveTextFiles          *bool                       `json:"saveTextFiles,omitempty" yaml:"saveTextFiles,omitempty"`
-	SaveOtherFiles         *bool                       `json:"saveOtherFiles,omitempty" yaml:"saveOtherFiles,omitempty"`
-	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates,omitempty" yaml:"savePossibleDuplicates,omitempty"`
-	Filters                *configurationSourceFilters `json:"filters,omitempty" yaml:"filters,omitempty"`
+	SaveImages             *bool                       `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             *bool                       `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         *bool                       `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          *bool                       `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         *bool                       `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	Filters                *configurationSourceFilters `json:"filters" yaml:"filters"`
 	Duplo                  *bool                       `json:"duplo,omitempty" yaml:"duplo,omitempty"`
 	DuploThreshold         *float64                    `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
@@ -445,17 +444,17 @@ var (
 
 type configurationSourceLog struct {
 	Destination         string  `json:"destination" yaml:"destination"`
-	DestinationIsFolder *bool   `json:"destinationIsFolder,omitempty" yaml:"destinationIsFolder,omitempty"`
-	DivideLogsByServer  *bool   `json:"divideLogsByServer,omitempty" yaml:"divideLogsByServer,omitempty"`
-	DivideLogsByChannel *bool   `json:"divideLogsByChannel,omitempty" yaml:"divideLogsByChannel,omitempty"`
-	DivideLogsByUser    *bool   `json:"divideLogsByUser,omitempty" yaml:"divideLogsByUser,omitempty"`
-	DivideLogsByStatus  *bool   `json:"divideLogsByStatus,omitempty" yaml:"divideLogsByStatus,omitempty"`
-	LogDownloads        *bool   `json:"logDownloads,omitempty" yaml:"logDownloads,omitempty"`
-	LogFailures         *bool   `json:"logFailures,omitempty" yaml:"logFailures,omitempty"`
-	FilterDuplicates    *bool   `json:"filterDuplicates,omitempty" yaml:"filterDuplicates,omitempty"`
-	Prefix              *string `json:"prefix,omitempty" yaml:"prefix,omitempty"`
-	Suffix              *string `json:"suffix,omitempty" yaml:"suffix,omitempty"`
-	UserData            *bool   `json:"userData,omitempty" yaml:"userData,omitempty"`
+	DestinationIsFolder *bool   `json:"destinationIsFolder" yaml:"destinationIsFolder"`
+	DivideLogsByServer  *bool   `json:"divideLogsByServer" yaml:"divideLogsByServer"`
+	DivideLogsByChannel *bool   `json:"divideLogsByChannel" yaml:"divideLogsByChannel"`
+	DivideLogsByUser    *bool   `json:"divideLogsByUser" yaml:"divideLogsByUser"`
+	DivideLogsByStatus  *bool   `json:"divideLogsByStatus" yaml:"divideLogsByStatus"`
+	LogDownloads        *bool   `json:"logDownloads" yaml:"logDownloads"`
+	LogFailures         *bool   `json:"logFailures" yaml:"logFailures"`
+	FilterDuplicates    *bool   `json:"filterDuplicates" yaml:"filterDuplicates"`
+	Prefix              *string `json:"prefix" yaml:"prefix"`
+	Suffix              *string `json:"suffix" yaml:"suffix"`
+	UserData            *bool   `json:"userData" yaml:"userData"`
 }
 
 //#endregion
@@ -472,10 +471,10 @@ var (
 type configurationAdminChannel struct {
 	ChannelID      string    `json:"channel" yaml:"channel"`
 	ChannelIDs     *[]string `json:"channels,omitempty" yaml:"channels,omitempty"`
-	LogProgram     *bool     `json:"logProgram,omitempty" yaml:"logProgram,omitempty"`
-	LogStatus      *bool     `json:"logStatus,omitempty" yaml:"logStatus,omitempty"`
-	LogErrors      *bool     `json:"logErrors,omitempty" yaml:"logErrors,omitempty"`
-	UnlockCommands *bool     `json:"unlockCommands,omitempty" yaml:"unlockCommands,omitempty"`
+	LogProgram     *bool     `json:"logProgram" yaml:"logProgram"`
+	LogStatus      *bool     `json:"logStatus" yaml:"logStatus"`
+	LogErrors      *bool     `json:"logErrors" yaml:"logErrors"`
+	UnlockCommands *bool     `json:"unlockCommands" yaml:"unlockCommands"`
 }
 
 //#endregion
@@ -733,28 +732,14 @@ func loadConfig() error {
 func createConfig() {
 	log.Println(lg("Settings", "create", color.YellowString, "Creating new settings file..."))
 
+	defaultConfig := defaultConfiguration()
+	defaultConfig.Credentials.Token = placeholderToken
+	defaultConfig.Credentials.Email = placeholderEmail
+	defaultConfig.Credentials.Password = placeholderPassword
+	defaultConfig.Admins = []string{"REPLACE_WITH_YOUR_DISCORD_USER_ID"}
+
 	enteredBaseChannel := "REPLACE_WITH_DISCORD_CHANNEL_ID_TO_DOWNLOAD_FROM"
 	enteredBaseDestination := "REPLACE_WITH_FOLDER_LOCATION_TO_DOWNLOAD_TO"
-
-	// Separate from Defaultconfiguration because there's some elements we want to strip for settings creation
-	defaultConfig := configuration{
-		Credentials: configurationCredentials{
-			Token:    placeholderToken,
-			Email:    placeholderEmail,
-			Password: placeholderPassword,
-		},
-		Admins:          []string{"REPLACE_WITH_YOUR_DISCORD_USER_ID"},
-		CommandPrefix:   defConfig_CommandPrefix,
-		ScanOwnMessages: defConfig_ScanOwnMessages,
-
-		PresenceEnabled:     defConfig_PresenceEnabled,
-		PresenceStatus:      defConfig_PresenceStatus,
-		PresenceType:        defConfig_PresenceType,
-		ReactWhenDownloaded: defConfig_ReactWhenDownloaded,
-
-		GithubUpdateChecking: defConfig_GithubUpdateChecking,
-		Debug:                defConfig_Debug,
-	}
 
 	// Import old config
 	if _, err := os.Stat("config.ini"); err == nil {
@@ -823,30 +808,18 @@ func createConfig() {
 		log.Println(lg("Settings", "create", color.HiGreenString,
 			"Finished importing config.ini from Seklfreak's discord-image-downloader-go!"))
 	} else {
-		baseChannel := configurationSource{
-			ChannelID:   enteredBaseChannel,
-			Destination: enteredBaseDestination,
+		var baseChannel configurationSource
+		sourceDefault(&baseChannel)
+		baseChannel.ChannelID = enteredBaseChannel
+		baseChannel.Destination = enteredBaseDestination
 
-			Enabled:           &defSource_Enabled,
-			Save:              &config.Save,
-			AllowCommands:     &config.AllowCommands,
-			SendErrorMessages: &config.SendErrorMessages,
-			ScanEdits:         &config.ScanEdits,
-			IgnoreBots:        &config.IgnoreBots,
-
-			PresenceEnabled:            &config.PresenceEnabled,
-			ReactWhenDownloadedHistory: &config.ReactWhenDownloadedHistory,
-
-			DivideByType: &config.DivideByType,
-			SaveImages:   &config.SaveImages,
-			SaveVideos:   &config.SaveVideos,
-		}
 		defaultConfig.Channels = append(defaultConfig.Channels, baseChannel)
 
 		baseAdminChannel := configurationAdminChannel{
 			ChannelID: "REPLACE_WITH_DISCORD_CHANNEL_ID_FOR_ADMIN_COMMANDS",
 		}
 		defaultConfig.AdminChannels = append(defaultConfig.AdminChannels, baseAdminChannel)
+		adminChannelDefault(&defaultConfig.AdminChannels[0])
 
 		//TODO: Improve, this is very crude, I just wanted *something* for this.
 		log.Print(lg("Settings", "create", color.HiCyanString, "Would you like to enter settings info now? [Y/N]: "))
@@ -1003,7 +976,7 @@ func sourceDefault(channel *configurationSource) {
 	if channel.BlacklistReactEmojis == nil {
 		channel.BlacklistReactEmojis = &[]string{}
 	}
-	if channel.HistoryTyping == nil {
+	if channel.HistoryTyping == nil && config.HistoryTyping {
 		channel.HistoryTyping = &config.HistoryTyping
 	}
 	if channel.EmbedColor == nil && config.EmbedColor != nil {
@@ -1028,10 +1001,10 @@ func sourceDefault(channel *configurationSource) {
 	}
 
 	// Rules for Saving
-	if channel.DelayHandling == nil {
+	if channel.DelayHandling == nil && config.DelayHandling != 0 {
 		channel.DelayHandling = &config.DelayHandling
 	}
-	if channel.DelayHandlingHistory == nil {
+	if channel.DelayHandlingHistory == nil && config.DelayHandlingHistory != 0 {
 		channel.DelayHandlingHistory = &config.DelayHandlingHistory
 	}
 	if channel.DivideByYear == nil {
@@ -1058,7 +1031,7 @@ func sourceDefault(channel *configurationSource) {
 	if channel.DivideByType == nil {
 		channel.DivideByType = &config.DivideByType
 	}
-	if channel.DivideFoldersUseID == nil {
+	if channel.DivideFoldersUseID == nil && config.DivideFoldersUseID {
 		channel.DivideFoldersUseID = &config.DivideFoldersUseID
 	}
 	if channel.SaveImages == nil {
@@ -1088,53 +1061,51 @@ func sourceDefault(channel *configurationSource) {
 	if channel.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
 		channel.Filters.BlockedPhrases = config.Filters.BlockedPhrases
 	}
-	if channel.Duplo == nil {
+	if channel.Duplo == nil && config.Duplo {
 		channel.Duplo = &config.Duplo
 	}
-	if channel.DuploThreshold == nil {
+	if channel.DuploThreshold == nil && config.DuploThreshold != 0 {
 		channel.DuploThreshold = &config.DuploThreshold
 	}
 
 	// Misc Rules
-	if channel.LogLinks == nil {
-		channel.LogLinks = &configurationSourceLog{}
-	}
-	if channel.LogLinks.DestinationIsFolder == nil {
-		channel.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
-	}
-	if channel.LogLinks.DivideLogsByServer == nil {
-		channel.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
-	}
-	if channel.LogLinks.DivideLogsByChannel == nil {
-		channel.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
-	}
-	if channel.LogLinks.DivideLogsByUser == nil {
-		channel.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
-	}
-	if channel.LogLinks.DivideLogsByStatus == nil {
-		channel.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
-	}
-	if channel.LogLinks.LogDownloads == nil {
-		channel.LogLinks.LogDownloads = &defSourceLog_LogDownloads
-	}
-	if channel.LogLinks.LogFailures == nil {
-		channel.LogLinks.LogFailures = &defSourceLog_LogFailures
+	if channel.LogLinks != nil {
+		if channel.LogLinks.DestinationIsFolder == nil {
+			channel.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
+		}
+		if channel.LogLinks.DivideLogsByServer == nil {
+			channel.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
+		}
+		if channel.LogLinks.DivideLogsByChannel == nil {
+			channel.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
+		}
+		if channel.LogLinks.DivideLogsByUser == nil {
+			channel.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
+		}
+		if channel.LogLinks.DivideLogsByStatus == nil {
+			channel.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
+		}
+		if channel.LogLinks.LogDownloads == nil {
+			channel.LogLinks.LogDownloads = &defSourceLog_LogDownloads
+		}
+		if channel.LogLinks.LogFailures == nil {
+			channel.LogLinks.LogFailures = &defSourceLog_LogFailures
+		}
 	}
 
-	if channel.LogMessages == nil {
-		channel.LogMessages = &configurationSourceLog{}
-	}
-	if channel.LogMessages.DestinationIsFolder == nil {
-		channel.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
-	}
-	if channel.LogMessages.DivideLogsByServer == nil {
-		channel.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
-	}
-	if channel.LogMessages.DivideLogsByChannel == nil {
-		channel.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
-	}
-	if channel.LogMessages.DivideLogsByUser == nil {
-		channel.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
+	if channel.LogMessages != nil {
+		if channel.LogMessages.DestinationIsFolder == nil {
+			channel.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
+		}
+		if channel.LogMessages.DivideLogsByServer == nil {
+			channel.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
+		}
+		if channel.LogMessages.DivideLogsByChannel == nil {
+			channel.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
+		}
+		if channel.LogMessages.DivideLogsByUser == nil {
+			channel.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
+		}
 	}
 
 	// LAZY CHECKS
