@@ -74,22 +74,25 @@ func versions(multiline bool) string {
 
 func init() {
 
-	// Initialize Logging
+	//#region Initialize Logging
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
 	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
+	//#endregion
 
-	// Initialize Variables
+	//#region Initialize Variables
 	loop = make(chan os.Signal, 1)
+
 	startTime = time.Now()
+
 	historyJobs = orderedmap.New[string, historyJob]()
+
 	if len(os.Args) > 1 {
 		configFileBase = os.Args[1]
 	}
+	//#endregion
 
-	log.Println(lg("Version", "", color.CyanString, versions(false)))
-
-	// Github Update Check
+	//#region Github Update Check
 	if config.GithubUpdateChecking {
 		if !isLatestGithubRelease() {
 			log.Println(lg("Version", "UPDATE", color.HiCyanString, "***\tUPDATE AVAILABLE\t***"))
@@ -103,6 +106,9 @@ func init() {
 			time.Sleep(5 * time.Second)
 		}
 	}
+	//#endregion
+
+	log.Println(lg("Version", "", color.CyanString, versions(false)))
 
 	log.Println(lg("Info", "", color.HiCyanString, "** Need help? Discord: https://discord.gg/6Z6FJZVaDV **"))
 }
