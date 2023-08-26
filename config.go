@@ -34,9 +34,11 @@ type configurationCredentials struct {
 	Email    string `json:"email,omitempty" yaml:"email,omitempty"`       // required for login (this or token)
 	Password string `json:"password,omitempty" yaml:"password,omitempty"` // required for login (this or token)
 	// APIs
+	TwitterAuthEnabled       *bool  `json:"twitterEnabled,omitempty" yaml:"twitterEnabled,omitempty"`
 	TwitterUsername          string `json:"twitterUsername,omitempty" yaml:"twitterUsername,omitempty"`
 	TwitterPassword          string `json:"twitterPassword,omitempty" yaml:"twitterPassword,omitempty"`
 	TwitterProxy             string `json:"twitterProxy,omitempty" yaml:"twitterProxy,omitempty"`
+	InstagramAuthEnabled     *bool  `json:"instagramEnabled,omitempty" yaml:"instagramEnabled,omitempty"`
 	InstagramUsername        string `json:"instagramUsername,omitempty" yaml:"instagramUsername,omitempty"`
 	InstagramPassword        string `json:"instagramPassword,omitempty" yaml:"instagramPassword,omitempty"`
 	InstagramProxy           string `json:"instagramProxy,omitempty" yaml:"instagramProxy,omitempty"`
@@ -52,6 +54,9 @@ type configurationCredentials struct {
 // defConfig_ = Config Default
 // Needed for settings used without redundant nil checks, and settings defaulting + creation
 var (
+	defConfig_AuthTwitter   bool = true
+	defConfig_AuthInstagram bool = true
+
 	defConfig_Debug                bool   = false
 	defConfig_CommandPrefix        string = "ddg "
 	defConfig_ScanOwnMessages      bool   = false
@@ -85,9 +90,11 @@ func defaultConfiguration() configuration {
 
 		// Logins
 		Credentials: configurationCredentials{
-			Token:    placeholderToken,
-			Email:    placeholderEmail,
-			Password: placeholderPassword,
+			Token:                placeholderToken,
+			Email:                placeholderEmail,
+			Password:             placeholderPassword,
+			TwitterAuthEnabled:   &defConfig_AuthTwitter,
+			InstagramAuthEnabled: &defConfig_AuthInstagram,
 		},
 
 		// Owner Settings

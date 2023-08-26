@@ -277,12 +277,14 @@ Alternatively, if you are using `.yaml`, the bot will convert to JSON and store 
         "token": "YOUR_USER_OR_BOT_TOKEN",        // user with 2FA or genuine Discord bot.
         "email": "YOUR_USER_EMAIL_NO_2FA",        // user without 2FA.
         "password": "YOUR_USER_PASSWORD_NO_2FA",  // user without 2FA.
-        "twitterUsername": "",          // Twitter Account, not required but can be used for scraping private accounts.
-        "twitterPassword": "",          // Twitter Account, not required but can be used for scraping private accounts.
-        "twitterProxy": "",             // OPTIONAL - Connect to Twitter via Proxy; Supports HTTP(s) and SOCKS5.
+        "twitterEnabled": true,         // Toggle Twitter / X authentication, enabled by default.
+        "twitterUsername": "",          // Twitter / X Account, not required but can be used for scraping private accounts.
+        "twitterPassword": "",          // Twitter / X Account, not required but can be used for scraping private accounts.
+        "twitterProxy": "",                 // OPTIONAL - Connect to Twitter / X via Proxy; Supports HTTP(s) and SOCKS5.
+        "instagramEnabled": true,       // Toggle Instagram authentication, enabled by default.
         "instagramUsername": "",        // Instagram Account, captcha required at some point(s).
         "instagramPassword": "",        // Instagram Account, captcha required at some point(s).
-        "instagramProxy": "",           // OPTIONAL - Connect to Instagram via Proxy; Supports HTTP(s) and SOCKS5.
+        "instagramProxy": "",               // OPTIONAL - Connect to Instagram via Proxy; Supports HTTP(s) and SOCKS5.
         "instagramProxyInsecure": false,    // OPTIONAL - Define if proxy is insecure connection.
         "instagramProxyForceHTTP2": false,  // OPTIONAL - Define if proxy client should force HTTP2.
         "flickrApiKey": ""
