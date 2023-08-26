@@ -114,7 +114,7 @@ func main() {
 	openDatabase()
 	//#endregion
 
-	mainWg.Wait() // wait because credentials from json
+	mainWg.Wait() // wait because credentials from config
 
 	//#region Connections
 	mainWg.Add(2)
@@ -496,10 +496,11 @@ func main() {
 }
 
 func openDatabase() {
-	var tt time.Time
+	var openT time.Time
+	var createT time.Time
 	// Database
 	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a second...)"))
-	tt = time.Now()
+	openT = time.Now()
 	myDB, err = db.OpenDB(pathDatabaseBase)
 	if err != nil {
 		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
@@ -507,15 +508,15 @@ func openDatabase() {
 	}
 	if myDB.Use("Downloads") == nil {
 		log.Println(lg("Database", "Setup", color.YellowString, "Creating database, please wait..."))
-		tt = time.Now()
+		createT = time.Now()
 		if err := myDB.Create("Downloads"); err != nil {
 			log.Println(lg("Database", "Setup", color.HiRedString, "Error while trying to create database: %s", err))
 			return
 		}
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database...\t(took %s)", timeSinceShort(tt)))
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database...\t(took %s)", timeSinceShort(createT)))
 		//
 		log.Println(lg("Database", "Setup", color.YellowString, "Indexing database, please wait..."))
-		tt = time.Now()
+		createT = time.Now()
 		indexColumn := func(col string) {
 			if err := myDB.Use("Downloads").Index([]string{col}); err != nil {
 				log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create index for %s: %s", col, err))
@@ -525,18 +526,18 @@ func openDatabase() {
 		indexColumn("URL")
 		indexColumn("ChannelID")
 		indexColumn("UserID")
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes...\t(took %s)", timeSinceShort(tt)))
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes...\t(took %s)", timeSinceShort(createT)))
 	}
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
-	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...\t(took %s)", cachedDownloadID, timeSinceShort(tt)))
+	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...\t(took %s)", cachedDownloadID, timeSinceShort(openT)))
 
 	// Duplo
 	if config.Duplo || sourceHasDuplo {
 		duploCatalog = duplo.New()
 		if _, err := os.Stat(pathCacheDuplo); err == nil {
 			log.Println(lg("Duplo", "", color.YellowString, "Opening duplo image catalog..."))
-			tt = time.Now()
+			openT = time.Now()
 			storeFile, err := os.ReadFile(pathCacheDuplo)
 			if err != nil {
 				log.Println(lg("Duplo", "", color.HiRedString, "Error opening duplo catalog:\t%s", err))
@@ -546,7 +547,7 @@ func openDatabase() {
 					log.Println(lg("Duplo", "", color.HiRedString, "Error decoding duplo catalog:\t%s", err))
 				}
 				if duploCatalog != nil {
-					log.Println(lg("Duplo", "", color.HiYellowString, "Duplo catalog opened (%d)\t(%s)", duploCatalog.Size(), timeSinceShort(tt)))
+					log.Println(lg("Duplo", "", color.HiYellowString, "Duplo catalog opened (%d)\t(took %s)", duploCatalog.Size(), timeSinceShort(openT)))
 				}
 			}
 		}
