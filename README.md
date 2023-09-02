@@ -123,7 +123,7 @@ While this project works for user logins, I do not reccomend it as you risk acco
 ## ❔ FAQ
 
 - **_Q: How do I install?_**
-- **A: [SEE #getting-started](#%EF%B8%8F-getting-started)**
+- **A: [SEE #getting-started](https://github.com/get-got/discord-downloader-go/wiki/Getting-Started)**
 
 ---
 
