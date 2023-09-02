@@ -30,7 +30,7 @@ require (
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
-	github.com/chromedp/cdproto v0.0.0-20230816033919-17ee49f3eb4f // indirect
+	github.com/chromedp/cdproto v0.0.0-20230901104747-bfe71bcbd1c0 // indirect
 	github.com/chromedp/chromedp v0.9.2 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
@@ -46,7 +46,7 @@ require (
 	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
 )
 
 replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.27.0-gg.1
