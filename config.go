@@ -300,7 +300,7 @@ type configuration struct {
 	DivideByChannel        bool                        `json:"divideByChannel" yaml:"divideByChannel"`
 	DivideByUser           bool                        `json:"divideByUser" yaml:"divideByUser"`
 	DivideByType           bool                        `json:"divideByType" yaml:"divideByType"`
-	DivideFoldersUseID     bool                        `json:"divideFoldersUseID,omitempty" yaml:"divideFoldersUseID,omitempty"`
+	DivideFoldersUseID     bool                        `json:"divideFoldersUseID" yaml:"divideFoldersUseID"`
 	SaveImages             bool                        `json:"saveImages" yaml:"saveImages"`
 	SaveVideos             bool                        `json:"saveVideos" yaml:"saveVideos"`
 	SaveAudioFiles         bool                        `json:"saveAudioFiles" yaml:"saveAudioFiles"`
