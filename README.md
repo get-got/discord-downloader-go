@@ -81,7 +81,7 @@ It also supports **very extensive** settings configurations and customization, a
 
 [Read more in Discord Trust & Safety Team's Official Statement...](https://support.discordapp.com/hc/en-us/articles/115002192352-Automated-user-accounts-self-bots-)
 
-While this project works for user logins, I do not reccomend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
+While this project works for user logins, I do not recommend it as you risk account termination. If you can, [use a proper Discord Bot user for this program.](https://discord.com/developers/applications)
 
 > _NOTE: This only applies to real User Accounts, not Bot users. This program currently works for either._
 
