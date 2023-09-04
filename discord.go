@@ -457,7 +457,7 @@ func updateDiscordPresence() {
 				Name:    status,
 				Type:    config.PresenceType,
 				Details: statusDetails, // Only visible if real user
-				State:   statusState,   // Only visible if real user
+				State:   statusState,
 			},
 			Status: config.PresenceStatus,
 		})

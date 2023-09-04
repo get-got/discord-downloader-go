@@ -966,8 +966,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// Subfolder Division - Server Nesting
 		if *channelConfig.DivideByServer {
 			subfolderSuffix := download.Message.GuildID
-			if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
-				subfolderSuffix = clearPath(sourceName)
+			if channelConfig.DivideFoldersUseID != nil {
+				if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
+					subfolderSuffix = clearPath(sourceName)
+				}
 			}
 			if subfolderSuffix != "" {
 				subfolderSuffix = subfolderSuffix + string(os.PathSeparator)
@@ -983,8 +985,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// Subfolder Division - Channel Nesting
 		if *channelConfig.DivideByChannel {
 			subfolderSuffix := download.Message.ChannelID
-			if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
-				subfolderSuffix = clearPath(sourceChannelName)
+			if channelConfig.DivideFoldersUseID != nil {
+				if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
+					subfolderSuffix = clearPath(sourceChannelName)
+				}
 			}
 			if subfolderSuffix != "" {
 				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
@@ -999,9 +1003,11 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// Subfolder Division - User Nesting
 		if *channelConfig.DivideByUser && download.Message.Author != nil {
 			subfolderSuffix := download.Message.Author.ID
-			if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
-				subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
-					download.Message.Author.Discriminator)
+			if channelConfig.DivideFoldersUseID != nil {
+				if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
+					subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
+						download.Message.Author.Discriminator)
+				}
 			}
 			if subfolderSuffix != "" {
 				subfolder = subfolder + subfolderSuffix + string(os.PathSeparator)
