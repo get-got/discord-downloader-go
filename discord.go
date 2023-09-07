@@ -230,6 +230,7 @@ func dataKeys(input string) string {
 				fmt.Sprint(len(config.AdminChannels))},
 			{"{{numAdmins}}",
 				fmt.Sprint(len(config.Admins))},
+			//TODO: redo time stuff
 			{"{{timeSavedShort}}",
 				timeLastUpdated.Format("3:04pm")},
 			{"{{timeSavedShortTZ}}",

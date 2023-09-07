@@ -778,14 +778,14 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 			if channelConfig.Filters.BlockedFilenames != nil {
 				for _, phrase := range *channelConfig.Filters.BlockedFilenames {
-					if phrase != "" && phrase != " " && strings.ContainsAny(download.Filename, phrase) {
+					if phrase != "" && phrase != " " && strings.Contains(download.Filename, phrase) {
 						shouldAbort = true
 					}
 				}
 			}
 			if channelConfig.Filters.AllowedFilenames != nil {
 				for _, phrase := range *channelConfig.Filters.AllowedFilenames {
-					if phrase != "" && phrase != " " && strings.ContainsAny(download.Filename, phrase) {
+					if phrase != "" && phrase != " " && strings.Contains(download.Filename, phrase) {
 						shouldAbort = false
 					}
 				}
