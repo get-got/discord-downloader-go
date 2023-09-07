@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
@@ -182,27 +181,6 @@ func handleCommands() *exrouter.Route {
 			}
 		}
 	}).Cat("Info").Desc("Outputs statistics regarding this channel")
-
-	go router.On("info", func(ctx *exrouter.Context) {
-		if isCommandableChannel(ctx.Msg) {
-			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-				log.Println(lg("Command", "Info", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
-			} else {
-				content := fmt.Sprintf("Here is some useful info...\n\n"+
-					"• **Your User ID —** `%s`\n"+
-					"• **Bots User ID —** `%s`\n"+
-					"• **This Channel ID —** `%s`\n"+
-					"• **This Server ID —** `%s`\n\n"+
-					"• **Versions —** `%s, discordgo v%s (modified), Discord API v%s`"+
-					"\n\nRemember to remove any spaces when copying to settings.",
-					ctx.Msg.Author.ID, botUser.ID, ctx.Msg.ChannelID, ctx.Msg.GuildID, runtime.Version(), discordgo.VERSION, discordgo.APIVersion)
-				if _, err := replyEmbed(ctx.Msg, "Command — Info", content); err != nil {
-					log.Println(lg("Command", "Info", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
-				}
-				log.Println(lg("Command", "Info", color.HiCyanString, "%s requested info", getUserIdentifier(*ctx.Msg.Author)))
-			}
-		}
-	}).Cat("Info").Alias("debug").Desc("Displays info regarding Discord IDs")
 
 	//#endregion
 
