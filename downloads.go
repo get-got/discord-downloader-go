@@ -843,7 +843,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Format Keys
-		download.Filename = dynamicKeyReplacement(channelConfig, download)
+		download.Filename = dataKeysDownload(channelConfig, download)
 
 		// Fix filename length
 		if len(download.Filename) >= 260 {
@@ -1285,7 +1285,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						msg := ""
 						if channelConfig.SendFileCaption != nil {
 							msg = *channelConfig.SendFileCaption
-							msg = channelKeyReplacement(msg, download.Message.ChannelID)
+							msg = dataKeysChannel(msg, download.Message.ChannelID)
 						}
 						// File
 						if actualFile {

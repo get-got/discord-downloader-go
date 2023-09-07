@@ -198,7 +198,7 @@ func channelDisplay(channelID string) (string, string) {
 
 //#region Presence
 
-func dataKeyReplacement(input string) string {
+func dataKeys(input string) string {
 	//TODO: Case-insensitive key replacement. -- If no streamlined way to do it, convert to lower to find substring location but replace normally
 	if strings.Contains(input, "{{") && strings.Contains(input, "}}") {
 		countInt := int64(dbDownloadCount()) + *config.InflateDownloadCount
@@ -274,7 +274,7 @@ func dataKeyReplacement(input string) string {
 	return input
 }
 
-func channelKeyReplacement(input string, srcchannel string) string {
+func dataKeysChannel(input string, srcchannel string) string {
 	ret := input
 	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
 		if channel, err := bot.State.Channel(srcchannel); err == nil {
@@ -290,11 +290,11 @@ func channelKeyReplacement(input string, srcchannel string) string {
 			}
 		}
 	}
-	return dataKeyReplacement(ret)
+	return dataKeys(ret)
 }
 
-func dynamicKeyReplacement(channelConfig configurationSource, download downloadRequestStruct) string {
-	//TODO: same as dataKeyReplacement
+func dataKeysDownload(channelConfig configurationSource, download downloadRequestStruct) string {
+	//TODO: same as dataKeys
 
 	ret := config.FilenameFormat
 	if channelConfig.FilenameFormat != nil {
@@ -316,12 +316,12 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 
 		shortID, err := shortid.Generate()
 		if err != nil && config.Debug {
-			log.Println(lg("Debug", "dynamicKeyReplacement", color.HiCyanString, "Error when generating a shortID %s", err))
+			log.Println(lg("Debug", "dataKeysDownload", color.HiCyanString, "Error when generating a shortID %s", err))
 		}
 
 		nanoID, err := nanoid.New()
 		if err != nil && config.Debug {
-			log.Println(lg("Debug", "dynamicKeyReplacement", color.HiCyanString, "Error when creating a nanoID %s", err))
+			log.Println(lg("Debug", "dataKeysDownload", color.HiCyanString, "Error when creating a nanoID %s", err))
 		}
 
 		userID := ""
@@ -385,7 +385,7 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			}
 		}
 	}
-	return dataKeyReplacement(ret)
+	return dataKeys(ret)
 }
 
 func updateDiscordPresence() {
@@ -406,21 +406,21 @@ func updateDiscordPresence() {
 		if config.PresenceLabel != nil {
 			status = *config.PresenceLabel
 			if status != "" {
-				status = dataKeyReplacement(status)
+				status = dataKeys(status)
 			}
 		}
 		// Overwrite Details
 		if config.PresenceDetails != nil {
 			statusDetails = *config.PresenceDetails
 			if statusDetails != "" {
-				statusDetails = dataKeyReplacement(statusDetails)
+				statusDetails = dataKeys(statusDetails)
 			}
 		}
 		// Overwrite State
 		if config.PresenceState != nil {
 			statusState = *config.PresenceState
 			if statusState != "" {
-				statusState = dataKeyReplacement(statusState)
+				statusState = dataKeys(statusState)
 			}
 		}
 

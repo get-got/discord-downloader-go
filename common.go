@@ -5,21 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
-	"path"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
-	"github.com/hako/durafmt"
 	"github.com/hashicorp/go-version"
 )
-
-//#region Instance
 
 func uptime() time.Duration {
 	return time.Since(startTime) //.Truncate(time.Second)
@@ -28,180 +21,9 @@ func uptime() time.Duration {
 func properExit() {
 	// Not formatting string because I only want the exit message to be red.
 	log.Println(lg("Main", "", color.HiRedString, "[EXIT IN 15 SECONDS] Uptime was %s...", timeSince(startTime)))
-	log.Println(color.HiCyanString("--------------------------------------------------------------------------------"))
+	log.Println(color.HiCyanString("----------------------------------------------------"))
 	time.Sleep(15 * time.Second)
 	os.Exit(1)
-}
-
-//#endregion
-
-//#region Files
-
-var (
-	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
-)
-
-//#endregion
-
-//#region Strings
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if strings.EqualFold(a, b) {
-			return true
-		}
-	}
-	return false
-}
-
-func formatNumber(n int64) string {
-	var numberSeparator byte = ','
-	if config.EuropeanNumbers {
-		numberSeparator = '.'
-	}
-
-	in := strconv.FormatInt(n, 10)
-	out := make([]byte, len(in)+(len(in)-2+int(in[0]/'0'))/3)
-	if in[0] == '-' {
-		in, out[0] = in[1:], '-'
-	}
-
-	for i, j, k := len(in)-1, len(out)-1, 0; ; i, j = i-1, j-1 {
-		out[j] = in[i]
-		if i == 0 {
-			return string(out)
-		}
-		if k++; k == 3 {
-			j, k = j-1, 0
-			out[j] = numberSeparator
-		}
-	}
-}
-
-func formatNumberShort(x int64) string {
-	var numberSeparator string = ","
-	if config.EuropeanNumbers {
-		numberSeparator = "."
-	}
-	var decimalSeparator string = "."
-	if config.EuropeanNumbers {
-		decimalSeparator = ","
-	}
-
-	if x > 1000 {
-		formattedNumber := formatNumber(x)
-		splitSlice := strings.Split(formattedNumber, numberSeparator)
-		suffixes := [4]string{"k", "m", "b", "t"}
-		partCount := len(splitSlice) - 1
-		var output string
-		if splitSlice[1][:1] != "0" {
-			output = fmt.Sprintf("%s%s%s%s", splitSlice[0], decimalSeparator, splitSlice[1][:1], suffixes[partCount-1])
-		} else {
-			output = fmt.Sprintf("%s%s", splitSlice[0], suffixes[partCount-1])
-		}
-		return output
-	}
-	return fmt.Sprint(x)
-}
-
-func pluralS(num int) string {
-	if num == 1 {
-		return ""
-	}
-	return "s"
-}
-
-func wrapHyphens(i string, l int) string {
-	n := i
-	if len(n) < l {
-		n = "- " + n + " -"
-		for len(n) < l {
-			n = "-" + n + "-"
-		}
-	}
-	return n
-}
-
-func wrapHyphensW(i string) string {
-	return wrapHyphens(i, 80)
-}
-
-func stripSymbols(i string) string {
-	re, err := regexp.Compile(`[^\w]`)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return re.ReplaceAllString(i, " ")
-}
-
-func isNumeric(s string) bool {
-	_, err := strconv.ParseFloat(s, 64)
-	return err == nil
-}
-
-func isDate(s string) bool {
-	_, err := time.Parse("2006-01-02", s)
-	return err == nil
-}
-
-func shortenTime(input string) string {
-	input = strings.ReplaceAll(input, " nanoseconds", "ns")
-	input = strings.ReplaceAll(input, " nanosecond", "ns")
-	input = strings.ReplaceAll(input, " microseconds", "μs")
-	input = strings.ReplaceAll(input, " microsecond", "μs")
-	input = strings.ReplaceAll(input, " milliseconds", "ms")
-	input = strings.ReplaceAll(input, " millisecond", "ms")
-	input = strings.ReplaceAll(input, " seconds", "s")
-	input = strings.ReplaceAll(input, " second", "s")
-	input = strings.ReplaceAll(input, " minutes", "m")
-	input = strings.ReplaceAll(input, " minute", "m")
-	input = strings.ReplaceAll(input, " hours", "h")
-	input = strings.ReplaceAll(input, " hour", "h")
-	input = strings.ReplaceAll(input, " days", "d")
-	input = strings.ReplaceAll(input, " day", "d")
-	input = strings.ReplaceAll(input, " weeks", "w")
-	input = strings.ReplaceAll(input, " week", "w")
-	input = strings.ReplaceAll(input, " months", "mo")
-	input = strings.ReplaceAll(input, " month", "mo")
-	return input
-}
-
-func timeSince(input time.Time) string {
-	return durafmt.Parse(time.Since(input)).String()
-}
-
-func timeSinceShort(input time.Time) string {
-	return shortenTime(durafmt.ParseShort(time.Since(input)).String())
-}
-
-func clearPath(p string) string {
-	r := p
-	for _, key := range pathBlacklist {
-		r = strings.ReplaceAll(r, key, "")
-	}
-	return r
-}
-
-func filenameFromURL(inputURL string) string {
-	base := path.Base(inputURL)
-	parts := strings.Split(base, "?")
-	return path.Clean(parts[0])
-}
-
-func filepathExtension(filepath string) string {
-	if strings.Contains(filepath, "?") {
-		filepath = strings.Split(filepath, "?")[0]
-	}
-	filepath = path.Ext(filepath)
-	return filepath
-}
-
-func getDomain(URL string) (string, error) {
-	parsedURL, err := url.Parse(URL)
-	if err != nil {
-		return parsedURL.Hostname(), nil
-	}
-	return "UNKNOWN", err
 }
 
 func getJSON(url string, target interface{}) error {
@@ -230,8 +52,6 @@ func getJSONwithHeaders(url string, target interface{}, headers map[string]strin
 
 	return json.NewDecoder(r.Body).Decode(target)
 }
-
-//#endregion
 
 //#region Github
 
