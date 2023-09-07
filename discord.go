@@ -14,41 +14,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
-	"github.com/hako/durafmt"
 	"github.com/teris-io/shortid"
 )
 
 //#region Get
 
-//TODO: Clean below
-
-/*func getChannelState(channelID string) *discordgo.Channel {
-	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil {
-		return sourceChannel
-	}
-	return &discordgo.Channel{}
-}*/
-
-/*func getGuildState(guildID string) *discordgo.Guild {
-	sourceGuild, _ := bot.State.Guild(guildID)
-	if sourceGuild != nil {
-		return sourceGuild
-	}
-	return &discordgo.Guild{}
-}*/
-
 const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
 )
-
-func getChannelGuildID(channelID string) string {
-	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil {
-		return sourceChannel.GuildID
-	}
-	return ""
-}
 
 func getGuildName(guildID string) string {
 	sourceGuildName := "DM"
@@ -400,7 +373,7 @@ func dynamicKeyReplacement(channelConfig configurationSource, download downloadR
 			{"{{serverName}}", guildName},
 			{"{{message}}", clearPath(download.Message.Content)},
 			{"{{downloadTime}}", timeSinceShort(download.StartTime)},
-			{"{{downloadTimeLong}}", durafmt.Parse(time.Since(download.StartTime)).String()},
+			{"{{downloadTimeLong}}", timeSince(download.StartTime)},
 			{"{{url}}", clearPath(download.InputURL)},
 			{"{{domain}}", domain},
 			{"{{nanoID}}", nanoID},

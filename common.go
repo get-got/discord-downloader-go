@@ -27,7 +27,7 @@ func uptime() time.Duration {
 
 func properExit() {
 	// Not formatting string because I only want the exit message to be red.
-	log.Println(lg("Main", "", color.HiRedString, "[EXIT IN 15 SECONDS] Uptime was %s...", durafmt.Parse(time.Since(startTime)).String()))
+	log.Println(lg("Main", "", color.HiRedString, "[EXIT IN 15 SECONDS] Uptime was %s...", timeSince(startTime)))
 	log.Println(color.HiCyanString("--------------------------------------------------------------------------------"))
 	time.Sleep(15 * time.Second)
 	os.Exit(1)
@@ -41,31 +41,9 @@ var (
 	pathBlacklist = []string{"/", "\\", "<", ">", ":", "\"", "|", "?", "*"}
 )
 
-func clearPath(p string) string {
-	r := p
-	for _, key := range pathBlacklist {
-		r = strings.ReplaceAll(r, key, "")
-	}
-	return r
-}
-
-func filenameFromURL(inputURL string) string {
-	base := path.Base(inputURL)
-	parts := strings.Split(base, "?")
-	return path.Clean(parts[0])
-}
-
-func filepathExtension(filepath string) string {
-	if strings.Contains(filepath, "?") {
-		filepath = strings.Split(filepath, "?")[0]
-	}
-	filepath = path.Ext(filepath)
-	return filepath
-}
-
 //#endregion
 
-//#region Text Formatting & Querying
+//#region Strings
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
@@ -196,19 +174,66 @@ func timeSinceShort(input time.Time) string {
 	return shortenTime(durafmt.ParseShort(time.Since(input)).String())
 }
 
-/*func condenseString(input string, length int) string {
-	filler := "....."
-	ret := input
-	if len(input) > length+len(filler) {
-		half := int((length / 2) - len(filler))
-		ret = input[0:half] + filler + input[len(input)-half:]
+func clearPath(p string) string {
+	r := p
+	for _, key := range pathBlacklist {
+		r = strings.ReplaceAll(r, key, "")
 	}
-	return ret
-}*/
+	return r
+}
+
+func filenameFromURL(inputURL string) string {
+	base := path.Base(inputURL)
+	parts := strings.Split(base, "?")
+	return path.Clean(parts[0])
+}
+
+func filepathExtension(filepath string) string {
+	if strings.Contains(filepath, "?") {
+		filepath = strings.Split(filepath, "?")[0]
+	}
+	filepath = path.Ext(filepath)
+	return filepath
+}
+
+func getDomain(URL string) (string, error) {
+	parsedURL, err := url.Parse(URL)
+	if err != nil {
+		return parsedURL.Hostname(), nil
+	}
+	return "UNKNOWN", err
+}
+
+func getJSON(url string, target interface{}) error {
+	r, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	return json.NewDecoder(r.Body).Decode(target)
+}
+
+func getJSONwithHeaders(url string, target interface{}, headers map[string]string) error {
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", url, nil)
+
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	r, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
+
+	return json.NewDecoder(r.Body).Decode(target)
+}
 
 //#endregion
 
-//#region Github Release Checking
+//#region Github
 
 type githubReleaseApiObject struct {
 	TagName string `json:"tag_name"`
@@ -253,50 +278,7 @@ func isLatestGithubRelease() bool {
 
 //#endregion
 
-//#region Requests
-
-func getJSON(url string, target interface{}) error {
-	r, err := http.Get(url)
-	if err != nil {
-		return err
-	}
-	defer r.Body.Close()
-
-	return json.NewDecoder(r.Body).Decode(target)
-}
-
-func getJSONwithHeaders(url string, target interface{}, headers map[string]string) error {
-	client := &http.Client{}
-	req, _ := http.NewRequest("GET", url, nil)
-
-	for k, v := range headers {
-		req.Header.Set(k, v)
-	}
-
-	r, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer r.Body.Close()
-
-	return json.NewDecoder(r.Body).Decode(target)
-}
-
-//#endregion
-
-//#region Log
-
-/*const (
-	logLevelOff       = -1
-	logLevelEssential = iota
-	logLevelFatal
-	logLevelError
-	logLevelWarning
-	logLevelInfo
-	logLevelDebug
-	logLevelVerbose
-	logLevelAll
-)*/
+//#region Logging
 
 func lg(group string, subgroup string, colorFunc func(string, ...interface{}) string, line string, p ...interface{}) string {
 	colorPrefix := group
@@ -436,11 +418,3 @@ func lg(group string, subgroup string, colorFunc func(string, ...interface{}) st
 }
 
 //#endregion
-
-func getDomain(URL string) (string, error) {
-	parsedURL, err := url.Parse(URL)
-	if err != nil {
-		return parsedURL.Hostname(), nil
-	}
-	return "UNKNOWN", err
-}

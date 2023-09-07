@@ -11,7 +11,6 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
-	"github.com/hako/durafmt"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )
 
@@ -368,7 +367,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					// Update Status
 					log.Println(lg("History", "", color.CyanString,
 						logPrefix+"Requesting more, \t%d downloaded (%s), \t%d processed, \tsearching before %s ago (%s)",
-						totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, durafmt.ParseShort(time.Since(beforeTime)).String(), beforeTime.String()[:10]))
+						totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, timeSinceShort(beforeTime), beforeTime.String()[:10]))
 					if sendStatus {
 						var status string
 						if totalDownloads == 0 {
@@ -568,12 +567,12 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							"**DONE!** - %s\n"+
 							"Ran ``%d`` message history requests\n\n"+
 							"%s_Duration was %s_",
-						durafmt.ParseShort(time.Since(historyStartTime)).String(),
+						timeSinceShort(historyStartTime),
 						formatNumber(int64(totalMessages)), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
 						msgSourceDisplay,
 						jobStatus,
 						messageRequestCount,
-						rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
+						rangeContent, timeSince(historyStartTime),
 					)
 				} else {
 					status = fmt.Sprintf(
@@ -583,13 +582,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 							"**DONE!** - %s\n"+
 							"Ran ``%d`` message history requests\n\n"+
 							"%s_Duration was %s_",
-						durafmt.ParseShort(time.Since(historyStartTime)).String(), formatNumber(int64(totalDownloads)),
+						timeSinceShort(historyStartTime), formatNumber(int64(totalDownloads)),
 						humanize.Bytes(uint64(totalFilesize)), float64(totalFilesize/humanize.MByte)/historyDownloadDuration.Seconds(),
 						formatNumber(int64(totalMessages)), int(float64(totalMessages)/time.Since(historyStartTime).Seconds()),
 						msgSourceDisplay,
 						jobStatus,
 						messageRequestCount,
-						rangeContent, durafmt.Parse(time.Since(historyStartTime)).String(),
+						rangeContent, timeSince(historyStartTime),
 					)
 				}
 				if !hasPermsToRespond {

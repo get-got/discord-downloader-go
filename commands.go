@@ -13,7 +13,6 @@ import (
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
-	"github.com/hako/durafmt"
 	"github.com/kennygrant/sanitize"
 )
 
@@ -23,6 +22,7 @@ const (
 	cmderrSendFailure          = "Failed to send command message (requested by %s)...\t%s"
 )
 
+// safe = logs errors
 func safeReply(ctx *exrouter.Context, content string) bool {
 	if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 		if _, err := ctx.Reply(content); err != nil {
@@ -136,7 +136,7 @@ func handleCommands() *exrouter.Route {
 					"• **Bound Users —** %d\n"+
 					"• **Admin Channels —** %d\n"+
 					"• **Heartbeat Latency —** %dms",
-					durafmt.Parse(time.Since(startTime)).String(),
+					timeSince(startTime),
 					startTime.Format("03:04:05pm on Monday, January 2, 2006 (MST)"),
 					len(bot.State.Guilds),
 					getBoundChannelsCount(),
