@@ -265,19 +265,21 @@ type configuration struct {
 	FilenameDateFormat string `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat     string `json:"filenameFormat" yaml:"filenameFormat"`
 
+	// Discord Presence
+	PresenceEnabled bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
+	PresenceStatus  string             `json:"presenceStatus" yaml:"presenceStatus"`
+	PresenceType    discordgo.GameType `json:"presenceType" yaml:"presenceType"`
+	PresenceLabel   *string            `json:"presenceLabel" yaml:"presenceLabel"`
+	PresenceDetails *string            `json:"presenceDetails" yaml:"presenceDetails"`
+	PresenceState   *string            `json:"presenceState" yaml:"presenceState"`
+
 	// Appearance
-	PresenceEnabled            bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
-	PresenceStatus             string             `json:"presenceStatus" yaml:"presenceStatus"`
-	PresenceType               discordgo.GameType `json:"presenceType" yaml:"presenceType"`
-	PresenceLabel              *string            `json:"presenceLabel" yaml:"presenceLabel"`
-	PresenceDetails            *string            `json:"presenceDetails" yaml:"presenceDetails"`
-	PresenceState              *string            `json:"presenceState" yaml:"presenceState"`
-	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
-	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
-	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
-	OverwriteDefaultReaction   *string            `json:"overwriteDefaultReaction,omitempty" yaml:"overwriteDefaultReaction,omitempty"`
-	HistoryTyping              bool               `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
-	EmbedColor                 *string            `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
+	ReactWhenDownloaded        bool    `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
+	ReactWhenDownloadedEmoji   *string `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
+	ReactWhenDownloadedHistory bool    `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
+	OverwriteDefaultReaction   *string `json:"overwriteDefaultReaction,omitempty" yaml:"overwriteDefaultReaction,omitempty"`
+	HistoryTyping              bool    `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
+	EmbedColor                 *string `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
 
 	// History
 	HistoryMaxJobs        int    `json:"historyMaxJobs" yaml:"historyMaxJobs"`
