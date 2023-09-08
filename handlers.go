@@ -68,13 +68,13 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 	}
 
 	// Registered Channel
-	if channelConfig := getSource(m, c); channelConfig != emptyConfig {
+	if sourceConfig := getSource(m, c); sourceConfig != emptyConfig {
 		// Ignore bots if told to do so
-		if m.Author.Bot && *channelConfig.IgnoreBots {
+		if m.Author.Bot && *sourceConfig.IgnoreBots {
 			return nil
 		}
 		// Ignore if told so by config
-		if (!history && !*channelConfig.Enabled) || (edited && !*channelConfig.ScanEdits) {
+		if (!history && !*sourceConfig.Enabled) || (edited && !*sourceConfig.ScanEdits) {
 			return nil
 		}
 
@@ -106,17 +106,17 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		}
 
 		// Log Messages to File
-		if channelConfig.LogMessages != nil {
-			if channelConfig.LogMessages.Destination != "" {
-				logPath := channelConfig.LogMessages.Destination
-				if *channelConfig.LogMessages.DestinationIsFolder {
+		if sourceConfig.LogMessages != nil {
+			if sourceConfig.LogMessages.Destination != "" {
+				logPath := sourceConfig.LogMessages.Destination
+				if *sourceConfig.LogMessages.DestinationIsFolder {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Messages"
-						if *channelConfig.LogMessages.DivideLogsByServer {
+						if *sourceConfig.LogMessages.DivideLogsByServer {
 							if m.GuildID == "" {
 								ch, err := bot.State.Channel(m.ChannelID)
 								if err != nil && c != nil {
@@ -149,10 +149,10 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 								logPath += " SID_" + m.GuildID
 							}
 						}
-						if *channelConfig.LogMessages.DivideLogsByChannel {
+						if *sourceConfig.LogMessages.DivideLogsByChannel {
 							logPath += " CID_" + m.ChannelID
 						}
-						if *channelConfig.LogMessages.DivideLogsByUser {
+						if *sourceConfig.LogMessages.DivideLogsByUser {
 							logPath += " UID_" + m.Author.ID
 						}
 					}
@@ -166,8 +166,8 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				}
 				canLog := true
 				// Filter Duplicates
-				if channelConfig.LogMessages.FilterDuplicates != nil {
-					if *channelConfig.LogMessages.FilterDuplicates {
+				if sourceConfig.LogMessages.FilterDuplicates != nil {
+					if *sourceConfig.LogMessages.FilterDuplicates {
 						if strings.Contains(currentLogS, fmt.Sprintf("[%s/%s/%s]", m.GuildID, m.ChannelID, m.ID)) {
 							canLog = false
 						}
@@ -178,7 +178,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					// Writer
 					f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 					if err != nil {
-						log.Println(lg("Message", "", color.RedString, "[channelConfig.LogMessages] Failed to open log file:\t%s", err))
+						log.Println(lg("Message", "", color.RedString, "[sourceConfig.LogMessages] Failed to open log file:\t%s", err))
 						f.Close()
 					}
 					defer f.Close()
@@ -186,13 +186,13 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					var newLine string
 					// Prepend
 					prefix := ""
-					if channelConfig.LogMessages.Prefix != nil {
-						prefix = *channelConfig.LogMessages.Prefix
+					if sourceConfig.LogMessages.Prefix != nil {
+						prefix = *sourceConfig.LogMessages.Prefix
 					}
 					// More Data
 					additionalInfo := ""
-					if channelConfig.LogMessages.UserData != nil {
-						if *channelConfig.LogMessages.UserData {
+					if sourceConfig.LogMessages.UserData != nil {
+						if *sourceConfig.LogMessages.UserData {
 							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID,
 								m.Author.Username, m.Author.Discriminator, m.Author.ID,
 								discordSnowflakeToTimestamp(m.ID, "2006-01-02 15-04-05"))
@@ -203,8 +203,8 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					}
 					// Append
 					suffix := ""
-					if channelConfig.LogMessages.Suffix != nil {
-						suffix = *channelConfig.LogMessages.Suffix
+					if sourceConfig.LogMessages.Suffix != nil {
+						suffix = *sourceConfig.LogMessages.Suffix
 					}
 					// New Line
 					contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
@@ -215,19 +215,19 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					}
 
 					if _, err = f.WriteString(newLine); err != nil {
-						log.Println(lg("Message", "", color.RedString, "[channelConfig.LogMessages] Failed to append file:\t%s", err))
+						log.Println(lg("Message", "", color.RedString, "[sourceConfig.LogMessages] Failed to append file:\t%s", err))
 					}
 				}
 			}
 		}
 
 		// Filters
-		if channelConfig.Filters != nil {
+		if sourceConfig.Filters != nil {
 			shouldAbort := false
 
-			if channelConfig.Filters.AllowedPhrases != nil ||
-				channelConfig.Filters.AllowedUsers != nil ||
-				channelConfig.Filters.AllowedRoles != nil {
+			if sourceConfig.Filters.AllowedPhrases != nil ||
+				sourceConfig.Filters.AllowedUsers != nil ||
+				sourceConfig.Filters.AllowedRoles != nil {
 				shouldAbort = true
 				if config.Debug {
 					log.Println(lg("Debug", "Message", color.YellowString,
@@ -236,8 +236,8 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				}
 			}
 
-			if channelConfig.Filters.BlockedPhrases != nil {
-				for _, phrase := range *channelConfig.Filters.BlockedPhrases {
+			if sourceConfig.Filters.BlockedPhrases != nil {
+				for _, phrase := range *sourceConfig.Filters.BlockedPhrases {
 					if strings.Contains(m.Content, phrase) && phrase != "" {
 						shouldAbort = true
 						if config.Debug {
@@ -249,8 +249,8 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					}
 				}
 			}
-			if channelConfig.Filters.AllowedPhrases != nil {
-				for _, phrase := range *channelConfig.Filters.AllowedPhrases {
+			if sourceConfig.Filters.AllowedPhrases != nil {
+				for _, phrase := range *sourceConfig.Filters.AllowedPhrases {
 					if strings.Contains(m.Content, phrase) && phrase != "" {
 						shouldAbort = false
 						if config.Debug {
@@ -263,8 +263,8 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				}
 			}
 
-			if channelConfig.Filters.BlockedUsers != nil {
-				if stringInSlice(m.Author.ID, *channelConfig.Filters.BlockedUsers) {
+			if sourceConfig.Filters.BlockedUsers != nil {
+				if stringInSlice(m.Author.ID, *sourceConfig.Filters.BlockedUsers) {
 					shouldAbort = true
 					if config.Debug {
 						log.Println(lg("Debug", "Message", color.YellowString,
@@ -273,8 +273,8 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					}
 				}
 			}
-			if channelConfig.Filters.AllowedUsers != nil {
-				if stringInSlice(m.Author.ID, *channelConfig.Filters.AllowedUsers) {
+			if sourceConfig.Filters.AllowedUsers != nil {
+				if stringInSlice(m.Author.ID, *sourceConfig.Filters.AllowedUsers) {
 					shouldAbort = false
 					if config.Debug {
 						log.Println(lg("Debug", "Message", color.YellowString,
@@ -284,14 +284,14 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				}
 			}
 
-			if channelConfig.Filters.BlockedRoles != nil {
+			if sourceConfig.Filters.BlockedRoles != nil {
 				member := m.Member
 				if member == nil {
 					member, _ = bot.GuildMember(m.GuildID, m.Author.ID)
 				}
 				if member != nil {
 					for _, role := range member.Roles {
-						if stringInSlice(role, *channelConfig.Filters.BlockedRoles) {
+						if stringInSlice(role, *sourceConfig.Filters.BlockedRoles) {
 							shouldAbort = true
 							if config.Debug {
 								log.Println(lg("Debug", "Message", color.YellowString,
@@ -303,14 +303,14 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 					}
 				}
 			}
-			if channelConfig.Filters.AllowedRoles != nil {
+			if sourceConfig.Filters.AllowedRoles != nil {
 				member := m.Member
 				if member == nil {
 					member, _ = bot.GuildMember(m.GuildID, m.Author.ID)
 				}
 				if member != nil {
 					for _, role := range member.Roles {
-						if stringInSlice(role, *channelConfig.Filters.AllowedRoles) {
+						if stringInSlice(role, *sourceConfig.Filters.AllowedRoles) {
 							shouldAbort = false
 							if config.Debug {
 								log.Println(lg("Debug", "Message", color.YellowString,
@@ -337,12 +337,12 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		// Delays
 		delay := 0
 		if history {
-			if channelConfig.DelayHandlingHistory != nil {
-				delay = *channelConfig.DelayHandlingHistory
+			if sourceConfig.DelayHandlingHistory != nil {
+				delay = *sourceConfig.DelayHandlingHistory
 			}
 		} else {
-			if channelConfig.DelayHandling != nil {
-				delay = *channelConfig.DelayHandling
+			if sourceConfig.DelayHandling != nil {
+				delay = *sourceConfig.DelayHandling
 			}
 		}
 		if delay > 0 {
@@ -365,7 +365,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 			status, filesize := downloadRequestStruct{
 				InputURL:   file.Link,
 				Filename:   file.Filename,
-				Path:       channelConfig.Destination,
+				Path:       sourceConfig.Destination,
 				Message:    m,
 				FileTime:   file.Time,
 				HistoryCmd: history,

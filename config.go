@@ -1141,8 +1141,8 @@ func isBotAdmin(m *discordgo.Message) bool {
 	}
 	// configurationAdminChannel.UnlockCommands Bypass
 	if isAdminChannelRegistered(m.ChannelID) {
-		channelConfig := getAdminChannelConfig(m.ChannelID)
-		if *channelConfig.UnlockCommands {
+		sourceConfig := getAdminChannelConfig(m.ChannelID)
+		if *sourceConfig.UnlockCommands {
 			return true
 		}
 	}
@@ -1371,8 +1371,8 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	}
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if channelConfig := getSource(m, nil); channelConfig != emptyConfig {
-		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
+	} else if sourceConfig := getSource(m, nil); sourceConfig != emptyConfig {
+		if *sourceConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
 	}

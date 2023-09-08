@@ -240,10 +240,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	for _, channel := range subjectChannels {
 		logPrefix = fmt.Sprintf("%s/%s: ", channel.ID, commander)
 
-		channelConfig := getSource(responseMsg, &channel)
+		sourceConfig := getSource(responseMsg, &channel)
 
 		// Invalid Source?
-		if channelConfig == emptyConfig {
+		if sourceConfig == emptyConfig {
 			log.Println(lg("History", "", color.HiRedString,
 				logPrefix+"Invalid source: "+channel.ID))
 			if job, exists := historyJobs.Get(subjectChannelID); exists {
@@ -255,13 +255,13 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		} else { // Process
 
 			// Overwrite Send Status
-			if channelConfig.SendAutoHistoryStatus != nil {
-				if autorun && !*channelConfig.SendAutoHistoryStatus {
+			if sourceConfig.SendAutoHistoryStatus != nil {
+				if autorun && !*sourceConfig.SendAutoHistoryStatus {
 					sendStatus = false
 				}
 			}
-			if channelConfig.SendHistoryStatus != nil {
-				if !autorun && !*channelConfig.SendHistoryStatus {
+			if sourceConfig.SendHistoryStatus != nil {
+				if !autorun && !*sourceConfig.SendHistoryStatus {
 					sendStatus = false
 				}
 			}
@@ -430,7 +430,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 					// Update presence
 					timeLastUpdated = time.Now()
-					if *channelConfig.PresenceEnabled {
+					if *sourceConfig.PresenceEnabled {
 						go updateDiscordPresence()
 					}
 				}
@@ -494,8 +494,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					sinceID = ""
 
 					// Process Messages
-					if channelConfig.HistoryTyping != nil && !autorun {
-						if *channelConfig.HistoryTyping && hasPermsToRespond {
+					if sourceConfig.HistoryTyping != nil && !autorun {
+						if *sourceConfig.HistoryTyping && hasPermsToRespond {
 							bot.ChannelTyping(commandingMessage.ChannelID)
 						}
 					}

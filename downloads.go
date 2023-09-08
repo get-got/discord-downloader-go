@@ -165,7 +165,7 @@ func trimDuplicateLinks(fileItems []*fileItem) []*fileItem {
 
 // Trim files already downloaded and stored in database
 func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[string]string {
-	channelConfig := getSource(m, nil)
+	sourceConfig := getSource(m, nil)
 
 	newList := make(map[string]string, 0)
 	for link, filename := range linkList {
@@ -178,8 +178,8 @@ func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[s
 		}
 
 		savePossibleDuplicates := false
-		if channelConfig.SavePossibleDuplicates != nil {
-			savePossibleDuplicates = *channelConfig.SavePossibleDuplicates
+		if sourceConfig.SavePossibleDuplicates != nil {
+			savePossibleDuplicates = *sourceConfig.SavePossibleDuplicates
 		}
 
 		if !alreadyDownloaded || savePossibleDuplicates {
@@ -469,8 +469,8 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 		log.Println(lg("Download", "", color.RedString,
 			"Gave up on downloading %s after %d failed attempts...\t%s",
 			download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		if channelConfig := getSource(download.Message, nil); channelConfig != emptyConfig {
-			if !download.HistoryCmd && *channelConfig.SendErrorMessages {
+		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptyConfig {
+			if !download.HistoryCmd && *sourceConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
 					download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status))
@@ -508,18 +508,18 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 	}
 
 	// Log Links to File
-	if channelConfig := getSource(download.Message, nil); channelConfig != emptyConfig {
-		if channelConfig.LogLinks != nil {
-			if channelConfig.LogLinks.Destination != "" {
-				logPath := channelConfig.LogLinks.Destination
-				if *channelConfig.LogLinks.DestinationIsFolder {
+	if sourceConfig := getSource(download.Message, nil); sourceConfig != emptyConfig {
+		if sourceConfig.LogLinks != nil {
+			if sourceConfig.LogLinks.Destination != "" {
+				logPath := sourceConfig.LogLinks.Destination
+				if *sourceConfig.LogLinks.DestinationIsFolder {
 					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
 						logPath += string(os.PathSeparator)
 					}
 					err := os.MkdirAll(logPath, 0755)
 					if err == nil {
 						logPath += "Log_Links"
-						if *channelConfig.LogLinks.DivideLogsByServer {
+						if *sourceConfig.LogLinks.DivideLogsByServer {
 							if download.Message.GuildID == "" {
 								ch, err := bot.State.Channel(download.Message.ChannelID)
 								if err == nil {
@@ -537,13 +537,13 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 								logPath += " SID_" + download.Message.GuildID
 							}
 						}
-						if *channelConfig.LogLinks.DivideLogsByChannel {
+						if *sourceConfig.LogLinks.DivideLogsByChannel {
 							logPath += " CID_" + download.Message.ChannelID
 						}
-						if *channelConfig.LogLinks.DivideLogsByUser {
+						if *sourceConfig.LogLinks.DivideLogsByUser {
 							logPath += " UID_" + download.Message.Author.ID
 						}
-						if *channelConfig.LogLinks.DivideLogsByStatus {
+						if *sourceConfig.LogLinks.DivideLogsByStatus {
 							if status.Status >= downloadFailed {
 								logPath += " - FAILED"
 							} else if status.Status >= downloadSkipped {
@@ -567,7 +567,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
 				if err != nil {
 					log.Println(lg("Download", "", color.RedString,
-						"[channelConfig.LogLinks] Failed to open log file:\t%s", err))
+						"[sourceConfig.LogLinks] Failed to open log file:\t%s", err))
 					f.Close()
 				}
 				defer f.Close()
@@ -577,13 +577,13 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 
 				// Log Failures
 				if status.Status > downloadSuccess {
-					shouldLog = *channelConfig.LogLinks.LogFailures // will not log if LogFailures is false
-				} else if *channelConfig.LogLinks.LogDownloads { // Log Downloads
+					shouldLog = *sourceConfig.LogLinks.LogFailures // will not log if LogFailures is false
+				} else if *sourceConfig.LogLinks.LogDownloads { // Log Downloads
 					shouldLog = true
 				}
 				// Filter Duplicates
-				if channelConfig.LogLinks.FilterDuplicates != nil {
-					if *channelConfig.LogLinks.FilterDuplicates {
+				if sourceConfig.LogLinks.FilterDuplicates != nil {
+					if *sourceConfig.LogLinks.FilterDuplicates {
 						if strings.Contains(currentLogS, download.InputURL) {
 							shouldLog = false
 						}
@@ -592,13 +592,13 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 				if shouldLog {
 					// Prepend
 					prefix := ""
-					if channelConfig.LogLinks.Prefix != nil {
-						prefix = *channelConfig.LogLinks.Prefix
+					if sourceConfig.LogLinks.Prefix != nil {
+						prefix = *sourceConfig.LogLinks.Prefix
 					}
 					// More Data
 					additionalInfo := ""
-					if channelConfig.LogLinks.UserData != nil {
-						if *channelConfig.LogLinks.UserData {
+					if sourceConfig.LogLinks.UserData != nil {
+						if *sourceConfig.LogLinks.UserData {
 							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
 								download.Message.GuildID, download.Message.ChannelID,
 								download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID,
@@ -607,15 +607,15 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 					}
 					// Append
 					suffix := ""
-					if channelConfig.LogLinks.Suffix != nil {
-						suffix = *channelConfig.LogLinks.Suffix
+					if sourceConfig.LogLinks.Suffix != nil {
+						suffix = *sourceConfig.LogLinks.Suffix
 					}
 					// New Line
 					newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
 
 					if _, err = f.WriteString(newLine); err != nil {
 						log.Println(lg("Download", "", color.RedString,
-							"[channelConfig.LogLinks] Failed to append file:\t%s", err))
+							"[sourceConfig.LogLinks] Failed to append file:\t%s", err))
 					}
 				}
 			}
@@ -637,13 +637,13 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 	var fileinfo fs.FileInfo
 
-	var channelConfig configurationSource
-	sourceDefault(&channelConfig)
-	_channelConfig := getSource(download.Message, nil)
-	if _channelConfig != emptyConfig {
-		channelConfig = _channelConfig
+	var sourceConfig configurationSource
+	sourceDefault(&sourceConfig)
+	_sourceConfig := getSource(download.Message, nil)
+	if _sourceConfig != emptyConfig {
+		sourceConfig = _sourceConfig
 	}
-	if _channelConfig != emptyConfig || download.EmojiCmd || download.ManualDownload {
+	if _sourceConfig != emptyConfig || download.EmojiCmd || download.ManualDownload {
 
 		// Source validation
 		if _, err = url.ParseRequestURI(download.InputURL); err != nil {
@@ -656,19 +656,19 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			log.Println(lg("Download", "", color.RedString, "Error while parsing url:\t%s", err))
 		}
 		domain := parsedURL.Hostname()
-		if channelConfig.Filters.AllowedDomains != nil || channelConfig.Filters.BlockedDomains != nil {
+		if sourceConfig.Filters.AllowedDomains != nil || sourceConfig.Filters.BlockedDomains != nil {
 			shouldAbort := false
-			if channelConfig.Filters.AllowedDomains != nil {
+			if sourceConfig.Filters.AllowedDomains != nil {
 				shouldAbort = true
 			}
 
-			if channelConfig.Filters.BlockedDomains != nil {
-				if stringInSlice(domain, *channelConfig.Filters.BlockedDomains) {
+			if sourceConfig.Filters.BlockedDomains != nil {
+				if stringInSlice(domain, *sourceConfig.Filters.BlockedDomains) {
 					shouldAbort = true
 				}
 			}
-			if channelConfig.Filters.AllowedDomains != nil {
-				if stringInSlice(domain, *channelConfig.Filters.AllowedDomains) {
+			if sourceConfig.Filters.AllowedDomains != nil {
+				if stringInSlice(domain, *sourceConfig.Filters.AllowedDomains) {
 					shouldAbort = false
 				}
 			}
@@ -770,21 +770,21 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Check Filename
-		if channelConfig.Filters.AllowedFilenames != nil || channelConfig.Filters.BlockedFilenames != nil {
+		if sourceConfig.Filters.AllowedFilenames != nil || sourceConfig.Filters.BlockedFilenames != nil {
 			shouldAbort := false
-			if channelConfig.Filters.AllowedFilenames != nil {
+			if sourceConfig.Filters.AllowedFilenames != nil {
 				shouldAbort = true
 			}
 
-			if channelConfig.Filters.BlockedFilenames != nil {
-				for _, phrase := range *channelConfig.Filters.BlockedFilenames {
+			if sourceConfig.Filters.BlockedFilenames != nil {
+				for _, phrase := range *sourceConfig.Filters.BlockedFilenames {
 					if phrase != "" && phrase != " " && strings.Contains(download.Filename, phrase) {
 						shouldAbort = true
 					}
 				}
 			}
-			if channelConfig.Filters.AllowedFilenames != nil {
-				for _, phrase := range *channelConfig.Filters.AllowedFilenames {
+			if sourceConfig.Filters.AllowedFilenames != nil {
+				for _, phrase := range *sourceConfig.Filters.AllowedFilenames {
 					if phrase != "" && phrase != " " && strings.Contains(download.Filename, phrase) {
 						shouldAbort = false
 					}
@@ -802,21 +802,21 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Check Reactions
-		if channelConfig.Filters.AllowedReactions != nil || channelConfig.Filters.BlockedReactions != nil {
+		if sourceConfig.Filters.AllowedReactions != nil || sourceConfig.Filters.BlockedReactions != nil {
 			shouldAbort := false
-			if channelConfig.Filters.AllowedReactions != nil {
+			if sourceConfig.Filters.AllowedReactions != nil {
 				shouldAbort = true
 			}
 
 			if download.Message.Reactions != nil {
 				for _, reaction := range download.Message.Reactions {
-					if channelConfig.Filters.BlockedReactions != nil {
-						if stringInSlice(reaction.Emoji.ID, *channelConfig.Filters.BlockedReactions) {
+					if sourceConfig.Filters.BlockedReactions != nil {
+						if stringInSlice(reaction.Emoji.ID, *sourceConfig.Filters.BlockedReactions) {
 							shouldAbort = true
 						}
 					}
-					if channelConfig.Filters.AllowedReactions != nil {
-						if stringInSlice(reaction.Emoji.ID, *channelConfig.Filters.AllowedReactions) {
+					if sourceConfig.Filters.AllowedReactions != nil {
+						if stringInSlice(reaction.Emoji.ID, *sourceConfig.Filters.AllowedReactions) {
 							shouldAbort = false
 						}
 					}
@@ -843,7 +843,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Format Keys
-		download.Filename = dataKeysDownload(channelConfig, download)
+		download.Filename = dataKeysDownload(sourceConfig, download)
 
 		// Fix filename length
 		if len(download.Filename) >= 260 {
@@ -871,19 +871,19 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Check extension
-		if channelConfig.Filters.AllowedExtensions != nil || channelConfig.Filters.BlockedExtensions != nil {
+		if sourceConfig.Filters.AllowedExtensions != nil || sourceConfig.Filters.BlockedExtensions != nil {
 			shouldAbort := false
-			if channelConfig.Filters.AllowedExtensions != nil {
+			if sourceConfig.Filters.AllowedExtensions != nil {
 				shouldAbort = true
 			}
 
-			if channelConfig.Filters.BlockedExtensions != nil {
-				if stringInSlice(download.Extension, *channelConfig.Filters.BlockedExtensions) {
+			if sourceConfig.Filters.BlockedExtensions != nil {
+				if stringInSlice(download.Extension, *sourceConfig.Filters.BlockedExtensions) {
 					shouldAbort = true
 				}
 			}
-			if channelConfig.Filters.AllowedExtensions != nil {
-				if stringInSlice(download.Extension, *channelConfig.Filters.AllowedExtensions) {
+			if sourceConfig.Filters.AllowedExtensions != nil {
+				if stringInSlice(download.Extension, *sourceConfig.Filters.AllowedExtensions) {
 					shouldAbort = false
 				}
 			}
@@ -899,11 +899,11 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Check content type
-		if !((*channelConfig.SaveImages && contentTypeBase == "image") ||
-			(*channelConfig.SaveVideos && contentTypeBase == "video") ||
-			(*channelConfig.SaveAudioFiles && contentTypeBase == "audio") ||
-			(*channelConfig.SaveTextFiles && contentTypeBase == "text" && !isHtml) ||
-			(*channelConfig.SaveOtherFiles && contentTypeBase == "application")) {
+		if !((*sourceConfig.SaveImages && contentTypeBase == "image") ||
+			(*sourceConfig.SaveVideos && contentTypeBase == "video") ||
+			(*sourceConfig.SaveAudioFiles && contentTypeBase == "audio") ||
+			(*sourceConfig.SaveTextFiles && contentTypeBase == "text" && !isHtml) ||
+			(*sourceConfig.SaveOtherFiles && contentTypeBase == "application")) {
 			if !download.HistoryCmd && !isHtml {
 				log.Println(lg("Download", "Skip", color.GreenString,
 					"Unpermitted filetype (%s) found at %s", contentTypeBase, download.InputURL))
@@ -969,10 +969,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		//TODO: refac this dumpster fire into nested function
 		subfolder := ""
 		// Subfolder Division - Server Nesting
-		if *channelConfig.DivideByServer {
+		if *sourceConfig.DivideByServer {
 			subfolderSuffix := download.Message.GuildID
-			if channelConfig.DivideFoldersUseID != nil {
-				if !*channelConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
+			if sourceConfig.DivideFoldersUseID != nil {
+				if !*sourceConfig.DivideFoldersUseID && sourceName != "" && sourceName != "UNKNOWN" {
 					subfolderSuffix = clearPath(sourceName)
 				}
 			}
@@ -988,10 +988,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 		// Subfolder Division - Channel Nesting
-		if *channelConfig.DivideByChannel {
+		if *sourceConfig.DivideByChannel {
 			subfolderSuffix := download.Message.ChannelID
-			if channelConfig.DivideFoldersUseID != nil {
-				if !*channelConfig.DivideFoldersUseID && sourceChannelName != "" {
+			if sourceConfig.DivideFoldersUseID != nil {
+				if !*sourceConfig.DivideFoldersUseID && sourceChannelName != "" {
 					subfolderSuffix = clearPath(sourceChannelName)
 				}
 			}
@@ -1006,10 +1006,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 		// Subfolder Division - User Nesting
-		if *channelConfig.DivideByUser && download.Message.Author != nil {
+		if *sourceConfig.DivideByUser && download.Message.Author != nil {
 			subfolderSuffix := download.Message.Author.ID
-			if channelConfig.DivideFoldersUseID != nil {
-				if !*channelConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
+			if sourceConfig.DivideFoldersUseID != nil {
+				if !*sourceConfig.DivideFoldersUseID && download.Message.Author.Username != "" {
 					subfolderSuffix = clearPath(download.Message.Author.Username + "#" +
 						download.Message.Author.Discriminator)
 				}
@@ -1025,7 +1025,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 		// Subfolder Division - Year Nesting
-		if *channelConfig.DivideByYear {
+		if *sourceConfig.DivideByYear {
 			year := fmt.Sprint(time.Now().Year())
 			if download.Message.Author != nil {
 				year = fmt.Sprint(download.Message.Timestamp.Year())
@@ -1040,7 +1040,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 		// Subfolder Division - Month Nesting
-		if *channelConfig.DivideByMonth {
+		if *sourceConfig.DivideByMonth {
 			month := fmt.Sprintf("%02d", time.Now().Month())
 			if download.Message.Author != nil {
 				month = fmt.Sprintf("%02d", download.Message.Timestamp.Month())
@@ -1055,7 +1055,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 		// Subfolder Division - Day Nesting
-		if *channelConfig.DivideByDay {
+		if *sourceConfig.DivideByDay {
 			day := fmt.Sprintf("%02d", time.Now().Day())
 			if download.Message.Author != nil {
 				day = fmt.Sprintf("%02d", download.Message.Timestamp.Day())
@@ -1070,7 +1070,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 		// Subfolder Division - Hour Nesting
-		if *channelConfig.DivideByHour {
+		if *sourceConfig.DivideByHour {
 			hour := fmt.Sprintf("%02d", time.Now().Hour())
 			if download.Message.Author != nil {
 				hour = fmt.Sprintf("%02d", download.Message.Timestamp.Hour())
@@ -1086,7 +1086,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Subfolder Division - Content Type
-		if *channelConfig.DivideByType {
+		if *sourceConfig.DivideByType {
 			subfolderSuffix := contentTypeBase
 			switch contentTypeBase {
 			case "image":
@@ -1113,7 +1113,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 		// Check if filepath exists
 		if _, err := os.Stat(completePath); err == nil {
-			if *channelConfig.SavePossibleDuplicates {
+			if *sourceConfig.SavePossibleDuplicates {
 				tmpPath := completePath
 				i := 1
 				for {
@@ -1140,7 +1140,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Write
-		if *channelConfig.Save {
+		if *sourceConfig.Save {
 			if err = os.WriteFile(completePath, bodyOfResp, 0644); err != nil {
 				log.Println(lg("Download", "", color.HiRedString,
 					"Error while writing file to disk \"%s\": %s", download.InputURL, err))
@@ -1206,22 +1206,22 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// React
 		{
 			shouldReact := config.ReactWhenDownloaded
-			if channelConfig.ReactWhenDownloaded != nil {
-				shouldReact = *channelConfig.ReactWhenDownloaded
+			if sourceConfig.ReactWhenDownloaded != nil {
+				shouldReact = *sourceConfig.ReactWhenDownloaded
 			}
 			if download.HistoryCmd {
 				if !config.ReactWhenDownloadedHistory {
 					shouldReact = false
 				}
-				if channelConfig.ReactWhenDownloadedHistory != nil {
-					if *channelConfig.ReactWhenDownloadedHistory {
+				if sourceConfig.ReactWhenDownloadedHistory != nil {
+					if *sourceConfig.ReactWhenDownloadedHistory {
 						shouldReact = true
 					}
 				}
 			}
 			if download.Message.Author != nil && shouldReact {
 				reaction := defaultReact
-				if channelConfig.ReactWhenDownloadedEmoji == nil {
+				if sourceConfig.ReactWhenDownloadedEmoji == nil {
 					if download.Message.GuildID != "" {
 						guild, err := bot.State.Guild(download.Message.GuildID)
 						if err != nil {
@@ -1236,7 +1236,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 									chosenEmoji := emojis[rand.Intn(len(emojis))]
 									formattedEmoji := chosenEmoji.APIName()
 									if !chosenEmoji.Animated && !stringInSlice(formattedEmoji,
-										*channelConfig.BlacklistReactEmojis) {
+										*sourceConfig.BlacklistReactEmojis) {
 										reaction = formattedEmoji
 										break
 									}
@@ -1249,7 +1249,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						reaction = defaultReact
 					}
 				} else {
-					reaction = *channelConfig.ReactWhenDownloadedEmoji
+					reaction = *sourceConfig.ReactWhenDownloadedEmoji
 				}
 				// Add Reaction
 				if hasPerms(download.Message.ChannelID, discordgo.PermissionAddReactions) {
@@ -1267,24 +1267,24 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// Log Media To Channel(s)
 		{
 			var logMediaChannels []string
-			if channelConfig.SendFileToChannel != nil {
-				if *channelConfig.SendFileToChannel != "" {
-					logMediaChannels = append(logMediaChannels, *channelConfig.SendFileToChannel)
+			if sourceConfig.SendFileToChannel != nil {
+				if *sourceConfig.SendFileToChannel != "" {
+					logMediaChannels = append(logMediaChannels, *sourceConfig.SendFileToChannel)
 				}
 			}
-			if channelConfig.SendFileToChannels != nil {
-				logMediaChannels = append(logMediaChannels, *channelConfig.SendFileToChannels...)
+			if sourceConfig.SendFileToChannels != nil {
+				logMediaChannels = append(logMediaChannels, *sourceConfig.SendFileToChannels...)
 			}
 			for _, logChannel := range logMediaChannels {
 				if logChannel != "" {
 					if hasPerms(logChannel, discordgo.PermissionSendMessages) {
 						actualFile := false
-						if channelConfig.SendFileDirectly != nil {
-							actualFile = *channelConfig.SendFileDirectly
+						if sourceConfig.SendFileDirectly != nil {
+							actualFile = *sourceConfig.SendFileDirectly
 						}
 						msg := ""
-						if channelConfig.SendFileCaption != nil {
-							msg = *channelConfig.SendFileCaption
+						if sourceConfig.SendFileCaption != nil {
+							msg = *sourceConfig.SendFileCaption
 							msg = dataKeysChannel(msg, download.Message.ChannelID)
 						}
 						// File
@@ -1335,13 +1335,13 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		// Update Presence
 		if !download.HistoryCmd {
 			timeLastUpdated = time.Now()
-			if *channelConfig.PresenceEnabled {
+			if *sourceConfig.PresenceEnabled {
 				go updateDiscordPresence()
 			}
 		}
 
 		timeLastDownload = time.Now()
-		if *channelConfig.Save {
+		if *sourceConfig.Save {
 			return mDownloadStatus(downloadSuccess), fileinfo.Size()
 		} else {
 			return mDownloadStatus(downloadSuccess), 0
