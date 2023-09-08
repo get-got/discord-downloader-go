@@ -224,7 +224,9 @@ type configuration struct {
 	LogOutput             string `json:"logOutput,omitempty" yaml:"logOutput,omitempty"`
 	LogIndent             bool   `json:"logIndent" yaml:"logIndent"`
 	ProcessLimit          int    `json:"processLimit" yaml:"processLimit"`
+	Verbose               bool   `json:"verbose" yaml:"verbose"`
 	Debug                 bool   `json:"debug" yaml:"debug"`
+	DebugVerbose          bool   `json:"debugV" yaml:"debugV"`
 	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart" yaml:"backupDatabaseOnStart"`
 	WatchSettings         bool   `json:"watchSettings" yaml:"watchSettings"`
 	SettingsOutput        bool   `json:"settingsOutput" yaml:"settingsOutput"`

@@ -120,6 +120,17 @@ func main() {
 	openDatabase()
 	//#endregion
 
+	// Output Flag Warnings
+	if config.Verbose {
+		log.Println(lg("Info", "", color.HiBlueString, "Verbose output enabled (extra info)..."))
+	}
+	if config.Debug {
+		log.Println(lg("Info", "", color.HiYellowString, "Debugging output enabled (troubleshooting info)..."))
+	}
+	if config.DebugVerbose {
+		log.Println(lg("Info", "", color.YellowString, "Verbose Debugging output enabled (extra troubleshooting info)..."))
+	}
+
 	mainWg.Wait() // wait because credentials from config
 
 	//#region Connections
