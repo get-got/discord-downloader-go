@@ -17,40 +17,42 @@ import (
 	"github.com/teris-io/shortid"
 )
 
-//#region Get
-
 const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
 )
 
-func getGuildName(guildID string) string {
-	sourceGuildName := "DM"
-	sourceGuild, err := bot.State.Guild(guildID)
+//#region Labels
+
+func getServerLabel(serverID string) (displayLabel string) {
+	displayLabel = "Discord"
+	sourceGuild, err := bot.State.Guild(serverID)
 	if err != nil {
-		sourceGuild, _ = bot.Guild(guildID)
+		sourceGuild, _ = bot.Guild(serverID)
 	}
-	if sourceGuild != nil && sourceGuild.Name != "" {
-		sourceGuildName = sourceGuild.Name
+	if sourceGuild != nil {
+		if sourceGuild.Name != "" {
+			displayLabel = sourceGuild.Name
+		}
 	}
-	return sourceGuildName
+	return displayLabel
 }
 
-func getChannelCategoryName(channelID string) string {
-	sourceChannelName := "unknown"
+func getCategoryLabel(channelID string) (displayLabel string) {
+	displayLabel = "Category"
 	sourceChannel, _ := bot.State.Channel(channelID)
 	if sourceChannel != nil {
 		sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
 		if sourceParent != nil {
 			if sourceChannel.Name != "" {
-				sourceChannelName = sourceParent.Name
+				displayLabel = sourceParent.Name
 			}
 		}
 	}
-	return sourceChannelName
+	return displayLabel
 }
 
-func getChannelName(channelID string, channelData *discordgo.Channel) string {
-	sourceChannelName := "unknown"
+func getChannelLabel(channelID string, channelData *discordgo.Channel) (displayLabel string) {
+	displayLabel = channelID
 	sourceChannel, err := bot.State.Channel(channelID)
 	if err != nil {
 		sourceChannel, _ = bot.Channel(channelID)
@@ -60,19 +62,23 @@ func getChannelName(channelID string, channelData *discordgo.Channel) string {
 	}
 	if sourceChannel != nil {
 		if sourceChannel.Name != "" {
-			sourceChannelName = sourceChannel.Name
+			displayLabel = sourceChannel.Name
 		} else if sourceChannel.Topic != "" {
-			sourceChannelName = sourceChannel.Topic
+			displayLabel = sourceChannel.Topic
 		} else {
 			switch sourceChannel.Type {
 			case discordgo.ChannelTypeDM:
-				sourceChannelName = "DM"
+				displayLabel = "DM"
 			case discordgo.ChannelTypeGroupDM:
-				sourceChannelName = "Group-DM"
+				displayLabel = "Group-DM"
 			}
 		}
 	}
-	return sourceChannelName
+	return displayLabel
+}
+
+func getUserIdentifier(usr discordgo.User) string {
+	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
 
 //#endregion
@@ -126,12 +132,12 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 				for _, mCached := range mCache {
 					if mCached.ID == m.ID {
 						// Fix original message having empty Guild ID
-						guildID := m.GuildID
+						serverID := m.GuildID
 						// Replace message
 						m = mCached
 						// ^^
-						if m.GuildID == "" && guildID != "" {
-							m.GuildID = guildID
+						if m.GuildID == "" && serverID != "" {
+							m.GuildID = serverID
 						}
 						// Parse commands
 						botCommands.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m))
@@ -160,14 +166,14 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 
 //#endregion
 
-func channelDisplay(channelID string) (string, string) {
-	sourceChannelName := channelID
-	sourceName := "UNKNOWN"
+func channelDisplay(channelID string) (sourceName string, sourceChannelName string) {
+	sourceChannelName = channelID
+	sourceName = "UNKNOWN"
 	sourceChannel, _ := bot.State.Channel(channelID)
 	if sourceChannel != nil {
 		// Channel Naming
 		if sourceChannel.Name != "" {
-			sourceChannelName = "#" + sourceChannel.Name
+			sourceChannelName = "#" + sourceChannel.Name // #example
 		}
 		switch sourceChannel.Type {
 		case discordgo.ChannelTypeGuildText:
@@ -183,7 +189,7 @@ func channelDisplay(channelID string) (string, string) {
 				sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
 				if sourceParent != nil {
 					if sourceParent.Name != "" {
-						sourceChannelName = sourceParent.Name + " / " + sourceChannelName
+						sourceChannelName = sourceParent.Name + " - " + sourceChannelName
 					}
 				}
 			}
@@ -685,23 +691,6 @@ func sendErrorMessage(err string) {
 
 //#region Permissions
 
-// Checks if message author is a specified bot admin.
-func isBotAdmin(m *discordgo.Message) bool {
-	// No Admins or Admin Channels
-	if len(config.Admins) == 0 && len(config.AdminChannels) == 0 {
-		return true
-	}
-	// configurationAdminChannel.UnlockCommands Bypass
-	if isAdminChannelRegistered(m.ChannelID) {
-		channelConfig := getAdminChannelConfig(m.ChannelID)
-		if *channelConfig.UnlockCommands {
-			return true
-		}
-	}
-
-	return m.Author.ID == botUser.ID || stringInSlice(m.Author.ID, config.Admins)
-}
-
 // Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
 /*func isLocalAdmin(m *discordgo.Message) bool {
 	if m == nil {
@@ -766,14 +755,6 @@ func hasPerms(channelID string, permission int64) bool {
 		}
 	}
 	return true
-}
-
-//#endregion
-
-//#region Labeling
-
-func getUserIdentifier(usr discordgo.User) string {
-	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
 
 //#endregion

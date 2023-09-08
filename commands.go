@@ -384,10 +384,10 @@ func handleCommands() *exrouter.Route {
 				if shouldProcess && config.Debug {
 					nameGuild := channel
 					if chinfo, err := bot.State.Channel(channel); err == nil {
-						nameGuild = getGuildName(chinfo.GuildID)
+						nameGuild = getServerLabel(chinfo.GuildID)
 					}
-					nameCategory := getChannelCategoryName(channel)
-					nameChannel := getChannelName(channel, nil)
+					nameCategory := getCategoryLabel(channel)
+					nameChannel := getChannelLabel(channel, nil)
 					nameDisplay := fmt.Sprintf("%s / %s", nameGuild, nameChannel)
 					if nameCategory != "unknown" {
 						nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)

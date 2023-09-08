@@ -125,8 +125,8 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		}
 	}
 
-	guildName := getGuildName(baseChannelInfo.GuildID)
-	categoryName := getChannelCategoryName(baseChannelInfo.ID)
+	guildName := getServerLabel(baseChannelInfo.GuildID)
+	categoryName := getCategoryLabel(baseChannelInfo.ID)
 
 	subjectChannels := []discordgo.Channel{}
 
@@ -325,9 +325,9 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 			//#endregion
 
-			channelName := getChannelName(channel.ID, &channel)
+			channelName := getChannelLabel(channel.ID, &channel)
 			if channel.ParentID != "" {
-				channelName = getChannelName(channel.ParentID, nil) + " \"" + getChannelName(channel.ID, &channel) + "\""
+				channelName = getChannelLabel(channel.ParentID, nil) + " \"" + getChannelLabel(channel.ID, &channel) + "\""
 			}
 			sourceName := fmt.Sprintf("%s / %s", guildName, channelName)
 			msgSourceDisplay := fmt.Sprintf("`Server:` **%s**\n`Channel:` #%s", guildName, channelName)

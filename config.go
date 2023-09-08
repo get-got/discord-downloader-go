@@ -1133,6 +1133,23 @@ func adminChannelDefault(channel *configurationAdminChannel) {
 	}
 }
 
+// Checks if message author is a specified bot admin.
+func isBotAdmin(m *discordgo.Message) bool {
+	// No Admins or Admin Channels
+	if len(config.Admins) == 0 && len(config.AdminChannels) == 0 {
+		return true
+	}
+	// configurationAdminChannel.UnlockCommands Bypass
+	if isAdminChannelRegistered(m.ChannelID) {
+		channelConfig := getAdminChannelConfig(m.ChannelID)
+		if *channelConfig.UnlockCommands {
+			return true
+		}
+	}
+
+	return m.Author.ID == botUser.ID || stringInSlice(m.Author.ID, config.Admins)
+}
+
 //#endregion
 
 //#region Functions, Admin & Source

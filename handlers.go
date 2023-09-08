@@ -54,7 +54,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		// Log
 		sendLabel := fmt.Sprintf("%s in \"%s\"#%s",
 			getUserIdentifier(*m.Author),
-			getGuildName(m.GuildID), getChannelName(m.ChannelID, nil),
+			getServerLabel(m.GuildID), getChannelLabel(m.ChannelID, nil),
 		)
 		content := m.Content
 		if len(m.Attachments) > 0 {
@@ -84,7 +84,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		if config.MessageOutput {
 			sendLabel := fmt.Sprintf("%s in \"%s\"#%s",
 				getUserIdentifier(*m.Author),
-				getGuildName(m.GuildID), getChannelName(m.ChannelID, nil),
+				getServerLabel(m.GuildID), getChannelLabel(m.ChannelID, nil),
 			)
 			content := m.Content
 			if len(m.Attachments) > 0 {
