@@ -335,11 +335,15 @@ func handleCommands() *exrouter.Route {
 										target, guild.Name))
 								}
 								for _, ch := range guild.Channels {
-									channels = append(channels, ch.ID)
-									if config.Debug {
-										log.Println(lg("Command", "History", color.YellowString,
-											"Added %s (#%s in \"%s\") to history queue",
-											ch.ID, ch.Name, guild.Name))
+									if ch.Type != discordgo.ChannelTypeGuildCategory &&
+										ch.Type != discordgo.ChannelTypeGuildStageVoice &&
+										ch.Type != discordgo.ChannelTypeGuildVoice {
+										channels = append(channels, ch.ID)
+										if config.Debug {
+											log.Println(lg("Command", "History", color.YellowString,
+												"Added %s (#%s in \"%s\") to history queue",
+												ch.ID, ch.Name, guild.Name))
+										}
 									}
 								}
 							} else { // Test/Use if number is channel
@@ -388,9 +392,9 @@ func handleCommands() *exrouter.Route {
 					}
 					nameCategory := getCategoryLabel(channel)
 					nameChannel := getChannelLabel(channel, nil)
-					nameDisplay := fmt.Sprintf("%s / %s", nameGuild, nameChannel)
-					if nameCategory != "unknown" {
-						nameDisplay = fmt.Sprintf("%s / %s / %s", nameGuild, nameCategory, nameChannel)
+					nameDisplay := fmt.Sprintf("%s / #%s", nameGuild, nameChannel)
+					if nameCategory != "Category" {
+						nameDisplay = fmt.Sprintf("%s / %s / #%s", nameGuild, nameCategory, nameChannel)
 					}
 					log.Println(lg("Command", "History", color.HiMagentaString,
 						"Queueing history job for \"%s\"\t\t(%s) ...", nameDisplay, channel))
