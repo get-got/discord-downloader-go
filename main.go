@@ -765,6 +765,7 @@ func botLoadDiscord() {
 		}
 		bot.Client.Timeout = dur
 
+		bot.StateEnabled = true
 		bot.State.MaxMessageCount = 100000
 		bot.State.TrackChannels = true
 		bot.State.TrackThreads = true
