@@ -350,25 +350,27 @@ func handleCommands() *exrouter.Route {
 										}
 									}
 								}
-							} else { // Test/Use if number is channel
+							} else { // Test/Use if number is channel or category
 								ch, err := bot.State.Channel(target)
 								if err == nil {
-									channels = append(channels, target)
-									if config.Debug {
-										log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
-											ch.ID, ch.Name, ch.GuildID))
-									}
-								} else {
-									// Category
-									for _, guild := range bot.State.Guilds {
-										for _, ch := range guild.Channels {
-											if ch.ParentID == target {
-												channels = append(channels, ch.ID)
-												if config.Debug {
-													log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
-														ch.ID, ch.Name, ch.GuildID))
+									if ch.Type == discordgo.ChannelTypeGuildCategory {
+										// Category
+										for _, guild := range bot.State.Guilds {
+											for _, ch := range guild.Channels {
+												if ch.ParentID == target {
+													channels = append(channels, ch.ID)
+													if config.Debug {
+														log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
+															ch.ID, ch.Name, ch.GuildID))
+													}
 												}
 											}
+										}
+									} else { // Standard Channel
+										channels = append(channels, target)
+										if config.Debug {
+											log.Println(lg("Command", "History", color.YellowString, "Added %s (#%s in %s) to history queue",
+												ch.ID, ch.Name, ch.GuildID))
 										}
 									}
 								}
