@@ -134,7 +134,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	baseChannelIsForum := true
 	if baseChannelInfo.Type != discordgo.ChannelTypeGuildCategory &&
 		baseChannelInfo.Type != discordgo.ChannelTypeGuildForum &&
-		baseChannelInfo.Type != discordgo.ChannelTypeGuildNews &&
 		baseChannelInfo.Type != discordgo.ChannelTypeGuildStageVoice &&
 		baseChannelInfo.Type != discordgo.ChannelTypeGuildVoice &&
 		baseChannelInfo.Type != discordgo.ChannelTypeGuildStore {
