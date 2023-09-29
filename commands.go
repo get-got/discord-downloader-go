@@ -202,6 +202,10 @@ func handleCommands() *exrouter.Route {
 			var since string
 			var sinceID string
 
+			if len(bot.State.Guilds) == 0 {
+				log.Println(lg("Command", "History", color.HiRedString, "WARNING: Something is wrong with your Discord cache. This can result in missed channels..."))
+			}
+
 			//#region Parse Args
 			for argKey, argValue := range ctx.Args {
 				if argKey == 0 { // skip head
