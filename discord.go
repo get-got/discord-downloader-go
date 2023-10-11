@@ -92,13 +92,17 @@ const (
 //TODO: Clean these two
 
 func discordTimestampToSnowflake(format string, timestamp string) string {
-	if t, err := time.ParseInLocation(format, timestamp, time.Local); err == nil {
-		return fmt.Sprint(((t.UnixNano() / int64(time.Millisecond)) - discordEpoch) << 22)
+	var snowflake string = ""
+	var err error
+	parsed, err := time.ParseInLocation(format, timestamp, time.Local)
+	if err == nil {
+		snowflake = fmt.Sprint(((parsed.UnixNano() / int64(time.Millisecond)) - discordEpoch) << 22)
+	} else {
+		log.Println(lg("Main", "", color.HiRedString,
+			"Failed to convert timestamp to discord snowflake... Format: '%s', Timestamp: '%s' - Error:\t%s",
+			format, timestamp, err))
 	}
-	log.Println(lg("Main", "", color.HiRedString,
-		"Failed to convert timestamp to discord snowflake... Format: '%s', Timestamp: '%s' - Error:\t%s",
-		format, timestamp, err))
-	return ""
+	return snowflake
 }
 
 func discordSnowflakeToTimestamp(snowflake string, format string) string {
