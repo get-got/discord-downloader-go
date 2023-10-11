@@ -224,7 +224,9 @@ type configuration struct {
 	LogOutput             string `json:"logOutput,omitempty" yaml:"logOutput,omitempty"`
 	LogIndent             bool   `json:"logIndent" yaml:"logIndent"`
 	ProcessLimit          int    `json:"processLimit" yaml:"processLimit"`
+	Verbose               bool   `json:"verbose" yaml:"verbose"`
 	Debug                 bool   `json:"debug" yaml:"debug"`
+	DebugVerbose          bool   `json:"debugV" yaml:"debugV"`
 	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart" yaml:"backupDatabaseOnStart"`
 	WatchSettings         bool   `json:"watchSettings" yaml:"watchSettings"`
 	SettingsOutput        bool   `json:"settingsOutput" yaml:"settingsOutput"`
@@ -265,19 +267,21 @@ type configuration struct {
 	FilenameDateFormat string `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat     string `json:"filenameFormat" yaml:"filenameFormat"`
 
+	// Discord Presence
+	PresenceEnabled bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
+	PresenceStatus  string             `json:"presenceStatus" yaml:"presenceStatus"`
+	PresenceType    discordgo.GameType `json:"presenceType" yaml:"presenceType"`
+	PresenceLabel   *string            `json:"presenceLabel" yaml:"presenceLabel"`
+	PresenceDetails *string            `json:"presenceDetails" yaml:"presenceDetails"`
+	PresenceState   *string            `json:"presenceState" yaml:"presenceState"`
+
 	// Appearance
-	PresenceEnabled            bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
-	PresenceStatus             string             `json:"presenceStatus" yaml:"presenceStatus"`
-	PresenceType               discordgo.GameType `json:"presenceType" yaml:"presenceType"`
-	PresenceLabel              *string            `json:"presenceLabel" yaml:"presenceLabel"`
-	PresenceDetails            *string            `json:"presenceDetails" yaml:"presenceDetails"`
-	PresenceState              *string            `json:"presenceState" yaml:"presenceState"`
-	ReactWhenDownloaded        bool               `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
-	ReactWhenDownloadedEmoji   *string            `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
-	ReactWhenDownloadedHistory bool               `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
-	OverwriteDefaultReaction   *string            `json:"overwriteDefaultReaction,omitempty" yaml:"overwriteDefaultReaction,omitempty"`
-	HistoryTyping              bool               `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
-	EmbedColor                 *string            `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
+	ReactWhenDownloaded        bool    `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
+	ReactWhenDownloadedEmoji   *string `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
+	ReactWhenDownloadedHistory bool    `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
+	OverwriteDefaultReaction   *string `json:"overwriteDefaultReaction,omitempty" yaml:"overwriteDefaultReaction,omitempty"`
+	HistoryTyping              bool    `json:"historyTyping,omitempty" yaml:"historyTyping,omitempty"`
+	EmbedColor                 *string `json:"embedColor,omitempty" yaml:"embedColor,omitempty"`
 
 	// History
 	HistoryMaxJobs        int    `json:"historyMaxJobs" yaml:"historyMaxJobs"`
@@ -1141,8 +1145,8 @@ func isBotAdmin(m *discordgo.Message) bool {
 	}
 	// configurationAdminChannel.UnlockCommands Bypass
 	if isAdminChannelRegistered(m.ChannelID) {
-		channelConfig := getAdminChannelConfig(m.ChannelID)
-		if *channelConfig.UnlockCommands {
+		sourceConfig := getAdminChannelConfig(m.ChannelID)
+		if *sourceConfig.UnlockCommands {
 			return true
 		}
 	}
@@ -1371,8 +1375,8 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	}
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if channelConfig := getSource(m, nil); channelConfig != emptyConfig {
-		if *channelConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
+	} else if sourceConfig := getSource(m, nil); sourceConfig != emptyConfig {
+		if *sourceConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
 	}

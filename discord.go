@@ -300,13 +300,13 @@ func dataKeysChannel(input string, srcchannel string) string {
 	return dataKeys(ret)
 }
 
-func dataKeysDownload(channelConfig configurationSource, download downloadRequestStruct) string {
+func dataKeysDownload(sourceConfig configurationSource, download downloadRequestStruct) string {
 	//TODO: same as dataKeys
 
 	ret := config.FilenameFormat
-	if channelConfig.FilenameFormat != nil {
-		if *channelConfig.FilenameFormat != "" {
-			ret = *channelConfig.FilenameFormat
+	if sourceConfig.FilenameFormat != nil {
+		if *sourceConfig.FilenameFormat != "" {
+			ret = *sourceConfig.FilenameFormat
 		}
 	}
 
@@ -314,9 +314,9 @@ func dataKeysDownload(channelConfig configurationSource, download downloadReques
 
 		// Format Filename Date
 		filenameDateFormat := config.FilenameDateFormat
-		if channelConfig.FilenameDateFormat != nil {
-			if *channelConfig.FilenameDateFormat != "" {
-				filenameDateFormat = *channelConfig.FilenameDateFormat
+		if sourceConfig.FilenameDateFormat != nil {
+			if *sourceConfig.FilenameDateFormat != "" {
+				filenameDateFormat = *sourceConfig.FilenameDateFormat
 			}
 		}
 		messageTime := download.Message.Timestamp
@@ -467,10 +467,10 @@ func getEmbedColor(channelID string) int {
 	/*var msg *discordgo.Message
 	msg.ChannelID = channelID
 	if channelRegistered(msg) {
-		channelConfig := getSource(channelID)
-		if channelConfig.OverwriteEmbedColor != nil {
-			if *channelConfig.OverwriteEmbedColor != "" {
-				color = channelConfig.OverwriteEmbedColor
+		sourceConfig := getSource(channelID)
+		if sourceConfig.OverwriteEmbedColor != nil {
+			if *sourceConfig.OverwriteEmbedColor != "" {
+				color = sourceConfig.OverwriteEmbedColor
 			}
 		}
 	}*/

@@ -120,6 +120,17 @@ func main() {
 	openDatabase()
 	//#endregion
 
+	// Output Flag Warnings
+	if config.Verbose {
+		log.Println(lg("Info", "", color.HiBlueString, "Verbose output enabled (extra info)..."))
+	}
+	if config.Debug {
+		log.Println(lg("Info", "", color.HiYellowString, "Debugging output enabled (troubleshooting info)..."))
+	}
+	if config.DebugVerbose {
+		log.Println(lg("Info", "", color.YellowString, "Verbose Debugging output enabled (extra troubleshooting info)..."))
+	}
+
 	mainWg.Wait() // wait because credentials from config
 
 	//#region Connections
@@ -231,13 +242,13 @@ func main() {
 	var autoHistoryChannels []arh
 	// Compile list of channels to autorun history
 	for _, channel := range getAllRegisteredChannels() {
-		channelConfig := getSource(&discordgo.Message{ChannelID: channel}, nil)
-		if channelConfig.AutoHistory != nil {
-			if *channelConfig.AutoHistory {
+		sourceConfig := getSource(&discordgo.Message{ChannelID: channel}, nil)
+		if sourceConfig.AutoHistory != nil {
+			if *sourceConfig.AutoHistory {
 				var autoHistoryChannel arh
 				autoHistoryChannel.channel = channel
-				autoHistoryChannel.before = *channelConfig.AutoHistoryBefore
-				autoHistoryChannel.since = *channelConfig.AutoHistorySince
+				autoHistoryChannel.before = *sourceConfig.AutoHistoryBefore
+				autoHistoryChannel.since = *sourceConfig.AutoHistorySince
 				autoHistoryChannels = append(autoHistoryChannels, autoHistoryChannel)
 			}
 			continue
