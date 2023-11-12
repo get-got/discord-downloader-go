@@ -194,10 +194,12 @@ func trimDownloadedLinks(linkList map[string]string, m *discordgo.Message) map[s
 func getRawLinks(m *discordgo.Message) []*fileItem {
 	var links []*fileItem
 
+	// Fix source author if nil
 	if m.Author == nil {
 		m.Author = new(discordgo.User)
 	}
 
+	// Search Discord File Attachments
 	for _, attachment := range m.Attachments {
 		links = append(links, &fileItem{
 			Link:     attachment.URL,
@@ -205,13 +207,7 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 		})
 	}
 
-	foundLinks := xurls.Strict().FindAllString(m.Content, -1)
-	for _, foundLink := range foundLinks {
-		links = append(links, &fileItem{
-			Link: foundLink,
-		})
-	}
-
+	// Search Discord Embedded Content
 	for _, embed := range m.Embeds {
 		if embed.URL != "" {
 			links = append(links, &fileItem{
@@ -219,7 +215,8 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 			})
 		}
 
-		// Removing for now as this causes it to try and pull shit from things like YouTube descriptions
+		// Description checking removed because it causes absolute chaos,
+		// fetching every random link from the description of things like YouTube videos.
 		/*if embed.Description != "" {
 			foundLinks = xurls.Strict().FindAllString(embed.Description, -1)
 			for _, foundLink := range foundLinks {
@@ -242,6 +239,14 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 		}
 	}
 
+	// Search Detected Links
+	foundLinks := xurls.Strict().FindAllString(m.Content, -1)
+	for _, foundLink := range foundLinks {
+		links = append(links, &fileItem{
+			Link: foundLink,
+		})
+	}
+
 	return links
 }
 
@@ -252,6 +257,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 	- Facebook Videos: Previously supported but they split mp4 into separate audio and video streams
 	*/
 
+	// Twitter / X
 	inputURL = strings.ReplaceAll(inputURL, "mobile.twitter", "twitter")
 	inputURL = strings.ReplaceAll(inputURL, "fxtwitter.com", "twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, "c.vxtwitter.com", "twitter.com")
@@ -283,6 +289,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		return trimDownloadedLinks(map[string]string{inputURL: ""}, m)
 	}
 
+	// Instagram
 	if instagramConnected {
 		if regexUrlInstagram.MatchString(inputURL) || regexUrlInstagramReel.MatchString(inputURL) {
 			if strings.Contains(inputURL, "?") {
@@ -297,6 +304,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
+	// Imgur (Legacy from DIDG)
 	if regexUrlImgurSingle.MatchString(inputURL) {
 		links, err := getImgurSingleUrls(inputURL)
 		if err != nil {
@@ -314,6 +322,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
+	// Streamable (Legacy from DIDG)
 	if regexUrlStreamable.MatchString(inputURL) {
 		links, err := getStreamableUrls(inputURL)
 		if err != nil {
@@ -323,6 +332,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
+	// Gfycat (Legacy from DIDG)
 	if regexUrlGfycat.MatchString(inputURL) {
 		links, err := getGfycatUrls(inputURL)
 		if err != nil {
@@ -332,6 +342,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
+	// Flickr (Legacy from DIDG)
 	if regexUrlFlickrPhoto.MatchString(inputURL) {
 		links, err := getFlickrPhotoUrls(inputURL)
 		if err != nil {
@@ -357,6 +368,7 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
+	// Tistory (Legacy from DIDG)
 	if regexUrlTistory.MatchString(inputURL) {
 		links, err := getTistoryUrls(inputURL)
 		if err != nil {
@@ -373,16 +385,6 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 			return trimDownloadedLinks(links, m)
 		}
 	}
-
-	if regexUrlRedditPost.MatchString(inputURL) {
-		links, err := getRedditPostUrls(inputURL)
-		if err != nil {
-			log.Println(lg("Download", "", color.RedString, "Reddit Post URL failed for %s -- %s", inputURL, err))
-		} else if len(links) > 0 {
-			return trimDownloadedLinks(links, m)
-		}
-	}
-
 	// The original project has this as an option,
 	if regexUrlPossibleTistorySite.MatchString(inputURL) {
 		links, err := getPossibleTistorySiteUrls(inputURL)
@@ -393,6 +395,17 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
+	// Reddit
+	if regexUrlRedditPost.MatchString(inputURL) {
+		links, err := getRedditPostUrls(inputURL)
+		if err != nil {
+			log.Println(lg("Download", "", color.RedString, "Reddit Post URL failed for %s -- %s", inputURL, err))
+		} else if len(links) > 0 {
+			return trimDownloadedLinks(links, m)
+		}
+	}
+
+	// Ignore Discord emojis
 	if strings.HasPrefix(inputURL, "https://cdn.discordapp.com/emojis/") {
 		return nil
 	}
