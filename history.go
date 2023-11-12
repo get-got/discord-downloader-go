@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -76,8 +75,6 @@ var (
 	historyJobCntAborted   int
 	historyJobCntErrored   int
 	historyJobCntCompleted int
-
-	historyWg sync.WaitGroup
 )
 
 // TODO: cleanup
@@ -537,23 +534,17 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						}
 
 						// Process Message
-						historyWg.Add(1)
-						go func() {
-							timeStartingDownload := time.Now()
-
-							downloadedFiles := handleMessage(message, &channel, false, true)
-							if len(downloadedFiles) > 0 {
-								totalDownloads += int64(len(downloadedFiles))
-								for _, file := range downloadedFiles {
-									totalFilesize += file.Filesize
-								}
-								historyDownloadDuration += time.Since(timeStartingDownload)
+						timeStartingDownload := time.Now()
+						downloadedFiles := handleMessage(message, &channel, false, true)
+						if len(downloadedFiles) > 0 {
+							totalDownloads += int64(len(downloadedFiles))
+							for _, file := range downloadedFiles {
+								totalFilesize += file.Filesize
 							}
-							totalMessages++
-							historyWg.Done()
-						}()
+							historyDownloadDuration += time.Since(timeStartingDownload)
+						}
+						totalMessages++
 					}
-					historyWg.Wait() // wait for all message threads per-batch before next batch
 				}
 			}
 
