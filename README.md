@@ -93,9 +93,8 @@ While this project works for user logins, I do not recommend it as you risk acco
 
 - Direct Links to Files
 - Discord File Attachments
-- Twitter / X _(requires account login, see config section)_
-- Instagram _(requires account login, see config section)_
-- Reddit
+- Twitter / X _(unofficial scraping, requires account login, see config section)_
+- Instagram _(unofficial scraping, requires account login, see config section)_
 - Imgur
 - Streamable
 - Gfycat
@@ -137,4 +136,5 @@ While this project works for user logins, I do not recommend it as you risk acco
 
 - I'm a complete amateur with Golang. If anything's bad please make a pull request.
 - Follows Semantic Versioning: `[MAJOR].[MINOR].[PATCH]` <https://semver.org/>
+- Follows Conventional Commits: `FEAT/FIX/REFACT/DOCS/CHORE/STYLE/TEST` <https://www.conventionalcommits.org/en/v1.0.0/>
 - [github.com/Seklfreak/discord-image-downloader-go - the original project this was founded on](https://github.com/Seklfreak/discord-image-downloader-go)
