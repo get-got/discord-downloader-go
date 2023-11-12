@@ -946,12 +946,13 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Names
-		sourceChannelName := download.Message.ChannelID
 		sourceName := "UNKNOWN"
+		sourceGuildID := "-"
 		sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
+		sourceChannelName := download.Message.ChannelID
 		sourceParent := &discordgo.Channel{}
-		sourceParentName := "-"
 		sourceParentID := "-"
+		sourceParentName := "-"
 		if sourceChannel != nil {
 			// Channel Naming
 			if sourceChannel.Name != "" {
@@ -961,6 +962,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			case discordgo.ChannelTypeGuildText:
 				// Server Naming
 				if sourceChannel.GuildID != "" {
+					sourceGuildID = sourceChannel.GuildID
 					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
 					if sourceGuild != nil && sourceGuild.Name != "" {
 						sourceName = sourceGuild.Name
@@ -988,8 +990,16 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		for index, subfolder := range *sourceConfig.Subfolders {
 			if strings.Contains(subfolder, "{{") && strings.Contains(subfolder, "}}") {
 				keys := [][]string{
+					{"{{year}}",
+						fmt.Sprint(download.Message.Timestamp.Year())},
+					{"{{monthNum}}",
+						fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
+					{"{{dayOfMonth}}",
+						fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
+					{"{{hour}}",
+						fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
 					{"{{serverID}}",
-						download.Message.GuildID},
+						sourceGuildID},
 					{"{{serverName}}",
 						clearPath(sourceName)},
 					{"{{categoryID}}",
@@ -1006,14 +1016,8 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						download.Message.Author.Username},
 					{"{{fileType}}",
 						contentTypeBase + "s"},
-					{"{{year}}",
-						fmt.Sprint(time.Now().Year())},
-					{"{{monthNum}}",
-						fmt.Sprintf("%02d", time.Now().Month())},
-					{"{{dayOfMonth}}",
-						fmt.Sprintf("%02d", time.Now().Day())},
-					{"{{hour}}",
-						fmt.Sprintf("%02d", time.Now().Hour())},
+					{"{{userName}}",
+						download.Message.Author.Username},
 				}
 				for _, key := range keys {
 					if strings.Contains(subfolder, key[0]) {
