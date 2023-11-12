@@ -166,15 +166,7 @@ func defaultConfiguration() configuration {
 		// Rules for Saving
 		DelayHandling:          0,
 		DelayHandlingHistory:   0,
-		DivideByYear:           false,
-		DivideByMonth:          false,
-		DivideByDay:            false,
-		DivideByHour:           false,
-		DivideByServer:         false,
-		DivideByChannel:        false,
-		DivideByUser:           false,
-		DivideByType:           true,
-		DivideFoldersUseID:     false,
+		Subfolders:             []string{"{{fileType}}"},
 		SaveImages:             true,
 		SaveVideos:             true,
 		SaveAudioFiles:         true,
@@ -294,26 +286,22 @@ type configuration struct {
 	HistoryRequestDelay   int    `json:"historyRequestDelay" yaml:"historyRequestDelay"`
 
 	// Rules for Saving
-	DelayHandling          int                         `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
-	DelayHandlingHistory   int                         `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-	DivideByYear           bool                        `json:"divideByYear" yaml:"divideByYear"`
-	DivideByMonth          bool                        `json:"divideByMonth" yaml:"divideByMonth"`
-	DivideByDay            bool                        `json:"divideByDay" yaml:"divideByDay"`
-	DivideByHour           bool                        `json:"divideByHour" yaml:"divideByHour"`
-	DivideByServer         bool                        `json:"divideByServer" yaml:"divideByServer"`
-	DivideByChannel        bool                        `json:"divideByChannel" yaml:"divideByChannel"`
-	DivideByUser           bool                        `json:"divideByUser" yaml:"divideByUser"`
-	DivideByType           bool                        `json:"divideByType" yaml:"divideByType"`
-	DivideFoldersUseID     bool                        `json:"divideFoldersUseID" yaml:"divideFoldersUseID"`
-	SaveImages             bool                        `json:"saveImages" yaml:"saveImages"`
-	SaveVideos             bool                        `json:"saveVideos" yaml:"saveVideos"`
-	SaveAudioFiles         bool                        `json:"saveAudioFiles" yaml:"saveAudioFiles"`
-	SaveTextFiles          bool                        `json:"saveTextFiles" yaml:"saveTextFiles"`
-	SaveOtherFiles         bool                        `json:"saveOtherFiles" yaml:"saveOtherFiles"`
-	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
-	Filters                *configurationSourceFilters `json:"filters" yaml:"filters"`
-	Duplo                  bool                        `json:"duplo,omitempty" yaml:"duplo,omitempty"`
-	DuploThreshold         float64                     `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
+	DelayHandling        int `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory int `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
+
+	Subfolders []string `json:"subfolders" yaml:"subfolders"`
+
+	SaveImages             bool `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             bool `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         bool `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          bool `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         bool `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates bool `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+
+	Filters *configurationSourceFilters `json:"filters" yaml:"filters"`
+
+	Duplo          bool    `json:"duplo,omitempty" yaml:"duplo,omitempty"`
+	DuploThreshold float64 `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Sources
 	All                    *configurationSource  `json:"all,omitempty" yaml:"all,omitempty"`
@@ -387,26 +375,22 @@ type configurationSource struct {
 	SendHistoryStatus     *bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
 
 	// Rules for Saving
-	DelayHandling          *int                        `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
-	DelayHandlingHistory   *int                        `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-	DivideByYear           *bool                       `json:"divideByYear" yaml:"divideByYear"`
-	DivideByMonth          *bool                       `json:"divideByMonth" yaml:"divideByMonth"`
-	DivideByDay            *bool                       `json:"divideByDay" yaml:"divideByDay"`
-	DivideByHour           *bool                       `json:"divideByHour" yaml:"divideByHour"`
-	DivideByServer         *bool                       `json:"divideByServer" yaml:"divideByServer"`
-	DivideByChannel        *bool                       `json:"divideByChannel" yaml:"divideByChannel"`
-	DivideByUser           *bool                       `json:"divideByUser" yaml:"divideByUser"`
-	DivideByType           *bool                       `json:"divideByType" yaml:"divideByType"`
-	DivideFoldersUseID     *bool                       `json:"divideFoldersUseID" yaml:"divideFoldersUseID"`
-	SaveImages             *bool                       `json:"saveImages" yaml:"saveImages"`
-	SaveVideos             *bool                       `json:"saveVideos" yaml:"saveVideos"`
-	SaveAudioFiles         *bool                       `json:"saveAudioFiles" yaml:"saveAudioFiles"`
-	SaveTextFiles          *bool                       `json:"saveTextFiles" yaml:"saveTextFiles"`
-	SaveOtherFiles         *bool                       `json:"saveOtherFiles" yaml:"saveOtherFiles"`
-	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
-	Filters                *configurationSourceFilters `json:"filters" yaml:"filters"`
-	Duplo                  *bool                       `json:"duplo,omitempty" yaml:"duplo,omitempty"`
-	DuploThreshold         *float64                    `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
+	DelayHandling        *int `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory *int `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
+
+	Subfolders *[]string `json:"subfolders" yaml:"subfolders"`
+
+	SaveImages             *bool `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             *bool `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         *bool `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          *bool `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         *bool `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates *bool `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+
+	Filters *configurationSourceFilters `json:"filters" yaml:"filters"`
+
+	Duplo          *bool    `json:"duplo,omitempty" yaml:"duplo,omitempty"`
+	DuploThreshold *float64 `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Misc Rules
 	LogLinks    *configurationSourceLog `json:"logLinks,omitempty" yaml:"logLinks,omitempty"`
@@ -1011,32 +995,8 @@ func sourceDefault(channel *configurationSource) {
 	if channel.DelayHandlingHistory == nil && config.DelayHandlingHistory != 0 {
 		channel.DelayHandlingHistory = &config.DelayHandlingHistory
 	}
-	if channel.DivideByYear == nil {
-		channel.DivideByYear = &config.DivideByYear
-	}
-	if channel.DivideByMonth == nil {
-		channel.DivideByMonth = &config.DivideByMonth
-	}
-	if channel.DivideByDay == nil {
-		channel.DivideByDay = &config.DivideByDay
-	}
-	if channel.DivideByHour == nil {
-		channel.DivideByHour = &config.DivideByHour
-	}
-	if channel.DivideByServer == nil {
-		channel.DivideByServer = &config.DivideByServer
-	}
-	if channel.DivideByChannel == nil {
-		channel.DivideByChannel = &config.DivideByChannel
-	}
-	if channel.DivideByUser == nil {
-		channel.DivideByUser = &config.DivideByUser
-	}
-	if channel.DivideByType == nil {
-		channel.DivideByType = &config.DivideByType
-	}
-	if channel.DivideFoldersUseID == nil {
-		channel.DivideFoldersUseID = &config.DivideFoldersUseID
+	if channel.Subfolders == nil {
+		channel.Subfolders = &config.Subfolders
 	}
 	if channel.SaveImages == nil {
 		channel.SaveImages = &config.SaveImages
