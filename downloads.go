@@ -998,26 +998,33 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
 					{"{{hour}}",
 						fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
+
 					{"{{serverID}}",
 						sourceGuildID},
 					{"{{serverName}}",
 						clearPath(sourceName)},
+
 					{"{{categoryID}}",
 						sourceParentID},
 					{"{{categoryName}}",
 						clearPath(sourceParentName)},
+
 					{"{{channelID}}",
 						download.Message.ChannelID},
 					{"{{channelName}}",
 						clearPath(sourceChannelName)},
+
 					{"{{userID}}",
 						download.Message.Author.ID},
 					{"{{userName}}",
 						download.Message.Author.Username},
+
 					{"{{fileType}}",
 						contentTypeBase + "s"},
-					{"{{userName}}",
-						download.Message.Author.Username},
+					{"{{message}}",
+						download.Message.Content},
+					{"{{messageID}}",
+						download.Message.ID},
 				}
 				for _, key := range keys {
 					if strings.Contains(subfolder, key[0]) {
