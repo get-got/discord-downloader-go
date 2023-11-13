@@ -669,8 +669,10 @@ func main() {
 	sendStatusMessage(sendStatusExit) // not goroutine because we want to wait to send this before logout
 
 	// Log out of twitter if authenticated.
-	if twitterScraper.IsLoggedIn() {
-		twitterScraper.Logout()
+	if twitterScraper != nil {
+		if twitterScraper.IsLoggedIn() {
+			twitterScraper.Logout()
+		}
 	}
 
 	log.Println(lg("Discord", "", color.GreenString, "Logging out of discord..."))
