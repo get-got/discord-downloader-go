@@ -17,7 +17,11 @@ import (
 )
 
 var (
-	config = defaultConfiguration()
+	configFileBase string = "settings"
+	configFile     string
+	configFileC    bool
+	configFileYaml bool
+	config         configuration = defaultConfiguration()
 )
 
 //#region Config, Credentials
@@ -164,8 +168,6 @@ func defaultConfiguration() configuration {
 		HistoryRequestDelay:   0,
 
 		// Rules for Saving
-		DelayHandling:          0,
-		DelayHandlingHistory:   0,
 		Subfolders:             []string{"{{fileType}}"},
 		SaveImages:             true,
 		SaveVideos:             true,
@@ -173,6 +175,8 @@ func defaultConfiguration() configuration {
 		SaveTextFiles:          false,
 		SaveOtherFiles:         false,
 		SavePossibleDuplicates: false,
+		DelayHandling:          0,
+		DelayHandlingHistory:   0,
 		Filters: &configurationSourceFilters{
 			BlockedExtensions: &[]string{
 				".htm",
@@ -286,17 +290,15 @@ type configuration struct {
 	HistoryRequestDelay   int    `json:"historyRequestDelay" yaml:"historyRequestDelay"`
 
 	// Rules for Saving
-	DelayHandling        int `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
-	DelayHandlingHistory int `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-
-	Subfolders []string `json:"subfolders" yaml:"subfolders"`
-
-	SaveImages             bool `json:"saveImages" yaml:"saveImages"`
-	SaveVideos             bool `json:"saveVideos" yaml:"saveVideos"`
-	SaveAudioFiles         bool `json:"saveAudioFiles" yaml:"saveAudioFiles"`
-	SaveTextFiles          bool `json:"saveTextFiles" yaml:"saveTextFiles"`
-	SaveOtherFiles         bool `json:"saveOtherFiles" yaml:"saveOtherFiles"`
-	SavePossibleDuplicates bool `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	Subfolders             []string `json:"subfolders" yaml:"subfolders"`
+	SaveImages             bool     `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             bool     `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         bool     `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          bool     `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         bool     `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates bool     `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	DelayHandling          int      `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory   int      `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
 
 	Filters *configurationSourceFilters `json:"filters" yaml:"filters"`
 
@@ -375,17 +377,15 @@ type configurationSource struct {
 	SendHistoryStatus     *bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
 
 	// Rules for Saving
-	DelayHandling        *int `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
-	DelayHandlingHistory *int `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-
-	Subfolders *[]string `json:"subfolders" yaml:"subfolders"`
-
-	SaveImages             *bool `json:"saveImages" yaml:"saveImages"`
-	SaveVideos             *bool `json:"saveVideos" yaml:"saveVideos"`
-	SaveAudioFiles         *bool `json:"saveAudioFiles" yaml:"saveAudioFiles"`
-	SaveTextFiles          *bool `json:"saveTextFiles" yaml:"saveTextFiles"`
-	SaveOtherFiles         *bool `json:"saveOtherFiles" yaml:"saveOtherFiles"`
-	SavePossibleDuplicates *bool `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	Subfolders             *[]string `json:"subfolders" yaml:"subfolders"`
+	SaveImages             *bool     `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             *bool     `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         *bool     `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          *bool     `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         *bool     `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	DelayHandling          *int      `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory   *int      `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
 
 	Filters *configurationSourceFilters `json:"filters" yaml:"filters"`
 

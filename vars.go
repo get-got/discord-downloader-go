@@ -23,14 +23,6 @@ var (
 	pathDatabaseBase      = "database"
 	pathDatabaseBackups   = "backups"
 
-	defaultReact   = "✅"
-	limitMsg       = 2000
-	limitEmbedDesc = 4096
-)
-
-var (
-	configFileBase = "settings"
-	configFile     string
-	configFileC    bool
-	configFileYaml bool
+	defaultReact = "✅"
+	limitMsg     = 2000
 )
