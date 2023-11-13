@@ -123,13 +123,13 @@ func main() {
 
 	// Output Flag Warnings
 	if config.Verbose {
-		log.Println(lg("Info", "", color.HiBlueString, "Verbose output enabled (extra info)..."))
+		log.Println(lg("Info", "", color.HiBlueString, "VERBOSE OUTPUT ENABLED ... just some extra info..."))
 	}
 	if config.Debug {
-		log.Println(lg("Info", "", color.HiYellowString, "Debugging output enabled (troubleshooting info)..."))
+		log.Println(lg("Info", "", color.HiYellowString, "DEBUGGING OUTPUT ENABLED ... some troubleshooting data..."))
 	}
 	if config.DebugVerbose {
-		log.Println(lg("Info", "", color.YellowString, "Verbose Debugging output enabled (extra troubleshooting info)..."))
+		log.Println(lg("Info", "", color.YellowString, "VERBOSE-DEBUGGING OUTPUT ENABLED ... some in-depth troubleshooting data..."))
 	}
 
 	mainWg.Wait() // wait because credentials from config
