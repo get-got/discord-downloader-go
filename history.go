@@ -242,7 +242,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 		sourceConfig := getSource(responseMsg, &channel)
 
 		// Invalid Source?
-		if sourceConfig == emptyConfig {
+		if sourceConfig == emptySourceConfig {
 			log.Println(lg("History", "", color.HiRedString,
 				logPrefix+"Invalid source: "+channel.ID))
 			if job, exists := historyJobs.Get(subjectChannelID); exists {

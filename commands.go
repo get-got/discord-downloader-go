@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
-	"github.com/kennygrant/sanitize"
 )
 
 // TODO: Implement this for more?
@@ -145,7 +143,7 @@ func handleCommands() *exrouter.Route {
 					len(config.AdminChannels),
 					bot.HeartbeatLatency().Milliseconds(),
 				)
-				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptyConfig {
+				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptySourceConfig {
 					configJson, _ := json.MarshalIndent(sourceConfig, "", "\t")
 					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
 				}
@@ -162,7 +160,7 @@ func handleCommands() *exrouter.Route {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Stats", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
-				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptyConfig {
+				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptySourceConfig {
 					if *sourceConfig.AllowCommands {
 						content := fmt.Sprintf("• **Total Downloads —** %s\n"+
 							"• **Downloads in this Channel —** %s",
@@ -552,98 +550,6 @@ func handleCommands() *exrouter.Route {
 			}
 		}
 	}).Cat("Admin").Alias("reload", "kill").Desc("Kills the bot")
-
-	go router.On("emojis", func(ctx *exrouter.Context) {
-		if isCommandableChannel(ctx.Msg) {
-			if isBotAdmin(ctx.Msg) {
-				if hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					// Determine which guild(s)
-					guilds := []string{ctx.Msg.GuildID}        // default to origin
-					if args := ctx.Args.After(1); args != "" { // specifics
-						guilds = nil
-						_guilds := strings.Split(args, ",")
-						if len(_guilds) > 0 {
-							for _, guild := range _guilds {
-								guild = strings.TrimSpace(guild)
-								guilds = append(guilds, guild)
-							}
-						}
-					}
-					for _, guild := range guilds {
-						i := 0
-						s := 0
-
-						guildName := guild
-						guildNameO := guild
-						if guildInfo, err := bot.Guild(guild); err == nil {
-							guildName = sanitize.Name(guildInfo.Name)
-							guildNameO = guildInfo.Name
-						}
-
-						destination := "emojis" + string(os.PathSeparator) + guildName + string(os.PathSeparator)
-						if err = os.MkdirAll(destination, 0755); err != nil {
-							log.Println(lg("Command", "Emojis", color.HiRedString, "Error while creating destination folder \"%s\": %s", destination, err))
-						} else {
-							emojis, err := bot.GuildEmojis(guild)
-							if err != nil {
-								log.Println(lg("Command", "Emojis", color.HiRedString, "Failed to get server emojis:\t%s", err))
-							} else {
-								for _, emoji := range emojis {
-									var message discordgo.Message
-									message.ChannelID = ctx.Msg.ChannelID
-									url := "https://cdn.discordapp.com/emojis/" + emoji.ID
-
-									status, _ := downloadRequestStruct{
-										InputURL:   url,
-										Filename:   emoji.ID,
-										Path:       destination,
-										Message:    &message,
-										FileTime:   time.Now(),
-										HistoryCmd: false,
-										EmojiCmd:   true,
-										StartTime:  time.Now(),
-									}.handleDownload()
-
-									if status.Status == downloadSuccess {
-										i++
-									} else {
-										s++
-										log.Println(lg("Command", "Emojis", color.HiRedString,
-											"Failed to download emoji \"%s\": \t[%d - %s] %v",
-											url, status.Status, getDownloadStatusString(status.Status), status.Error))
-									}
-								}
-								destinationOut := destination
-								abs, err := filepath.Abs(destination)
-								if err == nil {
-									destinationOut = abs
-								}
-								_, err = replyEmbed(ctx.Msg, "Command — Emojis",
-									fmt.Sprintf("`%d` emojis downloaded, `%d` skipped or failed\n• Destination: `%s`\n• Server: `%s`",
-										i, s, destinationOut, guildNameO,
-									),
-								)
-								if err != nil {
-									log.Println(lg("Command", "Emojis", color.HiRedString,
-										"Failed to send status message for emoji downloads:\t%s", err))
-								}
-							}
-						}
-					}
-				}
-			} else {
-				if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
-					log.Println(lg("Command", "Emojis", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
-				} else {
-					if _, err := replyEmbed(ctx.Msg, "Command — Emojis", cmderrLackingBotAdminPerms); err != nil {
-						log.Println(lg("Command", "Emojis", color.HiRedString, cmderrSendFailure, getUserIdentifier(*ctx.Msg.Author), err))
-					}
-				}
-				log.Println(lg("Command", "Emojis", color.HiCyanString,
-					"%s tried to download emojis but lacked bot admin perms.", getUserIdentifier(*ctx.Msg.Author)))
-			}
-		}
-	}).Cat("Admin").Desc("Saves all server emojis to download destination")
 
 	//#endregion
 

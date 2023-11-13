@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -481,6 +482,177 @@ func main() {
 	if config.Debug {
 		log.Println(lg("Main", "", color.YellowString, "Background startup tasks finished, took %s...", uptime()))
 	}
+
+	//#endregion
+
+	//#region Download Emojis & Stickers
+
+	go func() {
+		time.Sleep(3 * time.Second)
+
+		dataKeysEmoji := func(emoji discordgo.Emoji, serverID string) string {
+			ret := config.EmojisFilenameFormat
+			keys := [][]string{
+				{"{{ID}}", emoji.ID},
+				{"{{name}}", emoji.Name},
+			}
+			for _, key := range keys {
+				if strings.Contains(ret, key[0]) {
+					ret = strings.ReplaceAll(ret, key[0], key[1])
+				}
+			}
+			return ret
+		}
+
+		dataKeysSticker := func(sticker discordgo.Sticker) string {
+			ret := config.StickersFilenameFormat
+			keys := [][]string{
+				{"{{ID}}", sticker.ID},
+				{"{{name}}", sticker.Name},
+			}
+			for _, key := range keys {
+				if strings.Contains(ret, key[0]) {
+					ret = strings.ReplaceAll(ret, key[0], key[1])
+				}
+			}
+			return ret
+		}
+
+		if config.EmojisServers != nil {
+			// Handle destination
+			destination := "emojis"
+			if config.EmojisDestination != nil {
+				destination = *config.EmojisDestination
+			}
+			if err = os.MkdirAll(destination, 0755); err != nil {
+				log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating destination folder \"%s\": %s", destination, err))
+			}
+			// Start
+			log.Println(lg("Discord", "Emojis", color.MagentaString, "Starting emoji downloads..."))
+			for _, serverID := range *config.EmojisServers {
+				emojis, err := bot.GuildEmojis(serverID)
+				if err != nil {
+					log.Println(lg("Discord", "Emojis", color.HiRedString, "Error fetching emojis from %s... %s", serverID, err))
+				} else {
+					guildName := "UNKNOWN"
+					guild, err := bot.Guild(serverID)
+					if err == nil {
+						guildName = guild.Name
+					}
+					subfolder := destination + string(os.PathSeparator) + clearPath(guildName)
+					if err = os.MkdirAll(subfolder, 0755); err != nil {
+						log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating subfolder \"%s\": %s", subfolder, err))
+					}
+
+					countDownloaded := 0
+					countSkipped := 0
+					countFailed := 0
+					for _, emoji := range emojis {
+						url := "https://cdn.discordapp.com/emojis/" + emoji.ID
+
+						status, _ := downloadRequestStruct{
+							InputURL:   url,
+							Filename:   dataKeysEmoji(*emoji, serverID),
+							Path:       subfolder,
+							Message:    nil,
+							FileTime:   time.Now(),
+							HistoryCmd: false,
+							EmojiCmd:   true,
+							StartTime:  time.Now(),
+						}.handleDownload()
+
+						if status.Status == downloadSuccess {
+							countDownloaded++
+						} else if status.Status == downloadSkippedDuplicate {
+							countSkipped++
+						} else {
+							countFailed++
+							log.Println(lg("Discord", "Emojis", color.HiRedString,
+								"Failed to download emoji \"%s\": \t[%d - %s] %v",
+								url, status.Status, getDownloadStatusString(status.Status), status.Error))
+						}
+					}
+
+					// Log
+					destinationOut := destination
+					abs, err := filepath.Abs(destination)
+					if err == nil {
+						destinationOut = abs
+					}
+					log.Println(lg("Discord", "Emojis", color.HiMagentaString,
+						fmt.Sprintf("%d emojis downloaded, %d skipped, %d failed - Destination: %s",
+							countDownloaded, countSkipped, countFailed, destinationOut,
+						)))
+				}
+			}
+		}
+
+		if config.StickersServers != nil {
+			// Handle destination
+			destination := "stickers"
+			if config.StickersDestination != nil {
+				destination = *config.StickersDestination
+			}
+			if err = os.MkdirAll(destination, 0755); err != nil {
+				log.Println(lg("Discord", "Stickers", color.HiRedString, "Error while creating destination folder \"%s\": %s", destination, err))
+			}
+			log.Println(lg("Discord", "Stickers", color.MagentaString, "Starting sticker downloads..."))
+			for _, serverID := range *config.StickersServers {
+				guildName := "UNKNOWN"
+				guild, err := bot.Guild(serverID)
+				if err != nil {
+					log.Println(lg("Discord", "Stickers", color.HiRedString, "Error fetching server %s... %s", serverID, err))
+				} else {
+					guildName = guild.Name
+					subfolder := destination + string(os.PathSeparator) + clearPath(guildName)
+					if err = os.MkdirAll(subfolder, 0755); err != nil {
+						log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating subfolder \"%s\": %s", subfolder, err))
+					}
+
+					countDownloaded := 0
+					countSkipped := 0
+					countFailed := 0
+					for _, sticker := range guild.Stickers {
+						url := "https://media.discordapp.net/stickers/" + sticker.ID
+
+						status, _ := downloadRequestStruct{
+							InputURL:   url,
+							Filename:   dataKeysSticker(*sticker),
+							Path:       subfolder,
+							Message:    nil,
+							FileTime:   time.Now(),
+							HistoryCmd: false,
+							EmojiCmd:   true,
+							StartTime:  time.Now(),
+						}.handleDownload()
+
+						if status.Status == downloadSuccess {
+							countDownloaded++
+						} else if status.Status == downloadSkippedDuplicate {
+							countSkipped++
+						} else {
+							countFailed++
+							log.Println(lg("Discord", "Stickers", color.HiRedString,
+								"Failed to download sticker \"%s\": \t[%d - %s] %v",
+								url, status.Status, getDownloadStatusString(status.Status), status.Error))
+						}
+					}
+
+					// Log
+					destinationOut := destination
+					abs, err := filepath.Abs(destination)
+					if err == nil {
+						destinationOut = abs
+					}
+					log.Println(lg("Discord", "Stickers", color.HiMagentaString,
+						fmt.Sprintf("%d stickers downloaded, %d skipped, %d failed - Destination: %s",
+							countDownloaded, countSkipped, countFailed, destinationOut,
+						)))
+				}
+			}
+		}
+
+	}()
 
 	//#endregion
 

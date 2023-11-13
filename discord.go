@@ -307,6 +307,10 @@ func dataKeysChannel(input string, srcchannel string) string {
 func dataKeysDownload(sourceConfig configurationSource, download downloadRequestStruct) string {
 	//TODO: same as dataKeys
 
+	if sourceConfig == emptySourceConfig {
+		return config.FilenameFormat
+	}
+
 	ret := config.FilenameFormat
 	if sourceConfig.FilenameFormat != nil {
 		if *sourceConfig.FilenameFormat != "" {

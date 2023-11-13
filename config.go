@@ -135,6 +135,10 @@ func defaultConfiguration() configuration {
 		ConnectionCheckRate: defConfig_ConnectionCheckRate,
 		PresenceRefreshRate: defConfig_PresenceRefreshRate,
 
+		// Emojis & Stickers
+		EmojisFilenameFormat:   "{{ID}} {{name}}",
+		StickersFilenameFormat: "{{ID}} {{name}}",
+
 		// Source Setup Defaults
 		Save:          true,
 		AllowCommands: true,
@@ -248,6 +252,15 @@ type configuration struct {
 	ConnectionCheckRate int `json:"connectionCheckRate,omitempty" yaml:"connectionCheckRate,omitempty"`
 	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty" yaml:"presenceRefreshRate,omitempty"`
 
+	// Discord Emojis & Stickers
+	EmojisServers        *[]string `json:"emojisServers" yaml:"emojisServers"`
+	EmojisFilenameFormat string    `json:"emojisFilenameFormat" yaml:"emojisFilenameFormat"`
+	EmojisDestination    *string   `json:"emojisDestination" yaml:"emojisDestination"`
+
+	StickersServers        *[]string `json:"stickersServers" yaml:"stickersServers"`
+	StickersFilenameFormat string    `json:"stickersFilenameFormat" yaml:"stickersFilenameFormat"`
+	StickersDestination    *string   `json:"stickersDestination" yaml:"stickersDestination"`
+
 	// Source Setup Defaults
 	Save          bool `json:"save" yaml:"save"`
 	AllowCommands bool `json:"allowCommands" yaml:"allowCommands"`
@@ -259,9 +272,6 @@ type configuration struct {
 	SendFileToChannels []string `json:"sendFileToChannels,omitempty" yaml:"sendFileToChannels,omitempty"`
 	SendFileDirectly   bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
 	SendFileCaption    string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
-
-	FilenameDateFormat string `json:"filenameDateFormat" yaml:"filenameDateFormat"`
-	FilenameFormat     string `json:"filenameFormat" yaml:"filenameFormat"`
 
 	// Discord Presence
 	PresenceEnabled bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
@@ -290,20 +300,20 @@ type configuration struct {
 	HistoryRequestDelay   int    `json:"historyRequestDelay" yaml:"historyRequestDelay"`
 
 	// Rules for Saving
-	Subfolders             []string `json:"subfolders" yaml:"subfolders"`
-	SaveImages             bool     `json:"saveImages" yaml:"saveImages"`
-	SaveVideos             bool     `json:"saveVideos" yaml:"saveVideos"`
-	SaveAudioFiles         bool     `json:"saveAudioFiles" yaml:"saveAudioFiles"`
-	SaveTextFiles          bool     `json:"saveTextFiles" yaml:"saveTextFiles"`
-	SaveOtherFiles         bool     `json:"saveOtherFiles" yaml:"saveOtherFiles"`
-	SavePossibleDuplicates bool     `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
-	DelayHandling          int      `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
-	DelayHandlingHistory   int      `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-
-	Filters *configurationSourceFilters `json:"filters" yaml:"filters"`
-
-	Duplo          bool    `json:"duplo,omitempty" yaml:"duplo,omitempty"`
-	DuploThreshold float64 `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
+	Subfolders             []string                    `json:"subfolders" yaml:"subfolders"`
+	FilenameDateFormat     string                      `json:"filenameDateFormat" yaml:"filenameDateFormat"`
+	FilenameFormat         string                      `json:"filenameFormat" yaml:"filenameFormat"`
+	SaveImages             bool                        `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             bool                        `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         bool                        `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          bool                        `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         bool                        `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates bool                        `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	DelayHandling          int                         `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory   int                         `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
+	Filters                *configurationSourceFilters `json:"filters" yaml:"filters"`
+	Duplo                  bool                        `json:"duplo,omitempty" yaml:"duplo,omitempty"`
+	DuploThreshold         float64                     `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Sources
 	All                    *configurationSource  `json:"all,omitempty" yaml:"all,omitempty"`
@@ -357,9 +367,6 @@ type configurationSource struct {
 	SendFileDirectly   *bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
 	SendFileCaption    *string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
 
-	FilenameDateFormat *string `json:"filenameDateFormat" yaml:"filenameDateFormat"`
-	FilenameFormat     *string `json:"filenameFormat" yaml:"filenameFormat"`
-
 	// Appearance
 	PresenceEnabled            *bool     `json:"presenceEnabled" yaml:"presenceEnabled"`
 	ReactWhenDownloaded        *bool     `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
@@ -377,20 +384,20 @@ type configurationSource struct {
 	SendHistoryStatus     *bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
 
 	// Rules for Saving
-	Subfolders             *[]string `json:"subfolders" yaml:"subfolders"`
-	SaveImages             *bool     `json:"saveImages" yaml:"saveImages"`
-	SaveVideos             *bool     `json:"saveVideos" yaml:"saveVideos"`
-	SaveAudioFiles         *bool     `json:"saveAudioFiles" yaml:"saveAudioFiles"`
-	SaveTextFiles          *bool     `json:"saveTextFiles" yaml:"saveTextFiles"`
-	SaveOtherFiles         *bool     `json:"saveOtherFiles" yaml:"saveOtherFiles"`
-	SavePossibleDuplicates *bool     `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
-	DelayHandling          *int      `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
-	DelayHandlingHistory   *int      `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
-
-	Filters *configurationSourceFilters `json:"filters" yaml:"filters"`
-
-	Duplo          *bool    `json:"duplo,omitempty" yaml:"duplo,omitempty"`
-	DuploThreshold *float64 `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
+	Subfolders             *[]string                   `json:"subfolders" yaml:"subfolders"`
+	FilenameDateFormat     *string                     `json:"filenameDateFormat" yaml:"filenameDateFormat"`
+	FilenameFormat         *string                     `json:"filenameFormat" yaml:"filenameFormat"`
+	SaveImages             *bool                       `json:"saveImages" yaml:"saveImages"`
+	SaveVideos             *bool                       `json:"saveVideos" yaml:"saveVideos"`
+	SaveAudioFiles         *bool                       `json:"saveAudioFiles" yaml:"saveAudioFiles"`
+	SaveTextFiles          *bool                       `json:"saveTextFiles" yaml:"saveTextFiles"`
+	SaveOtherFiles         *bool                       `json:"saveOtherFiles" yaml:"saveOtherFiles"`
+	SavePossibleDuplicates *bool                       `json:"savePossibleDuplicates" yaml:"savePossibleDuplicates"`
+	DelayHandling          *int                        `json:"delayHandling,omitempty" yaml:"delayHandling,omitempty"`
+	DelayHandlingHistory   *int                        `json:"delayHandlingHistory,omitempty" yaml:"delayHandlingHistory,omitempty"`
+	Filters                *configurationSourceFilters `json:"filters" yaml:"filters"`
+	Duplo                  *bool                       `json:"duplo,omitempty" yaml:"duplo,omitempty"`
+	DuploThreshold         *float64                    `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Misc Rules
 	LogLinks    *configurationSourceLog `json:"logLinks,omitempty" yaml:"logLinks,omitempty"`
@@ -1126,7 +1133,7 @@ func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bo
 	return false
 }
 
-var emptyConfig configurationSource = configurationSource{}
+var emptySourceConfig configurationSource = configurationSource{}
 
 func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 
@@ -1164,7 +1171,7 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	for _, item := range config.Categories {
 		if item.CategoryBlacklist != nil {
 			if stringInSlice(channel.ID, *item.CategoryBlacklist) {
-				return emptyConfig
+				return emptySourceConfig
 			}
 		}
 		if item.CategoryID != "" {
@@ -1199,12 +1206,12 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 						// Channel Blacklisting within Server
 						if item.ServerBlacklist != nil {
 							if stringInSlice(subjectID, *item.ServerBlacklist) {
-								return emptyConfig
+								return emptySourceConfig
 							}
 							// Categories
 							if channel.ParentID != "" {
 								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-									return emptyConfig
+									return emptySourceConfig
 								}
 							}
 						}
@@ -1226,12 +1233,12 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 							// Channel Blacklisting within Servers
 							if item.ServerBlacklist != nil {
 								if stringInSlice(subjectID, *item.ServerBlacklist) {
-									return emptyConfig
+									return emptySourceConfig
 								}
 								// Categories
 								if channel.ParentID != "" {
 									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-										return emptyConfig
+										return emptySourceConfig
 									}
 								}
 							}
@@ -1264,31 +1271,31 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	if config.All != nil {
 		if config.AllBlacklistChannels != nil {
 			if stringInSlice(subjectID, *config.AllBlacklistChannels) {
-				return emptyConfig
+				return emptySourceConfig
 			}
 		}
 		if config.AllBlacklistCategories != nil {
 			chinf, err := bot.State.Channel(subjectID)
 			if err == nil {
 				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(subjectID, *config.AllBlacklistCategories) {
-					return emptyConfig
+					return emptySourceConfig
 				}
 			}
 		}
 		if config.AllBlacklistServers != nil {
 			if stringInSlice(m.GuildID, *config.AllBlacklistServers) {
-				return emptyConfig
+				return emptySourceConfig
 			}
 		}
 		if config.AllBlacklistUsers != nil && m.Author != nil {
 			if stringInSlice(m.Author.ID, *config.AllBlacklistUsers) {
-				return emptyConfig
+				return emptySourceConfig
 			}
 		}
 		return *config.All
 	}
 
-	return emptyConfig
+	return emptySourceConfig
 }
 
 func isAdminChannelRegistered(ChannelID string) bool {
@@ -1335,7 +1342,7 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	}
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if sourceConfig := getSource(m, nil); sourceConfig != emptyConfig {
+	} else if sourceConfig := getSource(m, nil); sourceConfig != emptySourceConfig {
 		if *sourceConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
@@ -1449,7 +1456,7 @@ func getAllRegisteredChannels() []string {
 				}
 			}
 			for _, channel := range guild.Channels {
-				if r := getSource(&discordgo.Message{ChannelID: channel.ID}, nil); r == emptyConfig { // easier than redoing it all but way less efficient, im lazy
+				if r := getSource(&discordgo.Message{ChannelID: channel.ID}, nil); r == emptySourceConfig { // easier than redoing it all but way less efficient, im lazy
 					continue
 				} else {
 					if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {

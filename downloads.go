@@ -405,8 +405,9 @@ func getDownloadLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
-	// Ignore Discord emojis
-	if strings.HasPrefix(inputURL, "https://cdn.discordapp.com/emojis/") {
+	// Ignore Discord emojis / stickers
+	if strings.HasPrefix(inputURL, "https://cdn.discordapp.com/emojis/") ||
+		strings.HasPrefix(inputURL, "https://media.discordapp.net/stickers/") {
 		return nil
 	}
 
@@ -482,7 +483,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 		log.Println(lg("Download", "", color.RedString,
 			"Gave up on downloading %s after %d failed attempts...\t%s",
 			download.InputURL, config.DownloadRetryMax, getDownloadStatusString(status.Status)))
-		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptyConfig {
+		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptySourceConfig {
 			if !download.HistoryCmd && *sourceConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -521,114 +522,116 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 	}
 
 	// Log Links to File
-	if sourceConfig := getSource(download.Message, nil); sourceConfig != emptyConfig {
-		if sourceConfig.LogLinks != nil {
-			if sourceConfig.LogLinks.Destination != "" {
-				logPath := sourceConfig.LogLinks.Destination
-				if *sourceConfig.LogLinks.DestinationIsFolder {
-					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
-						logPath += string(os.PathSeparator)
-					}
-					err := os.MkdirAll(logPath, 0755)
-					if err == nil {
-						logPath += "Log_Links"
-						if *sourceConfig.LogLinks.DivideLogsByServer {
-							if download.Message.GuildID == "" {
-								ch, err := bot.State.Channel(download.Message.ChannelID)
-								if err == nil {
-									if ch.Type == discordgo.ChannelTypeDM {
-										logPath += " DM"
-									} else if ch.Type == discordgo.ChannelTypeGroupDM {
-										logPath += " GroupDM"
+	if !download.EmojiCmd {
+		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptySourceConfig {
+			if sourceConfig.LogLinks != nil {
+				if sourceConfig.LogLinks.Destination != "" {
+					logPath := sourceConfig.LogLinks.Destination
+					if *sourceConfig.LogLinks.DestinationIsFolder {
+						if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
+							logPath += string(os.PathSeparator)
+						}
+						err := os.MkdirAll(logPath, 0755)
+						if err == nil {
+							logPath += "Log_Links"
+							if *sourceConfig.LogLinks.DivideLogsByServer {
+								if download.Message.GuildID == "" {
+									ch, err := bot.State.Channel(download.Message.ChannelID)
+									if err == nil {
+										if ch.Type == discordgo.ChannelTypeDM {
+											logPath += " DM"
+										} else if ch.Type == discordgo.ChannelTypeGroupDM {
+											logPath += " GroupDM"
+										} else {
+											logPath += " Unknown"
+										}
 									} else {
 										logPath += " Unknown"
 									}
 								} else {
-									logPath += " Unknown"
+									logPath += " SID_" + download.Message.GuildID
 								}
-							} else {
-								logPath += " SID_" + download.Message.GuildID
+							}
+							if *sourceConfig.LogLinks.DivideLogsByChannel {
+								logPath += " CID_" + download.Message.ChannelID
+							}
+							if *sourceConfig.LogLinks.DivideLogsByUser {
+								logPath += " UID_" + download.Message.Author.ID
+							}
+							if *sourceConfig.LogLinks.DivideLogsByStatus {
+								if status.Status >= downloadFailed {
+									logPath += " - FAILED"
+								} else if status.Status >= downloadSkipped {
+									logPath += " - SKIPPED"
+								} else if status.Status == downloadIgnored {
+									logPath += " - IGNORED"
+								} else if status.Status == downloadSuccess {
+									logPath += " - DOWNLOADED"
+								}
 							}
 						}
-						if *sourceConfig.LogLinks.DivideLogsByChannel {
-							logPath += " CID_" + download.Message.ChannelID
-						}
-						if *sourceConfig.LogLinks.DivideLogsByUser {
-							logPath += " UID_" + download.Message.Author.ID
-						}
-						if *sourceConfig.LogLinks.DivideLogsByStatus {
-							if status.Status >= downloadFailed {
-								logPath += " - FAILED"
-							} else if status.Status >= downloadSkipped {
-								logPath += " - SKIPPED"
-							} else if status.Status == downloadIgnored {
-								logPath += " - IGNORED"
-							} else if status.Status == downloadSuccess {
-								logPath += " - DOWNLOADED"
-							}
-						}
+						logPath += ".txt"
 					}
-					logPath += ".txt"
-				}
-				// Read
-				currentLog, err := os.ReadFile(logPath)
-				currentLogS := ""
-				if err == nil {
-					currentLogS = string(currentLog)
-				}
-				// Writer
-				f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
-				if err != nil {
-					log.Println(lg("Download", "", color.RedString,
-						"[sourceConfig.LogLinks] Failed to open log file:\t%s", err))
-					f.Close()
-				}
-				defer f.Close()
-
-				var newLine string
-				shouldLog := true
-
-				// Log Failures
-				if status.Status > downloadSuccess {
-					shouldLog = *sourceConfig.LogLinks.LogFailures // will not log if LogFailures is false
-				} else if *sourceConfig.LogLinks.LogDownloads { // Log Downloads
-					shouldLog = true
-				}
-				// Filter Duplicates
-				if sourceConfig.LogLinks.FilterDuplicates != nil {
-					if *sourceConfig.LogLinks.FilterDuplicates {
-						if strings.Contains(currentLogS, download.InputURL) {
-							shouldLog = false
-						}
+					// Read
+					currentLog, err := os.ReadFile(logPath)
+					currentLogS := ""
+					if err == nil {
+						currentLogS = string(currentLog)
 					}
-				}
-				if shouldLog {
-					// Prepend
-					prefix := ""
-					if sourceConfig.LogLinks.Prefix != nil {
-						prefix = *sourceConfig.LogLinks.Prefix
-					}
-					// More Data
-					additionalInfo := ""
-					if sourceConfig.LogLinks.UserData != nil {
-						if *sourceConfig.LogLinks.UserData {
-							additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
-								download.Message.GuildID, download.Message.ChannelID,
-								download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID,
-								discordSnowflakeToTimestamp(download.Message.ID, "2006-01-02 15-04-05"))
-						}
-					}
-					// Append
-					suffix := ""
-					if sourceConfig.LogLinks.Suffix != nil {
-						suffix = *sourceConfig.LogLinks.Suffix
-					}
-					// New Line
-					newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
-
-					if _, err = f.WriteString(newLine); err != nil {
+					// Writer
+					f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
+					if err != nil {
 						log.Println(lg("Download", "", color.RedString,
-							"[sourceConfig.LogLinks] Failed to append file:\t%s", err))
+							"[sourceConfig.LogLinks] Failed to open log file:\t%s", err))
+						f.Close()
+					}
+					defer f.Close()
+
+					var newLine string
+					shouldLog := true
+
+					// Log Failures
+					if status.Status > downloadSuccess {
+						shouldLog = *sourceConfig.LogLinks.LogFailures // will not log if LogFailures is false
+					} else if *sourceConfig.LogLinks.LogDownloads { // Log Downloads
+						shouldLog = true
+					}
+					// Filter Duplicates
+					if sourceConfig.LogLinks.FilterDuplicates != nil {
+						if *sourceConfig.LogLinks.FilterDuplicates {
+							if strings.Contains(currentLogS, download.InputURL) {
+								shouldLog = false
+							}
+						}
+					}
+					if shouldLog {
+						// Prepend
+						prefix := ""
+						if sourceConfig.LogLinks.Prefix != nil {
+							prefix = *sourceConfig.LogLinks.Prefix
+						}
+						// More Data
+						additionalInfo := ""
+						if sourceConfig.LogLinks.UserData != nil {
+							if *sourceConfig.LogLinks.UserData {
+								additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
+									download.Message.GuildID, download.Message.ChannelID,
+									download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID,
+									discordSnowflakeToTimestamp(download.Message.ID, "2006-01-02 15-04-05"))
+							}
+						}
+						// Append
+						suffix := ""
+						if sourceConfig.LogLinks.Suffix != nil {
+							suffix = *sourceConfig.LogLinks.Suffix
+						}
+						// New Line
+						newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
+
+						if _, err = f.WriteString(newLine); err != nil {
+							log.Println(lg("Download", "", color.RedString,
+								"[sourceConfig.LogLinks] Failed to append file:\t%s", err))
+						}
 					}
 				}
 			}
@@ -652,11 +655,14 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 	var sourceConfig configurationSource
 	sourceDefault(&sourceConfig)
-	_sourceConfig := getSource(download.Message, nil)
-	if _sourceConfig != emptyConfig {
+	_sourceConfig := emptySourceConfig
+	if !download.EmojiCmd {
+		_sourceConfig = getSource(download.Message, nil)
+	}
+	if _sourceConfig != emptySourceConfig {
 		sourceConfig = _sourceConfig
 	}
-	if _sourceConfig != emptyConfig || download.EmojiCmd || download.ManualDownload {
+	if _sourceConfig != emptySourceConfig || download.EmojiCmd || download.ManualDownload {
 
 		// Source validation
 		if _, err = url.ParseRequestURI(download.InputURL); err != nil {
@@ -856,7 +862,9 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Format Keys
-		download.Filename = dataKeysDownload(sourceConfig, download)
+		if !download.EmojiCmd {
+			download.Filename = dataKeysDownload(sourceConfig, download)
+		}
 
 		// Fix filename length
 		if len(download.Filename) >= 260 {
@@ -945,110 +953,114 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 		}
 
-		// Names
 		sourceName := "UNKNOWN"
-		sourceGuildID := "-"
-		sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
-		sourceChannelName := download.Message.ChannelID
-		sourceParent := &discordgo.Channel{}
-		sourceParentID := "-"
-		sourceParentName := "-"
-		if sourceChannel != nil {
-			// Channel Naming
-			if sourceChannel.Name != "" {
-				sourceChannelName = "#" + sourceChannel.Name
-			}
-			switch sourceChannel.Type {
-			case discordgo.ChannelTypeGuildText:
-				// Server Naming
-				if sourceChannel.GuildID != "" {
-					sourceGuildID = sourceChannel.GuildID
-					sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-					if sourceGuild != nil && sourceGuild.Name != "" {
-						sourceName = sourceGuild.Name
-					}
+		sourceChannelName := "UNKNOWN"
+		if !download.EmojiCmd {
+
+			// Names
+			sourceGuildID := "-"
+			sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
+			sourceChannelName = download.Message.ChannelID
+			sourceParent := &discordgo.Channel{}
+			sourceParentID := "-"
+			sourceParentName := "-"
+			if sourceChannel != nil {
+				// Channel Naming
+				if sourceChannel.Name != "" {
+					sourceChannelName = "#" + sourceChannel.Name
 				}
-				// Category Naming
-				if sourceChannel.ParentID != "" {
-					sourceParent, _ = bot.State.Channel(sourceChannel.ParentID)
-					if sourceParent != nil {
-						if sourceParent.Name != "" {
-							sourceParentName = sourceParent.Name
-							sourceParentID = sourceParent.ID
+				switch sourceChannel.Type {
+				case discordgo.ChannelTypeGuildText:
+					// Server Naming
+					if sourceChannel.GuildID != "" {
+						sourceGuildID = sourceChannel.GuildID
+						sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+						if sourceGuild != nil && sourceGuild.Name != "" {
+							sourceName = sourceGuild.Name
+						}
+					}
+					// Category Naming
+					if sourceChannel.ParentID != "" {
+						sourceParent, _ = bot.State.Channel(sourceChannel.ParentID)
+						if sourceParent != nil {
+							if sourceParent.Name != "" {
+								sourceParentName = sourceParent.Name
+								sourceParentID = sourceParent.ID
+							}
+						}
+					}
+				case discordgo.ChannelTypeDM:
+					sourceName = "Direct Messages"
+				case discordgo.ChannelTypeGroupDM:
+					sourceName = "Group Messages"
+				}
+			}
+
+			// Subfolder Division - Format Subfolders
+			subfolders := *sourceConfig.Subfolders
+			for index, subfolder := range *sourceConfig.Subfolders {
+				if strings.Contains(subfolder, "{{") && strings.Contains(subfolder, "}}") {
+					keys := [][]string{
+						{"{{year}}",
+							fmt.Sprint(download.Message.Timestamp.Year())},
+						{"{{monthNum}}",
+							fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
+						{"{{dayOfMonth}}",
+							fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
+						{"{{hour}}",
+							fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
+
+						{"{{serverID}}",
+							sourceGuildID},
+						{"{{serverName}}",
+							clearPath(sourceName)},
+
+						{"{{categoryID}}",
+							sourceParentID},
+						{"{{categoryName}}",
+							clearPath(sourceParentName)},
+
+						{"{{channelID}}",
+							download.Message.ChannelID},
+						{"{{channelName}}",
+							clearPath(sourceChannelName)},
+
+						{"{{userID}}",
+							download.Message.Author.ID},
+						{"{{userName}}",
+							download.Message.Author.Username},
+
+						{"{{fileType}}",
+							contentTypeBase + "s"},
+						{"{{message}}",
+							download.Message.Content},
+						{"{{messageID}}",
+							download.Message.ID},
+					}
+					for _, key := range keys {
+						if strings.Contains(subfolder, key[0]) {
+							subfolder = strings.ReplaceAll(subfolder, key[0], key[1])
 						}
 					}
 				}
-			case discordgo.ChannelTypeDM:
-				sourceName = "Direct Messages"
-			case discordgo.ChannelTypeGroupDM:
-				sourceName = "Group Messages"
+				subfolders[index] = subfolder
 			}
-		}
 
-		// Subfolder Division - Format Subfolders
-		subfolders := *sourceConfig.Subfolders
-		for index, subfolder := range *sourceConfig.Subfolders {
-			if strings.Contains(subfolder, "{{") && strings.Contains(subfolder, "}}") {
-				keys := [][]string{
-					{"{{year}}",
-						fmt.Sprint(download.Message.Timestamp.Year())},
-					{"{{monthNum}}",
-						fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
-					{"{{dayOfMonth}}",
-						fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
-					{"{{hour}}",
-						fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
-
-					{"{{serverID}}",
-						sourceGuildID},
-					{"{{serverName}}",
-						clearPath(sourceName)},
-
-					{"{{categoryID}}",
-						sourceParentID},
-					{"{{categoryName}}",
-						clearPath(sourceParentName)},
-
-					{"{{channelID}}",
-						download.Message.ChannelID},
-					{"{{channelName}}",
-						clearPath(sourceChannelName)},
-
-					{"{{userID}}",
-						download.Message.Author.ID},
-					{"{{userName}}",
-						download.Message.Author.Username},
-
-					{"{{fileType}}",
-						contentTypeBase + "s"},
-					{"{{message}}",
-						download.Message.Content},
-					{"{{messageID}}",
-						download.Message.ID},
-				}
-				for _, key := range keys {
-					if strings.Contains(subfolder, key[0]) {
-						subfolder = strings.ReplaceAll(subfolder, key[0], key[1])
-					}
+			// Subfolder Dividion - Handle Formatted Subfolders
+			subpath := ""
+			for _, subfolder := range subfolders {
+				subpath = subpath + subfolder + string(os.PathSeparator)
+				// Create folder
+				if err := os.MkdirAll(download.Path+subpath, 0755); err != nil {
+					log.Println(lg("Download", "", color.HiRedString,
+						"Error while creating subfolder \"%s\": %s", download.Path+subpath, err))
+					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
 				}
 			}
-			subfolders[index] = subfolder
-		}
 
-		// Subfolder Dividion - Handle Formatted Subfolders
-		subpath := ""
-		for _, subfolder := range subfolders {
-			subpath = subpath + subfolder + string(os.PathSeparator)
-			// Create folder
-			if err := os.MkdirAll(download.Path+subpath, 0755); err != nil {
-				log.Println(lg("Download", "", color.HiRedString,
-					"Error while creating subfolder \"%s\": %s", download.Path+subpath, err))
-				return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
-			}
+			// Format Path
+			download.Path = download.Path + subpath // overwrite with new destination path
 		}
-
-		// Format Path
-		download.Path = download.Path + subpath // overwrite with new destination path
 		completePath := filepath.Clean(download.Path + download.Filename)
 
 		// Check if filepath exists
@@ -1065,13 +1077,13 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 					}
 					i = i + 1
 				}
-				if !download.HistoryCmd {
+				if !download.HistoryCmd && !download.EmojiCmd {
 					log.Println(lg("Download", "Skip", color.GreenString,
 						"Matching filenames, possible duplicate? Saving \"%s\" as \"%s\" instead",
 						tmpPath, completePath))
 				}
 			} else {
-				if !download.HistoryCmd {
+				if !download.HistoryCmd && !download.EmojiCmd {
 					log.Println(lg("Download", "Skip", color.GreenString,
 						"Matching filenames, possible duplicate..."))
 				}
@@ -1112,30 +1124,43 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 				dlColor = color.HiCyanString
 				msgTimestamp = "on " + download.Message.Timestamp.Format("2006/01/02 @ 15:04:05") + " "
 			}
-			log.Println(lg("Download", "", dlColor,
-				logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t\t%s",
-				strings.ToUpper(contentTypeBase), msgTimestamp,
-				color.HiYellowString("\"%s / %s\" (%s, %s)", sourceName, sourceChannelName, download.Message.ChannelID, download.Message.ID),
-				color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
-					color.WhiteString("(%s, %s, %0.1f %s)",
-						filesize, timeSinceShort(download.StartTime), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
+
+			if download.EmojiCmd {
+				log.Println(lg("Download", "", dlColor, "Saved emoji/sticker %s", download.Filename))
+			} else {
+				log.Println(lg("Download", "", dlColor,
+					logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t\t%s",
+					strings.ToUpper(contentTypeBase), msgTimestamp,
+					color.HiYellowString("\"%s / %s\" (%s, %s)", sourceName, sourceChannelName, download.Message.ChannelID, download.Message.ID),
+					color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,
+						color.WhiteString("(%s, %s, %0.1f %s)",
+							filesize, timeSinceShort(download.StartTime), speed/time.Since(download.StartTime).Seconds(), speedlabel))))
+			}
 		} else {
-			log.Println(lg("Download", "", color.GreenString,
-				logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
-				contentTypeBase, sourceName, sourceChannelName))
+			if !download.EmojiCmd {
+				log.Println(lg("Download", "", color.GreenString,
+					logPrefix+"Did not save %s sent in %s#%s --- file saving disabled...",
+					contentTypeBase, sourceName, sourceChannelName))
+			}
 		}
 
 		userID := botUser.ID
-		if download.Message.Author != nil {
-			userID = download.Message.Author.ID
+		if !download.EmojiCmd {
+			if download.Message.Author != nil {
+				userID = download.Message.Author.ID
+			}
 		}
 		// Store in db
+		chID := "0"
+		if !download.EmojiCmd {
+			chID = download.Message.ChannelID
+		}
 		err = dbInsertDownload(&downloadItem{
 			URL:         download.InputURL,
 			Time:        time.Now(),
 			Destination: completePath,
 			Filename:    download.Filename,
-			ChannelID:   download.Message.ChannelID,
+			ChannelID:   chID,
 			UserID:      userID,
 		})
 		if err != nil {
@@ -1144,7 +1169,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// React
-		{
+		if !download.EmojiCmd {
 			shouldReact := config.ReactWhenDownloaded
 			if sourceConfig.ReactWhenDownloaded != nil {
 				shouldReact = *sourceConfig.ReactWhenDownloaded

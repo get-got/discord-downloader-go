@@ -15,7 +15,6 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hashicorp/go-version v1.6.0
-	github.com/kennygrant/sanitize v1.2.4
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0
 	github.com/n0madic/twitter-scraper v0.0.0-20230711213008-94503a2bc36c
 	github.com/rivo/duplo v0.0.0-20220703183130-751e882e6b83
