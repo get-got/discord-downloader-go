@@ -92,7 +92,7 @@ func wrapHyphens(i string, l int) string {
 }
 
 func wrapHyphensW(i string) string {
-	return wrapHyphens(i, 80)
+	return wrapHyphens(i, 90)
 }
 
 func stripSymbols(i string) string {

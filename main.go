@@ -26,11 +26,21 @@ import (
 )
 
 var (
-	err error
+	// General
+	err                error
+	loop               chan os.Signal
+	mainWg             sync.WaitGroup
+	startTime          time.Time
+	ddgUpdateAvailable bool = false
 
-	mainWg sync.WaitGroup
+	// Downloads
+	timeLastUpdated      time.Time
+	timeLastDownload     time.Time
+	timeLastMessage      time.Time
+	cachedDownloadID     int
+	configReloadLastTime time.Time
 
-	// Bot
+	// Discord
 	bot         *discordgo.Session
 	botUser     *discordgo.User
 	botCommands *exrouter.Route
@@ -46,15 +56,6 @@ var (
 	twitterScraper     *twitterscraper.Scraper
 	instagramConnected bool = false
 	instagramClient    *goinsta.Instagram
-
-	// Gen
-	loop                 chan os.Signal
-	startTime            time.Time
-	timeLastUpdated      time.Time
-	timeLastDownload     time.Time
-	timeLastMessage      time.Time
-	cachedDownloadID     int
-	configReloadLastTime time.Time
 
 	// Validation
 	invalidAdminChannels []string
@@ -78,7 +79,7 @@ func init() {
 	//#region Initialize Logging
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	log.SetOutput(color.Output)
-	log.Println(color.HiCyanString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
+	log.Println(color.HiGreenString(wrapHyphensW(fmt.Sprintf("Welcome to %s v%s", projectName, projectVersion))))
 	//#endregion
 
 	//#region Initialize Variables
@@ -95,23 +96,9 @@ func init() {
 
 	//#region Github Update Check
 	if config.GithubUpdateChecking {
-		if !isLatestGithubRelease() {
-			log.Println(lg("Version", "UPDATE", color.HiCyanString, "***\tUPDATE AVAILABLE\t***"))
-			log.Println(lg("Version", "UPDATE", color.CyanString, projectRepoURL+"/releases/latest"))
-			log.Println(lg("Version", "UPDATE", color.HiCyanString,
-				fmt.Sprintf("You are on v%s, latest is %s", projectVersion, latestGithubRelease),
-			))
-			log.Println(lg("Version", "UPDATE", color.HiCyanString, "*** See changelog for information ***"))
-			log.Println(lg("Version", "UPDATE", color.HiCyanString, "CHECK ALL CHANGELOGS SINCE YOUR LAST UPDATE"))
-			log.Println(lg("Version", "UPDATE", color.HiCyanString, "SOME SETTINGS MAY NEED TO BE UPDATED"))
-			time.Sleep(5 * time.Second)
-		}
+		ddgUpdateAvailable = !isLatestGithubRelease()
 	}
 	//#endregion
-
-	log.Println(lg("Version", "", color.CyanString, versions(false)))
-
-	log.Println(lg("Info", "", color.HiCyanString, "** Need help? Discord: https://discord.gg/6Z6FJZVaDV **"))
 }
 
 func main() {
@@ -123,13 +110,13 @@ func main() {
 
 	// Output Flag Warnings
 	if config.Verbose {
-		log.Println(lg("Info", "", color.HiBlueString, "VERBOSE OUTPUT ENABLED ... just some extra info..."))
+		log.Println(lg("VERBOSE", "", color.HiBlueString, "VERBOSE OUTPUT ENABLED ... just some extra info..."))
 	}
 	if config.Debug {
-		log.Println(lg("Info", "", color.HiYellowString, "DEBUGGING OUTPUT ENABLED ... some troubleshooting data..."))
+		log.Println(lg("DEBUG", "", color.HiYellowString, "DEBUGGING OUTPUT ENABLED ... some troubleshooting data..."))
 	}
 	if config.DebugExtra {
-		log.Println(lg("Info", "", color.YellowString, "EXTRA DEBUGGING OUTPUT ENABLED ... some in-depth troubleshooting data..."))
+		log.Println(lg("DEBUG2", "", color.YellowString, "EXTRA DEBUGGING OUTPUT ENABLED ... some in-depth troubleshooting data..."))
 	}
 
 	mainWg.Wait() // wait because credentials from config
@@ -223,12 +210,40 @@ func main() {
 
 	mainWg.Wait() // Once complete, bot is functional
 
+	//#region Misc Startup Output - Github Update Notification, Version, Discord Invite
+
+	log.Println(lg("Version", "", color.MagentaString, versions(false)))
+
+	if config.GithubUpdateChecking {
+		if ddgUpdateAvailable {
+			log.Println(lg("Version", "UPDATE", color.HiGreenString, "***\tUPDATE AVAILABLE\t***"))
+			log.Println(lg("Version", "UPDATE", color.HiGreenString, "DOWNLOAD:\n\n"+projectRepoURL+"/releases/latest\n\n"))
+			log.Println(lg("Version", "UPDATE", color.HiGreenString,
+				fmt.Sprintf("You are on v%s, latest is %s", projectVersion, latestGithubRelease),
+			))
+			log.Println(lg("Version", "UPDATE", color.GreenString, "*** See changelogs for information ***"))
+			log.Println(lg("Version", "UPDATE", color.GreenString, "Check ALL changelogs since your last update!"))
+			log.Println(lg("Version", "UPDATE", color.HiGreenString, "SOME SETTINGS-BREAKING CHANGES MAY HAVE OCCURED!!"))
+			time.Sleep(5 * time.Second)
+		} else {
+			if "v"+projectVersion == latestGithubRelease {
+				log.Println(lg("Version", "UPDATE", color.GreenString, "You are on the latest version, v%s", projectVersion))
+			} else {
+				log.Println(lg("Version", "UPDATE", color.GreenString, "No updates available, you are on v%s, latest is %s", projectVersion, latestGithubRelease))
+			}
+		}
+	}
+
+	log.Println(lg("Info", "", color.HiCyanString, "** NEED HELP? discord-downloader-go Discord Server: https://discord.gg/6Z6FJZVaDV **"))
+
+	//#endregion
+
 	//#region MAIN STARTUP COMPLETE, BOT IS FUNCTIONAL
 
-	if config.Debug {
-		log.Println(lg("Main", "", color.YellowString, "Startup finished, took %s...", uptime()))
+	if config.Verbose {
+		log.Println(lg("Verbose", "Startup", color.HiBlueString, "Startup finished, took %s...", uptime()))
 	}
-	log.Println(lg("Main", "", color.HiCyanString,
+	log.Println(lg("Main", "", color.HiGreenString,
 		wrapHyphensW(fmt.Sprintf("%s v%s is online with access to %d server%s",
 			projectLabel, projectVersion, len(bot.State.Guilds), pluralS(len(bot.State.Guilds))))))
 	log.Println(lg("Main", "", color.RedString, "CTRL+C to exit..."))
@@ -479,8 +494,8 @@ func main() {
 
 	//#region BG STARTUP COMPLETE
 
-	if config.Debug {
-		log.Println(lg("Main", "", color.YellowString, "Background startup tasks finished, took %s...", uptime()))
+	if config.Verbose {
+		log.Println(lg("Verbose", "Startup", color.HiBlueString, "Background task startup finished, took %s...", uptime()))
 	}
 
 	//#endregion
@@ -488,7 +503,7 @@ func main() {
 	//#region Download Emojis & Stickers
 
 	go func() {
-		time.Sleep(3 * time.Second)
+		time.Sleep(5 * time.Second)
 
 		dataKeysEmoji := func(emoji discordgo.Emoji, serverID string) string {
 			ret := config.EmojisFilenameFormat
@@ -690,7 +705,7 @@ func openDatabase() {
 	var openT time.Time
 	var createT time.Time
 	// Database
-	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a second...)"))
+	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a bit...)"))
 	openT = time.Now()
 	myDB, err = db.OpenDB(pathDatabaseBase)
 	if err != nil {
@@ -706,7 +721,7 @@ func openDatabase() {
 		}
 		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database...\t(took %s)", timeSinceShort(createT)))
 		//
-		log.Println(lg("Database", "Setup", color.YellowString, "Indexing database, please wait..."))
+		log.Println(lg("Database", "Setup", color.YellowString, "Structuring database, please wait..."))
 		createT = time.Now()
 		indexColumn := func(col string) {
 			if err := myDB.Use("Downloads").Index([]string{col}); err != nil {
@@ -717,7 +732,7 @@ func openDatabase() {
 		indexColumn("URL")
 		indexColumn("ChannelID")
 		indexColumn("UserID")
-		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new indexes...\t(took %s)", timeSinceShort(createT)))
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created database structure...\t(took %s)", timeSinceShort(createT)))
 	}
 	// Cache download tally
 	cachedDownloadID = dbDownloadCount()
@@ -725,6 +740,7 @@ func openDatabase() {
 
 	// Duplo
 	if config.Duplo || sourceHasDuplo {
+		log.Println(lg("Duplo", "", color.HiRedString, "!!! Duplo is barely supported and may cause issues, use at your own risk..."))
 		duploCatalog = duplo.New()
 		if _, err := os.Stat(pathCacheDuplo); err == nil {
 			log.Println(lg("Duplo", "", color.YellowString, "Opening duplo image catalog..."))
@@ -1028,17 +1044,19 @@ do_discord_login:
 		botReady = true
 		log.Println(lg("Discord", "", color.HiGreenString, "Logged into %s", getUserIdentifier(*botUser)))
 		if botUser.Bot {
-			log.Println(lg("Discord", "Info", color.MagentaString, "This is a genuine Discord Bot Application"))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ Presence details & state are disabled, only activity label will work."))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ The bot can only see servers you have added it to. Usually you need to be admin or know an admin."))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ Nothing is wrong, this is just info :)"))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "GENUINE DISCORD BOT APPLICATION"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ This is the safest way to use this bot."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ PRESENCE: Details don't work. Only activity and status."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ VISIBILITY: You can only see servers you have added the bot to, which requires you to be an admin or have an admin invite the bot."))
 		} else {
-			log.Println(lg("Discord", "Info", color.MagentaString, "This is a User Account (Self-Bot)"))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ Discord does not allow Automated User Accounts (Self-Bots), so by using this bot you potentially risk account termination."))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ See GitHub page for link to Discord's official statement."))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ If you wish to avoid this, use a Bot Application if possible."))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ But since you're using a self-bot, you can download from any channels this account can access."))
-			log.Println(lg("Discord", "Info", color.MagentaString, "~ Nothing is wrong, this is just info :)"))
+			log.Println(lg("Discord", "Info", color.HiYellowString, "!!! USER ACCOUNT / SELF-BOT !!!"))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "~ WARNING: Discord does NOT ALLOW automated user accounts (aka Self-Bots)."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ By using this bot application with a user account, you potentially risk account termination."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ See the GitHub page for link to Discord's official statement."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ IF YOU WISH TO AVOID THIS, USE A BOT APPLICATION IF POSSIBLE."))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "~ DISCORD API BUGS MAY OCCUR - KNOWN ISSUES:"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ Can't see active threads, only archived threads."))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "~ VISIBILITY: You can download from any channels/servers this account has access to."))
 		}
 	}
 	if bot.State.User != nil { // is selfbot
@@ -1056,7 +1074,7 @@ do_discord_login:
 
 	//(SV) Source Validation
 	if config.Debug {
-		log.Println(lg("Discord", "Validation", color.HiYellowString, "Validating configured sources..."))
+		log.Println(lg("Debug", "Discord Validation", color.GreenString, "Validating your configured Discord sources..."))
 	}
 	//(SV) Check Admin Channels
 	if config.AdminChannels != nil {
@@ -1189,7 +1207,7 @@ do_discord_login:
 		}
 		sendErrorMessage(logMsg)
 	} else if config.Debug {
-		log.Println(lg("Discord", "Validation", color.HiGreenString, "All sources successfully validated!"))
+		log.Println(lg("Debug", "Discord Validation", color.HiGreenString, "No issues detected! Bot has access to all configured sources."))
 	}
 
 	mainWg.Done()

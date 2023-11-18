@@ -688,10 +688,10 @@ func loadConfig() error {
 
 		allString := ""
 		if config.All != nil {
-			allString = ", ALL ENABLED"
+			allString = ", ALL GROUP ENABLED"
 		}
 		log.Println(lg("Settings", "", color.HiYellowString,
-			"Loaded - bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
+			"Finished loading ... bound to %d channel%s, %d categories, %d server%s, %d user%s%s",
 			getBoundChannelsCount(), pluralS(getBoundChannelsCount()),
 			getBoundCategoriesCount(),
 			getBoundServersCount(), pluralS(getBoundServersCount()),

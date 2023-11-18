@@ -655,8 +655,8 @@ func sendStatusMessage(status sendStatusType) {
 			}
 			// Send
 			if config.Debug {
-				log.Println(lg("Debug", "Status", color.HiCyanString, "Sending log for %s to admin channel %s",
-					label, adminChannel.ChannelID))
+				log.Println(lg("Debug", "Bot Status", color.YellowString, "Sending log for %s to admin channel %s",
+					strings.ToUpper(label), adminChannel.ChannelID))
 			}
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot {
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID,
@@ -664,8 +664,8 @@ func sendStatusMessage(status sendStatusType) {
 			} else if hasPerms(adminChannel.ChannelID, discordgo.PermissionSendMessages) {
 				bot.ChannelMessageSend(adminChannel.ChannelID, message)
 			} else {
-				log.Println(lg("Debug", "Status", color.HiRedString, "Perms checks failed for sending status log to %s",
-					adminChannel.ChannelID))
+				log.Println(lg("Debug", "Bot Status", color.HiRedString, "Perms checks failed for sending %s status log to %s",
+					strings.ToUpper(label), adminChannel.ChannelID))
 			}
 		}
 	}
