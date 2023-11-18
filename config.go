@@ -383,7 +383,7 @@ type configurationSource struct {
 	SendHistoryStatus     *bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
 
 	// Rules for Saving
-	Subfolders             *[]string                   `json:"subfolders" yaml:"subfolders"`
+	Subfolders             *[]string                   `json:"subfolders,omitempty" yaml:"subfolders,omitempty"`
 	FilenameDateFormat     *string                     `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat         *string                     `json:"filenameFormat" yaml:"filenameFormat"`
 	SaveImages             *bool                       `json:"saveImages" yaml:"saveImages"`
@@ -909,179 +909,179 @@ func createConfig() {
 	}
 }
 
-func sourceDefault(channel *configurationSource) {
+func sourceDefault(source *configurationSource) {
 	// These have to use the default variables since literal values and consts can't be set to the pointers
 
 	// Setup
-	if channel.Enabled == nil {
-		channel.Enabled = &defSource_Enabled
+	if source.Enabled == nil {
+		source.Enabled = &defSource_Enabled
 	}
-	if channel.Save == nil {
-		channel.Save = &config.Save
+	if source.Save == nil {
+		source.Save = &config.Save
 	}
-	if channel.AllowCommands == nil {
-		channel.AllowCommands = &config.AllowCommands
+	if source.AllowCommands == nil {
+		source.AllowCommands = &config.AllowCommands
 	}
-	if channel.SendErrorMessages == nil {
-		channel.SendErrorMessages = &config.SendErrorMessages
+	if source.SendErrorMessages == nil {
+		source.SendErrorMessages = &config.SendErrorMessages
 	}
-	if channel.ScanEdits == nil {
-		channel.ScanEdits = &config.ScanEdits
+	if source.ScanEdits == nil {
+		source.ScanEdits = &config.ScanEdits
 	}
-	if channel.IgnoreBots == nil {
-		channel.IgnoreBots = &config.IgnoreBots
-	}
-
-	if channel.SendErrorMessages == nil {
-		channel.SendErrorMessages = &config.SendErrorMessages
-	}
-	if channel.SendFileToChannel == nil && config.SendFileToChannel != "" {
-		channel.SendFileToChannel = &config.SendFileToChannel
-	}
-	if channel.SendFileToChannels == nil && config.SendFileToChannels != nil {
-		channel.SendFileToChannels = &config.SendFileToChannels
-	}
-	if channel.SendFileDirectly == nil {
-		channel.SendFileDirectly = &config.SendFileDirectly
-	}
-	if channel.SendFileCaption == nil && config.SendFileCaption != "" {
-		channel.SendFileCaption = &config.SendFileCaption
+	if source.IgnoreBots == nil {
+		source.IgnoreBots = &config.IgnoreBots
 	}
 
-	if channel.FilenameDateFormat == nil {
-		channel.FilenameDateFormat = &config.FilenameDateFormat
+	if source.SendErrorMessages == nil {
+		source.SendErrorMessages = &config.SendErrorMessages
 	}
-	if channel.FilenameFormat == nil {
-		channel.FilenameFormat = &config.FilenameFormat
+	if source.SendFileToChannel == nil && config.SendFileToChannel != "" {
+		source.SendFileToChannel = &config.SendFileToChannel
+	}
+	if source.SendFileToChannels == nil && config.SendFileToChannels != nil {
+		source.SendFileToChannels = &config.SendFileToChannels
+	}
+	if source.SendFileDirectly == nil {
+		source.SendFileDirectly = &config.SendFileDirectly
+	}
+	if source.SendFileCaption == nil && config.SendFileCaption != "" {
+		source.SendFileCaption = &config.SendFileCaption
+	}
+
+	if source.FilenameDateFormat == nil {
+		source.FilenameDateFormat = &config.FilenameDateFormat
+	}
+	if source.FilenameFormat == nil {
+		source.FilenameFormat = &config.FilenameFormat
 	}
 
 	// Appearance
-	if channel.PresenceEnabled == nil {
-		channel.PresenceEnabled = &config.PresenceEnabled
+	if source.PresenceEnabled == nil {
+		source.PresenceEnabled = &config.PresenceEnabled
 	}
-	if channel.ReactWhenDownloaded == nil {
-		channel.ReactWhenDownloaded = &config.ReactWhenDownloaded
+	if source.ReactWhenDownloaded == nil {
+		source.ReactWhenDownloaded = &config.ReactWhenDownloaded
 	}
-	if channel.ReactWhenDownloadedEmoji == nil && config.ReactWhenDownloadedEmoji != nil {
-		channel.ReactWhenDownloadedEmoji = config.ReactWhenDownloadedEmoji
+	if source.ReactWhenDownloadedEmoji == nil && config.ReactWhenDownloadedEmoji != nil {
+		source.ReactWhenDownloadedEmoji = config.ReactWhenDownloadedEmoji
 	}
-	if channel.ReactWhenDownloadedHistory == nil {
-		channel.ReactWhenDownloadedHistory = &config.ReactWhenDownloadedHistory
+	if source.ReactWhenDownloadedHistory == nil {
+		source.ReactWhenDownloadedHistory = &config.ReactWhenDownloadedHistory
 	}
-	if channel.BlacklistReactEmojis == nil {
-		channel.BlacklistReactEmojis = &[]string{}
+	if source.BlacklistReactEmojis == nil {
+		source.BlacklistReactEmojis = &[]string{}
 	}
-	if channel.HistoryTyping == nil && config.HistoryTyping {
-		channel.HistoryTyping = &config.HistoryTyping
+	if source.HistoryTyping == nil && config.HistoryTyping {
+		source.HistoryTyping = &config.HistoryTyping
 	}
-	if channel.EmbedColor == nil && config.EmbedColor != nil {
-		channel.EmbedColor = config.EmbedColor
+	if source.EmbedColor == nil && config.EmbedColor != nil {
+		source.EmbedColor = config.EmbedColor
 	}
 
 	// History
-	if channel.AutoHistory == nil {
-		channel.AutoHistory = &config.AutoHistory
+	if source.AutoHistory == nil {
+		source.AutoHistory = &config.AutoHistory
 	}
-	if channel.AutoHistoryBefore == nil {
-		channel.AutoHistoryBefore = &config.AutoHistoryBefore
+	if source.AutoHistoryBefore == nil {
+		source.AutoHistoryBefore = &config.AutoHistoryBefore
 	}
-	if channel.AutoHistorySince == nil {
-		channel.AutoHistorySince = &config.AutoHistorySince
+	if source.AutoHistorySince == nil {
+		source.AutoHistorySince = &config.AutoHistorySince
 	}
-	if channel.SendAutoHistoryStatus == nil {
-		channel.SendAutoHistoryStatus = &config.SendAutoHistoryStatus
+	if source.SendAutoHistoryStatus == nil {
+		source.SendAutoHistoryStatus = &config.SendAutoHistoryStatus
 	}
-	if channel.SendHistoryStatus == nil {
-		channel.SendHistoryStatus = &config.SendHistoryStatus
+	if source.SendHistoryStatus == nil {
+		source.SendHistoryStatus = &config.SendHistoryStatus
 	}
 
 	// Rules for Saving
-	if channel.DelayHandling == nil && config.DelayHandling != 0 {
-		channel.DelayHandling = &config.DelayHandling
+	if source.DelayHandling == nil && config.DelayHandling != 0 {
+		source.DelayHandling = &config.DelayHandling
 	}
-	if channel.DelayHandlingHistory == nil && config.DelayHandlingHistory != 0 {
-		channel.DelayHandlingHistory = &config.DelayHandlingHistory
+	if source.DelayHandlingHistory == nil && config.DelayHandlingHistory != 0 {
+		source.DelayHandlingHistory = &config.DelayHandlingHistory
 	}
-	if channel.Subfolders == nil {
-		channel.Subfolders = &config.Subfolders
+	if source.Subfolders == nil {
+		source.Subfolders = &config.Subfolders
 	}
-	if channel.SaveImages == nil {
-		channel.SaveImages = &config.SaveImages
+	if source.SaveImages == nil {
+		source.SaveImages = &config.SaveImages
 	}
-	if channel.SaveVideos == nil {
-		channel.SaveVideos = &config.SaveVideos
+	if source.SaveVideos == nil {
+		source.SaveVideos = &config.SaveVideos
 	}
-	if channel.SaveAudioFiles == nil {
-		channel.SaveAudioFiles = &config.SaveAudioFiles
+	if source.SaveAudioFiles == nil {
+		source.SaveAudioFiles = &config.SaveAudioFiles
 	}
-	if channel.SaveTextFiles == nil {
-		channel.SaveTextFiles = &config.SaveTextFiles
+	if source.SaveTextFiles == nil {
+		source.SaveTextFiles = &config.SaveTextFiles
 	}
-	if channel.SaveOtherFiles == nil {
-		channel.SaveOtherFiles = &config.SaveOtherFiles
+	if source.SaveOtherFiles == nil {
+		source.SaveOtherFiles = &config.SaveOtherFiles
 	}
-	if channel.SavePossibleDuplicates == nil {
-		channel.SavePossibleDuplicates = &config.SavePossibleDuplicates
+	if source.SavePossibleDuplicates == nil {
+		source.SavePossibleDuplicates = &config.SavePossibleDuplicates
 	}
-	if channel.Filters == nil {
-		channel.Filters = &configurationSourceFilters{}
+	if source.Filters == nil {
+		source.Filters = &configurationSourceFilters{}
 	}
-	if channel.Filters.BlockedExtensions == nil && config.Filters.BlockedExtensions != nil {
-		channel.Filters.BlockedExtensions = config.Filters.BlockedExtensions
+	if source.Filters.BlockedExtensions == nil && config.Filters.BlockedExtensions != nil {
+		source.Filters.BlockedExtensions = config.Filters.BlockedExtensions
 	}
-	if channel.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
-		channel.Filters.BlockedPhrases = config.Filters.BlockedPhrases
+	if source.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
+		source.Filters.BlockedPhrases = config.Filters.BlockedPhrases
 	}
-	if channel.Duplo == nil && config.Duplo {
-		channel.Duplo = &config.Duplo
+	if source.Duplo == nil && config.Duplo {
+		source.Duplo = &config.Duplo
 	}
-	if channel.DuploThreshold == nil && config.DuploThreshold != 0 {
-		channel.DuploThreshold = &config.DuploThreshold
+	if source.DuploThreshold == nil && config.DuploThreshold != 0 {
+		source.DuploThreshold = &config.DuploThreshold
 	}
 
 	// Misc Rules
-	if channel.LogLinks != nil {
-		if channel.LogLinks.DestinationIsFolder == nil {
-			channel.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
+	if source.LogLinks != nil {
+		if source.LogLinks.DestinationIsFolder == nil {
+			source.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
 		}
-		if channel.LogLinks.DivideLogsByServer == nil {
-			channel.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
+		if source.LogLinks.DivideLogsByServer == nil {
+			source.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
 		}
-		if channel.LogLinks.DivideLogsByChannel == nil {
-			channel.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
+		if source.LogLinks.DivideLogsByChannel == nil {
+			source.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
 		}
-		if channel.LogLinks.DivideLogsByUser == nil {
-			channel.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
+		if source.LogLinks.DivideLogsByUser == nil {
+			source.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
 		}
-		if channel.LogLinks.DivideLogsByStatus == nil {
-			channel.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
+		if source.LogLinks.DivideLogsByStatus == nil {
+			source.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
 		}
-		if channel.LogLinks.LogDownloads == nil {
-			channel.LogLinks.LogDownloads = &defSourceLog_LogDownloads
+		if source.LogLinks.LogDownloads == nil {
+			source.LogLinks.LogDownloads = &defSourceLog_LogDownloads
 		}
-		if channel.LogLinks.LogFailures == nil {
-			channel.LogLinks.LogFailures = &defSourceLog_LogFailures
+		if source.LogLinks.LogFailures == nil {
+			source.LogLinks.LogFailures = &defSourceLog_LogFailures
 		}
 	}
 
-	if channel.LogMessages != nil {
-		if channel.LogMessages.DestinationIsFolder == nil {
-			channel.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
+	if source.LogMessages != nil {
+		if source.LogMessages.DestinationIsFolder == nil {
+			source.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
 		}
-		if channel.LogMessages.DivideLogsByServer == nil {
-			channel.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
+		if source.LogMessages.DivideLogsByServer == nil {
+			source.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
 		}
-		if channel.LogMessages.DivideLogsByChannel == nil {
-			channel.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
+		if source.LogMessages.DivideLogsByChannel == nil {
+			source.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
 		}
-		if channel.LogMessages.DivideLogsByUser == nil {
-			channel.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
+		if source.LogMessages.DivideLogsByUser == nil {
+			source.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
 		}
 	}
 
 	// LAZY CHECKS
-	if channel.Duplo != nil {
-		if *channel.Duplo {
+	if source.Duplo != nil {
+		if *source.Duplo {
 			sourceHasDuplo = true
 		}
 	}

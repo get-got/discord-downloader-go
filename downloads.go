@@ -997,69 +997,71 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			}
 
 			// Subfolder Division - Format Subfolders
-			subfolders := *sourceConfig.Subfolders
-			for index, subfolder := range *sourceConfig.Subfolders {
-				if strings.Contains(subfolder, "{{") && strings.Contains(subfolder, "}}") {
-					keys := [][]string{
-						{"{{year}}",
-							fmt.Sprint(download.Message.Timestamp.Year())},
-						{"{{monthNum}}",
-							fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
-						{"{{dayOfMonth}}",
-							fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
-						{"{{hour}}",
-							fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
+			if sourceConfig.Subfolders != nil {
+				subfolders := *sourceConfig.Subfolders
+				for index, subfolder := range *sourceConfig.Subfolders {
+					fmtSubfolder := subfolder
+					if strings.Contains(subfolder, "{{") && strings.Contains(subfolder, "}}") {
+						keys := [][]string{
+							{"{{year}}",
+								fmt.Sprint(download.Message.Timestamp.Year())},
+							{"{{monthNum}}",
+								fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
+							{"{{dayOfMonth}}",
+								fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
+							{"{{hour}}",
+								fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
 
-						{"{{serverID}}",
-							sourceGuildID},
-						{"{{serverName}}",
-							clearPath(sourceName)},
+							{"{{serverID}}",
+								sourceGuildID},
+							{"{{serverName}}",
+								clearPath(sourceName)},
 
-						{"{{categoryID}}",
-							sourceParentID},
-						{"{{categoryName}}",
-							clearPath(sourceParentName)},
+							{"{{categoryID}}",
+								sourceParentID},
+							{"{{categoryName}}",
+								clearPath(sourceParentName)},
 
-						{"{{channelID}}",
-							download.Message.ChannelID},
-						{"{{channelName}}",
-							clearPath(sourceChannelName)},
+							{"{{channelID}}",
+								download.Message.ChannelID},
+							{"{{channelName}}",
+								clearPath(sourceChannelName)},
 
-						{"{{userID}}",
-							download.Message.Author.ID},
-						{"{{userName}}",
-							download.Message.Author.Username},
+							{"{{userID}}",
+								download.Message.Author.ID},
+							{"{{userName}}",
+								download.Message.Author.Username},
 
-						{"{{fileType}}",
-							contentTypeBase + "s"},
-						{"{{message}}",
-							download.Message.Content},
-						{"{{messageID}}",
-							download.Message.ID},
-					}
-					for _, key := range keys {
-						if strings.Contains(subfolder, key[0]) {
-							subfolder = strings.ReplaceAll(subfolder, key[0], key[1])
+							{"{{fileType}}",
+								contentTypeBase + "s"},
+							{"{{message}}",
+								download.Message.Content},
+							{"{{messageID}}",
+								download.Message.ID},
+						}
+						for _, key := range keys {
+							if strings.Contains(fmtSubfolder, key[0]) {
+								fmtSubfolder = strings.ReplaceAll(fmtSubfolder, key[0], key[1])
+							}
 						}
 					}
+					subfolders[index] = fmtSubfolder
 				}
-				subfolders[index] = subfolder
-			}
 
-			// Subfolder Dividion - Handle Formatted Subfolders
-			subpath := ""
-			for _, subfolder := range subfolders {
-				subpath = subpath + subfolder + string(os.PathSeparator)
-				// Create folder
-				if err := os.MkdirAll(download.Path+subpath, 0755); err != nil {
-					log.Println(lg("Download", "", color.HiRedString,
-						"Error while creating subfolder \"%s\": %s", download.Path+subpath, err))
-					return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
+				// Subfolder Dividion - Handle Formatted Subfolders
+				subpath := ""
+				for _, subfolder := range subfolders {
+					subpath = subpath + subfolder + string(os.PathSeparator)
+					// Create folder
+					if err := os.MkdirAll(download.Path+subpath, 0755); err != nil {
+						log.Println(lg("Download", "", color.HiRedString,
+							"Error while creating subfolder \"%s\": %s", download.Path+subpath, err))
+						return mDownloadStatus(downloadFailedCreatingSubfolder, err), 0
+					}
 				}
+				// Format Path
+				download.Path = download.Path + string(os.PathSeparator) + subpath // overwrite with new destination path
 			}
-
-			// Format Path
-			download.Path = download.Path + subpath // overwrite with new destination path
 		}
 		completePath := filepath.Clean(download.Path + download.Filename)
 
