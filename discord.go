@@ -403,6 +403,106 @@ func dataKeysDownload(sourceConfig configurationSource, download downloadRequest
 	return dataKeys(ret)
 }
 
+func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
+	ret := input
+	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
+		// Basic message data
+		keys := [][]string{
+			{"{{year}}",
+				fmt.Sprint(m.Timestamp.Year())},
+			{"{{monthNum}}",
+				fmt.Sprintf("%02d", m.Timestamp.Month())},
+			{"{{dayOfMonth}}",
+				fmt.Sprintf("%02d", m.Timestamp.Day())},
+			{"{{hour}}",
+				fmt.Sprintf("%02d", m.Timestamp.Hour())},
+			{"{{minute}}",
+				fmt.Sprintf("%02d", m.Timestamp.Minute())},
+			{"{{second}}",
+				fmt.Sprintf("%02d", m.Timestamp.Second())},
+			{"{{timestamp}}", discordSnowflakeToTimestamp(m.ID, "2006-01-02 15-04-05")},
+			{"{{timestampYYYYMMDD}}", discordSnowflakeToTimestamp(m.ID, "2006-01-02")},
+			{"{{timestampHHMMSS}}", discordSnowflakeToTimestamp(m.ID, "15-04-05")},
+			{"{{messageID}}", m.ID},
+			{"{{channelID}}", m.ChannelID},
+			{"{{serverID}}", m.GuildID},
+		}
+		// Author data if present
+		if m.Author != nil {
+			keys = append(keys, [][]string{
+				{"{{userID}}", m.Author.ID},
+				{"{{username}}", m.Author.Username},
+				{"{{userDisc}}", m.Author.Discriminator},
+			}...)
+		}
+		// Lookup server
+		if srv, err := bot.Guild(m.GuildID); err == nil {
+			keys = append(keys, [][]string{
+				{"{{serverName}}", srv.Name},
+			}...)
+		}
+		// Lookup channel
+		var ch *discordgo.Channel = nil
+		ch, err := bot.State.Channel(m.ChannelID)
+		if err != nil {
+			ch, _ = bot.Channel(m.ChannelID)
+		}
+		if ch != nil {
+			keys = append(keys, [][]string{
+				{"{{channelName}}", ch.Name},
+				{"{{channelTopic}}", ch.Topic},
+			}...)
+			// Lookup parent channel
+			if ch.ParentID != "" {
+				if cat, err := bot.State.Channel(ch.ParentID); err == nil {
+					if cat.Type == discordgo.ChannelTypeGuildCategory {
+						keys = append(keys, [][]string{
+							{"{{categoryID}}", cat.ID},
+							{"{{categoryName}}", cat.Name},
+						}...)
+					} else if cat.Type == discordgo.ChannelTypeGuildText ||
+						cat.Type == discordgo.ChannelTypeGuildForum ||
+						cat.Type == discordgo.ChannelTypeGuildNews {
+						keys = append(keys, [][]string{
+							{"{{threadID}}", ch.ID},
+							{"{{threadName}}", ch.Name},
+							{"{{threadTopic}}", ch.Topic},
+							{"{{forumID}}", cat.ID},
+							{"{{forumName}}", cat.Name},
+						}...)
+					}
+				}
+			}
+		}
+		for _, key := range keys {
+			if strings.Contains(ret, key[0]) {
+				ret = strings.ReplaceAll(ret, key[0], key[1])
+			}
+		}
+	}
+	return ret
+}
+
+func dataKeys_DownloadStatus(input string, status downloadStatusStruct, download downloadRequestStruct) string {
+	ret := input
+	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
+		// Basic message data
+		keys := [][]string{
+			{"{{downloadStatus}}", getDownloadStatusStringShort(status.Status)},
+			{"{{downloadStatusLong}}", getDownloadStatusString(status.Status)},
+			{"{{downloadFilename}}", download.Filename},
+			{"{{downloadExt}}", download.Extension},
+			{"{{downloadPath}}", download.Path},
+		}
+		for _, key := range keys {
+			if strings.Contains(ret, key[0]) {
+				ret = strings.ReplaceAll(ret, key[0], key[1])
+			}
+		}
+	}
+	return ret
+}
+
 func updateDiscordPresence() {
 	if config.PresenceEnabled {
 		// Vars

@@ -146,6 +146,19 @@ func getDownloadStatusString(status downloadStatus) string {
 	return "Unknown Error"
 }
 
+func getDownloadStatusStringShort(status downloadStatus) string {
+	if status >= downloadFailed {
+		return "FAILED"
+	} else if status >= downloadSkipped {
+		return "SKIPPED"
+	} else if status == downloadIgnored {
+		return "IGNORED"
+	} else if status == downloadSuccess {
+		return "DOWNLOADED"
+	}
+	return "UNKNOWN"
+}
+
 // Trim duplicate links in link list
 func trimDuplicateLinks(fileItems []*fileItem) []*fileItem {
 	var result []*fileItem
@@ -526,111 +539,109 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptySourceConfig {
 			if sourceConfig.LogLinks != nil {
 				if sourceConfig.LogLinks.Destination != "" {
-					logPath := sourceConfig.LogLinks.Destination
-					if *sourceConfig.LogLinks.DestinationIsFolder {
-						if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
-							logPath += string(os.PathSeparator)
+
+					encounteredErrors := false
+					savePath := sourceConfig.LogLinks.Destination + string(os.PathSeparator)
+
+					// Subfolder Division - Format Subfolders
+					if sourceConfig.LogLinks.Subfolders != nil {
+						subfolders := *sourceConfig.LogLinks.Subfolders
+						for index, subfolder := range *sourceConfig.LogLinks.Subfolders {
+							subfolders[index] = dataKeys_DiscordMessage(
+								dataKeys_DownloadStatus(subfolder, status, download),
+								download.Message)
 						}
-						err := os.MkdirAll(logPath, 0755)
-						if err == nil {
-							logPath += "Log_Links"
-							if *sourceConfig.LogLinks.DivideLogsByServer {
-								if download.Message.GuildID == "" {
-									ch, err := bot.State.Channel(download.Message.ChannelID)
-									if err == nil {
-										if ch.Type == discordgo.ChannelTypeDM {
-											logPath += " DM"
-										} else if ch.Type == discordgo.ChannelTypeGroupDM {
-											logPath += " GroupDM"
-										} else {
-											logPath += " Unknown"
-										}
-									} else {
-										logPath += " Unknown"
+
+						// Subfolder Dividion - Handle Formatted Subfolders
+						subpath := ""
+						for _, subfolder := range subfolders {
+							subpath = subpath + subfolder + string(os.PathSeparator)
+							// Create folder
+							if err := os.MkdirAll(filepath.Clean(savePath+subpath), 0755); err != nil {
+								log.Println(lg("LogLinks", "", color.HiRedString,
+									"Error while creating subfolder \"%s\": %s", savePath+subpath, err))
+								encounteredErrors = true
+							}
+						}
+						// Format Path
+						savePath = filepath.Clean(savePath + subpath) // overwrite with new destination path
+					}
+
+					if !encounteredErrors {
+						if _, err := os.Stat(savePath); err != nil {
+							log.Println(lg("Download", "LogLinks", color.HiRedString,
+								"Save path %s is invalid... %s", savePath, err))
+						} else {
+							filename := download.Message.ChannelID + ".txt"
+							if sourceConfig.LogLinks.FilenameFormat != nil {
+								if *sourceConfig.LogLinks.FilenameFormat != "" {
+									filename = dataKeys_DiscordMessage(
+										dataKeys_DownloadStatus(*sourceConfig.LogLinks.FilenameFormat, status, download),
+										download.Message)
+									// if extension presumed missing
+									if !strings.Contains(filename, ".") {
+										filename += ".txt"
 									}
-								} else {
-									logPath += " SID_" + download.Message.GuildID
 								}
 							}
-							if *sourceConfig.LogLinks.DivideLogsByChannel {
-								logPath += " CID_" + download.Message.ChannelID
+							logPath := filepath.Clean(savePath + string(os.PathSeparator) + filename)
+
+							// Format New Line
+							var newLine string
+							// Prepend
+							prefix := ""
+							if sourceConfig.LogLinks.LinePrefix != nil {
+								prefix = *sourceConfig.LogLinks.LinePrefix
 							}
-							if *sourceConfig.LogLinks.DivideLogsByUser {
-								logPath += " UID_" + download.Message.Author.ID
+							prefix = dataKeys_DiscordMessage(
+								dataKeys_DownloadStatus(prefix, status, download),
+								download.Message)
+
+							// Append
+							suffix := ""
+							if sourceConfig.LogLinks.LineSuffix != nil {
+								suffix = *sourceConfig.LogLinks.LineSuffix
 							}
-							if *sourceConfig.LogLinks.DivideLogsByStatus {
-								if status.Status >= downloadFailed {
-									logPath += " - FAILED"
-								} else if status.Status >= downloadSkipped {
-									logPath += " - SKIPPED"
-								} else if status.Status == downloadIgnored {
-									logPath += " - IGNORED"
-								} else if status.Status == downloadSuccess {
-									logPath += " - DOWNLOADED"
+							suffix = dataKeys_DiscordMessage(
+								dataKeys_DownloadStatus(suffix, status, download),
+								download.Message)
+							// New Line
+							newLine += "\n" + prefix + download.InputURL + suffix
+
+							// Read
+							currentLog := ""
+							if logfile, err := os.ReadFile(logPath); err == nil {
+								currentLog = string(logfile)
+							}
+							canLog := true
+							// Log Failures
+							if status.Status > downloadSuccess {
+								canLog = *sourceConfig.LogLinks.LogFailures // will not log if LogFailures is false
+							} else if *sourceConfig.LogLinks.LogDownloads { // Log Downloads
+								canLog = true
+							}
+							// Filter Duplicates
+							if sourceConfig.LogLinks.FilterDuplicates != nil {
+								if *sourceConfig.LogLinks.FilterDuplicates {
+									if strings.Contains(currentLog, newLine) {
+										canLog = false
+									}
 								}
 							}
-						}
-						logPath += ".txt"
-					}
-					// Read
-					currentLog, err := os.ReadFile(logPath)
-					currentLogS := ""
-					if err == nil {
-						currentLogS = string(currentLog)
-					}
-					// Writer
-					f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
-					if err != nil {
-						log.Println(lg("Download", "", color.RedString,
-							"[sourceConfig.LogLinks] Failed to open log file:\t%s", err))
-						f.Close()
-					}
-					defer f.Close()
 
-					var newLine string
-					shouldLog := true
+							if canLog {
+								// Writer
+								f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
+								if err != nil {
+									log.Println(lg("Download", "LogLinks", color.RedString, "[sourceConfig.LogLinks] Failed to open log file:\t%s", err))
+									f.Close()
+								}
+								defer f.Close()
 
-					// Log Failures
-					if status.Status > downloadSuccess {
-						shouldLog = *sourceConfig.LogLinks.LogFailures // will not log if LogFailures is false
-					} else if *sourceConfig.LogLinks.LogDownloads { // Log Downloads
-						shouldLog = true
-					}
-					// Filter Duplicates
-					if sourceConfig.LogLinks.FilterDuplicates != nil {
-						if *sourceConfig.LogLinks.FilterDuplicates {
-							if strings.Contains(currentLogS, download.InputURL) {
-								shouldLog = false
+								if _, err = f.WriteString(newLine); err != nil {
+									log.Println(lg("Download", "LogLinks", color.RedString, "[sourceConfig.LogLinks] Failed to append file:\t%s", err))
+								}
 							}
-						}
-					}
-					if shouldLog {
-						// Prepend
-						prefix := ""
-						if sourceConfig.LogLinks.Prefix != nil {
-							prefix = *sourceConfig.LogLinks.Prefix
-						}
-						// More Data
-						additionalInfo := ""
-						if sourceConfig.LogLinks.UserData != nil {
-							if *sourceConfig.LogLinks.UserData {
-								additionalInfo = fmt.Sprintf("[%s/%s] \"%s\"#%s (%s) @ %s: ",
-									download.Message.GuildID, download.Message.ChannelID,
-									download.Message.Author.Username, download.Message.Author.Discriminator, download.Message.Author.ID,
-									discordSnowflakeToTimestamp(download.Message.ID, "2006-01-02 15-04-05"))
-							}
-						}
-						// Append
-						suffix := ""
-						if sourceConfig.LogLinks.Suffix != nil {
-							suffix = *sourceConfig.LogLinks.Suffix
-						}
-						// New Line
-						newLine += "\n" + prefix + additionalInfo + download.InputURL + suffix
-
-						if _, err = f.WriteString(newLine); err != nil {
-							log.Println(lg("Download", "", color.RedString,
-								"[sourceConfig.LogLinks] Failed to append file:\t%s", err))
 						}
 					}
 				}

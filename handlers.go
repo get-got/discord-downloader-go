@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -108,114 +109,104 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 		// Log Messages to File
 		if sourceConfig.LogMessages != nil {
 			if sourceConfig.LogMessages.Destination != "" {
-				logPath := sourceConfig.LogMessages.Destination
-				if *sourceConfig.LogMessages.DestinationIsFolder {
-					if !strings.HasSuffix(logPath, string(os.PathSeparator)) {
-						logPath += string(os.PathSeparator)
-					}
-					err := os.MkdirAll(logPath, 0755)
-					if err == nil {
-						logPath += "Log_Messages"
-						if *sourceConfig.LogMessages.DivideLogsByServer {
-							if m.GuildID == "" {
-								ch, err := bot.State.Channel(m.ChannelID)
-								if err != nil && c != nil {
-									ch = c
-								}
-								if ch != nil {
-									if ch.Type == discordgo.ChannelTypeDM {
-										logPath += " DM"
-									} else if ch.Type == discordgo.ChannelTypeGroupDM {
-										logPath += " GroupDM"
-									} else if ch.Type == discordgo.ChannelTypeGuildText {
-										logPath += " Text"
-									} else if ch.Type == discordgo.ChannelTypeGuildCategory {
-										logPath += " Category"
-									} else if ch.Type == discordgo.ChannelTypeGuildForum {
-										logPath += " Forum"
-									} else if ch.Type == discordgo.ChannelTypeGuildPrivateThread || ch.Type == discordgo.ChannelTypeGuildPublicThread {
-										logPath += " Thread"
-									} else {
-										logPath += " Unknown"
-									}
+				encounteredErrors := false
+				savePath := sourceConfig.LogMessages.Destination + string(os.PathSeparator)
 
-									if ch.Name != "" {
-										logPath += " - " + clearPath(ch.Name) + " -"
-									} else if ch.Topic != "" {
-										logPath += " - " + clearPath(ch.Topic) + " -"
-									}
+				// Subfolder Division - Format Subfolders
+				if sourceConfig.LogMessages.Subfolders != nil {
+					subfolders := *sourceConfig.LogMessages.Subfolders
+					for index, subfolder := range *sourceConfig.LogMessages.Subfolders {
+						subfolders[index] = dataKeys_DiscordMessage(subfolder, m)
+					}
+
+					// Subfolder Dividion - Handle Formatted Subfolders
+					subpath := ""
+					for _, subfolder := range subfolders {
+						subpath = subpath + subfolder + string(os.PathSeparator)
+						// Create folder
+						if err := os.MkdirAll(filepath.Clean(savePath+subpath), 0755); err != nil {
+							log.Println(lg("LogMessages", "", color.HiRedString,
+								"Error while creating subfolder \"%s\": %s", savePath+subpath, err))
+							encounteredErrors = true
+						}
+					}
+					// Format Path
+					savePath = filepath.Clean(savePath + subpath) // overwrite with new destination path
+				}
+
+				if !encounteredErrors {
+					if _, err := os.Stat(savePath); err != nil {
+						log.Println(lg("LogMessages", "", color.HiRedString,
+							"Save path %s is invalid... %s", savePath, err))
+					} else {
+						filename := m.ChannelID + ".txt"
+						if sourceConfig.LogMessages.FilenameFormat != nil {
+							if *sourceConfig.LogMessages.FilenameFormat != "" {
+								filename = dataKeys_DiscordMessage(*sourceConfig.LogMessages.FilenameFormat, m)
+								// if extension presumed missing
+								if !strings.Contains(filename, ".") {
+									filename += ".txt"
 								}
-							} else {
-								logPath += " SID_" + m.GuildID
 							}
 						}
-						if *sourceConfig.LogMessages.DivideLogsByChannel {
-							logPath += " CID_" + m.ChannelID
-						}
-						if *sourceConfig.LogMessages.DivideLogsByUser {
-							logPath += " UID_" + m.Author.ID
-						}
-					}
-					logPath += ".txt"
-				}
-				// Read
-				currentLog, err := os.ReadFile(logPath)
-				currentLogS := ""
-				if err == nil {
-					currentLogS = string(currentLog)
-				}
-				canLog := true
-				// Filter Duplicates
-				if sourceConfig.LogMessages.FilterDuplicates != nil {
-					if *sourceConfig.LogMessages.FilterDuplicates {
-						if strings.Contains(currentLogS, fmt.Sprintf("[%s/%s/%s]", m.GuildID, m.ChannelID, m.ID)) {
-							canLog = false
-						}
-					}
-				}
+						logPath := filepath.Clean(savePath + string(os.PathSeparator) + filename)
 
-				if canLog {
-					// Writer
-					f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
-					if err != nil {
-						log.Println(lg("Message", "", color.RedString, "[sourceConfig.LogMessages] Failed to open log file:\t%s", err))
-						f.Close()
-					}
-					defer f.Close()
-
-					var newLine string
-					// Prepend
-					prefix := ""
-					if sourceConfig.LogMessages.Prefix != nil {
-						prefix = *sourceConfig.LogMessages.Prefix
-					}
-					// More Data
-					additionalInfo := ""
-					if sourceConfig.LogMessages.UserData != nil {
-						if *sourceConfig.LogMessages.UserData {
-							additionalInfo = fmt.Sprintf("[%s/%s/%s] \"%s\"#%s (%s) @ %s: ", m.GuildID, m.ChannelID, m.ID,
-								m.Author.Username, m.Author.Discriminator, m.Author.ID,
-								discordSnowflakeToTimestamp(m.ID, "2006-01-02 15-04-05"))
+						// Format New Line
+						var newLine string
+						// Prepend
+						prefix := ""
+						if sourceConfig.LogMessages.LinePrefix != nil {
+							prefix = *sourceConfig.LogMessages.LinePrefix
 						}
-					}
-					if len(m.Attachments) > 0 {
-						additionalInfo += fmt.Sprintf("<%d ATTACHMENTS> ", len(m.Attachments))
-					}
-					// Append
-					suffix := ""
-					if sourceConfig.LogMessages.Suffix != nil {
-						suffix = *sourceConfig.LogMessages.Suffix
-					}
-					// New Line
-					contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
-					if err == nil {
-						newLine += "\n" + prefix + additionalInfo + contentFmt + suffix
-					} else {
-						newLine += "\n" + prefix + additionalInfo + m.Content + suffix
-					}
+						prefix = dataKeys_DiscordMessage(prefix, m)
 
-					if _, err = f.WriteString(newLine); err != nil {
-						log.Println(lg("Message", "", color.RedString, "[sourceConfig.LogMessages] Failed to append file:\t%s", err))
+						// More Data
+						additionalInfo := ""
+						if len(m.Attachments) > 0 {
+							additionalInfo += fmt.Sprintf("<%d ATTACHMENTS> ", len(m.Attachments))
+						}
+						// Append
+						suffix := ""
+						if sourceConfig.LogMessages.LineSuffix != nil {
+							suffix = *sourceConfig.LogMessages.LineSuffix
+						}
+						suffix = dataKeys_DiscordMessage(suffix, m)
+						// New Line
+						contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
+						if err == nil {
+							newLine += "\n" + prefix + additionalInfo + contentFmt + suffix
+						} else {
+							newLine += "\n" + prefix + additionalInfo + m.Content + suffix
+						}
+
+						// Read
+						currentLog := ""
+						if logfile, err := os.ReadFile(logPath); err == nil {
+							currentLog = string(logfile)
+						}
+						canLog := true
+						// Filter Duplicates
+						if sourceConfig.LogMessages.FilterDuplicates != nil {
+							if *sourceConfig.LogMessages.FilterDuplicates {
+								if strings.Contains(currentLog, newLine) {
+									canLog = false
+								}
+							}
+						}
+
+						if canLog {
+							// Writer
+							f, err := os.OpenFile(logPath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0600)
+							if err != nil {
+								log.Println(lg("LogMessages", "", color.RedString, "[sourceConfig.LogMessages] Failed to open log file:\t%s", err))
+								f.Close()
+							}
+							defer f.Close()
+
+							if _, err = f.WriteString(newLine); err != nil {
+								log.Println(lg("Message", "", color.RedString, "[sourceConfig.LogMessages] Failed to append file:\t%s", err))
+							}
+						}
 					}
 				}
 			}

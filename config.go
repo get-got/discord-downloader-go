@@ -315,8 +315,8 @@ type configuration struct {
 	DuploThreshold         float64                     `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
 	// Misc Rules
-	//LogLinks    *configurationSourceLog `json:"logLinks,omitempty" yaml:"logLinks,omitempty"`
-	//LogMessages *configurationSourceLog `json:"logMessages,omitempty" yaml:"logMessages,omitempty"`
+	LogLinks    *configurationSourceLog `json:"logLinks,omitempty" yaml:"logLinks,omitempty"`
+	LogMessages *configurationSourceLog `json:"logMessages,omitempty" yaml:"logMessages,omitempty"`
 
 	// Sources
 	All                    *configurationSource  `json:"all,omitempty" yaml:"all,omitempty"`
@@ -427,28 +427,25 @@ type configurationSourceFilters struct {
 }
 
 var (
-	defSourceLog_DestinationIsFolder bool = false
-	defSourceLog_DivideLogsByServer  bool = true
-	defSourceLog_DivideLogsByChannel bool = true
-	defSourceLog_DivideLogsByUser    bool = false
-	defSourceLog_DivideLogsByStatus  bool = false
-	defSourceLog_LogDownloads        bool = true
-	defSourceLog_LogFailures         bool = true
+	defSourceLog_Subfolders     []string = []string{"{{year}}-{{monthNum}}-{{dayOfMonth}}"}
+	defSourceLog_FilenameFormat string   = "{{serverName}} - {{channelName}}.txt"
+	defSourceLog_LinePrefix     string   = "[{{serverName}} / {{channelName}}] \"{{username}}\" @ {{timestamp}}: "
+	defSourceLog_LogDownloads   bool     = true
+	defSourceLog_LogFailures    bool     = true
 )
 
 type configurationSourceLog struct {
-	Destination         string  `json:"destination" yaml:"destination"`
-	DestinationIsFolder *bool   `json:"destinationIsFolder" yaml:"destinationIsFolder"`
-	DivideLogsByServer  *bool   `json:"divideLogsByServer" yaml:"divideLogsByServer"`
-	DivideLogsByChannel *bool   `json:"divideLogsByChannel" yaml:"divideLogsByChannel"`
-	DivideLogsByUser    *bool   `json:"divideLogsByUser" yaml:"divideLogsByUser"`
-	DivideLogsByStatus  *bool   `json:"divideLogsByStatus" yaml:"divideLogsByStatus"`
-	LogDownloads        *bool   `json:"logDownloads" yaml:"logDownloads"`
-	LogFailures         *bool   `json:"logFailures" yaml:"logFailures"`
-	FilterDuplicates    *bool   `json:"filterDuplicates" yaml:"filterDuplicates"`
-	Prefix              *string `json:"prefix" yaml:"prefix"`
-	Suffix              *string `json:"suffix" yaml:"suffix"`
-	UserData            *bool   `json:"userData" yaml:"userData"`
+	Destination    string    `json:"destination" yaml:"destination"`
+	Subfolders     *[]string `json:"subfolders" yaml:"subfolders"`
+	FilenameFormat *string   `json:"filenameFormat" yaml:"filenameFormat"`
+
+	LinePrefix *string `json:"prefix" yaml:"prefix"`
+	LineSuffix *string `json:"suffix" yaml:"suffix"`
+
+	FilterDuplicates *bool `json:"filterDuplicates" yaml:"filterDuplicates"`
+
+	LogDownloads *bool `json:"logDownloads" yaml:"logDownloads"` // links only
+	LogFailures  *bool `json:"logFailures" yaml:"logFailures"`   // links only
 }
 
 //#endregion
@@ -606,6 +603,37 @@ func loadConfig() error {
 				log.Println(lg("Settings", "loadConfig", color.HiRedString, "Failed to open LogOutput file...\t%s", err))
 			} else {
 				log.SetOutput(io.MultiWriter(color.Output, f))
+			}
+		}
+
+		// Misc Rules
+		if config.LogLinks != nil {
+			if config.LogLinks.Subfolders == nil {
+				config.LogLinks.Subfolders = &defSourceLog_Subfolders
+			}
+			if config.LogLinks.FilenameFormat == nil {
+				config.LogLinks.FilenameFormat = &defSourceLog_FilenameFormat
+			}
+			if config.LogLinks.LinePrefix == nil {
+				config.LogLinks.LinePrefix = &defSourceLog_LinePrefix
+			}
+			// vv unique vv
+			if config.LogLinks.LogDownloads == nil {
+				config.LogLinks.LogDownloads = &defSourceLog_LogDownloads
+			}
+			if config.LogLinks.LogFailures == nil {
+				config.LogLinks.LogFailures = &defSourceLog_LogFailures
+			}
+		}
+		if config.LogMessages != nil {
+			if config.LogMessages.Subfolders == nil {
+				config.LogMessages.Subfolders = &defSourceLog_Subfolders
+			}
+			if config.LogMessages.FilenameFormat == nil {
+				config.LogMessages.FilenameFormat = &defSourceLog_FilenameFormat
+			}
+			if config.LogMessages.LinePrefix == nil {
+				config.LogMessages.LinePrefix = &defSourceLog_LinePrefix
 			}
 		}
 
@@ -1041,42 +1069,37 @@ func sourceDefault(source *configurationSource) {
 
 	// Misc Rules
 	if source.LogLinks != nil {
-		if source.LogLinks.DestinationIsFolder == nil {
-			source.LogLinks.DestinationIsFolder = &defSourceLog_DestinationIsFolder
+		if source.LogLinks.Subfolders == nil {
+			source.LogLinks.Subfolders = &defSourceLog_Subfolders
 		}
-		if source.LogLinks.DivideLogsByServer == nil {
-			source.LogLinks.DivideLogsByServer = &defSourceLog_DivideLogsByServer
+		if source.LogLinks.FilenameFormat == nil {
+			source.LogLinks.FilenameFormat = &defSourceLog_FilenameFormat
 		}
-		if source.LogLinks.DivideLogsByChannel == nil {
-			source.LogLinks.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
+		if source.LogLinks.LinePrefix == nil {
+			source.LogLinks.LinePrefix = &defSourceLog_LinePrefix
 		}
-		if source.LogLinks.DivideLogsByUser == nil {
-			source.LogLinks.DivideLogsByUser = &defSourceLog_DivideLogsByUser
-		}
-		if source.LogLinks.DivideLogsByStatus == nil {
-			source.LogLinks.DivideLogsByStatus = &defSourceLog_DivideLogsByStatus
-		}
+		// vv unique vv
 		if source.LogLinks.LogDownloads == nil {
 			source.LogLinks.LogDownloads = &defSourceLog_LogDownloads
 		}
 		if source.LogLinks.LogFailures == nil {
 			source.LogLinks.LogFailures = &defSourceLog_LogFailures
 		}
+	} else if config.LogLinks != nil {
+		source.LogLinks = config.LogLinks
 	}
-
 	if source.LogMessages != nil {
-		if source.LogMessages.DestinationIsFolder == nil {
-			source.LogMessages.DestinationIsFolder = &defSourceLog_DestinationIsFolder
+		if source.LogMessages.Subfolders == nil {
+			source.LogMessages.Subfolders = &defSourceLog_Subfolders
 		}
-		if source.LogMessages.DivideLogsByServer == nil {
-			source.LogMessages.DivideLogsByServer = &defSourceLog_DivideLogsByServer
+		if source.LogMessages.FilenameFormat == nil {
+			source.LogMessages.FilenameFormat = &defSourceLog_FilenameFormat
 		}
-		if source.LogMessages.DivideLogsByChannel == nil {
-			source.LogMessages.DivideLogsByChannel = &defSourceLog_DivideLogsByChannel
+		if source.LogMessages.LinePrefix == nil {
+			source.LogMessages.LinePrefix = &defSourceLog_LinePrefix
 		}
-		if source.LogMessages.DivideLogsByUser == nil {
-			source.LogMessages.DivideLogsByUser = &defSourceLog_DivideLogsByUser
-		}
+	} else if config.LogMessages != nil {
+		source.LogMessages = config.LogMessages
 	}
 
 	// LAZY CHECKS
