@@ -128,8 +128,8 @@ func main() {
 	if config.Debug {
 		log.Println(lg("Info", "", color.HiYellowString, "DEBUGGING OUTPUT ENABLED ... some troubleshooting data..."))
 	}
-	if config.DebugVerbose {
-		log.Println(lg("Info", "", color.YellowString, "VERBOSE-DEBUGGING OUTPUT ENABLED ... some in-depth troubleshooting data..."))
+	if config.DebugExtra {
+		log.Println(lg("Info", "", color.YellowString, "EXTRA DEBUGGING OUTPUT ENABLED ... some in-depth troubleshooting data..."))
 	}
 
 	mainWg.Wait() // wait because credentials from config
@@ -464,8 +464,8 @@ func main() {
 			log.Println(lg("Constants", "", color.HiRedString, "Encountered error deleting cache file:\t%s", err))
 		}
 	}
-	constantsStruct := constStruct{}
-	constantsStruct.Constants = constants
+	var constantsStruct map[string]string
+	constantsStruct = constants
 	newJson, err := json.MarshalIndent(constantsStruct, "", "\t")
 	if err != nil {
 		log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))

@@ -112,7 +112,7 @@ func defaultConfiguration() configuration {
 		Debug:                 defConfig_Debug,
 		BackupDatabaseOnStart: false,
 		WatchSettings:         true,
-		SettingsOutput:        true,
+		LogSettings:           true,
 		MessageOutput:         true,
 		MessageOutputHistory:  false,
 
@@ -220,68 +220,66 @@ type configuration struct {
 	OverwriteDatabasePath        string `json:"overwriteDatabasePath,omitempty" yaml:"overwriteDatabasePath,omitempty"`
 	OverwriteDatabaseBackupsPath string `json:"overwriteDatabaseBackupsPath,omitempty" yaml:"overwriteDatabaseBackupsPath,omitempty"`
 
+	// Logging
+	Verbose              bool   `json:"verbose" yaml:"verbose"`
+	Debug                bool   `json:"debug" yaml:"debug"`
+	DebugExtra           bool   `json:"debugExtra" yaml:"debugExtra"`
+	LogSettings          bool   `json:"settingsOutput" yaml:"settingsOutput"`
+	LogOutput            string `json:"logOutput,omitempty" yaml:"logOutput,omitempty"`
+	LogIndent            bool   `json:"logIndent" yaml:"logIndent"`
+	MessageOutput        bool   `json:"messageOutput" yaml:"messageOutput"`
+	MessageOutputHistory bool   `json:"messageOutputHistory" yaml:"messageOutputHistory"`
+	DiscordLogLevel      int    `json:"discordLogLevel" yaml:"discordLogLevel"`
+
 	// Program Settings
-	LogOutput             string `json:"logOutput,omitempty" yaml:"logOutput,omitempty"`
-	LogIndent             bool   `json:"logIndent" yaml:"logIndent"`
 	ProcessLimit          int    `json:"processLimit" yaml:"processLimit"`
-	Verbose               bool   `json:"verbose" yaml:"verbose"`
-	Debug                 bool   `json:"debug" yaml:"debug"`
-	DebugVerbose          bool   `json:"debugV" yaml:"debugV"`
-	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart" yaml:"backupDatabaseOnStart"`
+	GithubUpdateChecking  bool   `json:"githubUpdateChecking" yaml:"githubUpdateChecking"`
+	ExitOnBadConnection   bool   `json:"exitOnBadConnection" yaml:"exitOnBadConnection"`
 	WatchSettings         bool   `json:"watchSettings" yaml:"watchSettings"`
-	SettingsOutput        bool   `json:"settingsOutput" yaml:"settingsOutput"`
-	MessageOutput         bool   `json:"messageOutput" yaml:"messageOutput"`
-	MessageOutputHistory  bool   `json:"messageOutputHistory" yaml:"messageOutputHistory"`
+	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart" yaml:"backupDatabaseOnStart"`
+	CheckupRate           int    `json:"checkupRate,omitempty" yaml:"checkupRate,omitempty"`
+	ConnectionCheckRate   int    `json:"connectionCheckRate,omitempty" yaml:"connectionCheckRate,omitempty"`
+	HistoryManagerRate    int    `json:"historyManagerRate,omitempty" yaml:"historyManagerRate,omitempty"`
+	InflateDownloadCount  *int64 `json:"inflateDownloadCount,omitempty" yaml:"inflateDownloadCount,omitempty"`
+	EuropeanNumbers       bool   `json:"europeanNumbers,omitempty" yaml:"europeanNumbers,omitempty"`
 
-	DiscordLogLevel      int  `json:"discordLogLevel" yaml:"discordLogLevel"`
-	DiscordTimeout       int  `json:"discordTimeout" yaml:"discordTimeout"`
-	DownloadTimeout      int  `json:"downloadTimeout" yaml:"downloadTimeout"`
-	DownloadRetryMax     int  `json:"downloadRetryMax" yaml:"downloadRetryMax"`
-	ExitOnBadConnection  bool `json:"exitOnBadConnection" yaml:"exitOnBadConnection"`
-	GithubUpdateChecking bool `json:"githubUpdateChecking" yaml:"githubUpdateChecking"`
-
+	// Discord
+	ScanEdits            bool   `json:"scanEdits" yaml:"scanEdits"`
+	IgnoreBots           bool   `json:"ignoreBots" yaml:"ignoreBots"`
+	ScanOwnMessages      bool   `json:"scanOwnMessages" yaml:"scanOwnMessages"`
+	AllowCommands        bool   `json:"allowCommands" yaml:"allowCommands"`
+	AllowGeneralCommands bool   `json:"allowGeneralCommands" yaml:"allowGeneralCommands"`
 	CommandPrefix        string `json:"commandPrefix" yaml:"commandPrefix"`
 	CommandTagging       bool   `json:"commandTagging" yaml:"commandTagging"`
-	ScanOwnMessages      bool   `json:"scanOwnMessages" yaml:"scanOwnMessages"`
-	AllowGeneralCommands bool   `json:"allowGeneralCommands" yaml:"allowGeneralCommands"`
-	InflateDownloadCount *int64 `json:"inflateDownloadCount,omitempty" yaml:"inflateDownloadCount,omitempty"`
-	EuropeanNumbers      bool   `json:"europeanNumbers,omitempty" yaml:"europeanNumbers,omitempty"`
-
-	HistoryManagerRate  int `json:"historyManagerRate,omitempty" yaml:"historyManagerRate,omitempty"`
-	CheckupRate         int `json:"checkupRate,omitempty" yaml:"checkupRate,omitempty"`
-	ConnectionCheckRate int `json:"connectionCheckRate,omitempty" yaml:"connectionCheckRate,omitempty"`
-	PresenceRefreshRate int `json:"presenceRefreshRate,omitempty" yaml:"presenceRefreshRate,omitempty"`
+	DiscordTimeout       int    `json:"discordTimeout" yaml:"discordTimeout"`
+	DownloadTimeout      int    `json:"downloadTimeout" yaml:"downloadTimeout"`
+	DownloadRetryMax     int    `json:"downloadRetryMax" yaml:"downloadRetryMax"`
+	SendErrorMessages    bool   `json:"sendErrorMessages" yaml:"sendErrorMessages"`
 
 	// Discord Emojis & Stickers
-	EmojisServers        *[]string `json:"emojisServers" yaml:"emojisServers"`
-	EmojisFilenameFormat string    `json:"emojisFilenameFormat" yaml:"emojisFilenameFormat"`
-	EmojisDestination    *string   `json:"emojisDestination" yaml:"emojisDestination"`
-
+	EmojisServers          *[]string `json:"emojisServers" yaml:"emojisServers"`
+	EmojisFilenameFormat   string    `json:"emojisFilenameFormat" yaml:"emojisFilenameFormat"`
+	EmojisDestination      *string   `json:"emojisDestination" yaml:"emojisDestination"`
 	StickersServers        *[]string `json:"stickersServers" yaml:"stickersServers"`
 	StickersFilenameFormat string    `json:"stickersFilenameFormat" yaml:"stickersFilenameFormat"`
 	StickersDestination    *string   `json:"stickersDestination" yaml:"stickersDestination"`
 
-	// Source Setup Defaults
-	Save          bool `json:"save" yaml:"save"`
-	AllowCommands bool `json:"allowCommands" yaml:"allowCommands"`
-	ScanEdits     bool `json:"scanEdits" yaml:"scanEdits"`
-	IgnoreBots    bool `json:"ignoreBots" yaml:"ignoreBots"`
-
-	SendErrorMessages  bool     `json:"sendErrorMessages" yaml:"sendErrorMessages"`
+	// File Forwarding to Discord Channel
 	SendFileToChannel  string   `json:"sendFileToChannel" yaml:"sendFileToChannel"`
 	SendFileToChannels []string `json:"sendFileToChannels,omitempty" yaml:"sendFileToChannels,omitempty"`
 	SendFileDirectly   bool     `json:"sendFileDirectly,omitempty" yaml:"sendFileDirectly,omitempty"`
 	SendFileCaption    string   `json:"sendFileCaption,omitempty" yaml:"sendFileCaption,omitempty"`
 
 	// Discord Presence
-	PresenceEnabled bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
-	PresenceStatus  string             `json:"presenceStatus" yaml:"presenceStatus"`
-	PresenceType    discordgo.GameType `json:"presenceType" yaml:"presenceType"`
-	PresenceLabel   *string            `json:"presenceLabel" yaml:"presenceLabel"`
-	PresenceDetails *string            `json:"presenceDetails" yaml:"presenceDetails"`
-	PresenceState   *string            `json:"presenceState" yaml:"presenceState"`
+	PresenceEnabled     bool               `json:"presenceEnabled" yaml:"presenceEnabled"`
+	PresenceStatus      string             `json:"presenceStatus" yaml:"presenceStatus"`
+	PresenceType        discordgo.GameType `json:"presenceType" yaml:"presenceType"`
+	PresenceLabel       *string            `json:"presenceLabel" yaml:"presenceLabel"`
+	PresenceDetails     *string            `json:"presenceDetails" yaml:"presenceDetails"`
+	PresenceState       *string            `json:"presenceState" yaml:"presenceState"`
+	PresenceRefreshRate int                `json:"presenceRefreshRate,omitempty" yaml:"presenceRefreshRate,omitempty"`
 
-	// Appearance
+	// Discord Appearance
 	ReactWhenDownloaded        bool    `json:"reactWhenDownloaded" yaml:"reactWhenDownloaded"`
 	ReactWhenDownloadedEmoji   *string `json:"reactWhenDownloadedEmoji" yaml:"reactWhenDownloadedEmoji"`
 	ReactWhenDownloadedHistory bool    `json:"reactWhenDownloadedHistory" yaml:"reactWhenDownloadedHistory"`
@@ -300,6 +298,7 @@ type configuration struct {
 	HistoryRequestDelay   int    `json:"historyRequestDelay" yaml:"historyRequestDelay"`
 
 	// Rules for Saving
+	Save                   bool                        `json:"save" yaml:"save"`
 	Subfolders             []string                    `json:"subfolders" yaml:"subfolders"`
 	FilenameDateFormat     string                      `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat         string                      `json:"filenameFormat" yaml:"filenameFormat"`
@@ -315,6 +314,10 @@ type configuration struct {
 	Duplo                  bool                        `json:"duplo,omitempty" yaml:"duplo,omitempty"`
 	DuploThreshold         float64                     `json:"duploThreshold,omitempty" yaml:"duploThreshold,omitempty"`
 
+	// Misc Rules
+	//LogLinks    *configurationSourceLog `json:"logLinks,omitempty" yaml:"logLinks,omitempty"`
+	//LogMessages *configurationSourceLog `json:"logMessages,omitempty" yaml:"logMessages,omitempty"`
+
 	// Sources
 	All                    *configurationSource  `json:"all,omitempty" yaml:"all,omitempty"`
 	AllBlacklistUsers      *[]string             `json:"allBlacklistUsers,omitempty" yaml:"allBlacklistUsers,omitempty"`
@@ -325,10 +328,6 @@ type configuration struct {
 	Servers                []configurationSource `json:"servers,omitempty" yaml:"servers,omitempty"`
 	Categories             []configurationSource `json:"categories,omitempty" yaml:"categories,omitempty"`
 	Channels               []configurationSource `json:"channels,omitempty" yaml:"channels,omitempty"`
-}
-
-type constStruct struct {
-	Constants map[string]string `json:"_constants" yaml:"_constants"`
 }
 
 //#endregion
@@ -464,6 +463,7 @@ var (
 )
 
 type configurationAdminChannel struct {
+	// Specify target command channels
 	ChannelID      string    `json:"channel" yaml:"channel"`
 	ChannelIDs     *[]string `json:"channels,omitempty" yaml:"channels,omitempty"`
 	LogProgram     *bool     `json:"logProgram" yaml:"logProgram"`
@@ -641,7 +641,7 @@ func loadConfig() error {
 		}
 
 		// Settings Output
-		if config.SettingsOutput {
+		if config.LogSettings {
 			dupeConfig := config
 			if dupeConfig.Credentials.Token != "" && dupeConfig.Credentials.Token != placeholderToken {
 				dupeConfig.Credentials.Token = "STRIPPED_FOR_OUTPUT"
