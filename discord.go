@@ -21,6 +21,37 @@ const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
 )
 
+func getChannelErr(channelID string) error {
+	_, err := bot.Channel(channelID)
+	if err != nil {
+		_, err = bot.State.Channel(channelID)
+	}
+	return err
+}
+
+func getServerErr(guildID string) error {
+	_, err := bot.Guild(guildID)
+	if err != nil {
+		_, err = bot.State.Guild(guildID)
+	}
+	return err
+}
+func getChannel(channelID string) (*discordgo.Channel, error) {
+	channel, err := bot.Channel(channelID)
+	if err != nil {
+		channel, err = bot.State.Channel(channelID)
+	}
+	return channel, err
+}
+
+func getServer(guildID string) (*discordgo.Guild, error) {
+	guild, err := bot.Guild(guildID)
+	if err != nil {
+		guild, err = bot.State.Guild(guildID)
+	}
+	return guild, err
+}
+
 //#region Labels
 
 func getServerLabel(serverID string) (displayLabel string) {
