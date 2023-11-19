@@ -1221,7 +1221,7 @@ do_discord_login:
 		sendErrorMessage(logMsg)
 	} else {
 		log.Println(lg("Discord", "Validation", color.HiGreenString,
-			"No ID issues detected! Bot can see all configured Discord sources, but that doesn't account for permissions..."))
+			"No ID issues detected! Bot can see all configured Discord sources, but that doesn't check Discord permissions..."))
 	}
 	//(SV) Output Discord Permission Issues
 	missingPermsSources := len(missingPermsAdminChannels) + len(missingPermsCategories) + len(missingPermsChannels)
