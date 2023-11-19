@@ -252,11 +252,11 @@ func main() {
 	var autoHistoryChannels []arh
 	// Compile list of channels to autorun history
 	for _, channel := range getAllRegisteredChannels() {
-		sourceConfig := getSource(&discordgo.Message{ChannelID: channel}, nil)
+		sourceConfig := getSource(&discordgo.Message{ChannelID: channel.ChannelID}, nil)
 		if sourceConfig.AutoHistory != nil {
 			if *sourceConfig.AutoHistory {
 				var autoHistoryChannel arh
-				autoHistoryChannel.channel = channel
+				autoHistoryChannel.channel = channel.ChannelID
 				autoHistoryChannel.before = *sourceConfig.AutoHistoryBefore
 				autoHistoryChannel.since = *sourceConfig.AutoHistorySince
 				autoHistoryChannels = append(autoHistoryChannels, autoHistoryChannel)

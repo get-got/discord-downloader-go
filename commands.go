@@ -374,8 +374,40 @@ func handleCommands() *exrouter.Route {
 								}
 							}
 						} else if strings.Contains(strings.ToLower(target), "all") {
-							channels = getAllRegisteredChannels()
+							for _, channel := range getAllRegisteredChannels() {
+								channels = append(channels, channel.ChannelID)
+							}
 							all = true
+						} else { // Aliasing
+							for _, channel := range getAllRegisteredChannels() {
+								if channel.Source.Aliases != nil {
+									for _, alias := range *channel.Source.Aliases {
+										if alias != "" && alias != " " {
+											if strings.EqualFold(alias, target) {
+												channels = append(channels, channel.ChannelID)
+												if config.Debug {
+													log.Println(lg("Command", "History", color.YellowString,
+														"Added %s to history queue by alias \"%s\"",
+														channel.ChannelID, alias))
+												}
+												break
+											}
+										}
+									}
+								} else if channel.Source.Alias != nil {
+									alias := *channel.Source.Alias
+									if alias != "" && alias != " " {
+										if strings.EqualFold(alias, target) {
+											channels = append(channels, channel.ChannelID)
+											if config.Debug {
+												log.Println(lg("Command", "History", color.YellowString,
+													"Added %s to history queue by alias \"%s\"",
+													channel.ChannelID, alias))
+											}
+										}
+									}
+								}
+							}
 						}
 					}
 				}

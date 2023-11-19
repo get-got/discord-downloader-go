@@ -352,6 +352,8 @@ type configurationSource struct {
 	ChannelID         string    `json:"channel,omitempty" yaml:"channel,omitempty"`
 	ChannelIDs        *[]string `json:"channels,omitempty" yaml:"channels,omitempty"`
 	Destination       string    `json:"destination" yaml:"destination"`
+	Alias             *string   `json:"alias,omitempty" yaml:"alias,omitempty"`
+	Aliases           *[]string `json:"aliases,omitempty" yaml:"aliases,omitempty"`
 
 	// Setup
 	Enabled       *bool `json:"enabled" yaml:"enabled"`
@@ -1469,8 +1471,13 @@ func getBoundCategoriesCount() int {
 	return len(getBoundCategories())
 }
 
-func getAllRegisteredChannels() []string {
-	var channels []string
+type registeredChannelSource struct {
+	ChannelID string
+	Source    configurationSource
+}
+
+func getAllRegisteredChannels() []registeredChannelSource {
+	var channels []registeredChannelSource
 	if config.All != nil { // ALL MODE
 		for _, guild := range bot.State.Guilds {
 			if config.AllBlacklistServers != nil {
@@ -1483,7 +1490,7 @@ func getAllRegisteredChannels() []string {
 					continue
 				} else {
 					if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-						channels = append(channels, channel.ID)
+						channels = append(channels, registeredChannelSource{channel.ID, *config.All})
 					}
 				}
 			}
@@ -1497,7 +1504,7 @@ func getAllRegisteredChannels() []string {
 					if err == nil {
 						for _, channel := range guild.Channels {
 							if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-								channels = append(channels, channel.ID)
+								channels = append(channels, registeredChannelSource{channel.ID, server})
 							}
 						}
 					}
@@ -1507,7 +1514,7 @@ func getAllRegisteredChannels() []string {
 				if err == nil {
 					for _, channel := range guild.Channels {
 						if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
-							channels = append(channels, channel.ID)
+							channels = append(channels, registeredChannelSource{channel.ID, server})
 						}
 					}
 				}
@@ -1520,12 +1527,12 @@ func getAllRegisteredChannels() []string {
 					if source.CategoryIDs != nil {
 						for _, category := range *source.CategoryIDs {
 							if channel.ParentID == category {
-								channels = append(channels, channel.ID)
+								channels = append(channels, registeredChannelSource{channel.ID, source})
 							}
 						}
 					} else if isNumeric(source.CategoryID) {
 						if channel.ParentID == source.CategoryID {
-							channels = append(channels, channel.ID)
+							channels = append(channels, registeredChannelSource{channel.ID, source})
 						}
 					}
 				}
@@ -1534,9 +1541,11 @@ func getAllRegisteredChannels() []string {
 		// Compile all config channels
 		for _, channel := range config.Channels {
 			if channel.ChannelIDs != nil {
-				channels = append(channels, *channel.ChannelIDs...)
+				for _, subchannel := range *channel.ChannelIDs {
+					channels = append(channels, registeredChannelSource{subchannel, channel})
+				}
 			} else if isNumeric(channel.ChannelID) {
-				channels = append(channels, channel.ChannelID)
+				channels = append(channels, registeredChannelSource{channel.ChannelID, channel})
 			}
 		}
 	}
