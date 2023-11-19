@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -900,3 +901,485 @@ func hasPerms(channelID string, permission int64) bool {
 }
 
 //#endregion
+
+func downloadDiscordEmojis() {
+
+	dataKeysEmoji := func(emoji discordgo.Emoji, serverID string) string {
+		ret := config.EmojisFilenameFormat
+		keys := [][]string{
+			{"{{ID}}", emoji.ID},
+			{"{{name}}", emoji.Name},
+		}
+		for _, key := range keys {
+			if strings.Contains(ret, key[0]) {
+				ret = strings.ReplaceAll(ret, key[0], key[1])
+			}
+		}
+		return ret
+	}
+
+	if config.EmojisServers != nil {
+		// Handle destination
+		destination := "emojis"
+		if config.EmojisDestination != nil {
+			destination = *config.EmojisDestination
+		}
+		if err = os.MkdirAll(destination, 0755); err != nil {
+			log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating destination folder \"%s\": %s", destination, err))
+		}
+		// Start
+		log.Println(lg("Discord", "Emojis", color.MagentaString, "Starting emoji downloads..."))
+		for _, serverID := range *config.EmojisServers {
+			emojis, err := bot.GuildEmojis(serverID)
+			if err != nil {
+				log.Println(lg("Discord", "Emojis", color.HiRedString, "Error fetching emojis from %s... %s", serverID, err))
+			} else {
+				guildName := "UNKNOWN"
+				guild, err := bot.Guild(serverID)
+				if err == nil {
+					guildName = guild.Name
+				}
+				subfolder := destination + string(os.PathSeparator) + clearPathIllegalChars(guildName)
+				if err = os.MkdirAll(subfolder, 0755); err != nil {
+					log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating subfolder \"%s\": %s", subfolder, err))
+				}
+
+				countDownloaded := 0
+				countSkipped := 0
+				countFailed := 0
+				for _, emoji := range emojis {
+					url := "https://cdn.discordapp.com/emojis/" + emoji.ID
+
+					status, _ := downloadRequestStruct{
+						InputURL:   url,
+						Filename:   dataKeysEmoji(*emoji, serverID),
+						Path:       subfolder,
+						Message:    nil,
+						FileTime:   time.Now(),
+						HistoryCmd: false,
+						EmojiCmd:   true,
+						StartTime:  time.Now(),
+					}.handleDownload()
+
+					if status.Status == downloadSuccess {
+						countDownloaded++
+					} else if status.Status == downloadSkippedDuplicate {
+						countSkipped++
+					} else {
+						countFailed++
+						log.Println(lg("Discord", "Emojis", color.HiRedString,
+							"Failed to download emoji \"%s\": \t[%d - %s] %v",
+							url, status.Status, getDownloadStatusString(status.Status), status.Error))
+					}
+				}
+
+				// Log
+				destinationOut := destination
+				abs, err := filepath.Abs(destination)
+				if err == nil {
+					destinationOut = abs
+				}
+				log.Println(lg("Discord", "Emojis", color.HiMagentaString,
+					fmt.Sprintf("%d emojis downloaded, %d skipped, %d failed - Destination: %s",
+						countDownloaded, countSkipped, countFailed, destinationOut,
+					)))
+			}
+		}
+	}
+
+}
+
+func downloadDiscordStickers() {
+
+	dataKeysSticker := func(sticker discordgo.Sticker) string {
+		ret := config.StickersFilenameFormat
+		keys := [][]string{
+			{"{{ID}}", sticker.ID},
+			{"{{name}}", sticker.Name},
+		}
+		for _, key := range keys {
+			if strings.Contains(ret, key[0]) {
+				ret = strings.ReplaceAll(ret, key[0], key[1])
+			}
+		}
+		return ret
+	}
+
+	if config.StickersServers != nil {
+		// Handle destination
+		destination := "stickers"
+		if config.StickersDestination != nil {
+			destination = *config.StickersDestination
+		}
+		if err = os.MkdirAll(destination, 0755); err != nil {
+			log.Println(lg("Discord", "Stickers", color.HiRedString, "Error while creating destination folder \"%s\": %s", destination, err))
+		}
+		log.Println(lg("Discord", "Stickers", color.MagentaString, "Starting sticker downloads..."))
+		for _, serverID := range *config.StickersServers {
+			guildName := "UNKNOWN"
+			guild, err := bot.Guild(serverID)
+			if err != nil {
+				log.Println(lg("Discord", "Stickers", color.HiRedString, "Error fetching server %s... %s", serverID, err))
+			} else {
+				guildName = guild.Name
+				subfolder := destination + string(os.PathSeparator) + clearPathIllegalChars(guildName)
+				if err = os.MkdirAll(subfolder, 0755); err != nil {
+					log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating subfolder \"%s\": %s", subfolder, err))
+				}
+
+				countDownloaded := 0
+				countSkipped := 0
+				countFailed := 0
+				for _, sticker := range guild.Stickers {
+					url := "https://media.discordapp.net/stickers/" + sticker.ID
+
+					status, _ := downloadRequestStruct{
+						InputURL:   url,
+						Filename:   dataKeysSticker(*sticker),
+						Path:       subfolder,
+						Message:    nil,
+						FileTime:   time.Now(),
+						HistoryCmd: false,
+						EmojiCmd:   true,
+						StartTime:  time.Now(),
+					}.handleDownload()
+
+					if status.Status == downloadSuccess {
+						countDownloaded++
+					} else if status.Status == downloadSkippedDuplicate {
+						countSkipped++
+					} else {
+						countFailed++
+						log.Println(lg("Discord", "Stickers", color.HiRedString,
+							"Failed to download sticker \"%s\": \t[%d - %s] %v",
+							url, status.Status, getDownloadStatusString(status.Status), status.Error))
+					}
+				}
+
+				// Log
+				destinationOut := destination
+				abs, err := filepath.Abs(destination)
+				if err == nil {
+					destinationOut = abs
+				}
+				log.Println(lg("Discord", "Stickers", color.HiMagentaString,
+					fmt.Sprintf("%d stickers downloaded, %d skipped, %d failed - Destination: %s",
+						countDownloaded, countSkipped, countFailed, destinationOut,
+					)))
+			}
+		}
+	}
+
+}
+
+func botLoadDiscord() {
+	var err error
+
+	// Discord Login
+	connectBot := func() {
+		// Connect Bot
+		bot.LogLevel = -1 // to ignore dumb wsapi error
+		err = bot.Open()
+		if err != nil && !strings.Contains(strings.ToLower(err.Error()), "web socket already opened") {
+			log.Println(lg("Discord", "", color.HiRedString, "Discord login failed:\t%s", err))
+			properExit()
+		}
+
+		bot.LogLevel = config.DiscordLogLevel // reset
+		bot.ShouldReconnectOnError = true
+		dur, err := time.ParseDuration(fmt.Sprint(config.DiscordTimeout) + "s")
+		if err != nil {
+			dur, _ = time.ParseDuration("180s")
+		}
+		bot.Client.Timeout = dur
+
+		bot.StateEnabled = true
+		bot.State.MaxMessageCount = 100000
+		bot.State.TrackChannels = true
+		bot.State.TrackThreads = true
+		bot.State.TrackMembers = true
+		bot.State.TrackThreadMembers = true
+
+		botUser, err = bot.User("@me")
+		if err != nil {
+			botUser = bot.State.User
+		}
+	}
+
+	discord_login_count := 0
+do_discord_login:
+	discord_login_count++
+	if discord_login_count > 1 {
+		time.Sleep(3 * time.Second)
+	}
+
+	if config.Credentials.Token != "" && config.Credentials.Token != placeholderToken {
+		// Login via Token (Bot or User)
+		log.Println(lg("Discord", "", color.GreenString, "Connecting to Discord via Token..."))
+		// attempt login without Bot prefix
+		bot, err = discordgo.New(config.Credentials.Token)
+		connectBot()
+		if botUser.Bot { // is bot application, reconnect properly
+			//log.Println(lg("Discord", "", color.GreenString, "Reconnecting as bot..."))
+			bot, err = discordgo.New("Bot " + config.Credentials.Token)
+		}
+
+	} else if (config.Credentials.Email != "" && config.Credentials.Email != placeholderEmail) &&
+		(config.Credentials.Password != "" && config.Credentials.Password != placeholderPassword) {
+		// Login via Email+Password (User Only obviously)
+		log.Println(lg("Discord", "", color.GreenString, "Connecting via Login..."))
+		bot, err = discordgo.New(config.Credentials.Email, config.Credentials.Password)
+	} else {
+		if discord_login_count > 5 {
+			log.Println(lg("Discord", "", color.HiRedString, "No valid credentials for Discord..."))
+			properExit()
+		} else {
+			goto do_discord_login
+		}
+	}
+	if err != nil {
+		if discord_login_count > 5 {
+			log.Println(lg("Discord", "", color.HiRedString, "Error logging in: %s", err))
+			properExit()
+		} else {
+			goto do_discord_login
+		}
+	}
+
+	connectBot()
+
+	// Fetch Bot's User Info
+	botUser, err = bot.User("@me")
+	if err != nil {
+		botUser = bot.State.User
+		if botUser == nil {
+			if discord_login_count > 5 {
+				log.Println(lg("Discord", "", color.HiRedString, "Error obtaining user details: %s", err))
+				properExit()
+			} else {
+				goto do_discord_login
+			}
+		}
+	} else if botUser == nil {
+		if discord_login_count > 5 {
+			log.Println(lg("Discord", "", color.HiRedString, "No error encountered obtaining user details, but it's empty..."))
+			properExit()
+		} else {
+			goto do_discord_login
+		}
+	} else {
+		botReady = true
+		log.Println(lg("Discord", "", color.HiGreenString, "Logged into %s", getUserIdentifier(*botUser)))
+		if botUser.Bot {
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "GENUINE DISCORD BOT APPLICATION"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ This is the safest way to use this bot."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ INTENTS: Make sure you have all 3 intents enabled for this bot in the Discord Developer Portal."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ PRESENCE: Details don't work. Only activity and status."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ VISIBILITY: You can only see servers you have added the bot to, which requires you to be an admin or have an admin invite the bot."))
+		} else {
+			log.Println(lg("Discord", "Info", color.HiYellowString, "!!! USER ACCOUNT / SELF-BOT !!!"))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "~ WARNING: Discord does NOT ALLOW automated user accounts (aka Self-Bots)."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ By using this bot application with a user account, you potentially risk account termination."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ See the GitHub page for link to Discord's official statement."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ IF YOU WISH TO AVOID THIS, USE A BOT APPLICATION IF POSSIBLE."))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "~ DISCORD API BUGS MAY OCCUR - KNOWN ISSUES:"))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~~~ Can't see active threads, only archived threads."))
+			log.Println(lg("Discord", "Info", color.HiMagentaString, "~ VISIBILITY: You can download from any channels/servers this account has access to."))
+		}
+	}
+	if bot.State.User != nil { // is selfbot
+		selfbot = bot.State.User.Email != ""
+	}
+
+	// Event Handlers
+	botCommands = handleCommands()
+	bot.AddHandler(messageCreate)
+	bot.AddHandler(messageUpdate)
+
+	// Start Presence
+	timeLastUpdated = time.Now()
+	go updateDiscordPresence()
+
+	//(SV) Source Validation
+	var invalidAdminChannels []string
+	var invalidServers []string
+	var invalidCategories []string
+	var invalidChannels []string
+	var missingPermsAdminChannels [][]string
+	var missingPermsCategories [][]string
+	var missingPermsChannels [][]string
+	log.Println(lg("Discord", "Validation", color.GreenString, "Validating your configured Discord sources..."))
+
+	validateSource := func(checkFunc func(string) error, target string, label string, invalidStack *[]string) bool {
+		if err := checkFunc(target); err != nil {
+			*invalidStack = append(*invalidStack, target)
+			log.Println(lg("Discord", "Validation", color.HiRedString,
+				"Bot cannot access %s %s...\t%s", label, target, err))
+			return false
+		}
+		return true
+	}
+	checkChannelPerm := func(perm int64, permName string, target string, label string, invalidStack *[][]string) {
+		if perms, err := bot.State.UserChannelPermissions(botUser.ID, target); err == nil {
+			if perms&perm == 0 { // lacks permission
+				*invalidStack = append(*invalidStack, []string{target, permName})
+				log.Println(lg("Discord", "Validation", color.HiRedString,
+					"%s %s / %s - Lacks <%s>...", strings.ToUpper(label), target, getChannelLabel(target, nil), permName))
+			}
+		} else if config.Debug {
+			log.Println(lg("Discord", "Validation", color.HiRedString,
+				"Encountered error checking Discord permission <%s> in %s %s / %s...\t%s",
+				permName, label, target, getChannelLabel(target, nil), err))
+		}
+	}
+
+	//(SV) Check Admin Channels
+	if config.AdminChannels != nil {
+		for _, adminChannel := range config.AdminChannels {
+			if adminChannel.ChannelIDs != nil {
+				for _, subchannel := range *adminChannel.ChannelIDs {
+					if validateSource(getChannelErr, subchannel, "admin subchannel", &invalidAdminChannels) {
+						checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+							subchannel, "admin subchannel", &missingPermsChannels)
+						checkChannelPerm(discordgo.PermissionSendMessages, "PermissionSendMessages",
+							subchannel, "admin subchannel", &missingPermsChannels)
+						checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+							subchannel, "admin subchannel", &missingPermsChannels)
+					}
+				}
+			} else {
+				if validateSource(getChannelErr, adminChannel.ChannelID, "admin channel", &invalidAdminChannels) {
+					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionSendMessages, "PermissionSendMessages",
+						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
+				}
+			}
+		}
+	}
+	//(SV) Check "servers" config.Servers
+	for _, server := range config.Servers {
+		if server.ServerIDs != nil {
+			for _, subserver := range *server.ServerIDs {
+				if validateSource(getServerErr, subserver, "subserver", &invalidServers) {
+					// tbd?
+				}
+			}
+		} else {
+			if validateSource(getServerErr, server.ServerID, "server", &invalidServers) {
+				// tbd?
+			}
+		}
+	}
+	//(SV) Check "categories" config.Categories
+	for _, category := range config.Categories {
+		if category.CategoryIDs != nil {
+			for _, subcategory := range *category.CategoryIDs {
+				if validateSource(getChannelErr, subcategory, "subcategory", &invalidCategories) {
+					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+						subcategory, "subcategory", &missingPermsChannels)
+				}
+			}
+
+		} else {
+			if validateSource(getChannelErr, category.CategoryID, "category", &invalidCategories) {
+				checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+					category.CategoryID, "category", &missingPermsChannels)
+			}
+		}
+	}
+	//(SV) Check "channels" config.Channels
+	for _, channel := range config.Channels {
+		if channel.ChannelIDs != nil {
+			for _, subchannel := range *channel.ChannelIDs {
+				if validateSource(getChannelErr, subchannel, "subchannel", &invalidChannels) {
+					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+						subchannel, "subchannel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionReadMessageHistory, "PermissionReadMessageHistory",
+						subchannel, "subchannel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+						subchannel, "subchannel", &missingPermsChannels)
+					if channel.ReactWhenDownloaded != nil {
+						if *channel.ReactWhenDownloaded {
+							checkChannelPerm(discordgo.PermissionAddReactions, "PermissionAddReactions",
+								subchannel, "subchannel", &missingPermsChannels)
+						}
+					}
+				}
+			}
+
+		} else {
+			if validateSource(getChannelErr, channel.ChannelID, "channel", &invalidChannels) {
+				checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+					channel.ChannelID, "channel", &missingPermsChannels)
+				checkChannelPerm(discordgo.PermissionReadMessageHistory, "PermissionReadMessageHistory",
+					channel.ChannelID, "channel", &missingPermsChannels)
+				checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+					channel.ChannelID, "channel", &missingPermsChannels)
+				if channel.ReactWhenDownloaded != nil {
+					if *channel.ReactWhenDownloaded {
+						checkChannelPerm(discordgo.PermissionAddReactions, "PermissionAddReactions",
+							channel.ChannelID, "channel", &missingPermsChannels)
+					}
+				}
+			}
+		}
+	}
+	//(SV) NOTE: No validation for users because no way to do that by just user ID from what I've seen.
+
+	//(SV) Output Invalid Sources
+	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidCategories) + len(invalidServers)
+	if invalidSources > 0 {
+		log.Println(lg("Discord", "Validation", color.HiRedString,
+			"Found %d invalid sources in configuration...", invalidSources))
+		logMsg := fmt.Sprintf("Validation found %d invalid sources...\n", invalidSources)
+		if len(invalidAdminChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s",
+				len(invalidAdminChannels), strings.Join(invalidAdminChannels, ", "))
+		}
+		if len(invalidServers) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Servers: (%d)** - %s",
+				len(invalidServers), strings.Join(invalidServers, ", "))
+		}
+		if len(invalidCategories) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Categories: (%d)** - %s",
+				len(invalidCategories), strings.Join(invalidCategories, ", "))
+		}
+		if len(invalidChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s",
+				len(invalidChannels), strings.Join(invalidChannels, ", "))
+		}
+		sendErrorMessage(logMsg)
+	} else {
+		log.Println(lg("Discord", "Validation", color.HiGreenString,
+			"No ID issues detected! Bot can see all configured Discord sources, but that doesn't check Discord permissions..."))
+	}
+	//(SV) Output Discord Permission Issues
+	missingPermsSources := len(missingPermsAdminChannels) + len(missingPermsCategories) + len(missingPermsChannels)
+	if missingPermsSources > 0 {
+		log.Println(lg("Discord", "Validation", color.HiRedString,
+			"Found %d sources with insufficient Discord permissions...", missingPermsSources))
+		// removing this part for now due to multidimensional array change
+		/*logMsg := fmt.Sprintf("Validation found %d sources with insufficient Discord permissions...\n", missingPermsSources)
+		if len(missingPermsAdminChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s",
+				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
+		}
+		if len(missingPermsCategories) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Categories: (%d)** - %s",
+				len(missingPermsCategories), strings.Join(missingPermsCategories, ", "))
+		}
+		if len(missingPermsAdminChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s",
+				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
+		}
+		sendErrorMessage(logMsg)*/
+	} else {
+		log.Println(lg("Discord", "Validation", color.HiGreenString,
+			"No permission issues detected! Bot seems to have all required Discord permissions."))
+	}
+
+	mainWg.Done()
+}

@@ -145,6 +145,26 @@ func clearDoubleSpaces(p string) string {
 	return ret
 }
 
+func clearSourceField(p string, cfg configurationSource) string {
+	ret := p
+
+	if cfg.FilepathNormalizeText != nil {
+		if *cfg.FilepathNormalizeText {
+			ret = clearDiacritics(ret)
+		}
+	}
+
+	if cfg.FilepathStripSymbols != nil {
+		if *cfg.FilepathStripSymbols {
+			ret = clearNonAscii(ret)
+		}
+	}
+
+	ret = clearDoubleSpaces(ret)
+
+	return ret
+}
+
 func clearSourceLogField(p string, cfg configurationSourceLog) string {
 	ret := p
 

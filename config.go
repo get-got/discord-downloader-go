@@ -150,9 +150,6 @@ func defaultConfiguration() configuration {
 		SendFileDirectly:  true,
 		SendFileCaption:   "",
 
-		FilenameDateFormat: defConfig_FilenameDateFormat,
-		FilenameFormat:     defConfig_FilenameFormat,
-
 		// Appearance
 		PresenceEnabled:            defConfig_PresenceEnabled,
 		PresenceStatus:             defConfig_PresenceStatus,
@@ -173,6 +170,10 @@ func defaultConfiguration() configuration {
 
 		// Rules for Saving
 		Subfolders:             []string{"{{fileType}}"},
+		FilenameDateFormat:     defConfig_FilenameDateFormat,
+		FilenameFormat:         defConfig_FilenameFormat,
+		FilepathNormalizeText:  true,
+		FilepathStripSymbols:   false,
 		SaveImages:             true,
 		SaveVideos:             true,
 		SaveAudioFiles:         true,
@@ -302,6 +303,8 @@ type configuration struct {
 	Subfolders             []string                    `json:"subfolders" yaml:"subfolders"`
 	FilenameDateFormat     string                      `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat         string                      `json:"filenameFormat" yaml:"filenameFormat"`
+	FilepathNormalizeText  bool                        `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
+	FilepathStripSymbols   bool                        `json:"filepathStripSymbols,omitempty" yaml:"filepathStripSymbols,omitempty"`
 	SaveImages             bool                        `json:"saveImages" yaml:"saveImages"`
 	SaveVideos             bool                        `json:"saveVideos" yaml:"saveVideos"`
 	SaveAudioFiles         bool                        `json:"saveAudioFiles" yaml:"saveAudioFiles"`
@@ -388,6 +391,8 @@ type configurationSource struct {
 	Subfolders             *[]string                   `json:"subfolders,omitempty" yaml:"subfolders,omitempty"`
 	FilenameDateFormat     *string                     `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat         *string                     `json:"filenameFormat" yaml:"filenameFormat"`
+	FilepathNormalizeText  *bool                       `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
+	FilepathStripSymbols   *bool                       `json:"filepathStripSymbols,omitempty" yaml:"filepathStripSymbols,omitempty"`
 	SaveImages             *bool                       `json:"saveImages" yaml:"saveImages"`
 	SaveVideos             *bool                       `json:"saveVideos" yaml:"saveVideos"`
 	SaveAudioFiles         *bool                       `json:"saveAudioFiles" yaml:"saveAudioFiles"`
@@ -994,13 +999,6 @@ func sourceDefault(source *configurationSource) {
 		source.SendFileCaption = &config.SendFileCaption
 	}
 
-	if source.FilenameDateFormat == nil {
-		source.FilenameDateFormat = &config.FilenameDateFormat
-	}
-	if source.FilenameFormat == nil {
-		source.FilenameFormat = &config.FilenameFormat
-	}
-
 	// Appearance
 	if source.PresenceEnabled == nil {
 		source.PresenceEnabled = &config.PresenceEnabled
@@ -1042,14 +1040,20 @@ func sourceDefault(source *configurationSource) {
 	}
 
 	// Rules for Saving
-	if source.DelayHandling == nil && config.DelayHandling != 0 {
-		source.DelayHandling = &config.DelayHandling
-	}
-	if source.DelayHandlingHistory == nil && config.DelayHandlingHistory != 0 {
-		source.DelayHandlingHistory = &config.DelayHandlingHistory
-	}
 	if source.Subfolders == nil {
 		source.Subfolders = &config.Subfolders
+	}
+	if source.FilenameDateFormat == nil {
+		source.FilenameDateFormat = &config.FilenameDateFormat
+	}
+	if source.FilenameFormat == nil {
+		source.FilenameFormat = &config.FilenameFormat
+	}
+	if source.FilepathNormalizeText == nil {
+		source.FilepathNormalizeText = &config.FilepathNormalizeText
+	}
+	if source.FilepathStripSymbols == nil {
+		source.FilepathStripSymbols = &config.FilepathStripSymbols
 	}
 	if source.SaveImages == nil {
 		source.SaveImages = &config.SaveImages
@@ -1068,6 +1072,12 @@ func sourceDefault(source *configurationSource) {
 	}
 	if source.SavePossibleDuplicates == nil {
 		source.SavePossibleDuplicates = &config.SavePossibleDuplicates
+	}
+	if source.DelayHandling == nil && config.DelayHandling != 0 {
+		source.DelayHandling = &config.DelayHandling
+	}
+	if source.DelayHandlingHistory == nil && config.DelayHandlingHistory != 0 {
+		source.DelayHandlingHistory = &config.DelayHandlingHistory
 	}
 	if source.Filters == nil {
 		source.Filters = &configurationSourceFilters{}

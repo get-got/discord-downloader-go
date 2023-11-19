@@ -12,7 +12,68 @@ import (
 
 	"github.com/HouzuoGuo/tiedot/db"
 	"github.com/fatih/color"
+	"github.com/rivo/duplo"
 )
+
+func openDatabase() {
+	var openT time.Time
+	var createT time.Time
+	// Database
+	log.Println(lg("Database", "", color.YellowString, "Opening database...\t(this can take a bit...)"))
+	openT = time.Now()
+	myDB, err = db.OpenDB(pathDatabaseBase)
+	if err != nil {
+		log.Println(lg("Database", "", color.HiRedString, "Unable to open database: %s", err))
+		return
+	}
+	if myDB.Use("Downloads") == nil {
+		log.Println(lg("Database", "Setup", color.YellowString, "Creating database, please wait..."))
+		createT = time.Now()
+		if err := myDB.Create("Downloads"); err != nil {
+			log.Println(lg("Database", "Setup", color.HiRedString, "Error while trying to create database: %s", err))
+			return
+		}
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created new database...\t(took %s)", timeSinceShort(createT)))
+		//
+		log.Println(lg("Database", "Setup", color.YellowString, "Structuring database, please wait..."))
+		createT = time.Now()
+		indexColumn := func(col string) {
+			if err := myDB.Use("Downloads").Index([]string{col}); err != nil {
+				log.Println(lg("Database", "Setup", color.HiRedString, "Unable to create index for %s: %s", col, err))
+				return
+			}
+		}
+		indexColumn("URL")
+		indexColumn("ChannelID")
+		indexColumn("UserID")
+		log.Println(lg("Database", "Setup", color.HiYellowString, "Created database structure...\t(took %s)", timeSinceShort(createT)))
+	}
+	// Cache download tally
+	cachedDownloadID = dbDownloadCount()
+	log.Println(lg("Database", "", color.HiYellowString, "Database opened, contains %d entries...\t(took %s)", cachedDownloadID, timeSinceShort(openT)))
+
+	// Duplo
+	if config.Duplo || sourceHasDuplo {
+		log.Println(lg("Duplo", "", color.HiRedString, "!!! Duplo is barely supported and may cause issues, use at your own risk..."))
+		duploCatalog = duplo.New()
+		if _, err := os.Stat(pathCacheDuplo); err == nil {
+			log.Println(lg("Duplo", "", color.YellowString, "Opening duplo image catalog..."))
+			openT = time.Now()
+			storeFile, err := os.ReadFile(pathCacheDuplo)
+			if err != nil {
+				log.Println(lg("Duplo", "", color.HiRedString, "Error opening duplo catalog:\t%s", err))
+			} else {
+				err = duploCatalog.GobDecode(storeFile)
+				if err != nil {
+					log.Println(lg("Duplo", "", color.HiRedString, "Error decoding duplo catalog:\t%s", err))
+				}
+				if duploCatalog != nil {
+					log.Println(lg("Duplo", "", color.HiYellowString, "Duplo catalog opened (%d)\t(took %s)", duploCatalog.Size(), timeSinceShort(openT)))
+				}
+			}
+		}
+	}
+}
 
 func backupDatabase() error {
 	if err := os.MkdirAll(pathDatabaseBackups, 0755); err != nil {

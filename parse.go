@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -14,12 +16,190 @@ import (
 	"github.com/Davincible/goinsta/v3"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bwmarrin/discordgo"
+	"github.com/fatih/color"
+	twitterscraper "github.com/n0madic/twitter-scraper"
 )
 
 const (
 	imgurClientID   = "08af502a9e70d65"
 	sneakyUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36"
 )
+
+func botLoadAPIs() {
+	// Twitter API
+	if *config.Credentials.TwitterAuthEnabled {
+		go func() {
+			twitterScraper = twitterscraper.New()
+			if config.Credentials.TwitterUsername != "" &&
+				config.Credentials.TwitterPassword != "" {
+				log.Println(lg("API", "Twitter", color.MagentaString, "Connecting..."))
+
+				// Proxy
+				twitterProxy := func(logIt bool) {
+					if config.Credentials.TwitterProxy != "" {
+						err := twitterScraper.SetProxy(config.Credentials.TwitterProxy)
+						if logIt {
+							if err != nil {
+								log.Println(lg("API", "Twitter", color.HiRedString, "Error setting proxy: %s", err.Error()))
+							} else {
+								log.Println(lg("API", "Twitter", color.HiMagentaString, "Proxy set to "+config.Credentials.TwitterProxy))
+							}
+						}
+					}
+				}
+				twitterProxy(true)
+
+				twitterImport := func() error {
+					f, err := os.Open(pathCacheTwitter)
+					if err != nil {
+						return err
+					}
+					var cookies []*http.Cookie
+					err = json.NewDecoder(f).Decode(&cookies)
+					if err != nil {
+						return err
+					}
+					twitterScraper.SetCookies(cookies)
+					twitterScraper.IsLoggedIn()
+					_, err = twitterScraper.GetProfile("x")
+					if err != nil {
+						return err
+					}
+					return nil
+				}
+
+				twitterExport := func() error {
+					cookies := twitterScraper.GetCookies()
+					js, err := json.Marshal(cookies)
+					if err != nil {
+						return err
+					}
+					f, err := os.Create(pathCacheTwitter)
+					if err != nil {
+						return err
+					}
+					f.Write(js)
+					return nil
+				}
+
+				// Login Loop
+				twitterLoginCount := 0
+			do_twitter_login:
+				twitterLoginCount++
+				if twitterLoginCount > 1 {
+					time.Sleep(3 * time.Second)
+				}
+
+				if twitterImport() != nil {
+					twitterScraper.ClearCookies()
+					if err := twitterScraper.Login(config.Credentials.TwitterUsername, config.Credentials.TwitterPassword); err != nil {
+						log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", err.Error()))
+						if twitterLoginCount <= 3 {
+							goto do_twitter_login
+						} else {
+							log.Println(lg("API", "Twitter", color.HiRedString,
+								"Failed to login to Twitter (X), the bot will not fetch this media..."))
+						}
+					} else {
+						twitterConnected = true
+						defer twitterExport()
+						if twitterScraper.IsLoggedIn() {
+							log.Println(lg("API", "Twitter", color.HiMagentaString, fmt.Sprintf("Connected to @%s via new login", config.Credentials.TwitterUsername)))
+						} else {
+							log.Println(lg("API", "Twitter", color.HiRedString,
+								"Scraper login seemed successful but bot is not logged in, Twitter (X) parsing may not work..."))
+						}
+					}
+				} else {
+					log.Println(lg("API", "Twitter", color.HiMagentaString,
+						"Connected to @%s via cache", config.Credentials.TwitterUsername))
+					twitterConnected = true
+				}
+
+				if twitterConnected {
+					twitterProxy(false)
+				}
+			} else {
+				log.Println(lg("API", "Twitter", color.MagentaString,
+					"Twitter (X) login missing, the bot will not fetch this media..."))
+			}
+		}()
+	} else {
+		log.Println(lg("API", "Twitter", color.RedString,
+			"TWITTER AUTHENTICATION IS DISABLED IN SETTINGS..."))
+	}
+
+	// Instagram API
+	if *config.Credentials.InstagramAuthEnabled {
+		go func() {
+			if config.Credentials.InstagramUsername != "" &&
+				config.Credentials.InstagramPassword != "" {
+				log.Println(lg("API", "Instagram", color.MagentaString, "Connecting..."))
+
+				// Proxy
+				instagramProxy := func(logIt bool) {
+					if config.Credentials.InstagramProxy != "" {
+						insecure := false
+						if config.Credentials.InstagramProxyInsecure != nil {
+							insecure = *config.Credentials.InstagramProxyInsecure
+						}
+						forceHTTP2 := false
+						if config.Credentials.InstagramProxyForceHTTP2 != nil {
+							forceHTTP2 = *config.Credentials.InstagramProxyForceHTTP2
+						}
+						err := instagramClient.SetProxy(config.Credentials.InstagramProxy, insecure, forceHTTP2)
+						if err != nil {
+							log.Println(lg("API", "Instagram", color.HiRedString, "Error setting proxy: %s", err.Error()))
+						} else {
+							log.Println(lg("API", "Instagram", color.HiMagentaString, "Proxy set to "+config.Credentials.InstagramProxy))
+						}
+					}
+				}
+				instagramProxy(true)
+
+				// Login Loop
+				instagramLoginCount := 0
+			do_instagram_login:
+				instagramLoginCount++
+				if instagramLoginCount > 1 {
+					time.Sleep(3 * time.Second)
+				}
+				if instagramClient, err = goinsta.Import(pathCacheInstagram); err != nil {
+					instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
+					if err := instagramClient.Login(); err != nil {
+						log.Println(lg("API", "Instagram", color.HiRedString, "Login Error: %s", err.Error()))
+						if instagramLoginCount <= 3 {
+							goto do_instagram_login
+						} else {
+							log.Println(lg("API", "Instagram", color.HiRedString,
+								"Failed to login to Instagram, the bot will not fetch this media..."))
+						}
+					} else {
+						log.Println(lg("API", "Instagram", color.HiMagentaString,
+							"Connected to @%s via new login", instagramClient.Account.Username))
+						instagramConnected = true
+						defer instagramClient.Export(pathCacheInstagram)
+					}
+				} else {
+					log.Println(lg("API", "Instagram", color.HiMagentaString,
+						"Connected to @%s via cache", instagramClient.Account.Username))
+					instagramConnected = true
+				}
+				if instagramConnected {
+					instagramProxy(false)
+				}
+			} else {
+				log.Println(lg("API", "Instagram", color.MagentaString,
+					"Instagram login missing, the bot will not fetch this media..."))
+			}
+		}()
+	} else {
+		log.Println(lg("API", "Instagram", color.RedString,
+			"INSTAGRAM AUTHENTICATION IS DISABLED IN SETTINGS..."))
+	}
+
+	mainWg.Done()
+}
 
 //#region Twitter
 

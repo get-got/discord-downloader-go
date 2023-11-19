@@ -888,6 +888,9 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			download.Filename = dataKeysDownload(sourceConfig, download)
 		}
 
+		// Scrub Filename
+		download.Filename = clearSourceField(download.Filename, sourceConfig)
+
 		// Fix filename length
 		if len(download.Filename) >= 260 {
 			download.Filename = download.Filename[:250]
@@ -1066,6 +1069,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 							}
 						}
 					}
+
+					// Scrub Subfolder
+					fmtSubfolder = clearSourceField(fmtSubfolder, sourceConfig)
+
 					subfolders = append(subfolders, fmtSubfolder)
 				}
 
