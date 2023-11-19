@@ -172,50 +172,56 @@ func clearPaddedSymbols(p string) string { // currently just spaces
 func clearSourceField(p string, cfg configurationSource) string {
 	ret := clearPathIllegalChars(p)
 
+	// FilepathNormalizeText
 	if cfg.FilepathNormalizeText != nil {
 		if *cfg.FilepathNormalizeText {
 			ret = clearDiacritics(ret)
 		}
 	}
 
+	// FilepathStripSymbols
 	if cfg.FilepathStripSymbols != nil {
 		if *cfg.FilepathStripSymbols {
 			ret = clearNonAscii(ret)
 		}
 	}
 
-	ret = clearDoubleSpaces(clearPathIllegalChars(clearPaddedSymbols(ret)))
+	// Clear illegal chars and clear extra space.
+	ret = clearDoubleSpaces(clearPaddedSymbols(clearPathIllegalChars(ret)))
 
-	re := regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
-	reret := re.ReplaceAllLiteralString(ret, "")
-	if len(reret) == 0 {
-		return p
+	// if there's nothing left, just return what originally came through, without illegal characters.
+	if len(regexp.MustCompile(`[^a-zA-Z0-9 ]+`).ReplaceAllLiteralString(ret, "")) == 0 {
+		return clearPathIllegalChars(p)
 	}
+
 	return ret
 }
 
 func clearSourceLogField(p string, cfg configurationSourceLog) string {
 	ret := clearPathIllegalChars(p)
 
+	// FilepathNormalizeText
 	if cfg.FilepathNormalizeText != nil {
 		if *cfg.FilepathNormalizeText {
 			ret = clearDiacritics(ret)
 		}
 	}
 
+	// FilepathStripSymbols
 	if cfg.FilepathStripSymbols != nil {
 		if *cfg.FilepathStripSymbols {
 			ret = clearNonAscii(ret)
 		}
 	}
 
-	ret = clearDoubleSpaces(clearPathIllegalChars(clearPaddedSymbols(ret)))
+	// Clear illegal chars and clear extra space.
+	ret = clearDoubleSpaces(clearPaddedSymbols(clearPathIllegalChars(ret)))
 
-	re := regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
-	reret := re.ReplaceAllLiteralString(ret, "")
-	if len(reret) == 0 {
-		return p
+	// if there's nothing left, just return what originally came through, without illegal characters.
+	if len(regexp.MustCompile(`[^a-zA-Z0-9 ]+`).ReplaceAllLiteralString(ret, "")) == 0 {
+		return clearPathIllegalChars(p)
 	}
+
 	return ret
 }
 
