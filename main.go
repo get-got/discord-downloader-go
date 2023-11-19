@@ -56,12 +56,6 @@ var (
 	twitterScraper     *twitterscraper.Scraper
 	instagramConnected bool = false
 	instagramClient    *goinsta.Instagram
-
-	// Validation
-	invalidAdminChannels []string
-	invalidChannels      []string
-	invalidCategories    []string
-	invalidServers       []string
 )
 
 func versions(multiline bool) string {
@@ -1073,27 +1067,61 @@ do_discord_login:
 	go updateDiscordPresence()
 
 	//(SV) Source Validation
+	var invalidAdminChannels []string
+	var invalidServers []string
+	var invalidCategories []string
+	var invalidChannels []string
+	var missingPermsAdminChannels [][]string
+	var missingPermsCategories [][]string
+	var missingPermsChannels [][]string
 	if config.Debug {
 		log.Println(lg("Debug", "Discord Validation", color.GreenString, "Validating your configured Discord sources..."))
 	}
-	validateSource := func(checkFunc func(string) error, target string, label string, invalidStack *[]string) error {
+	validateSource := func(checkFunc func(string) error, target string, label string, invalidStack *[]string) bool {
 		if err := checkFunc(target); err != nil {
 			*invalidStack = append(*invalidStack, target)
 			log.Println(lg("Discord", "Validation", color.HiRedString,
 				"Bot cannot access %s %s...\t%s", label, target, err))
-			return err
+			return false
 		}
-		return nil
+		return true
 	}
+	checkChannelPerm := func(perm int64, permName string, target string, label string, invalidStack *[][]string) {
+		if perms, err := bot.State.UserChannelPermissions(botUser.ID, target); err == nil {
+			if perms&perm == 0 { // lacks permission
+				*invalidStack = append(*invalidStack, []string{target, permName})
+				log.Println(lg("Discord", "Validation", color.HiRedString,
+					"%s %s - Lacks <%s>...", strings.ToUpper(label), target, permName))
+			}
+		} else if config.Debug {
+			log.Println(lg("Discord", "Validation", color.HiRedString,
+				"Encountered error checking Discord permission <%s> in %s %s...\t%s", permName, label, target, err))
+		}
+	}
+
 	//(SV) Check Admin Channels
 	if config.AdminChannels != nil {
 		for _, adminChannel := range config.AdminChannels {
 			if adminChannel.ChannelIDs != nil {
 				for _, subchannel := range *adminChannel.ChannelIDs {
-					validateSource(getChannelErr, subchannel, "admin subchannel", &invalidAdminChannels)
+					if validateSource(getChannelErr, subchannel, "admin subchannel", &invalidAdminChannels) {
+						checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+							subchannel, "admin subchannel", &missingPermsChannels)
+						checkChannelPerm(discordgo.PermissionSendMessages, "PermissionSendMessages",
+							subchannel, "admin subchannel", &missingPermsChannels)
+						checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+							subchannel, "admin subchannel", &missingPermsChannels)
+					}
 				}
 			} else {
-				validateSource(getChannelErr, adminChannel.ChannelID, "admin channel", &invalidAdminChannels)
+				if validateSource(getChannelErr, adminChannel.ChannelID, "admin channel", &invalidAdminChannels) {
+					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionSendMessages, "PermissionSendMessages",
+						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
+				}
 			}
 		}
 	}
@@ -1101,41 +1129,77 @@ do_discord_login:
 	for _, server := range config.Servers {
 		if server.ServerIDs != nil {
 			for _, subserver := range *server.ServerIDs {
-				validateSource(getServerErr, subserver, "subserver", &invalidServers)
+				if validateSource(getServerErr, subserver, "subserver", &invalidServers) {
+					// tbd?
+				}
 			}
 		} else {
-			validateSource(getServerErr, server.ServerID, "server", &invalidServers)
+			if validateSource(getServerErr, server.ServerID, "server", &invalidServers) {
+				// tbd?
+			}
 		}
 	}
 	//(SV) Check "categories" config.Categories
 	for _, category := range config.Categories {
 		if category.CategoryIDs != nil {
 			for _, subcategory := range *category.CategoryIDs {
-				validateSource(getChannelErr, subcategory, "subcategory", &invalidCategories)
+				if validateSource(getChannelErr, subcategory, "subcategory", &invalidCategories) {
+					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+						subcategory, "subcategory", &missingPermsChannels)
+				}
 			}
 
 		} else {
-			validateSource(getChannelErr, category.CategoryID, "category", &invalidCategories)
+			if validateSource(getChannelErr, category.CategoryID, "category", &invalidCategories) {
+				checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+					category.CategoryID, "category", &missingPermsChannels)
+			}
 		}
 	}
 	//(SV) Check "channels" config.Channels
 	for _, channel := range config.Channels {
 		if channel.ChannelIDs != nil {
 			for _, subchannel := range *channel.ChannelIDs {
-				validateSource(getChannelErr, subchannel, "subchannel", &invalidChannels)
+				if validateSource(getChannelErr, subchannel, "subchannel", &invalidChannels) {
+					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+						subchannel, "subchannel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionReadMessageHistory, "PermissionReadMessageHistory",
+						subchannel, "subchannel", &missingPermsChannels)
+					checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+						subchannel, "subchannel", &missingPermsChannels)
+					if channel.ReactWhenDownloaded != nil {
+						if *channel.ReactWhenDownloaded {
+							checkChannelPerm(discordgo.PermissionAddReactions, "PermissionAddReactions",
+								subchannel, "subchannel", &missingPermsChannels)
+						}
+					}
+				}
 			}
 
 		} else {
-			validateSource(getChannelErr, channel.ChannelID, "channel", &invalidChannels)
+			if validateSource(getChannelErr, channel.ChannelID, "channel", &invalidChannels) {
+				checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
+					channel.ChannelID, "channel", &missingPermsChannels)
+				checkChannelPerm(discordgo.PermissionReadMessageHistory, "PermissionReadMessageHistory",
+					channel.ChannelID, "channel", &missingPermsChannels)
+				checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
+					channel.ChannelID, "channel", &missingPermsChannels)
+				if channel.ReactWhenDownloaded != nil {
+					if *channel.ReactWhenDownloaded {
+						checkChannelPerm(discordgo.PermissionAddReactions, "PermissionAddReactions",
+							channel.ChannelID, "channel", &missingPermsChannels)
+					}
+				}
+			}
 		}
 	}
 	//(SV) NOTE: No validation for users because no way to do that by just user ID from what I've seen.
 
-	//(SV) Output
+	//(SV) Output Invalid Sources
 	invalidSources := len(invalidAdminChannels) + len(invalidChannels) + len(invalidCategories) + len(invalidServers)
 	if invalidSources > 0 {
 		log.Println(lg("Discord", "Validation", color.HiRedString,
-			"Found %d invalid channels/servers in configuration...", invalidSources))
+			"Found %d invalid sources in configuration...", invalidSources))
 		logMsg := fmt.Sprintf("Validation found %d invalid sources...\n", invalidSources)
 		if len(invalidAdminChannels) > 0 {
 			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s",
@@ -1156,6 +1220,30 @@ do_discord_login:
 		sendErrorMessage(logMsg)
 	} else if config.Debug {
 		log.Println(lg("Debug", "Discord Validation", color.HiGreenString, "No source issues detected! Bot has access to all configured sources."))
+	}
+	//(SV) Output Discord Permission Issues
+	missingPermsSources := len(missingPermsAdminChannels) + len(missingPermsCategories) + len(missingPermsChannels)
+	if missingPermsSources > 0 {
+		log.Println(lg("Discord", "Validation", color.HiRedString,
+			"Found %d sources with insufficient Discord permissions...", missingPermsSources))
+		// removing this part for now due to multidimensional array change
+		/*logMsg := fmt.Sprintf("Validation found %d sources with insufficient Discord permissions...\n", missingPermsSources)
+		if len(missingPermsAdminChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s",
+				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
+		}
+		if len(missingPermsCategories) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Categories: (%d)** - %s",
+				len(missingPermsCategories), strings.Join(missingPermsCategories, ", "))
+		}
+		if len(missingPermsAdminChannels) > 0 {
+			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s",
+				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
+		}
+		sendErrorMessage(logMsg)*/
+	} else if config.Debug {
+		log.Println(lg("Debug", "Discord Validation", color.HiGreenString,
+			"No permission issues detected! Bot seems to have all required Discord permissions."))
 	}
 
 	mainWg.Done()
