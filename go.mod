@@ -21,7 +21,6 @@ require (
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	golang.org/x/text v0.14.0
-	gopkg.in/Regis24GmbH/go-diacritics.v2 v2.0.3
 	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/yaml.v3 v3.0.1
 	mvdan.cc/xurls/v2 v2.5.0

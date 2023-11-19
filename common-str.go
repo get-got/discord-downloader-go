@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"golang.org/x/text/unicode/norm"
-	godiacritics "gopkg.in/Regis24GmbH/go-diacritics.v2"
 )
 
 var (
@@ -120,10 +119,7 @@ func clearPathIllegalChars(p string) string {
 }
 
 func clearDiacritics(p string) string {
-	ret := p
-	ret = godiacritics.Normalize(ret)
-	ret = norm.NFKC.String(ret)
-	return ret
+	return norm.NFKC.String(p)
 }
 
 func clearNonAscii(p string) string {
@@ -145,8 +141,26 @@ func clearDoubleSpaces(p string) string {
 	return ret
 }
 
-func clearSourceField(p string, cfg configurationSource) string {
+func clearPaddedSymbols(p string) string { // currently just spaces
 	ret := p
+	for {
+		if ret[0] != ' ' {
+			break
+		}
+		ret = ret[1:]
+	}
+	for {
+		size := len(ret)
+		if ret[size-1] != ' ' {
+			break
+		}
+		ret = ret[:size-1]
+	}
+	return ret
+}
+
+func clearSourceField(p string, cfg configurationSource) string {
+	ret := clearPathIllegalChars(p)
 
 	if cfg.FilepathNormalizeText != nil {
 		if *cfg.FilepathNormalizeText {
@@ -160,13 +174,18 @@ func clearSourceField(p string, cfg configurationSource) string {
 		}
 	}
 
-	ret = clearDoubleSpaces(ret)
+	ret = clearDoubleSpaces(clearPathIllegalChars(clearPaddedSymbols(ret)))
 
+	re := regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
+	reret := re.ReplaceAllLiteralString(ret, "")
+	if len(reret) == 0 {
+		return p
+	}
 	return ret
 }
 
 func clearSourceLogField(p string, cfg configurationSourceLog) string {
-	ret := p
+	ret := clearPathIllegalChars(p)
 
 	if cfg.FilepathNormalizeText != nil {
 		if *cfg.FilepathNormalizeText {
@@ -180,8 +199,13 @@ func clearSourceLogField(p string, cfg configurationSourceLog) string {
 		}
 	}
 
-	ret = clearDoubleSpaces(ret)
+	ret = clearDoubleSpaces(clearPathIllegalChars(clearPaddedSymbols(ret)))
 
+	re := regexp.MustCompile(`[^a-zA-Z0-9 ]+`)
+	reret := re.ReplaceAllLiteralString(ret, "")
+	if len(reret) == 0 {
+		return p
+	}
 	return ret
 }
 
