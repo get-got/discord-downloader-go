@@ -144,17 +144,27 @@ func clearDoubleSpaces(p string) string {
 func clearPaddedSymbols(p string) string { // currently just spaces
 	ret := p
 	for {
+		if len(ret) == 0 {
+			break
+		}
 		if ret[0] != ' ' {
 			break
 		}
 		ret = ret[1:]
 	}
 	for {
+		if len(ret) == 0 {
+			break
+		}
 		size := len(ret)
 		if ret[size-1] != ' ' {
 			break
 		}
-		ret = ret[:size-1]
+		if (size - 1) <= 0 {
+			break
+		} else {
+			ret = ret[:size-1]
+		}
 	}
 	return ret
 }
