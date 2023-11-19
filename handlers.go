@@ -114,9 +114,14 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 
 				// Subfolder Division - Format Subfolders
 				if sourceConfig.LogMessages.Subfolders != nil {
-					subfolders := *sourceConfig.LogMessages.Subfolders
-					for index, subfolder := range *sourceConfig.LogMessages.Subfolders {
-						subfolders[index] = dataKeys_DiscordMessage(subfolder, m)
+					subfolders := []string{}
+					for _, subfolder := range *sourceConfig.LogMessages.Subfolders {
+						newSubfolder := dataKeys_DiscordMessage(subfolder, m)
+
+						// Scrub subfolder
+						newSubfolder = clearSourceLogField(newSubfolder, *sourceConfig.LogMessages)
+
+						subfolders = append(subfolders, newSubfolder)
 					}
 
 					// Subfolder Dividion - Handle Formatted Subfolders
@@ -131,7 +136,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						}
 					}
 					// Format Path
-					savePath = filepath.Clean(savePath + subpath) // overwrite with new destination path
+					savePath = filepath.Clean(savePath + string(os.PathSeparator) + subpath) // overwrite with new destination path
 				}
 
 				if !encounteredErrors {
@@ -139,6 +144,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						log.Println(lg("LogMessages", "", color.HiRedString,
 							"Save path %s is invalid... %s", savePath, err))
 					} else {
+						// Format filename
 						filename := m.ChannelID + ".txt"
 						if sourceConfig.LogMessages.FilenameFormat != nil {
 							if *sourceConfig.LogMessages.FilenameFormat != "" {
@@ -149,6 +155,11 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 								}
 							}
 						}
+
+						// Scrub filename
+						filename = clearSourceLogField(filename, *sourceConfig.LogMessages)
+
+						// Build path
 						logPath := filepath.Clean(savePath + string(os.PathSeparator) + filename)
 
 						// Format New Line

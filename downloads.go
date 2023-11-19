@@ -545,11 +545,16 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 
 					// Subfolder Division - Format Subfolders
 					if sourceConfig.LogLinks.Subfolders != nil {
-						subfolders := *sourceConfig.LogLinks.Subfolders
-						for index, subfolder := range *sourceConfig.LogLinks.Subfolders {
-							subfolders[index] = dataKeys_DiscordMessage(
+						subfolders := []string{}
+						for _, subfolder := range *sourceConfig.LogLinks.Subfolders {
+							newSubfolder := dataKeys_DiscordMessage(
 								dataKeys_DownloadStatus(subfolder, status, download),
 								download.Message)
+
+							// Scrub subfolder
+							newSubfolder = clearSourceLogField(newSubfolder, *sourceConfig.LogLinks)
+
+							subfolders = append(subfolders, newSubfolder)
 						}
 
 						// Subfolder Dividion - Handle Formatted Subfolders
@@ -572,6 +577,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 							log.Println(lg("Download", "LogLinks", color.HiRedString,
 								"Save path %s is invalid... %s", savePath, err))
 						} else {
+							// Format filename
 							filename := download.Message.ChannelID + ".txt"
 							if sourceConfig.LogLinks.FilenameFormat != nil {
 								if *sourceConfig.LogLinks.FilenameFormat != "" {
@@ -584,6 +590,11 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 									}
 								}
 							}
+
+							// Scrub filename
+							filename = clearSourceLogField(filename, *sourceConfig.LogLinks)
+
+							// Build path
 							logPath := filepath.Clean(savePath + string(os.PathSeparator) + filename)
 
 							// Format New Line
@@ -1021,17 +1032,17 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 					{"{{serverID}}",
 						sourceGuildID},
 					{"{{serverName}}",
-						clearPath(sourceName)},
+						clearPathIllegalChars(sourceName)},
 
 					{"{{categoryID}}",
 						sourceParentID},
 					{"{{categoryName}}",
-						clearPath(sourceParentName)},
+						clearPathIllegalChars(sourceParentName)},
 
 					{"{{channelID}}",
 						download.Message.ChannelID},
 					{"{{channelName}}",
-						clearPath(sourceChannelName)},
+						clearPathIllegalChars(sourceChannelName)},
 
 					{"{{userID}}",
 						download.Message.Author.ID},

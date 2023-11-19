@@ -8,6 +8,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/unicode/norm"
+	godiacritics "gopkg.in/Regis24GmbH/go-diacritics.v2"
 )
 
 var (
@@ -108,12 +111,58 @@ func isNumeric(s string) bool {
 	return err == nil
 }
 
-func clearPath(p string) string {
+func clearPathIllegalChars(p string) string {
 	r := p
 	for _, key := range pathBlacklist {
 		r = strings.ReplaceAll(r, key, "")
 	}
 	return r
+}
+
+func clearDiacritics(p string) string {
+	ret := p
+	ret = godiacritics.Normalize(ret)
+	ret = norm.NFKC.String(ret)
+	return ret
+}
+
+func clearNonAscii(p string) string {
+	re := regexp.MustCompile("[[:^ascii:]]")
+	return re.ReplaceAllLiteralString(p, "")
+}
+
+func clearDoubleSpaces(p string) string {
+	ret := p
+	for {
+		ret = strings.ReplaceAll(ret, "  ", " ")
+		if !strings.Contains(ret, "  ") {
+			break
+		}
+	}
+	if ret == "" {
+		return p
+	}
+	return ret
+}
+
+func clearSourceLogField(p string, cfg configurationSourceLog) string {
+	ret := p
+
+	if cfg.FilepathNormalizeText != nil {
+		if *cfg.FilepathNormalizeText {
+			ret = clearDiacritics(ret)
+		}
+	}
+
+	if cfg.FilepathStripSymbols != nil {
+		if *cfg.FilepathStripSymbols {
+			ret = clearNonAscii(ret)
+		}
+	}
+
+	ret = clearDoubleSpaces(ret)
+
+	return ret
 }
 
 func filenameFromURL(inputURL string) string {

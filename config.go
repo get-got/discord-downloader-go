@@ -429,20 +429,24 @@ type configurationSourceFilters struct {
 }
 
 var (
-	defSourceLog_Subfolders     []string = []string{"{{year}}-{{monthNum}}-{{dayOfMonth}}"}
-	defSourceLog_FilenameFormat string   = "{{serverName}} - {{channelName}}.txt"
-	defSourceLog_LinePrefix     string   = "[{{serverName}} / {{channelName}}] \"{{username}}\" @ {{timestamp}}: "
-	defSourceLog_LogDownloads   bool     = true
-	defSourceLog_LogFailures    bool     = true
+	defSourceLog_Subfolders            []string = []string{"{{year}}-{{monthNum}}-{{dayOfMonth}}"}
+	defSourceLog_FilenameFormat        string   = "{{serverName}} - {{channelName}}.txt"
+	defSourceLog_FilepathNormalizeText bool     = true
+	defSourceLog_FilepathStripSymbols  bool     = false
+	defSourceLog_LinePrefix            string   = "[{{serverName}} / {{channelName}}] \"{{username}}\" @ {{timestamp}}: "
+	defSourceLog_LogDownloads          bool     = true
+	defSourceLog_LogFailures           bool     = true
 )
 
 type configurationSourceLog struct {
-	Destination    string    `json:"destination" yaml:"destination"`
-	Subfolders     *[]string `json:"subfolders" yaml:"subfolders"`
-	FilenameFormat *string   `json:"filenameFormat" yaml:"filenameFormat"`
+	Destination           string    `json:"destination" yaml:"destination"`
+	Subfolders            *[]string `json:"subfolders,omitempty" yaml:"subfolders,omitempty"`
+	FilenameFormat        *string   `json:"filenameFormat,omitempty" yaml:"filenameFormat,omitempty"`
+	FilepathNormalizeText *bool     `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
+	FilepathStripSymbols  *bool     `json:"filepathStripSymbols,omitempty" yaml:"filepathStripSymbols,omitempty"`
 
-	LinePrefix *string `json:"prefix" yaml:"prefix"`
-	LineSuffix *string `json:"suffix" yaml:"suffix"`
+	LinePrefix *string `json:"prefix,omitempty" yaml:"prefix,omitempty"`
+	LineSuffix *string `json:"suffix,omitempty" yaml:"suffix,omitempty"`
 
 	FilterDuplicates *bool `json:"filterDuplicates" yaml:"filterDuplicates"`
 
@@ -616,6 +620,12 @@ func loadConfig() error {
 			if config.LogLinks.FilenameFormat == nil {
 				config.LogLinks.FilenameFormat = &defSourceLog_FilenameFormat
 			}
+			if config.LogLinks.FilepathNormalizeText == nil {
+				config.LogLinks.FilepathNormalizeText = &defSourceLog_FilepathNormalizeText
+			}
+			if config.LogLinks.FilepathStripSymbols == nil {
+				config.LogLinks.FilepathStripSymbols = &defSourceLog_FilepathStripSymbols
+			}
 			if config.LogLinks.LinePrefix == nil {
 				config.LogLinks.LinePrefix = &defSourceLog_LinePrefix
 			}
@@ -633,6 +643,12 @@ func loadConfig() error {
 			}
 			if config.LogMessages.FilenameFormat == nil {
 				config.LogMessages.FilenameFormat = &defSourceLog_FilenameFormat
+			}
+			if config.LogMessages.FilepathNormalizeText == nil {
+				config.LogMessages.FilepathNormalizeText = &defSourceLog_FilepathNormalizeText
+			}
+			if config.LogMessages.FilepathStripSymbols == nil {
+				config.LogMessages.FilepathStripSymbols = &defSourceLog_FilepathStripSymbols
 			}
 			if config.LogMessages.LinePrefix == nil {
 				config.LogMessages.LinePrefix = &defSourceLog_LinePrefix
@@ -1077,6 +1093,12 @@ func sourceDefault(source *configurationSource) {
 		if source.LogLinks.FilenameFormat == nil {
 			source.LogLinks.FilenameFormat = &defSourceLog_FilenameFormat
 		}
+		if source.LogLinks.FilepathNormalizeText == nil {
+			source.LogLinks.FilepathNormalizeText = &defSourceLog_FilepathNormalizeText
+		}
+		if source.LogLinks.FilepathStripSymbols == nil {
+			source.LogLinks.FilepathStripSymbols = &defSourceLog_FilepathStripSymbols
+		}
 		if source.LogLinks.LinePrefix == nil {
 			source.LogLinks.LinePrefix = &defSourceLog_LinePrefix
 		}
@@ -1096,6 +1118,12 @@ func sourceDefault(source *configurationSource) {
 		}
 		if source.LogMessages.FilenameFormat == nil {
 			source.LogMessages.FilenameFormat = &defSourceLog_FilenameFormat
+		}
+		if source.LogMessages.FilepathNormalizeText == nil {
+			source.LogMessages.FilepathNormalizeText = &defSourceLog_FilepathNormalizeText
+		}
+		if source.LogMessages.FilepathStripSymbols == nil {
+			source.LogMessages.FilepathStripSymbols = &defSourceLog_FilepathStripSymbols
 		}
 		if source.LogMessages.LinePrefix == nil {
 			source.LogMessages.LinePrefix = &defSourceLog_LinePrefix

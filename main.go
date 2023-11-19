@@ -548,7 +548,7 @@ func main() {
 					if err == nil {
 						guildName = guild.Name
 					}
-					subfolder := destination + string(os.PathSeparator) + clearPath(guildName)
+					subfolder := destination + string(os.PathSeparator) + clearPathIllegalChars(guildName)
 					if err = os.MkdirAll(subfolder, 0755); err != nil {
 						log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating subfolder \"%s\": %s", subfolder, err))
 					}
@@ -613,7 +613,7 @@ func main() {
 					log.Println(lg("Discord", "Stickers", color.HiRedString, "Error fetching server %s... %s", serverID, err))
 				} else {
 					guildName = guild.Name
-					subfolder := destination + string(os.PathSeparator) + clearPath(guildName)
+					subfolder := destination + string(os.PathSeparator) + clearPathIllegalChars(guildName)
 					if err = os.MkdirAll(subfolder, 0755); err != nil {
 						log.Println(lg("Discord", "Emojis", color.HiRedString, "Error while creating subfolder \"%s\": %s", subfolder, err))
 					}
