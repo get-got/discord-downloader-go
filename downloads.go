@@ -978,7 +978,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			if sourceChannel != nil {
 				// Channel Naming
 				if sourceChannel.Name != "" {
-					sourceChannelName = "#" + sourceChannel.Name
+					sourceChannelName = sourceChannel.Name
 				}
 				switch sourceChannel.Type {
 				case discordgo.ChannelTypeGuildText:
