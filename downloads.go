@@ -967,7 +967,6 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		sourceName := "UNKNOWN"
 		sourceChannelName := "UNKNOWN"
 		if !download.EmojiCmd {
-
 			// Names
 			sourceGuildID := "-"
 			sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
@@ -1009,54 +1008,54 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 			// Subfolder Division - Format Subfolders
 			if sourceConfig.Subfolders != nil {
-				subfolders := *sourceConfig.Subfolders
-				for index, subfolder := range *sourceConfig.Subfolders {
+				keys := [][]string{
+					{"{{year}}",
+						fmt.Sprint(download.Message.Timestamp.Year())},
+					{"{{monthNum}}",
+						fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
+					{"{{dayOfMonth}}",
+						fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
+					{"{{hour}}",
+						fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
+
+					{"{{serverID}}",
+						sourceGuildID},
+					{"{{serverName}}",
+						clearPath(sourceName)},
+
+					{"{{categoryID}}",
+						sourceParentID},
+					{"{{categoryName}}",
+						clearPath(sourceParentName)},
+
+					{"{{channelID}}",
+						download.Message.ChannelID},
+					{"{{channelName}}",
+						clearPath(sourceChannelName)},
+
+					{"{{userID}}",
+						download.Message.Author.ID},
+					{"{{userName}}",
+						download.Message.Author.Username},
+
+					{"{{fileType}}",
+						contentTypeBase + "s"},
+					{"{{message}}",
+						download.Message.Content},
+					{"{{messageID}}",
+						download.Message.ID},
+				}
+				subfolders := []string{}
+				for _, subfolder := range *sourceConfig.Subfolders {
 					fmtSubfolder := subfolder
 					if strings.Contains(subfolder, "{{") && strings.Contains(subfolder, "}}") {
-						keys := [][]string{
-							{"{{year}}",
-								fmt.Sprint(download.Message.Timestamp.Year())},
-							{"{{monthNum}}",
-								fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
-							{"{{dayOfMonth}}",
-								fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
-							{"{{hour}}",
-								fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
-
-							{"{{serverID}}",
-								sourceGuildID},
-							{"{{serverName}}",
-								clearPath(sourceName)},
-
-							{"{{categoryID}}",
-								sourceParentID},
-							{"{{categoryName}}",
-								clearPath(sourceParentName)},
-
-							{"{{channelID}}",
-								download.Message.ChannelID},
-							{"{{channelName}}",
-								clearPath(sourceChannelName)},
-
-							{"{{userID}}",
-								download.Message.Author.ID},
-							{"{{userName}}",
-								download.Message.Author.Username},
-
-							{"{{fileType}}",
-								contentTypeBase + "s"},
-							{"{{message}}",
-								download.Message.Content},
-							{"{{messageID}}",
-								download.Message.ID},
-						}
 						for _, key := range keys {
 							if strings.Contains(fmtSubfolder, key[0]) {
 								fmtSubfolder = strings.ReplaceAll(fmtSubfolder, key[0], key[1])
 							}
 						}
 					}
-					subfolders[index] = fmtSubfolder
+					subfolders = append(subfolders, fmtSubfolder)
 				}
 
 				// Subfolder Dividion - Handle Formatted Subfolders
@@ -1071,7 +1070,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 					}
 				}
 				// Format Path
-				download.Path = download.Path + string(os.PathSeparator) + subpath // overwrite with new destination path
+				download.Path = download.Path + subpath // overwrite with new destination path
 			}
 		}
 		completePath := filepath.Clean(download.Path + download.Filename)
