@@ -1074,9 +1074,8 @@ do_discord_login:
 	var missingPermsAdminChannels [][]string
 	var missingPermsCategories [][]string
 	var missingPermsChannels [][]string
-	if config.Debug {
-		log.Println(lg("Debug", "Discord Validation", color.GreenString, "Validating your configured Discord sources..."))
-	}
+	log.Println(lg("Discord", "Validation", color.GreenString, "Validating your configured Discord sources..."))
+
 	validateSource := func(checkFunc func(string) error, target string, label string, invalidStack *[]string) bool {
 		if err := checkFunc(target); err != nil {
 			*invalidStack = append(*invalidStack, target)
@@ -1218,8 +1217,8 @@ do_discord_login:
 				len(invalidChannels), strings.Join(invalidChannels, ", "))
 		}
 		sendErrorMessage(logMsg)
-	} else if config.Debug {
-		log.Println(lg("Debug", "Discord Validation", color.HiGreenString, "No source issues detected! Bot has access to all configured sources."))
+	} else {
+		log.Println(lg("Discord", "Validation", color.HiGreenString, "No source issues detected! Bot has access to all configured sources."))
 	}
 	//(SV) Output Discord Permission Issues
 	missingPermsSources := len(missingPermsAdminChannels) + len(missingPermsCategories) + len(missingPermsChannels)
@@ -1241,8 +1240,8 @@ do_discord_login:
 				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
 		}
 		sendErrorMessage(logMsg)*/
-	} else if config.Debug {
-		log.Println(lg("Debug", "Discord Validation", color.HiGreenString,
+	} else {
+		log.Println(lg("Discord", "Validation", color.HiGreenString,
 			"No permission issues detected! Bot seems to have all required Discord permissions."))
 	}
 
