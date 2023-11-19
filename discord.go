@@ -109,6 +109,9 @@ func getChannelLabel(channelID string, channelData *discordgo.Channel) (displayL
 }
 
 func getUserIdentifier(usr discordgo.User) string {
+	if usr.Discriminator == "0" {
+		return "@" + usr.Username
+	}
 	return fmt.Sprintf("\"%s\"#%s", usr.Username, usr.Discriminator)
 }
 
@@ -786,8 +789,8 @@ func sendStatusMessage(status sendStatusType) {
 			}
 			// Send
 			if config.Debug {
-				log.Println(lg("Debug", "Bot Status", color.YellowString, "Sending log for %s to admin channel %s",
-					strings.ToUpper(label), adminChannel.ChannelID))
+				log.Println(lg("Debug", "Bot Status", color.YellowString, "Sending log for %s to admin channel: %s",
+					strings.ToUpper(label), getChannelLabel(adminChannel.ChannelID, nil)))
 			}
 			if hasPerms(adminChannel.ChannelID, discordgo.PermissionEmbedLinks) && !selfbot {
 				bot.ChannelMessageSendEmbed(adminChannel.ChannelID,

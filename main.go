@@ -1040,6 +1040,7 @@ do_discord_login:
 		if botUser.Bot {
 			log.Println(lg("Discord", "Info", color.HiMagentaString, "GENUINE DISCORD BOT APPLICATION"))
 			log.Println(lg("Discord", "Info", color.MagentaString, "~ This is the safest way to use this bot."))
+			log.Println(lg("Discord", "Info", color.MagentaString, "~ INTENTS: Make sure you have all 3 intents enabled for this bot in the Discord Developer Portal."))
 			log.Println(lg("Discord", "Info", color.MagentaString, "~ PRESENCE: Details don't work. Only activity and status."))
 			log.Println(lg("Discord", "Info", color.MagentaString, "~ VISIBILITY: You can only see servers you have added the bot to, which requires you to be an admin or have an admin invite the bot."))
 		} else {
@@ -1090,11 +1091,12 @@ do_discord_login:
 			if perms&perm == 0 { // lacks permission
 				*invalidStack = append(*invalidStack, []string{target, permName})
 				log.Println(lg("Discord", "Validation", color.HiRedString,
-					"%s %s - Lacks <%s>...", strings.ToUpper(label), target, permName))
+					"%s %s / %s - Lacks <%s>...", strings.ToUpper(label), target, getChannelLabel(target, nil), permName))
 			}
 		} else if config.Debug {
 			log.Println(lg("Discord", "Validation", color.HiRedString,
-				"Encountered error checking Discord permission <%s> in %s %s...\t%s", permName, label, target, err))
+				"Encountered error checking Discord permission <%s> in %s %s / %s...\t%s",
+				permName, label, target, getChannelLabel(target, nil), err))
 		}
 	}
 
@@ -1218,7 +1220,8 @@ do_discord_login:
 		}
 		sendErrorMessage(logMsg)
 	} else {
-		log.Println(lg("Discord", "Validation", color.HiGreenString, "No source issues detected! Bot has access to all configured sources."))
+		log.Println(lg("Discord", "Validation", color.HiGreenString,
+			"No ID issues detected! Bot can see all configured Discord sources, but that doesn't account for permissions..."))
 	}
 	//(SV) Output Discord Permission Issues
 	missingPermsSources := len(missingPermsAdminChannels) + len(missingPermsCategories) + len(missingPermsChannels)
