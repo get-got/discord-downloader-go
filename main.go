@@ -66,6 +66,14 @@ func versions(multiline bool) string {
 	}
 }
 
+func botLoad() {
+	mainWg.Add(1)
+	botLoadAPIs()
+
+	mainWg.Add(1)
+	botLoadDiscord()
+}
+
 func init() {
 
 	//#region Initialize Logging
@@ -533,12 +541,4 @@ func main() {
 	log.Println(lg("Main", "", color.HiRedString, "Exiting... "))
 	//#endregion
 
-}
-
-func botLoad() {
-	mainWg.Add(1)
-	botLoadAPIs()
-
-	mainWg.Add(1)
-	botLoadDiscord()
 }

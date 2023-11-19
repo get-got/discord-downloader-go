@@ -356,7 +356,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 
 		// Process Files
 		var downloadedItems []downloadedItem
-		files := getFileLinks(m)
+		files := getLinksByMessage(m)
 		for _, file := range files {
 			if file.Link == "" {
 				continue

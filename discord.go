@@ -22,27 +22,19 @@ const (
 	fmtBotSendPerm = "Bot does not have permission to send messages in %s"
 )
 
-func getChannelErr(channelID string) error {
-	_, err := bot.Channel(channelID)
-	if err != nil {
-		_, err = bot.State.Channel(channelID)
-	}
-	return err
-}
+//#region Getters
 
-func getServerErr(guildID string) error {
-	_, err := bot.Guild(guildID)
-	if err != nil {
-		_, err = bot.State.Guild(guildID)
-	}
-	return err
-}
 func getChannel(channelID string) (*discordgo.Channel, error) {
 	channel, err := bot.Channel(channelID)
 	if err != nil {
 		channel, err = bot.State.Channel(channelID)
 	}
 	return channel, err
+}
+
+func getChannelErr(channelID string) error {
+	_, errr := getChannel(channelID)
+	return errr
 }
 
 func getServer(guildID string) (*discordgo.Guild, error) {
@@ -52,6 +44,13 @@ func getServer(guildID string) (*discordgo.Guild, error) {
 	}
 	return guild, err
 }
+
+func getServerErr(guildID string) error {
+	_, errr := getServer(guildID)
+	return errr
+}
+
+//#endregion
 
 //#region Labels
 
@@ -523,8 +522,8 @@ func dataKeys_DownloadStatus(input string, status downloadStatusStruct, download
 	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
 		// Basic message data
 		keys := [][]string{
-			{"{{downloadStatus}}", getDownloadStatusStringShort(status.Status)},
-			{"{{downloadStatusLong}}", getDownloadStatusString(status.Status)},
+			{"{{downloadStatus}}", getDownloadStatusShort(status.Status)},
+			{"{{downloadStatusLong}}", getDownloadStatus(status.Status)},
 			{"{{downloadFilename}}", download.Filename},
 			{"{{downloadExt}}", download.Extension},
 			{"{{downloadPath}}", download.Path},
@@ -711,7 +710,7 @@ func replyEmbed(m *discordgo.Message, title string, description string) (*discor
 
 //#endregion
 
-//#region Send Status
+//#region Send Status Message
 
 type sendStatusType int
 
@@ -902,6 +901,8 @@ func hasPerms(channelID string, permission int64) bool {
 
 //#endregion
 
+//#region Download Emojis & Stickers
+
 func downloadDiscordEmojis() {
 
 	dataKeysEmoji := func(emoji discordgo.Emoji, serverID string) string {
@@ -969,7 +970,7 @@ func downloadDiscordEmojis() {
 						countFailed++
 						log.Println(lg("Discord", "Emojis", color.HiRedString,
 							"Failed to download emoji \"%s\": \t[%d - %s] %v",
-							url, status.Status, getDownloadStatusString(status.Status), status.Error))
+							url, status.Status, getDownloadStatus(status.Status), status.Error))
 					}
 				}
 
@@ -1052,7 +1053,7 @@ func downloadDiscordStickers() {
 						countFailed++
 						log.Println(lg("Discord", "Stickers", color.HiRedString,
 							"Failed to download sticker \"%s\": \t[%d - %s] %v",
-							url, status.Status, getDownloadStatusString(status.Status), status.Error))
+							url, status.Status, getDownloadStatus(status.Status), status.Error))
 					}
 				}
 
@@ -1071,6 +1072,10 @@ func downloadDiscordStickers() {
 	}
 
 }
+
+//#endregion
+
+//#region BOT LOGIN SEQUENCE
 
 func botLoadDiscord() {
 	var err error
@@ -1383,3 +1388,5 @@ do_discord_login:
 
 	mainWg.Done()
 }
+
+//#endregion

@@ -231,19 +231,19 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 
 	links := make(map[string]string)
 	for _, photo := range tweet.Photos {
-		foundUrls := getDownloadLinks(photo.URL, m)
+		foundUrls := getParsedLinks(photo.URL, m)
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}
 	}
 	for _, video := range tweet.Videos {
-		foundUrls := getDownloadLinks(video.URL, m)
+		foundUrls := getParsedLinks(video.URL, m)
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}
 	}
 	for _, gif := range tweet.GIFs {
-		foundUrls := getDownloadLinks(gif.URL, m)
+		foundUrls := getParsedLinks(gif.URL, m)
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}

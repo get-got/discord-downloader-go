@@ -123,6 +123,8 @@ func backupDatabase() error {
 	return nil
 }
 
+//#region Database Utility
+
 func dbInsertDownload(download *downloadItem) error {
 	_, err := myDB.Use("Downloads").Insert(map[string]interface{}{
 		"URL":         download.URL,
@@ -174,6 +176,8 @@ func dbDeleteByChannelID(channelID string) {
 		myDB.Use("Downloads").Delete(id)
 	}
 }
+
+//#endregion
 
 //#region Statistics
 
