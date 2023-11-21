@@ -103,9 +103,11 @@ func init() {
 
 func main() {
 
-	//#region Critical to functionality
+	//#region <<< CRITICAL INIT >>>
+
 	loadConfig()
 	openDatabase()
+
 	//#endregion
 
 	// Output Flag Warnings
@@ -121,10 +123,14 @@ func main() {
 
 	mainWg.Wait() // wait because credentials from config
 
-	//#region Connections
+	//#region <<< CONNECTIONS >>>
+
 	mainWg.Add(2)
+
 	go botLoadAPIs()
+
 	go botLoadDiscord()
+
 	//#endregion
 
 	//#region Initialize Regex
@@ -210,7 +216,7 @@ func main() {
 
 	mainWg.Wait() // Once complete, bot is functional
 
-	//#region Misc Startup Output - Github Update Notification, Version, Discord Invite
+	//#region MISC STARTUP OUTPUT - Github Update Notification, Version, Discord Invite
 
 	log.Println(lg("Version", "", color.MagentaString, versions(false)))
 
@@ -238,7 +244,7 @@ func main() {
 
 	//#endregion
 
-	//#region MAIN STARTUP COMPLETE, BOT IS FUNCTIONAL
+	//#region <<< MAIN STARTUP COMPLETE - BOT IS FUNCTIONAL >>>
 
 	if config.Verbose {
 		log.Println(lg("Verbose", "Startup", color.HiBlueString, "Startup finished, took %s...", uptime()))
@@ -438,69 +444,65 @@ func main() {
 	//#endregion
 
 	//#region Cache Constants
-	constants := make(map[string]string)
-	//--- Compile constants
-	for _, server := range bot.State.Guilds {
-		serverKey := fmt.Sprintf("SERVER_%s", stripSymbols(server.Name))
-		serverKey = strings.ReplaceAll(serverKey, " ", "_")
-		for strings.Contains(serverKey, "__") {
-			serverKey = strings.ReplaceAll(serverKey, "__", "_")
-		}
-		serverKey = strings.ToUpper(serverKey)
-		if constants[serverKey] == "" {
-			constants[serverKey] = server.ID
-		}
-		for _, channel := range server.Channels {
-			if channel.Type != discordgo.ChannelTypeGuildCategory {
-				categoryName := ""
-				if channel.ParentID != "" {
-					channelParent, err := bot.State.Channel(channel.ParentID)
-					if err == nil {
-						categoryName = channelParent.Name
+
+	go func() {
+		constants := make(map[string]string)
+		//--- Compile constants
+		for _, server := range bot.State.Guilds {
+			serverKey := fmt.Sprintf("SERVER_%s", stripSymbols(server.Name))
+			serverKey = strings.ReplaceAll(serverKey, " ", "_")
+			for strings.Contains(serverKey, "__") {
+				serverKey = strings.ReplaceAll(serverKey, "__", "_")
+			}
+			serverKey = strings.ToUpper(serverKey)
+			if constants[serverKey] == "" {
+				constants[serverKey] = server.ID
+			}
+			for _, channel := range server.Channels {
+				if channel.Type != discordgo.ChannelTypeGuildCategory {
+					categoryName := ""
+					if channel.ParentID != "" {
+						channelParent, err := bot.State.Channel(channel.ParentID)
+						if err == nil {
+							categoryName = channelParent.Name
+						}
 					}
-				}
-				channelKey := fmt.Sprintf("CHANNEL_%s_%s_%s",
-					stripSymbols(server.Name), stripSymbols(categoryName), stripSymbols(channel.Name))
-				channelKey = strings.ReplaceAll(channelKey, " ", "_")
-				for strings.Contains(channelKey, "__") {
-					channelKey = strings.ReplaceAll(channelKey, "__", "_")
-				}
-				channelKey = strings.ToUpper(channelKey)
-				if constants[channelKey] == "" {
-					constants[channelKey] = channel.ID
+					channelKey := fmt.Sprintf("CHANNEL_%s_%s_%s",
+						stripSymbols(server.Name), stripSymbols(categoryName), stripSymbols(channel.Name))
+					channelKey = strings.ReplaceAll(channelKey, " ", "_")
+					for strings.Contains(channelKey, "__") {
+						channelKey = strings.ReplaceAll(channelKey, "__", "_")
+					}
+					channelKey = strings.ToUpper(channelKey)
+					if constants[channelKey] == "" {
+						constants[channelKey] = channel.ID
+					}
 				}
 			}
 		}
-	}
-	//--- Save constants
-	if _, err := os.Stat(pathConstants); err == nil {
-		err = os.Remove(pathConstants)
-		if err != nil {
-			log.Println(lg("Constants", "", color.HiRedString, "Encountered error deleting cache file:\t%s", err))
+		//--- Save constants
+		if _, err := os.Stat(pathConstants); err == nil {
+			err = os.Remove(pathConstants)
+			if err != nil {
+				log.Println(lg("Constants", "", color.HiRedString, "Encountered error deleting cache file:\t%s", err))
+			}
 		}
-	}
-	var constantsStruct map[string]string
-	constantsStruct = constants
-	newJson, err := json.MarshalIndent(constantsStruct, "", "\t")
-	if err != nil {
-		log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))
-	} else {
-		err := os.WriteFile(pathConstants, newJson, 0644)
+		var constantsStruct map[string]string
+		constantsStruct = constants
+		newJson, err := json.MarshalIndent(constantsStruct, "", "\t")
 		if err != nil {
-			log.Println(lg("Constants", "", color.HiRedString, "Failed to save new constants file...\t%s", err))
+			log.Println(lg("Constants", "", color.HiRedString, "Failed to format constants...\t%s", err))
+		} else {
+			err := os.WriteFile(pathConstants, newJson, 0644)
+			if err != nil {
+				log.Println(lg("Constants", "", color.HiRedString, "Failed to save new constants file...\t%s", err))
+			}
 		}
-	}
-	//#endregion
-
-	//#region BG STARTUP COMPLETE
-
-	if config.Verbose {
-		log.Println(lg("Verbose", "Startup", color.HiBlueString, "Background task startup finished, took %s...", uptime()))
-	}
+	}()
 
 	//#endregion
 
-	//#region Download Emojis & Stickers
+	//#region Download Emojis & Stickers (after 5s delay)
 
 	go func() {
 		time.Sleep(5 * time.Second)
@@ -513,7 +515,15 @@ func main() {
 
 	//#endregion
 
-	// ~~~ RUNNING ~~~
+	//#region <<< BACKGROUND STARTUP COMPLETE >>>
+
+	if config.Verbose {
+		log.Println(lg("Verbose", "Startup", color.HiBlueString, "Background task startup finished, took %s...", uptime()))
+	}
+
+	//#endregion
+
+	// <<<<<< RUNNING >>>>>>
 
 	//#region ----------- TEST ENV / main
 

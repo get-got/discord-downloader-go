@@ -78,6 +78,13 @@ type downloadStatusStruct struct {
 	Error  error
 }
 
+type fileItem struct {
+	Link         string
+	Filename     string
+	AttachmentID string
+	Time         time.Time
+}
+
 func mDownloadStatus(status downloadStatus, _error ...error) downloadStatusStruct {
 	if len(_error) == 0 {
 		return downloadStatusStruct{
@@ -215,8 +222,9 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 	// Search Discord File Attachments
 	for _, attachment := range m.Attachments {
 		links = append(links, &fileItem{
-			Link:     attachment.URL,
-			Filename: attachment.Filename,
+			Link:         attachment.URL,
+			Filename:     attachment.Filename,
+			AttachmentID: attachment.ID,
 		})
 	}
 
@@ -455,9 +463,10 @@ func getLinksByMessage(m *discordgo.Message) []*fileItem {
 			}
 
 			fileItems = append(fileItems, &fileItem{
-				Link:     link,
-				Filename: filename,
-				Time:     linkTime,
+				Link:         link,
+				Filename:     filename,
+				Time:         linkTime,
+				AttachmentID: rawLink.AttachmentID,
 			})
 		}
 	}
@@ -476,6 +485,7 @@ type downloadRequestStruct struct {
 	EmojiCmd       bool
 	ManualDownload bool
 	StartTime      time.Time
+	AttachmentID   string
 }
 
 func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, int64) {

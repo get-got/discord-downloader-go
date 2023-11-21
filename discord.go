@@ -411,6 +411,7 @@ func dataKeysDownload(sourceConfig configurationSource, download downloadRequest
 			{"{{file}}", download.Filename},
 			{"{{fileType}}", download.Extension},
 			{"{{fileSize}}", filesize},
+			{"{{attachmentID}}", download.AttachmentID},
 			{"{{messageID}}", download.Message.ID},
 			{"{{userID}}", userID},
 			{"{{username}}", username},

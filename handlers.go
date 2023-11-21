@@ -12,12 +12,6 @@ import (
 	"github.com/fatih/color"
 )
 
-type fileItem struct {
-	Link     string
-	Filename string
-	Time     time.Time
-}
-
 //#region Events
 
 var lastMessageID string
@@ -365,14 +359,15 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				log.Println(lg("Debug", "Message", color.HiCyanString, "FOUND FILE: "+file.Link+fmt.Sprintf(" \t<%s>", m.ID)))
 			}
 			status, filesize := downloadRequestStruct{
-				InputURL:   file.Link,
-				Filename:   file.Filename,
-				Path:       sourceConfig.Destination,
-				Message:    m,
-				FileTime:   file.Time,
-				HistoryCmd: history,
-				EmojiCmd:   false,
-				StartTime:  time.Now(),
+				InputURL:     file.Link,
+				Filename:     file.Filename,
+				Path:         sourceConfig.Destination,
+				Message:      m,
+				FileTime:     file.Time,
+				HistoryCmd:   history,
+				EmojiCmd:     false,
+				StartTime:    time.Now(),
+				AttachmentID: file.AttachmentID,
 			}.handleDownload()
 			if status.Status == downloadSuccess {
 				domain, _ := getDomain(file.Link)
