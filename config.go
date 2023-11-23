@@ -359,11 +359,12 @@ type configurationSource struct {
 	Aliases           *[]string `json:"aliases,omitempty" yaml:"aliases,omitempty"`
 
 	// Setup
-	Enabled       *bool `json:"enabled" yaml:"enabled"`
-	Save          *bool `json:"save" yaml:"save"`
-	AllowCommands *bool `json:"allowCommands" yaml:"allowCommands"`
-	ScanEdits     *bool `json:"scanEdits" yaml:"scanEdits"`
-	IgnoreBots    *bool `json:"ignoreBots" yaml:"ignoreBots"`
+	Enabled       *bool   `json:"enabled" yaml:"enabled"`
+	Save          *bool   `json:"save" yaml:"save"`
+	AllowCommands *bool   `json:"allowCommands" yaml:"allowCommands"`
+	ScanEdits     *bool   `json:"scanEdits" yaml:"scanEdits"`
+	IgnoreBots    *bool   `json:"ignoreBots" yaml:"ignoreBots"`
+	CommandPrefix *string `json:"commandPrefix" yaml:"commandPrefix"`
 
 	SendErrorMessages  *bool     `json:"sendErrorMessages" yaml:"sendErrorMessages"`
 	SendFileToChannel  *string   `json:"sendFileToChannel" yaml:"sendFileToChannel"`
@@ -478,6 +479,7 @@ type configurationAdminChannel struct {
 	LogStatus      *bool     `json:"logStatus" yaml:"logStatus"`
 	LogErrors      *bool     `json:"logErrors" yaml:"logErrors"`
 	UnlockCommands *bool     `json:"unlockCommands" yaml:"unlockCommands"`
+	CommandPrefix  *string   `json:"commandPrefix,omitempty" yaml:"commandPrefix,omitempty"`
 }
 
 //#endregion
@@ -1360,6 +1362,8 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 
 	return emptySourceConfig
 }
+
+var emptyAdminChannelConfig configurationAdminChannel = configurationAdminChannel{}
 
 func isAdminChannelRegistered(ChannelID string) bool {
 	if config.AdminChannels != nil {

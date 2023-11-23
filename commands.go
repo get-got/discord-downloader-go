@@ -587,8 +587,25 @@ func handleCommands() *exrouter.Route {
 
 	// Handler for Command Router
 	go bot.AddHandler(func(_ *discordgo.Session, m *discordgo.MessageCreate) {
+
+		// Override Prefix per-Source
+		prefix := config.CommandPrefix
+		if channel, err := getChannel(m.ChannelID); err == nil {
+			if messageConfig := getSource(m.Message, channel); messageConfig != emptySourceConfig {
+				if messageConfig.CommandPrefix != nil {
+					prefix = *messageConfig.CommandPrefix
+				}
+			} else {
+				if messageAdminConfig := getAdminChannelConfig(m.Message.ChannelID); messageAdminConfig != emptyAdminChannelConfig {
+					if messageAdminConfig.CommandPrefix != nil {
+						prefix = *messageAdminConfig.CommandPrefix
+					}
+				}
+			}
+		}
+
 		//NOTE: This setup makes it case-insensitive but message content will be lowercase, currently case sensitivity is not necessary.
-		router.FindAndExecute(bot, strings.ToLower(config.CommandPrefix), bot.State.User.ID, messageToLower(m.Message))
+		router.FindAndExecute(bot, strings.ToLower(prefix), bot.State.User.ID, messageToLower(m.Message))
 	})
 
 	return router
