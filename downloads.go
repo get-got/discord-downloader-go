@@ -1059,7 +1059,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 					{"{{userID}}",
 						download.Message.Author.ID},
-					{"{{userName}}",
+					{"{{username}}",
 						download.Message.Author.Username},
 
 					{"{{fileType}}",
