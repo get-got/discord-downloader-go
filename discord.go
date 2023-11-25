@@ -1249,8 +1249,6 @@ do_discord_login:
 							subchannel, "admin subchannel", &missingPermsChannels)
 						checkChannelPerm(discordgo.PermissionSendMessages, "PermissionSendMessages",
 							subchannel, "admin subchannel", &missingPermsChannels)
-						checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
-							subchannel, "admin subchannel", &missingPermsChannels)
 					}
 				}
 			} else {
@@ -1258,8 +1256,6 @@ do_discord_login:
 					checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
 						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
 					checkChannelPerm(discordgo.PermissionSendMessages, "PermissionSendMessages",
-						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
-					checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
 						adminChannel.ChannelID, "admin channel", &missingPermsChannels)
 				}
 			}
@@ -1270,12 +1266,12 @@ do_discord_login:
 		if server.ServerIDs != nil {
 			for _, subserver := range *server.ServerIDs {
 				if validateSource(getServerErr, subserver, "subserver", &invalidServers) {
-					// tbd?
+					//TODO: tbd?
 				}
 			}
 		} else {
 			if validateSource(getServerErr, server.ServerID, "server", &invalidServers) {
-				// tbd?
+				//TODO: tbd?
 			}
 		}
 	}
@@ -1305,8 +1301,6 @@ do_discord_login:
 						subchannel, "subchannel", &missingPermsChannels)
 					checkChannelPerm(discordgo.PermissionReadMessageHistory, "PermissionReadMessageHistory",
 						subchannel, "subchannel", &missingPermsChannels)
-					checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
-						subchannel, "subchannel", &missingPermsChannels)
 					if channel.ReactWhenDownloaded != nil {
 						if *channel.ReactWhenDownloaded {
 							checkChannelPerm(discordgo.PermissionAddReactions, "PermissionAddReactions",
@@ -1321,8 +1315,6 @@ do_discord_login:
 				checkChannelPerm(discordgo.PermissionViewChannel, "PermissionViewChannel",
 					channel.ChannelID, "channel", &missingPermsChannels)
 				checkChannelPerm(discordgo.PermissionReadMessageHistory, "PermissionReadMessageHistory",
-					channel.ChannelID, "channel", &missingPermsChannels)
-				checkChannelPerm(discordgo.PermissionEmbedLinks, "PermissionEmbedLinks",
 					channel.ChannelID, "channel", &missingPermsChannels)
 				if channel.ReactWhenDownloaded != nil {
 					if *channel.ReactWhenDownloaded {
@@ -1367,21 +1359,8 @@ do_discord_login:
 	if missingPermsSources > 0 {
 		log.Println(lg("Discord", "Validation", color.HiRedString,
 			"Found %d sources with insufficient Discord permissions...", missingPermsSources))
-		// removing this part for now due to multidimensional array change
-		/*logMsg := fmt.Sprintf("Validation found %d sources with insufficient Discord permissions...\n", missingPermsSources)
-		if len(missingPermsAdminChannels) > 0 {
-			logMsg += fmt.Sprintf("\n**- Admin Channels: (%d)** - %s",
-				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
-		}
-		if len(missingPermsCategories) > 0 {
-			logMsg += fmt.Sprintf("\n**- Download Categories: (%d)** - %s",
-				len(missingPermsCategories), strings.Join(missingPermsCategories, ", "))
-		}
-		if len(missingPermsAdminChannels) > 0 {
-			logMsg += fmt.Sprintf("\n**- Download Channels: (%d)** - %s",
-				len(missingPermsAdminChannels), strings.Join(missingPermsAdminChannels, ", "))
-		}
-		sendErrorMessage(logMsg)*/
+		log.Println(lg("Discord", "Validation", color.HiRedString,
+			"The bot will still function, these are just warnings..."))
 	} else {
 		log.Println(lg("Discord", "Validation", color.HiGreenString,
 			"No permission issues detected! Bot seems to have all required Discord permissions."))
