@@ -363,6 +363,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				Filename:     file.Filename,
 				Path:         sourceConfig.Destination,
 				Message:      m,
+				Channel:      c,
 				FileTime:     file.Time,
 				HistoryCmd:   history,
 				EmojiCmd:     false,

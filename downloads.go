@@ -480,6 +480,7 @@ type downloadRequestStruct struct {
 	Extension      string
 	Path           string
 	Message        *discordgo.Message
+	Channel        *discordgo.Channel
 	FileTime       time.Time
 	HistoryCmd     bool
 	EmojiCmd       bool
@@ -689,7 +690,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 	sourceDefault(&sourceConfig)
 	_sourceConfig := emptySourceConfig
 	if !download.EmojiCmd {
-		_sourceConfig = getSource(download.Message, nil)
+		_sourceConfig = getSource(download.Message, download.Channel)
 	}
 	if _sourceConfig != emptySourceConfig {
 		sourceConfig = _sourceConfig
