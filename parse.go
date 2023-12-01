@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -167,12 +168,62 @@ func botLoadAPIs() {
 				if instagramClient, err = goinsta.Import(pathCacheInstagram); err != nil {
 					instagramClient = goinsta.New(config.Credentials.InstagramUsername, config.Credentials.InstagramPassword)
 					if err := instagramClient.Login(); err != nil {
-						log.Println(lg("API", "Instagram", color.HiRedString, "Login Error: %s", err.Error()))
-						if instagramLoginCount <= 3 {
-							goto do_instagram_login
-						} else {
-							log.Println(lg("API", "Instagram", color.HiRedString,
-								"Failed to login to Instagram, the bot will not fetch this media..."))
+						// 2fa
+						if strings.Contains(err.Error(), "two Factor Autentication required") {
+							// Generate TOTP
+							if config.Credentials.InstagramTOTP != nil {
+								if *config.Credentials.InstagramTOTP != "" {
+									instagramClient.SetTOTPSeed(*config.Credentials.InstagramTOTP)
+									if err := instagramClient.TwoFactorInfo.Login2FA(); err != nil {
+										log.Println(lg("API", "Instagram", color.HiRedString, "2FA-Generated Login Error: %s", err.Error()))
+										if instagramLoginCount <= 3 {
+											goto do_instagram_login
+										} else {
+											log.Println(lg("API", "Instagram", color.HiRedString,
+												"Failed to login to Instagram, the bot will not fetch this media..."))
+										}
+									} else {
+										log.Println(lg("API", "Instagram", color.HiMagentaString,
+											"Connected to @%s via new 2FA-Generated login", instagramClient.Account.Username))
+										instagramConnected = true
+										defer instagramClient.Export(pathCacheInstagram)
+									}
+								}
+							} else { // Manual TOTP
+								log.Println(lg("API", "Instagram", color.HiYellowString,
+									"MANUAL 2FA LOGIN\nPlease enter OTP code... "))
+								reader := bufio.NewReader(os.Stdin)
+								inputCode, _ := reader.ReadString('\n')
+								inputCode = strings.ReplaceAll(inputCode, "\n", "")
+								inputCode = strings.ReplaceAll(inputCode, "\r", "")
+								if inputCode != "" {
+									if err := instagramClient.TwoFactorInfo.Login2FA(inputCode); err != nil {
+										log.Println(lg("API", "Instagram", color.HiRedString, "2FA-Code Login Error: %s", err.Error()))
+										if instagramLoginCount <= 3 {
+											goto do_instagram_login
+										} else {
+											log.Println(lg("API", "Instagram", color.HiRedString,
+												"Failed to login to Instagram, the bot will not fetch this media..."))
+										}
+									} else {
+										log.Println(lg("API", "Instagram", color.HiMagentaString,
+											"Connected to @%s via new 2FA-Code login", instagramClient.Account.Username))
+										instagramConnected = true
+										defer instagramClient.Export(pathCacheInstagram)
+									}
+								} else {
+									log.Println(lg("API", "Instagram", color.HiRedString,
+										"Blank OTP given... Try again."))
+								}
+							}
+						} else { // non-2fa
+							log.Println(lg("API", "Instagram", color.HiRedString, "Login Error: %s", err.Error()))
+							if instagramLoginCount <= 3 {
+								goto do_instagram_login
+							} else {
+								log.Println(lg("API", "Instagram", color.HiRedString,
+									"Failed to login to Instagram, the bot will not fetch this media..."))
+							}
 						}
 					} else {
 						log.Println(lg("API", "Instagram", color.HiMagentaString,

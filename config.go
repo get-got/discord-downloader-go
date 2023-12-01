@@ -38,17 +38,18 @@ type configurationCredentials struct {
 	Email    string `json:"email" yaml:"email"`       // required for login (this or token)
 	Password string `json:"password" yaml:"password"` // required for login (this or token)
 	// APIs
-	TwitterAuthEnabled       *bool  `json:"twitterEnabled" yaml:"twitterEnabled"`
-	TwitterUsername          string `json:"twitterUsername" yaml:"twitterUsername"`
-	TwitterPassword          string `json:"twitterPassword" yaml:"twitterPassword"`
-	TwitterProxy             string `json:"twitterProxy,omitempty" yaml:"twitterProxy,omitempty"`
-	InstagramAuthEnabled     *bool  `json:"instagramEnabled" yaml:"instagramEnabled"`
-	InstagramUsername        string `json:"instagramUsername" yaml:"instagramUsername"`
-	InstagramPassword        string `json:"instagramPassword" yaml:"instagramPassword"`
-	InstagramProxy           string `json:"instagramProxy,omitempty" yaml:"instagramProxy,omitempty"`
-	InstagramProxyInsecure   *bool  `json:"instagramProxyInsecure,omitempty" yaml:"instagramProxyInsecure,omitempty"`
-	InstagramProxyForceHTTP2 *bool  `json:"instagramProxyForceHTTP2,omitempty" yaml:"instagramProxyForceHTTP2,omitempty"`
-	FlickrApiKey             string `json:"flickrApiKey" yaml:"flickrApiKey"`
+	TwitterAuthEnabled       *bool   `json:"twitterEnabled" yaml:"twitterEnabled"`
+	TwitterUsername          string  `json:"twitterUsername" yaml:"twitterUsername"`
+	TwitterPassword          string  `json:"twitterPassword" yaml:"twitterPassword"`
+	TwitterProxy             string  `json:"twitterProxy,omitempty" yaml:"twitterProxy,omitempty"`
+	InstagramAuthEnabled     *bool   `json:"instagramEnabled" yaml:"instagramEnabled"`
+	InstagramUsername        string  `json:"instagramUsername" yaml:"instagramUsername"`
+	InstagramPassword        string  `json:"instagramPassword" yaml:"instagramPassword"`
+	InstagramTOTP            *string `json:"instagramTOTP,omitempty" yaml:"instagramTOTP,omitempty"`
+	InstagramProxy           string  `json:"instagramProxy,omitempty" yaml:"instagramProxy,omitempty"`
+	InstagramProxyInsecure   *bool   `json:"instagramProxyInsecure,omitempty" yaml:"instagramProxyInsecure,omitempty"`
+	InstagramProxyForceHTTP2 *bool   `json:"instagramProxyForceHTTP2,omitempty" yaml:"instagramProxyForceHTTP2,omitempty"`
+	FlickrApiKey             string  `json:"flickrApiKey" yaml:"flickrApiKey"`
 }
 
 //#endregion
