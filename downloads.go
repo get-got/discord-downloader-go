@@ -863,12 +863,14 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			if download.Message.Reactions != nil {
 				for _, reaction := range download.Message.Reactions {
 					if sourceConfig.Filters.BlockedReactions != nil {
-						if stringInSlice(reaction.Emoji.ID, *sourceConfig.Filters.BlockedReactions) {
+						if stringInSlice(reaction.Emoji.ID, *sourceConfig.Filters.BlockedReactions) ||
+							stringInSlice(reaction.Emoji.Name, *sourceConfig.Filters.BlockedReactions) {
 							shouldAbort = true
 						}
 					}
 					if sourceConfig.Filters.AllowedReactions != nil {
-						if stringInSlice(reaction.Emoji.ID, *sourceConfig.Filters.AllowedReactions) {
+						if stringInSlice(reaction.Emoji.ID, *sourceConfig.Filters.AllowedReactions) ||
+							stringInSlice(reaction.Emoji.Name, *sourceConfig.Filters.AllowedReactions) {
 							shouldAbort = false
 						}
 					}
