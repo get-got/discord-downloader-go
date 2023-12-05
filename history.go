@@ -108,15 +108,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	// Vars
-	var totalMessages int64 = 0
-	var totalDownloads int64 = 0
-	var totalFilesize int64 = 0
-	var messageRequestCount int = 0
-	var responseMsg *discordgo.Message = &discordgo.Message{} // dummy message
-	responseMsg.ID = ""
-	responseMsg.ChannelID = subjectChannelID
-	responseMsg.GuildID = ""
-
 	baseChannelInfo, err := bot.State.Channel(subjectChannelID)
 	if err != nil {
 		baseChannelInfo, err = bot.Channel(subjectChannelID)
@@ -124,6 +115,18 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			log.Println(lg("History", "", color.HiRedString, logPrefix+"Error fetching channel data from discordgo:\t%s", err))
 		}
 	}
+
+	var totalMessages int64 = 0
+	var totalDownloads int64 = 0
+	var totalFilesize int64 = 0
+	var messageRequestCount int = 0
+
+	sourceMessage := discordgo.Message{} // dummy message
+	sourceMessage.ChannelID = subjectChannelID
+	sourceMessage.GuildID = baseChannelInfo.GuildID
+	sourceConfig := getSource(&sourceMessage)
+
+	var responseMsg *discordgo.Message = nil
 
 	guildName := getServerLabel(baseChannelInfo.GuildID)
 	categoryName := getCategoryLabel(baseChannelInfo.ID)
@@ -142,15 +145,41 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 	}
 
 	// Index Threads
-	now := time.Now()
-	if threads, err := bot.ThreadsArchived(subjectChannelID, &now, 0); err == nil {
-		for _, thread := range threads.Threads {
-			subjectChannels = append(subjectChannels, *thread)
-		}
-	}
+	indexedThreads := map[string]bool{}
 	if threads, err := bot.ThreadsActive(subjectChannelID); err == nil {
 		for _, thread := range threads.Threads {
+			if indexedThreads[thread.ID] {
+				continue
+			}
 			subjectChannels = append(subjectChannels, *thread)
+			indexedThreads[thread.ID] = true
+		}
+	}
+	if threads, err := bot.ThreadsArchived(subjectChannelID, nil, 0); err == nil {
+		for _, thread := range threads.Threads {
+			if indexedThreads[thread.ID] {
+				continue
+			}
+			subjectChannels = append(subjectChannels, *thread)
+			indexedThreads[thread.ID] = true
+		}
+	}
+	if threads, err := bot.ThreadsPrivateArchived(subjectChannelID, nil, 0); err == nil {
+		for _, thread := range threads.Threads {
+			if indexedThreads[thread.ID] {
+				continue
+			}
+			subjectChannels = append(subjectChannels, *thread)
+			indexedThreads[thread.ID] = true
+		}
+	}
+	if threads, err := bot.ThreadsPrivateJoinedArchived(subjectChannelID, nil, 0); err == nil {
+		for _, thread := range threads.Threads {
+			if indexedThreads[thread.ID] {
+				continue
+			}
+			subjectChannels = append(subjectChannels, *thread)
+			indexedThreads[thread.ID] = true
 		}
 	}
 
@@ -238,9 +267,6 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 	for _, channel := range subjectChannels {
 		logPrefix = fmt.Sprintf("%s/%s: ", channel.ID, commander)
-
-		sourceConfig := getSource(responseMsg, &channel)
-
 		// Invalid Source?
 		if sourceConfig == emptySourceConfig {
 			log.Println(lg("History", "", color.HiRedString,

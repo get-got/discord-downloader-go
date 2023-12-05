@@ -215,6 +215,10 @@ func channelDisplay(channelID string) (sourceName string, sourceChannelName stri
 		}
 		switch sourceChannel.Type {
 		case discordgo.ChannelTypeGuildText:
+		case discordgo.ChannelTypeGuildNews:
+		case discordgo.ChannelTypeGuildNewsThread:
+		case discordgo.ChannelTypeGuildPrivateThread:
+		case discordgo.ChannelTypeGuildPublicThread:
 			// Server Naming
 			if sourceChannel.GuildID != "" {
 				sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
@@ -455,25 +459,19 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 				fmt.Sprintf("%02d", m.Timestamp.Minute())},
 			{"{{second}}",
 				fmt.Sprintf("%02d", m.Timestamp.Second())},
-			{"{{timestamp}}", discordSnowflakeToTimestamp(m.ID, "2006-01-02 15-04-05")},
+			{"{{timestamp}}", discordSnowflakeToTimestamp(m.ID, "2006-01-02_15-04-05")},
 			{"{{timestampYYYYMMDD}}", discordSnowflakeToTimestamp(m.ID, "2006-01-02")},
 			{"{{timestampHHMMSS}}", discordSnowflakeToTimestamp(m.ID, "15-04-05")},
 			{"{{messageID}}", m.ID},
+			{"{{message}}", clearPathIllegalChars(m.Content)},
 			{"{{channelID}}", m.ChannelID},
-			{"{{serverID}}", m.GuildID},
 		}
 		// Author data if present
 		if m.Author != nil {
 			keys = append(keys, [][]string{
 				{"{{userID}}", m.Author.ID},
-				{"{{username}}", m.Author.Username},
+				{"{{username}}", clearPathIllegalChars(m.Author.Username)},
 				{"{{userDisc}}", m.Author.Discriminator},
-			}...)
-		}
-		// Lookup server
-		if srv, err := bot.Guild(m.GuildID); err == nil {
-			keys = append(keys, [][]string{
-				{"{{serverName}}", srv.Name},
 			}...)
 		}
 		// Lookup channel
@@ -484,27 +482,43 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 		}
 		if ch != nil {
 			keys = append(keys, [][]string{
-				{"{{channelName}}", ch.Name},
-				{"{{channelTopic}}", ch.Topic},
+				{"{{channelName}}", clearPathIllegalChars(ch.Name)},
+				{"{{channelTopic}}", clearPathIllegalChars(ch.Topic)},
+				{"{{serverID}}", ch.GuildID},
 			}...)
+			// Lookup server
+			if srv, err := bot.Guild(ch.GuildID); err == nil {
+				keys = append(keys, [][]string{
+					{"{{serverName}}", clearPathIllegalChars(srv.Name)},
+				}...)
+			}
 			// Lookup parent channel
 			if ch.ParentID != "" {
 				if cat, err := bot.State.Channel(ch.ParentID); err == nil {
 					if cat.Type == discordgo.ChannelTypeGuildCategory {
 						keys = append(keys, [][]string{
 							{"{{categoryID}}", cat.ID},
-							{"{{categoryName}}", cat.Name},
+							{"{{categoryName}}", clearPathIllegalChars(cat.Name)},
+							{"{{forumID}}", ch.ID},                            // no check that this is actually a forum, just accountability so it's not using {{}}
+							{"{{forumName}}", clearPathIllegalChars(ch.Name)}, // ^^^
 						}...)
-					} else if cat.Type == discordgo.ChannelTypeGuildText ||
-						cat.Type == discordgo.ChannelTypeGuildForum ||
-						cat.Type == discordgo.ChannelTypeGuildNews {
+					} else {
 						keys = append(keys, [][]string{
 							{"{{threadID}}", ch.ID},
-							{"{{threadName}}", ch.Name},
-							{"{{threadTopic}}", ch.Topic},
+							{"{{threadName}}", clearPathIllegalChars(ch.Name)},
+							{"{{threadTopic}}", clearPathIllegalChars(ch.Topic)},
 							{"{{forumID}}", cat.ID},
-							{"{{forumName}}", cat.Name},
+							{"{{forumName}}", clearPathIllegalChars(cat.Name)},
 						}...)
+						// Parent Category
+						if cat.ParentID != "" {
+							if cat2, err := bot.State.Channel(cat.ParentID); err == nil {
+								keys = append(keys, [][]string{
+									{"{{categoryID}}", cat2.ID},
+									{"{{categoryName}}", clearPathIllegalChars(cat2.Name)},
+								}...)
+							}
+						}
 					}
 				}
 			}
@@ -515,6 +529,19 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 			}
 		}
 	}
+
+	// Cleanup
+	ret = strings.ReplaceAll(ret, "{{channelName}}", "DM")
+	ret = strings.ReplaceAll(ret, "{{channelTopic}}", "DM")
+	ret = strings.ReplaceAll(ret, "{{serverName}}", "DM")
+	ret = strings.ReplaceAll(ret, "{{categoryID}}", "Uncategorized")
+	ret = strings.ReplaceAll(ret, "{{categoryName}}", "Uncategorized")
+	ret = strings.ReplaceAll(ret, "{{forumID}}", "NOT_FORUM")
+	ret = strings.ReplaceAll(ret, "{{forumName}}", "NOT_FORUM")
+	ret = strings.ReplaceAll(ret, "{{threadID}}", "NOT_THREAD")
+	ret = strings.ReplaceAll(ret, "{{threadName}}", "NOT_THREAD")
+	ret = strings.ReplaceAll(ret, "{{threadTopic}}", "NOT_THREAD")
+
 	return ret
 }
 
@@ -888,7 +915,7 @@ func hasPerms(channelID string, permission int64) bool {
 			return true
 		case discordgo.ChannelTypeGroupDM:
 			return true
-		case discordgo.ChannelTypeGuildText:
+		default:
 			perms, err := bot.UserChannelPermissions(botUser.ID, channelID)
 			if err == nil {
 				return perms&permission == permission

@@ -1191,38 +1191,26 @@ func isBotAdmin(m *discordgo.Message) bool {
 
 //#region Functions, Admin & Source
 
-func isNestedMessage(subjectMessage *discordgo.Message, targetChannel string) bool {
-	if subjectMessage.ID != "" {
-		_, err := bot.State.Message(targetChannel, subjectMessage.ChannelID)
-		return err == nil
-	}
-	return false
-}
-
 var emptySourceConfig configurationSource = configurationSource{}
 
-func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
-
-	subjectID := m.ChannelID
-
-	if c != nil {
-		if (c.Type == discordgo.ChannelTypeGuildPublicThread ||
-			c.Type == discordgo.ChannelTypeGuildPrivateThread ||
-			c.Type == discordgo.ChannelTypeGuildNewsThread) && c.ParentID != "" {
-			subjectID = c.ParentID
-		}
+func getSource(m *discordgo.Message) configurationSource {
+	chinfo, err := bot.State.Channel(m.ChannelID)
+	if err != nil {
+		chinfo, err = bot.Channel(m.ChannelID)
 	}
 
 	// Channel
 	for _, item := range config.Channels {
 		// Single Channel Config
-		if subjectID == item.ChannelID || isNestedMessage(m, item.ChannelID) {
+		if m.ChannelID == item.ChannelID || // Standard text channel
+			chinfo.ParentID == item.ChannelID { // Nested text channel
 			return item
 		}
 		// Multi-Channel Config
 		if item.ChannelIDs != nil {
 			for _, subchannel := range *item.ChannelIDs {
-				if subjectID == subchannel || isNestedMessage(m, subchannel) {
+				if m.ChannelID == subchannel || // Standard text channel
+					chinfo.ParentID == subchannel { // Nested text channel
 					return item
 				}
 			}
@@ -1230,19 +1218,15 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	}
 
 	// Category Config
-	channel, err := bot.State.Channel(subjectID)
-	if err != nil {
-		channel, err = bot.Channel(subjectID)
-	}
 	for _, item := range config.Categories {
 		if item.CategoryBlacklist != nil {
-			if stringInSlice(channel.ID, *item.CategoryBlacklist) {
+			if stringInSlice(chinfo.ID, *item.CategoryBlacklist) {
 				return emptySourceConfig
 			}
 		}
 		if item.CategoryID != "" {
 			if err == nil {
-				if channel.ParentID == item.CategoryID {
+				if chinfo.ParentID == item.CategoryID {
 					return item
 				}
 			}
@@ -1251,7 +1235,7 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 		if item.CategoryIDs != nil {
 			for _, subcategory := range *item.CategoryIDs {
 				if err == nil {
-					if channel.ParentID == subcategory {
+					if chinfo.ParentID == subcategory {
 						return item
 					}
 				}
@@ -1260,74 +1244,63 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	}
 
 	// Server
-	for _, item := range config.Servers {
-		if item.ServerID != "" {
-			guild, err := bot.State.Guild(item.ServerID)
-			if err != nil {
-				guild, err = bot.Guild(item.ServerID)
-			}
-			if err == nil {
-				for _, channel := range guild.Channels {
-					if subjectID == channel.ID || isNestedMessage(m, channel.ID) {
-						// Channel Blacklisting within Server
-						if item.ServerBlacklist != nil {
-							if stringInSlice(subjectID, *item.ServerBlacklist) {
+	getSourceServer := func(testID string, testSource configurationSource) configurationSource {
+		guild, err := bot.State.Guild(testID)
+		if err != nil {
+			guild, err = bot.Guild(testID)
+		}
+		if err == nil {
+			for _, channel := range guild.Channels {
+				if m.ChannelID == channel.ID || // Standard text channel
+					chinfo.ParentID == channel.ID { // Nested text channel
+					// Channel Blacklisting within Server
+					if testSource.ServerBlacklist != nil {
+						if stringInSlice(m.ChannelID, *testSource.ServerBlacklist) {
+							return emptySourceConfig
+						}
+						// Categories
+						if channel.ParentID != "" {
+							if stringInSlice(channel.ParentID, *testSource.ServerBlacklist) {
 								return emptySourceConfig
 							}
-							// Categories
-							if channel.ParentID != "" {
-								if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-									return emptySourceConfig
-								}
-							}
 						}
-						return item
 					}
+					return testSource
 				}
+			}
+		}
+		return emptySourceConfig
+	}
+	for _, item := range config.Servers {
+		if item.ServerID != "" {
+			if lookup := getSourceServer(item.ServerID, item); lookup != emptySourceConfig {
+				return lookup
 			}
 		}
 		// Multi-Server Config
 		if item.ServerIDs != nil {
 			for _, subserver := range *item.ServerIDs {
-				guild, err := bot.State.Guild(subserver)
-				if err != nil {
-					guild, err = bot.Guild(subserver)
-				}
-				if err == nil {
-					for _, channel := range guild.Channels {
-						if subjectID == channel.ID || isNestedMessage(m, channel.ID) {
-							// Channel Blacklisting within Servers
-							if item.ServerBlacklist != nil {
-								if stringInSlice(subjectID, *item.ServerBlacklist) {
-									return emptySourceConfig
-								}
-								// Categories
-								if channel.ParentID != "" {
-									if stringInSlice(channel.ParentID, *item.ServerBlacklist) {
-										return emptySourceConfig
-									}
-								}
-							}
-							return item
-						}
-					}
+				if lookup := getSourceServer(subserver, item); lookup != emptySourceConfig {
+					return lookup
 				}
 			}
 		}
 	}
 
 	// User Config
-	for _, item := range config.Users {
-		if item.UserID != "" {
-			if m.Author.ID == item.UserID {
-				return item
-			}
-		}
-		// Multi-User Config
-		if item.UserIDs != nil {
-			for _, subuser := range *item.UserIDs {
-				if m.Author.ID == subuser {
+	if m.Author != nil {
+		for _, item := range config.Users {
+			if item.UserID != "" {
+				if m.Author.ID == item.UserID {
 					return item
+				}
+			}
+			// Multi-User Config
+			if item.UserIDs != nil {
+				for _, subuser := range *item.UserIDs {
+					if m.Author.ID == subuser {
+						return item
+					}
 				}
 			}
 		}
@@ -1336,14 +1309,15 @@ func getSource(m *discordgo.Message, c *discordgo.Channel) configurationSource {
 	// All
 	if config.All != nil {
 		if config.AllBlacklistChannels != nil {
-			if stringInSlice(subjectID, *config.AllBlacklistChannels) {
+			if stringInSlice(m.ChannelID, *config.AllBlacklistChannels) ||
+				stringInSlice(chinfo.ParentID, *config.AllBlacklistChannels) {
 				return emptySourceConfig
 			}
 		}
 		if config.AllBlacklistCategories != nil {
-			chinf, err := bot.State.Channel(subjectID)
+			chinf, err := bot.State.Channel(m.ChannelID)
 			if err == nil {
-				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(subjectID, *config.AllBlacklistCategories) {
+				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(m.ChannelID, *config.AllBlacklistCategories) {
 					return emptySourceConfig
 				}
 			}
@@ -1410,7 +1384,7 @@ func isCommandableChannel(m *discordgo.Message) bool {
 	}
 	if isAdminChannelRegistered(m.ChannelID) {
 		return true
-	} else if sourceConfig := getSource(m, nil); sourceConfig != emptySourceConfig {
+	} else if sourceConfig := getSource(m); sourceConfig != emptySourceConfig {
 		if *sourceConfig.AllowCommands || isBotAdmin(m) || m.Author.ID == bot.State.User.ID {
 			return true
 		}
@@ -1529,7 +1503,7 @@ func getAllRegisteredChannels() []registeredChannelSource {
 				}
 			}
 			for _, channel := range guild.Channels {
-				if r := getSource(&discordgo.Message{ChannelID: channel.ID}, nil); r == emptySourceConfig { // easier than redoing it all but way less efficient, im lazy
+				if r := getSource(&discordgo.Message{ChannelID: channel.ID}); r == emptySourceConfig { // easier than redoing it all but way less efficient, im lazy
 					continue
 				} else {
 					if hasPerms(channel.ID, discordgo.PermissionViewChannel) && hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {

@@ -185,13 +185,12 @@ func trimDuplicateLinks(fileItems []*fileItem) []*fileItem {
 
 // Trim files already downloaded and stored in database
 func pruneCompletedLinks(linkList map[string]string, m *discordgo.Message) map[string]string {
-	sourceConfig := getSource(m, nil)
+	sourceConfig := getSource(m)
 
 	newList := make(map[string]string, 0)
 	for link, filename := range linkList {
-		downloadedFiles := dbFindDownloadByURL(link)
 		alreadyDownloaded := false
-		for _, downloadedFile := range downloadedFiles {
+		for _, downloadedFile := range dbFindDownloadByURL(link) {
 			if downloadedFile.ChannelID == m.ChannelID {
 				alreadyDownloaded = true
 			}
@@ -507,7 +506,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 		log.Println(lg("Download", "", color.RedString,
 			"Gave up on downloading %s after %d failed attempts...\t%s",
 			download.InputURL, config.DownloadRetryMax, getDownloadStatus(status.Status)))
-		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptySourceConfig {
+		if sourceConfig := getSource(download.Message); sourceConfig != emptySourceConfig {
 			if !download.HistoryCmd && *sourceConfig.SendErrorMessages {
 				content := fmt.Sprintf(
 					"Gave up trying to download\n<%s>\nafter %d failed attempts...\n\n``%s``",
@@ -547,7 +546,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 
 	// Log Links to File
 	if !download.EmojiCmd {
-		if sourceConfig := getSource(download.Message, nil); sourceConfig != emptySourceConfig {
+		if sourceConfig := getSource(download.Message); sourceConfig != emptySourceConfig {
 			if sourceConfig.LogLinks != nil {
 				if sourceConfig.LogLinks.Destination != "" {
 
@@ -688,14 +687,14 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 	var sourceConfig configurationSource
 	sourceDefault(&sourceConfig)
-	_sourceConfig := emptySourceConfig
+	sourceConfigNew := emptySourceConfig
 	if !download.EmojiCmd {
-		_sourceConfig = getSource(download.Message, download.Channel)
+		sourceConfigNew = getSource(download.Message)
 	}
-	if _sourceConfig != emptySourceConfig {
-		sourceConfig = _sourceConfig
+	if sourceConfigNew != emptySourceConfig { // this looks stupid but it has a purpose.
+		sourceConfig = sourceConfigNew
 	}
-	if _sourceConfig != emptySourceConfig || download.EmojiCmd || download.ManualDownload {
+	if sourceConfigNew != emptySourceConfig || download.EmojiCmd || download.ManualDownload {
 
 		// Source validation
 		if _, err = url.ParseRequestURI(download.InputURL); err != nil {
@@ -995,82 +994,39 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		sourceChannelName := "UNKNOWN"
 		if !download.EmojiCmd {
 			// Names
-			sourceGuildID := "-"
-			sourceChannel, _ := bot.State.Channel(download.Message.ChannelID)
+			sourceChannel, err := bot.State.Channel(download.Message.ChannelID)
+			if err != nil {
+				sourceChannel, _ = bot.Channel(download.Message.ChannelID)
+			}
 			sourceChannelName = download.Message.ChannelID
-			sourceParent := &discordgo.Channel{}
-			sourceParentID := "-"
-			sourceParentName := "-"
 			if sourceChannel != nil {
 				// Channel Naming
 				if sourceChannel.Name != "" {
 					sourceChannelName = sourceChannel.Name
 				}
 				switch sourceChannel.Type {
-				case discordgo.ChannelTypeGuildText:
-					// Server Naming
-					if sourceChannel.GuildID != "" {
-						sourceGuildID = sourceChannel.GuildID
-						sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-						if sourceGuild != nil && sourceGuild.Name != "" {
-							sourceName = sourceGuild.Name
-						}
-					}
-					// Category Naming
-					if sourceChannel.ParentID != "" {
-						sourceParent, _ = bot.State.Channel(sourceChannel.ParentID)
-						if sourceParent != nil {
-							if sourceParent.Name != "" {
-								sourceParentName = sourceParent.Name
-								sourceParentID = sourceParent.ID
-							}
-						}
-					}
 				case discordgo.ChannelTypeDM:
 					sourceName = "Direct Messages"
 				case discordgo.ChannelTypeGroupDM:
 					sourceName = "Group Messages"
+				default:
+					// Server Naming
+					if sourceChannel.GuildID != "" {
+						sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
+						if sourceGuild != nil && sourceGuild.Name != "" {
+							sourceName = sourceGuild.Name
+						} else {
+							sourceName = sourceChannel.GuildID
+						}
+					}
 				}
 			}
 
 			// Subfolder Division - Format Subfolders
 			if sourceConfig.Subfolders != nil {
 				keys := [][]string{
-					{"{{year}}",
-						fmt.Sprint(download.Message.Timestamp.Year())},
-					{"{{monthNum}}",
-						fmt.Sprintf("%02d", download.Message.Timestamp.Month())},
-					{"{{dayOfMonth}}",
-						fmt.Sprintf("%02d", download.Message.Timestamp.Day())},
-					{"{{hour}}",
-						fmt.Sprintf("%02d", download.Message.Timestamp.Hour())},
-
-					{"{{serverID}}",
-						sourceGuildID},
-					{"{{serverName}}",
-						clearPathIllegalChars(sourceName)},
-
-					{"{{categoryID}}",
-						sourceParentID},
-					{"{{categoryName}}",
-						clearPathIllegalChars(sourceParentName)},
-
-					{"{{channelID}}",
-						download.Message.ChannelID},
-					{"{{channelName}}",
-						clearPathIllegalChars(sourceChannelName)},
-
-					{"{{userID}}",
-						download.Message.Author.ID},
-					{"{{username}}",
-						download.Message.Author.Username},
-
 					{"{{fileType}}",
 						contentTypeBase + "s"},
-					{"{{message}}",
-						download.Message.Content},
-					{"{{messageID}}",
-						download.Message.ID},
 				}
 				subfolders := []string{}
 				for _, subfolder := range *sourceConfig.Subfolders {
@@ -1081,6 +1037,8 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 								fmtSubfolder = strings.ReplaceAll(fmtSubfolder, key[0], key[1])
 							}
 						}
+						// all other keys ...
+						fmtSubfolder = dataKeys_DiscordMessage(fmtSubfolder, download.Message)
 					}
 
 					// Scrub Subfolder
@@ -1172,7 +1130,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 				log.Println(lg("Download", "", dlColor, "Saved emoji/sticker %s", download.Filename))
 			} else {
 				log.Println(lg("Download", "", dlColor,
-					logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t\t\t%s",
+					logPrefix+"SAVED %s sent %sin %s\n\t\t\t\t%s",
 					strings.ToUpper(contentTypeBase), msgTimestamp,
 					color.HiYellowString("\"%s / %s\" (%s, %s)", sourceName, sourceChannelName, download.Message.ChannelID, download.Message.ID),
 					color.GreenString("> %s to \"%s%s\"\t\t%s", domain, download.Path, download.Filename,

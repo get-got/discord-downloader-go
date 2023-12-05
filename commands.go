@@ -143,7 +143,7 @@ func handleCommands() *exrouter.Route {
 					len(config.AdminChannels),
 					bot.HeartbeatLatency().Milliseconds(),
 				)
-				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptySourceConfig {
+				if sourceConfig := getSource(ctx.Msg); sourceConfig != emptySourceConfig {
 					configJson, _ := json.MarshalIndent(sourceConfig, "", "\t")
 					message = message + fmt.Sprintf("\n• **Channel Settings...** ```%s```", string(configJson))
 				}
@@ -160,7 +160,7 @@ func handleCommands() *exrouter.Route {
 			if !hasPerms(ctx.Msg.ChannelID, discordgo.PermissionSendMessages) {
 				log.Println(lg("Command", "Stats", color.HiRedString, fmtBotSendPerm, ctx.Msg.ChannelID))
 			} else {
-				if sourceConfig := getSource(ctx.Msg, nil); sourceConfig != emptySourceConfig {
+				if sourceConfig := getSource(ctx.Msg); sourceConfig != emptySourceConfig {
 					if *sourceConfig.AllowCommands {
 						content := fmt.Sprintf("• **Total Downloads —** %s\n"+
 							"• **Downloads in this Channel —** %s",
@@ -590,8 +590,8 @@ func handleCommands() *exrouter.Route {
 
 		// Override Prefix per-Source
 		prefix := config.CommandPrefix
-		if channel, err := getChannel(m.ChannelID); err == nil {
-			if messageConfig := getSource(m.Message, channel); messageConfig != emptySourceConfig {
+		if _, err := getChannel(m.ChannelID); err == nil {
+			if messageConfig := getSource(m.Message); messageConfig != emptySourceConfig {
 				if messageConfig.CommandPrefix != nil {
 					prefix = *messageConfig.CommandPrefix
 				}

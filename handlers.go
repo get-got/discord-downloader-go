@@ -63,7 +63,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 	}
 
 	// Registered Channel
-	if sourceConfig := getSource(m, c); sourceConfig != emptySourceConfig {
+	if sourceConfig := getSource(m); sourceConfig != emptySourceConfig {
 		// Ignore bots if told to do so
 		if m.Author.Bot && *sourceConfig.IgnoreBots {
 			return nil
