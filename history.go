@@ -325,7 +325,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			var beforeRange = before
 			if beforeRange != "" {
 				if isDate(beforeRange) {
-					beforeRange = discordTimestampToSnowflake(beforeID, "2006-01-02")
+					beforeRange = discordTimestampToSnowflake("2006-01-02", beforeID)
 				}
 				if isNumeric(beforeRange) {
 					rangeContent += fmt.Sprintf("**Before:** `%s`\n", beforeRange)
@@ -336,7 +336,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			var sinceRange = since
 			if sinceRange != "" {
 				if isDate(sinceRange) {
-					sinceRange = discordTimestampToSnowflake(sinceRange, "2006-01-02")
+					sinceRange = discordTimestampToSnowflake("2006-01-02", sinceRange)
 				}
 				if isNumeric(sinceRange) {
 					rangeContent += fmt.Sprintf("**Since:** `%s`\n", sinceRange)
