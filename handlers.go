@@ -156,8 +156,6 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						// Build path
 						logPath := filepath.Clean(savePath + string(os.PathSeparator) + filename)
 
-						// Format New Line
-						var newLine string
 						// Prepend
 						prefix := ""
 						if sourceConfig.LogMessages.LinePrefix != nil {
@@ -165,24 +163,32 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						}
 						prefix = dataKeys_DiscordMessage(prefix, m)
 
-						// More Data
-						additionalInfo := ""
-						if len(m.Attachments) > 0 {
-							additionalInfo += fmt.Sprintf("<%d ATTACHMENTS> ", len(m.Attachments))
-						}
 						// Append
 						suffix := ""
 						if sourceConfig.LogMessages.LineSuffix != nil {
 							suffix = *sourceConfig.LogMessages.LineSuffix
 						}
 						suffix = dataKeys_DiscordMessage(suffix, m)
+
 						// New Line
-						contentFmt, err := m.ContentWithMoreMentionsReplaced(bot)
-						if err == nil {
-							newLine += "\n" + prefix + additionalInfo + contentFmt + suffix
-						} else {
-							newLine += "\n" + prefix + additionalInfo + m.Content + suffix
+						var newLine string
+						msgContent := m.Content
+						if contentFmt, err := m.ContentWithMoreMentionsReplaced(bot); err == nil {
+							msgContent = contentFmt
 						}
+						lineContent := msgContent
+						if sourceConfig.LogMessages.LineContent != nil {
+							lineContent = *sourceConfig.LogMessages.LineContent
+						}
+						keys := [][]string{
+							{"{{message}}", msgContent},
+						}
+						for _, key := range keys {
+							if strings.Contains(lineContent, key[0]) {
+								lineContent = strings.ReplaceAll(lineContent, key[0], key[1])
+							}
+						}
+						newLine += "\n" + prefix + lineContent + suffix
 
 						// Read
 						currentLog := ""

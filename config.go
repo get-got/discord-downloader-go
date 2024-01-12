@@ -443,6 +443,8 @@ var (
 	defSourceLog_LinePrefix            string   = "[{{serverName}} / {{channelName}}] \"{{username}}\" @ {{timestamp}}: "
 	defSourceLog_LogDownloads          bool     = true
 	defSourceLog_LogFailures           bool     = true
+	defSourceLogMsg_LineContent        string   = "{{message}}"
+	defSourceLogLink_LineContent       string   = "{{link}}"
 )
 
 type configurationSourceLog struct {
@@ -452,8 +454,9 @@ type configurationSourceLog struct {
 	FilepathNormalizeText *bool     `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
 	FilepathStripSymbols  *bool     `json:"filepathStripSymbols,omitempty" yaml:"filepathStripSymbols,omitempty"`
 
-	LinePrefix *string `json:"prefix,omitempty" yaml:"prefix,omitempty"`
-	LineSuffix *string `json:"suffix,omitempty" yaml:"suffix,omitempty"`
+	LinePrefix  *string `json:"prefix,omitempty" yaml:"prefix,omitempty"`
+	LineSuffix  *string `json:"suffix,omitempty" yaml:"suffix,omitempty"`
+	LineContent *string `json:"content,omitempty" yaml:"content,omitempty"`
 
 	FilterDuplicates *bool `json:"filterDuplicates" yaml:"filterDuplicates"`
 
@@ -638,6 +641,9 @@ func loadConfig() error {
 				config.LogLinks.LinePrefix = &defSourceLog_LinePrefix
 			}
 			// vv unique vv
+			if config.LogLinks.LineContent == nil {
+				config.LogLinks.LineContent = &defSourceLogLink_LineContent
+			}
 			if config.LogLinks.LogDownloads == nil {
 				config.LogLinks.LogDownloads = &defSourceLog_LogDownloads
 			}
@@ -660,6 +666,10 @@ func loadConfig() error {
 			}
 			if config.LogMessages.LinePrefix == nil {
 				config.LogMessages.LinePrefix = &defSourceLog_LinePrefix
+			}
+			// vv unique vv
+			if config.LogMessages.LineContent == nil {
+				config.LogMessages.LineContent = &defSourceLogMsg_LineContent
 			}
 		}
 
@@ -1116,6 +1126,9 @@ func sourceDefault(source *configurationSource) {
 			source.LogLinks.LinePrefix = &defSourceLog_LinePrefix
 		}
 		// vv unique vv
+		if source.LogLinks.LineContent == nil {
+			source.LogLinks.LineContent = &defSourceLogLink_LineContent
+		}
 		if source.LogLinks.LogDownloads == nil {
 			source.LogLinks.LogDownloads = &defSourceLog_LogDownloads
 		}
@@ -1140,6 +1153,10 @@ func sourceDefault(source *configurationSource) {
 		}
 		if source.LogMessages.LinePrefix == nil {
 			source.LogMessages.LinePrefix = &defSourceLog_LinePrefix
+		}
+		// vv unique vv
+		if source.LogMessages.LineContent == nil {
+			source.LogMessages.LineContent = &defSourceLogMsg_LineContent
 		}
 	} else if config.LogMessages != nil {
 		source.LogMessages = config.LogMessages

@@ -627,7 +627,25 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 								dataKeys_DownloadStatus(suffix, status, download),
 								download.Message)
 							// New Line
-							newLine += "\n" + prefix + download.InputURL + suffix
+							lineContent := download.InputURL
+							if sourceConfig.LogLinks.LineContent != nil {
+								lineContent = *sourceConfig.LogLinks.LineContent
+							}
+							// Message content
+							msgContent := download.Message.Content
+							if contentFmt, err := download.Message.ContentWithMoreMentionsReplaced(bot); err == nil {
+								msgContent = contentFmt
+							}
+							keys := [][]string{
+								{"{{link}}", download.InputURL},
+								{"{{message}}", msgContent},
+							}
+							for _, key := range keys {
+								if strings.Contains(lineContent, key[0]) {
+									lineContent = strings.ReplaceAll(lineContent, key[0], key[1])
+								}
+							}
+							newLine += "\n" + prefix + lineContent + suffix
 
 							// Read
 							currentLog := ""
