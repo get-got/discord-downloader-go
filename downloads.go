@@ -638,7 +638,12 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 							}
 							keys := [][]string{
 								{"{{link}}", download.InputURL},
-								{"{{message}}", msgContent},
+								{"{{msgContent}}", msgContent},
+							}
+							if len(download.Message.Embeds) > 0 {
+								keys = append(keys, [][]string{
+									{"{{embedDesc}}", download.Message.Embeds[0].Description},
+								}...)
 							}
 							for _, key := range keys {
 								if strings.Contains(lineContent, key[0]) {
