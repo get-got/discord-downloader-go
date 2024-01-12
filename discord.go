@@ -487,14 +487,24 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 				{"{{serverID}}", ch.GuildID},
 			}...)
 			// Lookup server
-			if srv, err := bot.Guild(ch.GuildID); err == nil {
+			var srv *discordgo.Guild = nil
+			srv, err := bot.State.Guild(m.GuildID)
+			if err != nil {
+				srv, _ = bot.Guild(m.GuildID)
+			}
+			if srv != nil {
 				keys = append(keys, [][]string{
 					{"{{serverName}}", clearPathIllegalChars(srv.Name)},
 				}...)
 			}
 			// Lookup parent channel
 			if ch.ParentID != "" {
-				if cat, err := bot.State.Channel(ch.ParentID); err == nil {
+				var cat *discordgo.Channel = nil
+				cat, err := bot.State.Channel(ch.ParentID)
+				if err != nil {
+					cat, _ = bot.Channel(ch.ParentID)
+				}
+				if cat != nil {
 					if cat.Type == discordgo.ChannelTypeGuildCategory {
 						keys = append(keys, [][]string{
 							{"{{categoryID}}", cat.ID},
