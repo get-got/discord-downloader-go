@@ -432,7 +432,7 @@ func getParsedLinks(inputURL string, m *discordgo.Message) map[string]string {
 	}
 
 	// Try without queries
-	parsedURL, err := url.Parse(inputURL)
+	/*parsedURL, err := url.Parse(inputURL)
 	if err == nil {
 		if strings.Contains(parsedURL.String(), "format=") {
 			parsedURL.RawQuery = "format=" + parsedURL.Query().Get("format")
@@ -443,7 +443,7 @@ func getParsedLinks(inputURL string, m *discordgo.Message) map[string]string {
 		if inputURLWithoutQueries != inputURL {
 			return pruneCompletedLinks(getParsedLinks(inputURLWithoutQueries, m), m)
 		}
-	}
+	}*/
 
 	return pruneCompletedLinks(map[string]string{inputURL: ""}, m)
 }
