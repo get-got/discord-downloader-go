@@ -173,7 +173,7 @@ func defaultConfiguration() configuration {
 		Subfolders:             []string{"{{fileType}}"},
 		FilenameDateFormat:     defConfig_FilenameDateFormat,
 		FilenameFormat:         defConfig_FilenameFormat,
-		FilepathNormalizeText:  true,
+		FilepathNormalizeText:  false,
 		FilepathStripSymbols:   false,
 		SaveImages:             true,
 		SaveVideos:             true,
@@ -438,7 +438,7 @@ type configurationSourceFilters struct {
 var (
 	defSourceLog_Subfolders            []string = []string{"{{year}}-{{monthNum}}-{{dayOfMonth}}"}
 	defSourceLog_FilenameFormat        string   = "{{serverName}} - {{channelName}}.txt"
-	defSourceLog_FilepathNormalizeText bool     = true
+	defSourceLog_FilepathNormalizeText bool     = false
 	defSourceLog_FilepathStripSymbols  bool     = false
 	defSourceLog_LinePrefix            string   = "[{{serverName}} / {{channelName}}] \"{{username}}\" @ {{timestamp}}: "
 	defSourceLog_LogDownloads          bool     = true
