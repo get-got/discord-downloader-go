@@ -190,7 +190,21 @@ func pruneCompletedLinks(linkList map[string]string, m *discordgo.Message) map[s
 	newList := make(map[string]string, 0)
 	for link, filename := range linkList {
 		alreadyDownloaded := false
-		for _, downloadedFile := range dbFindDownloadByURL(link) {
+		testLink := link
+
+		parsedURL, err := url.Parse(testLink)
+		if err == nil {
+			if parsedURL.Hostname() == "cdn.discordapp.com" {
+				if strings.Contains(parsedURL.String(), "format=") {
+					parsedURL.RawQuery = "format=" + parsedURL.Query().Get("format")
+				} else {
+					parsedURL.RawQuery = ""
+				}
+				testLink = parsedURL.String()
+			}
+		}
+
+		for _, downloadedFile := range dbFindDownloadByURL(testLink) {
 			if downloadedFile.ChannelID == m.ChannelID {
 				alreadyDownloaded = true
 			}
