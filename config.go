@@ -1227,6 +1227,9 @@ func getSource(m *discordgo.Message) configurationSource {
 	if err != nil {
 		chinfo, err = bot.Channel(m.ChannelID)
 	}
+	if err != nil || chinfo == nil {
+		log.Println(lg("Settings", "getSource", color.HiRedString, "Failed to find channel info...\t%s", err))
+	}
 
 	// Channel
 	for _, item := range config.Channels {
