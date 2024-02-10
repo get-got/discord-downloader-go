@@ -1243,7 +1243,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 							emojis := guild.Emojis
 							if len(emojis) > 1 {
 								for {
-									rand.Seed(time.Now().UnixNano())
+									rand.New(rand.NewSource((time.Now().UnixNano())))
 									chosenEmoji := emojis[rand.Intn(len(emojis))]
 									formattedEmoji := chosenEmoji.APIName()
 									if !chosenEmoji.Animated && !stringInSlice(formattedEmoji,
