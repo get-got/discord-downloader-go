@@ -808,8 +808,16 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 		// Errors
 		if response.StatusCode >= 400 {
-			log.Println(lg("Download", "", color.HiRedString, logPrefix+"DOWNLOAD FAILED, %d %s: %s",
-				response.StatusCode, http.StatusText(response.StatusCode), download.InputURL))
+			// Output
+			logHistoryErrors := true
+			if sourceConfig.OutputHistoryStatus != nil {
+				logHistoryErrors = *sourceConfig.OutputHistoryStatus
+			}
+			if logHistoryErrors {
+				log.Println(lg("Download", "", color.HiRedString, logPrefix+"DOWNLOAD FAILED, %d %s: %s",
+					response.StatusCode, http.StatusText(response.StatusCode), download.InputURL))
+			}
+			// Return
 			if response.StatusCode == 403 {
 				return mDownloadStatus(downloadFailedCode403, err), 0
 			} else if response.StatusCode == 404 {

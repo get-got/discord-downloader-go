@@ -278,6 +278,10 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			}
 			continue
 		} else { // Process
+			logHistoryStatus := true
+			if sourceConfig.OutputHistoryStatus != nil {
+				logHistoryStatus = *sourceConfig.OutputHistoryStatus
+			}
 
 			// Overwrite Send Status
 			if sourceConfig.SendAutoHistoryStatus != nil {
@@ -390,9 +394,11 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					})
 
 					// Update Status
-					log.Println(lg("History", "", color.CyanString,
-						logPrefix+"Requesting more, \t%d downloaded (%s), \t%d processed, \tsearching before %s ago (%s)",
-						totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, timeSinceShort(beforeTime), beforeTime.String()[:10]))
+					if logHistoryStatus {
+						log.Println(lg("History", "", color.CyanString,
+							logPrefix+"Requesting more, \t%d downloaded (%s), \t%d processed, \tsearching before %s ago (%s)",
+							totalDownloads, humanize.Bytes(uint64(totalFilesize)), totalMessages, timeSinceShort(beforeTime), beforeTime.String()[:10]))
+					}
 					if sendStatus {
 						var status string
 						if totalDownloads == 0 {
@@ -465,7 +471,9 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 			request_messages:
 				msg_rq_cnt++
 				if config.HistoryRequestDelay > 0 {
-					log.Println(lg("History", "", color.YellowString, "Delaying next batch request for %d seconds...", config.HistoryRequestDelay))
+					if logHistoryStatus {
+						log.Println(lg("History", "", color.YellowString, "Delaying next batch request for %d seconds...", config.HistoryRequestDelay))
+					}
 					time.Sleep(time.Second * time.Duration(config.HistoryRequestDelay))
 				}
 				if messages, err := bot.ChannelMessages(channel.ID, config.HistoryRequestCount, beforeID, sinceID, ""); err != nil {

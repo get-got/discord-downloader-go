@@ -166,6 +166,8 @@ func defaultConfiguration() configuration {
 		AutoHistorySince:      "",
 		SendHistoryStatus:     true,
 		SendAutoHistoryStatus: false,
+		OutputHistoryStatus:   true,
+		OutputHistoryErrors:   true,
 		HistoryRequestCount:   100,
 		HistoryRequestDelay:   0,
 
@@ -296,6 +298,8 @@ type configuration struct {
 	AutoHistorySince      string `json:"autoHistorySince" yaml:"autoHistorySince"`
 	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus" yaml:"sendAutoHistoryStatus"`
 	SendHistoryStatus     bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
+	OutputHistoryStatus   bool   `json:"outputHistoryStatus" yaml:"outputHistoryStatus"`
+	OutputHistoryErrors   bool   `json:"outputHistoryErrors" yaml:"outputHistoryErrors"`
 	HistoryRequestCount   int    `json:"historyRequestCount" yaml:"historyRequestCount"`
 	HistoryRequestDelay   int    `json:"historyRequestDelay" yaml:"historyRequestDelay"`
 
@@ -388,6 +392,8 @@ type configurationSource struct {
 	AutoHistorySince      *string `json:"autoHistorySince" yaml:"autoHistorySince"`
 	SendAutoHistoryStatus *bool   `json:"sendAutoHistoryStatus" yaml:"sendAutoHistoryStatus"`
 	SendHistoryStatus     *bool   `json:"sendHistoryStatus" yaml:"sendHistoryStatus"`
+	OutputHistoryStatus   *bool   `json:"outputHistoryStatus" yaml:"outputHistoryStatus"`
+	OutputHistoryErrors   *bool   `json:"outputHistoryErrors" yaml:"outputHistoryErrors"`
 
 	// Rules for Saving
 	Subfolders             *[]string                   `json:"subfolders,omitempty" yaml:"subfolders,omitempty"`
@@ -1050,6 +1056,12 @@ func sourceDefault(source *configurationSource) {
 	}
 	if source.SendHistoryStatus == nil {
 		source.SendHistoryStatus = &config.SendHistoryStatus
+	}
+	if source.OutputHistoryStatus == nil {
+		source.OutputHistoryStatus = &config.OutputHistoryStatus
+	}
+	if source.OutputHistoryErrors == nil {
+		source.OutputHistoryErrors = &config.OutputHistoryErrors
 	}
 
 	// Rules for Saving
