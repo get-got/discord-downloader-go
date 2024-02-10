@@ -494,7 +494,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status, tempfilesize = download.tryDownload()
 		// Success or Skip
-		if status.Status < downloadFailed || status.Status == downloadFailedCode404 || status.Status == downloadFailedCode403 {
+		if status.Status < downloadFailed || status.Status == downloadFailedCode404 {
 			break
 		} else {
 			time.Sleep(5 * time.Second)
@@ -780,7 +780,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 			Timeout: timeout,
 		}
 		request, err := http.NewRequest("GET", download.InputURL, nil)
-		request.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36")
+		request.Header.Set("User-Agent", sneakyUserAgent)
 		if err != nil {
 			log.Println(lg("Download", "", color.HiRedString, "Error while requesting \"%s\": %s", download.InputURL, err))
 			return mDownloadStatus(downloadFailedRequesting, err), 0
