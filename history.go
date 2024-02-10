@@ -420,7 +420,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 						if responseMsg == nil {
 							log.Println(lg("History", "", color.RedString,
 								logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
-							if responseMsg, err = replyEmbed(responseMsg, "Command — History", status); err != nil { // Failed to Edit Status, Send New Message
+							if responseMsg, err = replyEmbed(commandingMessage, "Command — History", status); err != nil { // Failed to Edit Status, Send New Message
 								log.Println(lg("History", "", color.HiRedString,
 									logPrefix+"Failed to send replacement status message:\t%s", err))
 							}
@@ -622,7 +622,7 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					if responseMsg == nil {
 						log.Println(lg("History", "", color.RedString,
 							logPrefix+"Tried to edit status message but it doesn't exist, sending new one."))
-						if _, err = replyEmbed(responseMsg, "Command — History", status); err != nil { // Failed to Edit Status, Send New Message
+						if _, err = replyEmbed(commandingMessage, "Command — History", status); err != nil { // Failed to Edit Status, Send New Message
 							log.Println(lg("History", "", color.HiRedString,
 								logPrefix+"Failed to send replacement status message:\t%s", err))
 						}
