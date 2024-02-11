@@ -1348,6 +1348,9 @@ func getSource(m *discordgo.Message) configurationSource {
 		}
 		if config.AllBlacklistCategories != nil {
 			chinf, err := bot.State.Channel(m.ChannelID)
+			if err != nil {
+				chinf, err = bot.Channel(m.ChannelID)
+			}
 			if err == nil {
 				if stringInSlice(chinf.ParentID, *config.AllBlacklistCategories) || stringInSlice(m.ChannelID, *config.AllBlacklistCategories) {
 					return emptySourceConfig
@@ -1550,6 +1553,9 @@ func getAllRegisteredChannels() []registeredChannelSource {
 			if server.ServerIDs != nil {
 				for _, subserver := range *server.ServerIDs {
 					guild, err := bot.State.Guild(subserver)
+					if err != nil {
+						guild, err = bot.Guild(subserver)
+					}
 					if err == nil {
 						for _, channel := range guild.Channels {
 							if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {
@@ -1560,6 +1566,9 @@ func getAllRegisteredChannels() []registeredChannelSource {
 				}
 			} else if isNumeric(server.ServerID) {
 				guild, err := bot.State.Guild(server.ServerID)
+				if err != nil {
+					guild, err = bot.Guild(server.ServerID)
+				}
 				if err == nil {
 					for _, channel := range guild.Channels {
 						if hasPerms(channel.ID, discordgo.PermissionReadMessageHistory) {

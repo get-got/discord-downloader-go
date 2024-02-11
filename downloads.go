@@ -1057,11 +1057,16 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 				default:
 					// Server Naming
 					if sourceChannel.GuildID != "" {
-						sourceGuild, _ := bot.State.Guild(sourceChannel.GuildID)
-						if sourceGuild != nil && sourceGuild.Name != "" {
-							sourceName = sourceGuild.Name
-						} else {
-							sourceName = sourceChannel.GuildID
+						sourceGuild, err := bot.State.Guild(sourceChannel.GuildID)
+						if err != nil {
+							sourceGuild, _ = bot.Guild(sourceChannel.GuildID)
+						}
+						if sourceGuild != nil {
+							if sourceGuild.Name != "" {
+								sourceName = sourceGuild.Name
+							} else {
+								sourceName = sourceChannel.GuildID
+							}
 						}
 					}
 				}
@@ -1235,6 +1240,9 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 				if sourceConfig.ReactWhenDownloadedEmoji == nil {
 					if download.Message.GuildID != "" {
 						guild, err := bot.State.Guild(download.Message.GuildID)
+						if err != nil {
+							guild, err = bot.Guild(download.Message.GuildID)
+						}
 						if err != nil {
 							log.Println(lg("Download", "", color.RedString,
 								"Error fetching guild state for emojis from %s: %s",

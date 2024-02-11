@@ -70,12 +70,22 @@ func getServerLabel(serverID string) (displayLabel string) {
 
 func getCategoryLabel(channelID string) (displayLabel string) {
 	displayLabel = "Category"
-	sourceChannel, _ := bot.State.Channel(channelID)
-	if sourceChannel != nil {
-		sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
-		if sourceParent != nil {
-			if sourceChannel.Name != "" {
-				displayLabel = sourceParent.Name
+	sourceChannel, err := bot.State.Channel(channelID)
+	if err != nil {
+		sourceChannel, err = bot.Channel(channelID)
+	}
+	if err == nil {
+		if sourceChannel != nil {
+			sourceParent, err := bot.State.Channel(sourceChannel.ParentID)
+			if err != nil {
+				sourceParent, err = bot.Channel(sourceChannel.ParentID)
+			}
+			if err == nil {
+				if sourceParent != nil {
+					if sourceChannel.Name != "" {
+						displayLabel = sourceParent.Name
+					}
+				}
 			}
 		}
 	}
@@ -207,7 +217,10 @@ func fixMessage(m *discordgo.Message) *discordgo.Message {
 func channelDisplay(channelID string) (sourceName string, sourceChannelName string) {
 	sourceChannelName = channelID
 	sourceName = "UNKNOWN"
-	sourceChannel, _ := bot.State.Channel(channelID)
+	sourceChannel, err := bot.State.Channel(channelID)
+	if err != nil {
+		sourceChannel, _ = bot.Channel(channelID)
+	}
 	if sourceChannel != nil {
 		// Channel Naming
 		if sourceChannel.Name != "" {
@@ -228,7 +241,10 @@ func channelDisplay(channelID string) (sourceName string, sourceChannelName stri
 			}
 			// Category Naming
 			if sourceChannel.ParentID != "" {
-				sourceParent, _ := bot.State.Channel(sourceChannel.ParentID)
+				sourceParent, err := bot.State.Channel(sourceChannel.ParentID)
+				if err != nil {
+					sourceParent, _ = bot.Channel(sourceChannel.ParentID)
+				}
 				if sourceParent != nil {
 					if sourceParent.Name != "" {
 						sourceChannelName = sourceParent.Name + " - " + sourceChannelName
@@ -326,7 +342,11 @@ func dataKeys(input string) string {
 func dataKeysChannel(input string, srcchannel string) string {
 	ret := input
 	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
-		if channel, err := bot.State.Channel(srcchannel); err == nil {
+		channel, err := bot.State.Channel(srcchannel)
+		if err != nil {
+			channel, err = bot.Channel(srcchannel)
+		}
+		if err == nil {
 			keys := [][]string{
 				{"{{channelID}}", channel.ID},
 				{"{{serverID}}", channel.GuildID},
@@ -388,14 +408,28 @@ func dataKeysDownload(sourceConfig configurationSource, download downloadRequest
 		categoryID := download.Message.ChannelID
 		categoryName := download.Message.ChannelID
 		guildName := download.Message.GuildID
-		if chinfo, err := bot.State.Channel(download.Message.ChannelID); err == nil {
+
+		chinfo, err := bot.State.Channel(download.Message.ChannelID)
+		if err != nil {
+			chinfo, err = bot.Channel(download.Message.ChannelID)
+		}
+		if err == nil {
 			channelName = chinfo.Name
 			categoryID = chinfo.ParentID
-			if catinfo, err := bot.State.Channel(categoryID); err == nil {
+
+			catinfo, err := bot.State.Channel(categoryID)
+			if err != nil {
+				catinfo, err = bot.Channel(categoryID)
+			}
+			if err == nil {
 				categoryName = catinfo.Name
 			}
 		}
-		if guildinfo, err := bot.State.Guild(download.Message.GuildID); err == nil {
+		guildinfo, err := bot.State.Guild(download.Message.GuildID)
+		if err != nil {
+			guildinfo, err = bot.Guild(download.Message.GuildID)
+		}
+		if err == nil {
 			guildName = guildinfo.Name
 		}
 
@@ -522,7 +556,11 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 						}...)
 						// Parent Category
 						if cat.ParentID != "" {
-							if cat2, err := bot.State.Channel(cat.ParentID); err == nil {
+							cat2, err := bot.State.Channel(cat.ParentID)
+							if err != nil {
+								cat2, err = bot.Channel(cat.ParentID)
+							}
+							if err == nil {
 								keys = append(keys, [][]string{
 									{"{{categoryID}}", cat2.ID},
 									{"{{categoryName}}", clearPathIllegalChars(cat2.Name)},
@@ -688,6 +726,9 @@ func getEmbedColor(channelID string) int {
 
 	// User color
 	channelInfo, err = bot.State.Channel(channelID)
+	if err != nil {
+		channelInfo, err = bot.Channel(channelID)
+	}
 	if err == nil {
 		if channelInfo.Type != discordgo.ChannelTypeDM && channelInfo.Type != discordgo.ChannelTypeGroupDM {
 			if bot.State.UserColor(botUser.ID, channelID) != 0 {
@@ -871,54 +912,15 @@ func sendErrorMessage(err string) {
 
 //#region Permissions
 
-// Checks if message author is a specified bot admin OR is server admin OR has message management perms in channel
-/*func isLocalAdmin(m *discordgo.Message) bool {
-	if m == nil {
-		if config.Debug {
-			log.Println(lg("Debug", "isLocalAdmin", color.YellowString, "check failed due to empty message"))
-		}
-		return true
-	}
-	sourceChannel, err := bot.State.Channel(m.ChannelID)
-	if err != nil || sourceChannel == nil {
-		if config.Debug {
-			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
-				"check failed due to an error or received empty channel info for message:\t%s", err))
-		}
-		return true
-	} else if sourceChannel.Name == "" || sourceChannel.GuildID == "" {
-		if config.Debug {
-			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
-				"check failed due to incomplete channel info"))
-		}
-		return true
-	}
-
-	guild, _ := bot.State.Guild(m.GuildID)
-	localPerms, err := bot.State.UserChannelPermissions(m.Author.ID, m.ChannelID)
-	if err != nil {
-		if config.Debug {
-			log.Println(lg("Debug", "isLocalAdmin", color.YellowString,
-				"check failed due to error when checking permissions:\t%s", err))
-		}
-		return true
-	}
-
-	botSelf := m.Author.ID == botUser.ID
-	botAdmin := stringInSlice(m.Author.ID, config.Admins)
-	guildOwner := m.Author.ID == guild.OwnerID
-	guildAdmin := localPerms&discordgo.PermissionAdministrator > 0
-	localManageMessages := localPerms&discordgo.PermissionManageMessages > 0
-
-	return botSelf || botAdmin || guildOwner || guildAdmin || localManageMessages
-}*/
-
 func hasPerms(channelID string, permission int64) bool {
 	if selfbot {
 		return true
 	}
 
 	sourceChannel, err := bot.State.Channel(channelID)
+	if err != nil {
+		sourceChannel, err = bot.Channel(channelID)
+	}
 	if sourceChannel != nil && err == nil {
 		switch sourceChannel.Type {
 		case discordgo.ChannelTypeDM:

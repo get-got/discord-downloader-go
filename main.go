@@ -463,6 +463,9 @@ func main() {
 					categoryName := ""
 					if channel.ParentID != "" {
 						channelParent, err := bot.State.Channel(channel.ParentID)
+						if err != nil {
+							channelParent, err = bot.Channel(channel.ParentID)
+						}
 						if err == nil {
 							categoryName = channelParent.Name
 						}

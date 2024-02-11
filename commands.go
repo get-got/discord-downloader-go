@@ -330,6 +330,9 @@ func handleCommands() *exrouter.Route {
 						if isNumeric(target) {
 							// Test/Use if number is guild
 							guild, err := bot.State.Guild(target)
+							if err != nil {
+								guild, err = bot.Guild(target)
+							}
 							if err == nil {
 								if config.Debug {
 									log.Println(lg("Command", "History", color.YellowString,
@@ -350,6 +353,9 @@ func handleCommands() *exrouter.Route {
 								}
 							} else { // Test/Use if number is channel or category
 								ch, err := bot.State.Channel(target)
+								if err != nil {
+									ch, err = bot.Channel(target)
+								}
 								if err == nil {
 									if ch.Type == discordgo.ChannelTypeGuildCategory {
 										// Category
@@ -371,6 +377,9 @@ func handleCommands() *exrouter.Route {
 												ch.ID, ch.Name, ch.GuildID))
 										}
 									}
+								} else if config.Debug {
+									log.Println(lg("Command", "History", color.HiRedString, "All attempts to identify target \"%s\" have failed...",
+										target))
 								}
 							}
 						} else if strings.Contains(strings.ToLower(target), "all") {
@@ -423,7 +432,11 @@ func handleCommands() *exrouter.Route {
 				//#region Process Channels
 				if shouldProcess && config.Debug {
 					nameGuild := channel
-					if chinfo, err := bot.State.Channel(channel); err == nil {
+					chinfo, err := bot.State.Channel(channel)
+					if err != nil {
+						chinfo, err = bot.Channel(channel)
+					}
+					if err == nil {
 						nameGuild = getServerLabel(chinfo.GuildID)
 					}
 					nameCategory := getCategoryLabel(channel)
