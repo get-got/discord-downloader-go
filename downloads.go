@@ -508,7 +508,7 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 	for i := 0; i < config.DownloadRetryMax; i++ {
 		status, tempfilesize = download.tryDownload()
 		// Success or Skip
-		if status.Status < downloadFailed || status.Status == downloadFailedCode404 {
+		if status.Status < downloadFailed || status.Status == downloadFailedCode403 || status.Status == downloadFailedCode404 {
 			break
 		} else {
 			time.Sleep(5 * time.Second)
