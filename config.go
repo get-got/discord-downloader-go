@@ -173,6 +173,7 @@ func defaultConfiguration() configuration {
 
 		// Rules for Saving
 		Subfolders:             []string{"{{fileType}}"},
+		SubfoldersFallback:     nil,
 		FilenameDateFormat:     defConfig_FilenameDateFormat,
 		FilenameFormat:         defConfig_FilenameFormat,
 		FilepathNormalizeText:  false,
@@ -306,6 +307,7 @@ type configuration struct {
 	// Rules for Saving
 	Save                   bool                        `json:"save" yaml:"save"`
 	Subfolders             []string                    `json:"subfolders" yaml:"subfolders"`
+	SubfoldersFallback     []string                    `json:"subfoldersFallback,omitempty" yaml:"subfoldersFallback,omitempty"`
 	FilenameDateFormat     string                      `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat         string                      `json:"filenameFormat" yaml:"filenameFormat"`
 	FilepathNormalizeText  bool                        `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
@@ -397,6 +399,7 @@ type configurationSource struct {
 
 	// Rules for Saving
 	Subfolders             *[]string                   `json:"subfolders,omitempty" yaml:"subfolders,omitempty"`
+	SubfoldersFallback     *[]string                   `json:"subfoldersFallback,omitempty" yaml:"subfoldersFallback,omitempty"`
 	FilenameDateFormat     *string                     `json:"filenameDateFormat" yaml:"filenameDateFormat"`
 	FilenameFormat         *string                     `json:"filenameFormat" yaml:"filenameFormat"`
 	FilepathNormalizeText  *bool                       `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
@@ -443,6 +446,7 @@ type configurationSourceFilters struct {
 
 var (
 	defSourceLog_Subfolders            []string = []string{"{{year}}-{{monthNum}}-{{dayOfMonth}}"}
+	defSourceLog_SubfoldersFallback    []string = nil
 	defSourceLog_FilenameFormat        string   = "{{serverName}} - {{channelName}}.txt"
 	defSourceLog_FilepathNormalizeText bool     = false
 	defSourceLog_FilepathStripSymbols  bool     = false
@@ -456,6 +460,7 @@ var (
 type configurationSourceLog struct {
 	Destination           string    `json:"destination" yaml:"destination"`
 	Subfolders            *[]string `json:"subfolders,omitempty" yaml:"subfolders,omitempty"`
+	SubfoldersFallback    *[]string `json:"subfoldersFallback,omitempty" yaml:"subfoldersFallback,omitempty"`
 	FilenameFormat        *string   `json:"filenameFormat,omitempty" yaml:"filenameFormat,omitempty"`
 	FilepathNormalizeText *bool     `json:"filepathNormalizeText,omitempty" yaml:"filepathNormalizeText,omitempty"`
 	FilepathStripSymbols  *bool     `json:"filepathStripSymbols,omitempty" yaml:"filepathStripSymbols,omitempty"`
@@ -634,6 +639,9 @@ func loadConfig() error {
 			if config.LogLinks.Subfolders == nil {
 				config.LogLinks.Subfolders = &defSourceLog_Subfolders
 			}
+			if config.LogLinks.SubfoldersFallback == nil {
+				config.LogLinks.SubfoldersFallback = &defSourceLog_SubfoldersFallback
+			}
 			if config.LogLinks.FilenameFormat == nil {
 				config.LogLinks.FilenameFormat = &defSourceLog_FilenameFormat
 			}
@@ -660,6 +668,9 @@ func loadConfig() error {
 		if config.LogMessages != nil {
 			if config.LogMessages.Subfolders == nil {
 				config.LogMessages.Subfolders = &defSourceLog_Subfolders
+			}
+			if config.LogMessages.SubfoldersFallback == nil {
+				config.LogMessages.SubfoldersFallback = &defSourceLog_SubfoldersFallback
 			}
 			if config.LogMessages.FilenameFormat == nil {
 				config.LogMessages.FilenameFormat = &defSourceLog_FilenameFormat
@@ -1068,6 +1079,9 @@ func sourceDefault(source *configurationSource) {
 	if source.Subfolders == nil {
 		source.Subfolders = &config.Subfolders
 	}
+	if source.SubfoldersFallback == nil {
+		source.SubfoldersFallback = &config.SubfoldersFallback
+	}
 	if source.FilenameDateFormat == nil {
 		source.FilenameDateFormat = &config.FilenameDateFormat
 	}
@@ -1125,6 +1139,9 @@ func sourceDefault(source *configurationSource) {
 		if source.LogLinks.Subfolders == nil {
 			source.LogLinks.Subfolders = &defSourceLog_Subfolders
 		}
+		if source.LogLinks.SubfoldersFallback == nil {
+			source.LogLinks.SubfoldersFallback = &defSourceLog_SubfoldersFallback
+		}
 		if source.LogLinks.FilenameFormat == nil {
 			source.LogLinks.FilenameFormat = &defSourceLog_FilenameFormat
 		}
@@ -1153,6 +1170,9 @@ func sourceDefault(source *configurationSource) {
 	if source.LogMessages != nil {
 		if source.LogMessages.Subfolders == nil {
 			source.LogMessages.Subfolders = &defSourceLog_Subfolders
+		}
+		if source.LogMessages.SubfoldersFallback == nil {
+			source.LogMessages.SubfoldersFallback = &defSourceLog_SubfoldersFallback
 		}
 		if source.LogMessages.FilenameFormat == nil {
 			source.LogMessages.FilenameFormat = &defSourceLog_FilenameFormat

@@ -115,7 +115,22 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						// Scrub subfolder
 						newSubfolder = clearSourceLogField(newSubfolder, *sourceConfig.LogMessages)
 
-						subfolders = append(subfolders, newSubfolder)
+						// Do Fallback if a line contains an unparsed key (if fallback exists).
+						if strings.Contains(newSubfolder, "{{") && strings.Contains(newSubfolder, "}}") &&
+							sourceConfig.LogMessages.SubfoldersFallback != nil {
+							subfolders = []string{}
+							for _, subfolder2 := range *sourceConfig.LogMessages.SubfoldersFallback {
+								newSubfolder2 := dataKeys_DiscordMessage(subfolder2, m)
+
+								// Scrub subfolder
+								newSubfolder2 = clearSourceLogField(newSubfolder2, *sourceConfig.LogMessages)
+
+								subfolders = append(subfolders, newSubfolder2)
+							}
+							break
+						} else {
+							subfolders = append(subfolders, newSubfolder)
+						}
 					}
 
 					// Subfolder Dividion - Handle Formatted Subfolders

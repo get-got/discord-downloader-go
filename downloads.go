@@ -578,7 +578,24 @@ func (download downloadRequestStruct) handleDownload() (downloadStatusStruct, in
 							// Scrub subfolder
 							newSubfolder = clearSourceLogField(newSubfolder, *sourceConfig.LogLinks)
 
-							subfolders = append(subfolders, newSubfolder)
+							// Do Fallback if a line contains an unparsed key (if fallback exists).
+							if strings.Contains(newSubfolder, "{{") && strings.Contains(newSubfolder, "}}") &&
+								sourceConfig.LogLinks.SubfoldersFallback != nil {
+								subfolders = []string{}
+								for _, subfolder2 := range *sourceConfig.LogLinks.SubfoldersFallback {
+									newSubfolder2 := dataKeys_DiscordMessage(
+										dataKeys_DownloadStatus(subfolder2, status, download),
+										download.Message)
+
+									// Scrub subfolder
+									newSubfolder2 = clearSourceLogField(newSubfolder2, *sourceConfig.LogLinks)
+
+									subfolders = append(subfolders, newSubfolder2)
+								}
+								break
+							} else {
+								subfolders = append(subfolders, newSubfolder)
+							}
 						}
 
 						// Subfolder Dividion - Handle Formatted Subfolders
@@ -1094,7 +1111,31 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 					// Scrub Subfolder
 					fmtSubfolder = clearSourceField(fmtSubfolder, sourceConfig)
 
-					subfolders = append(subfolders, fmtSubfolder)
+					// Do Fallback if a line contains an unparsed key (if fallback exists).
+					if strings.Contains(fmtSubfolder, "{{") && strings.Contains(fmtSubfolder, "}}") &&
+						sourceConfig.SubfoldersFallback != nil {
+						subfolders = []string{}
+						for _, subfolder2 := range *sourceConfig.SubfoldersFallback {
+							fmtSubfolder2 := subfolder
+							if strings.Contains(subfolder2, "{{") && strings.Contains(subfolder2, "}}") {
+								for _, key := range keys {
+									if strings.Contains(fmtSubfolder, key[0]) {
+										fmtSubfolder2 = strings.ReplaceAll(fmtSubfolder2, key[0], key[1])
+									}
+								}
+								// all other keys ...
+								fmtSubfolder2 = dataKeys_DiscordMessage(subfolder2, download.Message)
+							}
+
+							// Scrub subfolder
+							fmtSubfolder2 = clearSourceField(fmtSubfolder2, sourceConfig)
+
+							subfolders = append(subfolders, fmtSubfolder2)
+						}
+						break
+					} else {
+						subfolders = append(subfolders, fmtSubfolder)
+					}
 				}
 
 				// Subfolder Dividion - Handle Formatted Subfolders
