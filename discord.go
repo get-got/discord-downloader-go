@@ -453,6 +453,17 @@ func dataKeysDownload(sourceConfig configurationSource, download downloadRequest
 			{"{{messageID}}", download.Message.ID},
 			{"{{userID}}", userID},
 			{"{{username}}", username},
+			{"{{usernameNoLeadPeriod}}", func() string {
+				usernameCleaned := username
+				for strings.HasPrefix(usernameCleaned, ".") {
+					if len(usernameCleaned) <= 1 {
+						break
+					} else {
+						usernameCleaned = usernameCleaned[1:]
+					}
+				}
+				return usernameCleaned
+			}()},
 			{"{{channelID}}", download.Message.ChannelID},
 			{"{{channelName}}", channelName},
 			{"{{categoryID}}", categoryID},
@@ -505,6 +516,17 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 			keys = append(keys, [][]string{
 				{"{{userID}}", m.Author.ID},
 				{"{{username}}", clearPathIllegalChars(m.Author.Username)},
+				{"{{usernameNoLeadPeriod}}", func() string {
+					usernameCleaned := clearPathIllegalChars(m.Author.Username)
+					for strings.HasPrefix(usernameCleaned, ".") {
+						if len(usernameCleaned) <= 1 {
+							break
+						} else {
+							usernameCleaned = usernameCleaned[1:]
+						}
+					}
+					return usernameCleaned
+				}()},
 				{"{{userDisc}}", m.Author.Discriminator},
 			}...)
 		}
