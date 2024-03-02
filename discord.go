@@ -510,9 +510,9 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 		}
 		// Lookup channel
 		var ch *discordgo.Channel = nil
-		ch, err := bot.State.Channel(m.ChannelID)
-		if err != nil {
-			ch, _ = bot.Channel(m.ChannelID)
+		ch, err = bot.Channel(m.ChannelID)
+		if err != nil || ch == nil {
+			ch, _ = bot.State.Channel(m.ChannelID)
 		}
 		if ch != nil {
 			keys = append(keys, [][]string{
@@ -522,9 +522,9 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 			}...)
 			// Lookup server
 			var srv *discordgo.Guild = nil
-			srv, err := bot.State.Guild(m.GuildID)
-			if err != nil {
-				srv, _ = bot.Guild(m.GuildID)
+			srv, err = bot.Guild(ch.GuildID)
+			if err != nil || srv == nil {
+				srv, _ = bot.State.Guild(ch.GuildID)
 			}
 			if srv != nil {
 				keys = append(keys, [][]string{
@@ -534,9 +534,9 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 			// Lookup parent channel
 			if ch.ParentID != "" {
 				var cat *discordgo.Channel = nil
-				cat, err := bot.State.Channel(ch.ParentID)
-				if err != nil {
-					cat, _ = bot.Channel(ch.ParentID)
+				cat, err = bot.Channel(ch.ParentID)
+				if err != nil || cat == nil {
+					cat, _ = bot.State.Channel(ch.ParentID)
 				}
 				if cat != nil {
 					if cat.Type == discordgo.ChannelTypeGuildCategory {
