@@ -1344,9 +1344,10 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						}
 						msg := ""
 						if sourceConfig.SendFileCaption != nil {
-							msg = *sourceConfig.SendFileCaption
-							msg = dataKeys_DiscordMessage(msg, download.Message)
+							msg = dataKeys_DiscordMessage(*sourceConfig.SendFileCaption, download.Message)
 						}
+						msg = strings.ReplaceAll(msg, "\\r", "\r")
+						msg = strings.ReplaceAll(msg, "\\n", "\n")
 						// File
 						if actualFile {
 							_, err := bot.ChannelMessageSendComplex(logChannel,
