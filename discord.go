@@ -339,17 +339,19 @@ func dataKeys(input string) string {
 	return input
 }
 
-func dataKeysDownload(sourceConfig configurationSource, download downloadRequestStruct) string {
+func dataKeysDownload(input string, sourceConfig configurationSource, download downloadRequestStruct, buildingFilename bool) string {
 	//TODO: same as dataKeys
+	ret := input
 
-	if sourceConfig == emptySourceConfig {
-		return config.FilenameFormat
-	}
-
-	ret := config.FilenameFormat
-	if sourceConfig.FilenameFormat != nil {
-		if *sourceConfig.FilenameFormat != "" {
-			ret = *sourceConfig.FilenameFormat
+	if buildingFilename {
+		if sourceConfig == emptySourceConfig {
+			return config.FilenameFormat
+		}
+		ret = config.FilenameFormat
+		if sourceConfig.FilenameFormat != nil {
+			if *sourceConfig.FilenameFormat != "" {
+				ret = *sourceConfig.FilenameFormat
+			}
 		}
 	}
 

@@ -959,7 +959,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 
 		// Format Keys
 		if !download.EmojiCmd {
-			download.Filename = dataKeysDownload(sourceConfig, download)
+			download.Filename = dataKeysDownload("", sourceConfig, download, true)
 		}
 
 		// Scrub Filename
@@ -1345,7 +1345,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						msg := ""
 						if sourceConfig.SendFileCaption != nil {
 							msg = dataKeys_DiscordMessage(*sourceConfig.SendFileCaption, download.Message)
-							msg = dataKeysDownload(sourceConfig, download)
+							msg = dataKeysDownload(msg, sourceConfig, download, false)
 						}
 						msg = strings.ReplaceAll(msg, "\\r", "\r")
 						msg = strings.ReplaceAll(msg, "\\n", "\n")
