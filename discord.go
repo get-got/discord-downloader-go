@@ -423,6 +423,15 @@ func dataKeysDownload(input string, sourceConfig configurationSource, download d
 			filesize = humanize.Bytes(uint64(fileinfo.Size()))
 		}
 
+		fmt_msg := download.Message.Content
+		if buildingFilename {
+			fmt_msg = clearPathIllegalChars(download.Message.Content)
+		}
+		fmt_url := download.InputURL
+		if buildingFilename {
+			fmt_url = clearPathIllegalChars(download.InputURL)
+		}
+
 		keys := [][]string{
 			{"{{date}}", messageTime.Format(filenameDateFormat)},
 			{"{{file}}", download.Filename},
@@ -449,10 +458,10 @@ func dataKeysDownload(input string, sourceConfig configurationSource, download d
 			{"{{categoryName}}", categoryName},
 			{"{{serverID}}", download.Message.GuildID},
 			{"{{serverName}}", guildName},
-			{"{{message}}", clearPathIllegalChars(download.Message.Content)},
+			{"{{message}}", fmt_msg},
 			{"{{downloadTime}}", timeSinceShort(download.StartTime)},
 			{"{{downloadTimeLong}}", timeSince(download.StartTime)},
-			{"{{url}}", clearPathIllegalChars(download.InputURL)},
+			{"{{url}}", fmt_url},
 			{"{{domain}}", domain},
 			{"{{nanoID}}", nanoID},
 			{"{{shortID}}", shortID},
