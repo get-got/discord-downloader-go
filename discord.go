@@ -339,29 +339,6 @@ func dataKeys(input string) string {
 	return input
 }
 
-func dataKeysChannel(input string, srcchannel string) string {
-	ret := input
-	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
-		channel, err := bot.State.Channel(srcchannel)
-		if err != nil {
-			channel, err = bot.Channel(srcchannel)
-		}
-		if err == nil {
-			keys := [][]string{
-				{"{{channelID}}", channel.ID},
-				{"{{serverID}}", channel.GuildID},
-				{"{{channelName}}", channel.Name},
-			}
-			for _, key := range keys {
-				if strings.Contains(ret, key[0]) {
-					ret = strings.ReplaceAll(ret, key[0], key[1])
-				}
-			}
-		}
-	}
-	return dataKeys(ret)
-}
-
 func dataKeysDownload(sourceConfig configurationSource, download downloadRequestStruct) string {
 	//TODO: same as dataKeys
 
@@ -489,7 +466,7 @@ func dataKeysDownload(sourceConfig configurationSource, download downloadRequest
 
 func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 	ret := input
-	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") {
+	if strings.Contains(ret, "{{") && strings.Contains(ret, "}}") && m != nil {
 		// Basic message data
 		keys := [][]string{
 			{"{{year}}",

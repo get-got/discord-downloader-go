@@ -1345,7 +1345,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 						msg := ""
 						if sourceConfig.SendFileCaption != nil {
 							msg = *sourceConfig.SendFileCaption
-							msg = dataKeysChannel(msg, download.Message.ChannelID)
+							msg = dataKeys_DiscordMessage(msg, download.Message)
 						}
 						// File
 						if actualFile {
