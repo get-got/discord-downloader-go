@@ -431,6 +431,9 @@ type configurationSourceFilters struct {
 	BlockedRoles *[]string `json:"blockedRoles,omitempty" yaml:"blockedRoles,omitempty"`
 	AllowedRoles *[]string `json:"allowedRoles,omitempty" yaml:"allowedRoles,omitempty"`
 
+	BlockedLinkContent *[]string `json:"blockedLinkContent,omitempty" yaml:"blockedLinkContent,omitempty"`
+	AllowedLinkContent *[]string `json:"allowedLinkContent,omitempty" yaml:"allowedLinkContent,omitempty"`
+
 	BlockedDomains *[]string `json:"blockedDomains,omitempty" yaml:"blockedDomains,omitempty"`
 	AllowedDomains *[]string `json:"allowedDomains,omitempty" yaml:"allowedDomains,omitempty"`
 
@@ -1138,6 +1141,12 @@ func sourceDefault(source *configurationSource) {
 	}
 	if source.Filters.AllowedRoles == nil && config.Filters.AllowedRoles != nil {
 		source.Filters.AllowedRoles = config.Filters.AllowedRoles
+	}
+	if source.Filters.BlockedLinkContent == nil && config.Filters.BlockedLinkContent != nil {
+		source.Filters.BlockedLinkContent = config.Filters.BlockedLinkContent
+	}
+	if source.Filters.AllowedLinkContent == nil && config.Filters.AllowedLinkContent != nil {
+		source.Filters.AllowedLinkContent = config.Filters.AllowedLinkContent
 	}
 	if source.Filters.BlockedDomains == nil && config.Filters.BlockedDomains != nil {
 		source.Filters.BlockedDomains = config.Filters.BlockedDomains

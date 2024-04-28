@@ -369,16 +369,55 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 			time.Sleep(time.Duration(delay) * time.Millisecond)
 		}
 
-		// Process Files
+		// Process Collected Links
 		var downloadedItems []downloadedItem
 		files := getLinksByMessage(m)
 		for _, file := range files {
+			// Blank link?
 			if file.Link == "" {
 				continue
 			}
+			// Filter Checks
+			shouldAbort := false
+			if sourceConfig.Filters.BlockedLinkContent != nil {
+				for _, phrase := range *sourceConfig.Filters.BlockedLinkContent {
+					if strings.Contains(file.Link, phrase) && phrase != "" {
+						shouldAbort = true
+						if config.Debug {
+							log.Println(lg("Debug", "Message", color.YellowString,
+								"%s blockedLinkContent found \"%s\" in message, planning to abort...",
+								color.HiMagentaString("(FILTER)"), phrase))
+						}
+						break
+					}
+				}
+			}
+			if sourceConfig.Filters.AllowedLinkContent != nil {
+				for _, phrase := range *sourceConfig.Filters.AllowedLinkContent {
+					if strings.Contains(file.Link, phrase) && phrase != "" {
+						shouldAbort = false
+						if config.Debug {
+							log.Println(lg("Debug", "Message", color.YellowString,
+								"%s allowedLinkContent found \"%s\" in message, planning to process...",
+								color.HiMagentaString("(FILTER)"), phrase))
+						}
+						break
+					}
+				}
+			}
+			if shouldAbort {
+				if config.Debug {
+					log.Println(lg("Debug", "Message", color.YellowString,
+						"%s Filter decided to ignore link...",
+						color.HiMagentaString("(FILTER)")))
+				}
+				continue
+			}
+			// Output
 			if config.Debug && (!history || config.MessageOutputHistory) {
 				log.Println(lg("Debug", "Message", color.HiCyanString, "FOUND FILE: "+file.Link+fmt.Sprintf(" \t<%s>", m.ID)))
 			}
+			// Handle Download
 			status, filesize := downloadRequestStruct{
 				InputURL:     file.Link,
 				Filename:     file.Filename,
@@ -391,6 +430,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 				StartTime:    time.Now(),
 				AttachmentID: file.AttachmentID,
 			}.handleDownload()
+			// Await Status
 			if status.Status == downloadSuccess {
 				domain, _ := getDomain(file.Link)
 				downloadedItems = append(downloadedItems, downloadedItem{
