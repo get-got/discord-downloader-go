@@ -274,6 +274,8 @@ func dataKeys(input string) string {
 				projectVersion},
 			{"{{apiVersion}}",
 				discordgo.APIVersion},
+			{"{{botUsername}}",
+				botUser.Username},
 			{"{{countNoCommas}}",
 				fmt.Sprint(countInt)},
 			{"{{count}}",
