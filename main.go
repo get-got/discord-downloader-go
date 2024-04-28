@@ -18,7 +18,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
-	twitterscraper "github.com/n0madic/twitter-scraper"
+	twitterscraper "github.com/imperatrona/twitter-scraper"
 	"github.com/rivo/duplo"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 )

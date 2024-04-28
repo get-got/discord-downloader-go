@@ -15,8 +15,8 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/hashicorp/go-version v1.6.0
+	github.com/imperatrona/twitter-scraper v0.0.0-20240425221339-715658ada4d9
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0
-	github.com/n0madic/twitter-scraper v0.0.0-20231104223941-296710769dd8
 	github.com/rivo/duplo v0.0.0-20220703183130-751e882e6b83
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
 	github.com/wk8/go-ordered-map/v2 v2.1.8
@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	github.com/AlexEidt/Vidio v1.5.1 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
@@ -44,9 +45,9 @@ require (
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 )
 
 replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.27.0-gg.1
