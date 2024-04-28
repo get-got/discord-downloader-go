@@ -275,7 +275,7 @@ func dataKeys(input string) string {
 			{"{{apiVersion}}",
 				discordgo.APIVersion},
 			{"{{botUsername}}",
-				botUser.Username},
+				clearPathIllegalChars(botUser.Username)},
 			{"{{countNoCommas}}",
 				fmt.Sprint(countInt)},
 			{"{{count}}",
@@ -467,6 +467,8 @@ func dataKeysDownload(input string, sourceConfig configurationSource, download d
 			{"{{domain}}", domain},
 			{"{{nanoID}}", nanoID},
 			{"{{shortID}}", shortID},
+			{"{{botUsername}}",
+				clearPathIllegalChars(botUser.Username)},
 		}
 		for _, key := range keys {
 			if strings.Contains(ret, key[0]) {
@@ -500,6 +502,8 @@ func dataKeys_DiscordMessage(input string, m *discordgo.Message) string {
 			{"{{messageID}}", m.ID},
 			{"{{message}}", clearPathIllegalChars(m.Content)},
 			{"{{channelID}}", m.ChannelID},
+			{"{{botUsername}}",
+				clearPathIllegalChars(botUser.Username)},
 		}
 		// Author data if present
 		if m.Author != nil {
