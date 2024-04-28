@@ -385,7 +385,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						shouldAbort = true
 						if config.Debug {
 							log.Println(lg("Debug", "Message", color.YellowString,
-								"%s blockedLinkContent found \"%s\" in message, planning to abort...",
+								"%s blockedLinkContent found \"%s\" in link, planning to abort...",
 								color.HiMagentaString("(FILTER)"), phrase))
 						}
 						break
@@ -398,7 +398,7 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 						shouldAbort = false
 						if config.Debug {
 							log.Println(lg("Debug", "Message", color.YellowString,
-								"%s allowedLinkContent found \"%s\" in message, planning to process...",
+								"%s allowedLinkContent found \"%s\" in link, planning to process...",
 								color.HiMagentaString("(FILTER)"), phrase))
 						}
 						break
