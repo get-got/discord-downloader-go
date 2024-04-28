@@ -1121,11 +1121,47 @@ func sourceDefault(source *configurationSource) {
 	if source.Filters == nil {
 		source.Filters = &configurationSourceFilters{}
 	}
+	if source.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
+		source.Filters.BlockedPhrases = config.Filters.BlockedPhrases
+	}
+	if source.Filters.AllowedPhrases == nil && config.Filters.AllowedPhrases != nil {
+		source.Filters.AllowedPhrases = config.Filters.AllowedPhrases
+	}
+	if source.Filters.BlockedUsers == nil && config.Filters.BlockedUsers != nil {
+		source.Filters.BlockedUsers = config.Filters.BlockedUsers
+	}
+	if source.Filters.AllowedUsers == nil && config.Filters.AllowedUsers != nil {
+		source.Filters.AllowedUsers = config.Filters.AllowedUsers
+	}
+	if source.Filters.BlockedRoles == nil && config.Filters.BlockedRoles != nil {
+		source.Filters.BlockedRoles = config.Filters.BlockedRoles
+	}
+	if source.Filters.AllowedRoles == nil && config.Filters.AllowedRoles != nil {
+		source.Filters.AllowedRoles = config.Filters.AllowedRoles
+	}
+	if source.Filters.BlockedDomains == nil && config.Filters.BlockedDomains != nil {
+		source.Filters.BlockedDomains = config.Filters.BlockedDomains
+	}
+	if source.Filters.AllowedDomains == nil && config.Filters.AllowedDomains != nil {
+		source.Filters.AllowedDomains = config.Filters.AllowedDomains
+	}
 	if source.Filters.BlockedExtensions == nil && config.Filters.BlockedExtensions != nil {
 		source.Filters.BlockedExtensions = config.Filters.BlockedExtensions
 	}
-	if source.Filters.BlockedPhrases == nil && config.Filters.BlockedPhrases != nil {
-		source.Filters.BlockedPhrases = config.Filters.BlockedPhrases
+	if source.Filters.AllowedExtensions == nil && config.Filters.AllowedExtensions != nil {
+		source.Filters.AllowedExtensions = config.Filters.AllowedExtensions
+	}
+	if source.Filters.BlockedFilenames == nil && config.Filters.BlockedFilenames != nil {
+		source.Filters.BlockedFilenames = config.Filters.BlockedFilenames
+	}
+	if source.Filters.AllowedFilenames == nil && config.Filters.AllowedFilenames != nil {
+		source.Filters.AllowedFilenames = config.Filters.AllowedFilenames
+	}
+	if source.Filters.BlockedReactions == nil && config.Filters.BlockedReactions != nil {
+		source.Filters.BlockedReactions = config.Filters.BlockedReactions
+	}
+	if source.Filters.AllowedReactions == nil && config.Filters.AllowedReactions != nil {
+		source.Filters.AllowedReactions = config.Filters.AllowedReactions
 	}
 	if source.Duplo == nil && config.Duplo {
 		source.Duplo = &config.Duplo
