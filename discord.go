@@ -630,7 +630,7 @@ func dataKeys_DownloadStatus(input string, status downloadStatusStruct, download
 }
 
 func updateDiscordPresence() {
-	if config.PresenceEnabled {
+	if bot != nil && botReady && config.PresenceEnabled {
 		// Vars
 		countInt := int64(dbDownloadCount()) + *config.InflateDownloadCount
 		count := formatNumber(countInt)
