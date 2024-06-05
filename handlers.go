@@ -33,9 +33,12 @@ func messageUpdate(s *discordgo.Session, m *discordgo.MessageUpdate) {
 }
 
 func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, history bool) []downloadedItem {
+	shouldBail := false //TODO: this is messy, overlapped purpose with shouldAbort used for filters down below in this func.
+	shouldBailReason := ""
 	// Ignore own messages unless told not to
 	if m.Author.ID == botUser.ID && !config.ScanOwnMessages {
-		return nil
+		shouldBail = true
+		shouldBailReason = "config.ScanOwnMessages"
 	}
 
 	if !history && !edited {
@@ -66,10 +69,21 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 	if sourceConfig := getSource(m); sourceConfig != emptySourceConfig {
 		// Ignore bots if told to do so
 		if m.Author.Bot && *sourceConfig.IgnoreBots {
-			return nil
+			shouldBail = true
+			shouldBailReason = "config.IgnoreBots"
 		}
 		// Ignore if told so by config
 		if (!history && !*sourceConfig.Enabled) || (edited && !*sourceConfig.ScanEdits) {
+			shouldBail = true
+			shouldBailReason = "config.ScanEdits"
+		}
+
+		// Bail due to basic config rules
+		if shouldBail {
+			if config.Debug {
+				log.Println(lg("Debug", "Message", color.YellowString,
+					"%s Ignoring message due to %s...", color.HiMagentaString("(CONFIG)"), shouldBailReason))
+			}
 			return nil
 		}
 
