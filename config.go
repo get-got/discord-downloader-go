@@ -133,6 +133,7 @@ func defaultConfiguration() configuration {
 
 		HistoryManagerRate:  defConfig_HistoryManagerRate,
 		CheckupRate:         defConfig_CheckupRate,
+		ConnectionCheck:     true,
 		ConnectionCheckRate: defConfig_ConnectionCheckRate,
 		PresenceRefreshRate: defConfig_PresenceRefreshRate,
 
@@ -243,6 +244,7 @@ type configuration struct {
 	WatchSettings         bool   `json:"watchSettings" yaml:"watchSettings"`
 	BackupDatabaseOnStart bool   `json:"backupDatabaseOnStart" yaml:"backupDatabaseOnStart"`
 	CheckupRate           int    `json:"checkupRate,omitempty" yaml:"checkupRate,omitempty"`
+	ConnectionCheck       bool   `json:"connectionCheck,omitempty" yaml:"connectionCheck,omitempty"`
 	ConnectionCheckRate   int    `json:"connectionCheckRate,omitempty" yaml:"connectionCheckRate,omitempty"`
 	HistoryManagerRate    int    `json:"historyManagerRate,omitempty" yaml:"historyManagerRate,omitempty"`
 	InflateDownloadCount  *int64 `json:"inflateDownloadCount,omitempty" yaml:"inflateDownloadCount,omitempty"`

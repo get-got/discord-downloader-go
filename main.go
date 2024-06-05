@@ -346,35 +346,36 @@ func main() {
 				go updateDiscordPresence()
 
 			case <-tickerConnection.C:
-				doReconnect := func() {
-					log.Println(lg("Discord", "", color.YellowString, "Closing Discord connections..."))
-					bot.Client.CloseIdleConnections()
-					bot.CloseWithCode(1001)
-					bot = nil
-					log.Println(lg("Discord", "", color.RedString, "Discord connections closed!"))
-					time.Sleep(15 * time.Second)
-					if config.ExitOnBadConnection {
-						properExit()
-					} else {
-						log.Println(lg("Discord", "", color.GreenString, "Logging in..."))
-						botLoad()
-						log.Println(lg("Discord", "", color.HiGreenString,
-							"Reconnected! The bot *should* resume working..."))
-						// Log Status
-						sendStatusMessage(sendStatusReconnect)
+				if config.ConnectionCheck {
+					doReconnect := func() {
+						log.Println(lg("Discord", "", color.YellowString, "Closing Discord connections..."))
+						bot.Client.CloseIdleConnections()
+						bot.CloseWithCode(1001)
+						bot = nil
+						log.Println(lg("Discord", "", color.RedString, "Discord connections closed!"))
+						time.Sleep(15 * time.Second)
+						if config.ExitOnBadConnection {
+							properExit()
+						} else {
+							log.Println(lg("Discord", "", color.GreenString, "Logging in..."))
+							botLoad()
+							log.Println(lg("Discord", "", color.HiGreenString,
+								"Reconnected! The bot *should* resume working..."))
+							// Log Status
+							sendStatusMessage(sendStatusReconnect)
+						}
+					}
+					gate, err := bot.Gateway()
+					if err != nil || gate == "" {
+						log.Println(lg("Discord", "", color.HiYellowString,
+							"Bot encountered a gateway error: GATEWAY: %s,\tERR: %s", gate, err))
+						doReconnect()
+					} else if time.Since(bot.LastHeartbeatAck).Seconds() > 4*60 {
+						log.Println(lg("Discord", "", color.HiYellowString,
+							"Bot has not received a heartbeat from Discord in 4 minutes..."))
+						doReconnect()
 					}
 				}
-				gate, err := bot.Gateway()
-				if err != nil || gate == "" {
-					log.Println(lg("Discord", "", color.HiYellowString,
-						"Bot encountered a gateway error: GATEWAY: %s,\tERR: %s", gate, err))
-					doReconnect()
-				} else if time.Since(bot.LastHeartbeatAck).Seconds() > 4*60 {
-					log.Println(lg("Discord", "", color.HiYellowString,
-						"Bot has not received a heartbeat from Discord in 4 minutes..."))
-					doReconnect()
-				}
-
 			}
 		}
 	}()
