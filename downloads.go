@@ -298,6 +298,7 @@ func getParsedLinks(inputURL string, m *discordgo.Message) map[string]string {
 	inputURL = strings.ReplaceAll(inputURL, "vxtwitter.com", "twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, "//x.com", "//twitter.com")
 	inputURL = strings.ReplaceAll(inputURL, ".x.com", ".twitter.com")
+	inputURL = strings.ReplaceAll(inputURL, "𝕏", "x")
 	if twitterConnected {
 		if regexUrlTwitter.MatchString(inputURL) {
 			links, err := getTwitterUrls(inputURL)
