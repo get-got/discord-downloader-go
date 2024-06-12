@@ -307,8 +307,13 @@ func handleCommands() *exrouter.Route {
 						beforeID = discordTimestampToSnowflake("2006-01-02", before)
 					} else if isNumeric(before) {
 						beforeID = before
+					} else { // try to parse duration
+						dur, err := time.ParseDuration(before)
+						if err == nil {
+							beforeID = discordTimestampToSnowflake("2006-01-02 15:04:05.999999999 -0700 MST", time.Now().Add(-dur).Format("2006-01-02 15:04:05.999999999 -0700 MST"))
+						}
 					}
-					if config.Debug {
+					if config.Debug && beforeID != "" {
 						log.Println(lg("Command", "History", color.CyanString, "Date before range applied, snowflake %s, converts back to %s",
 							beforeID, discordSnowflakeToTimestamp(beforeID, "2006-01-02T15:04:05.000Z07:00")))
 					}
@@ -318,8 +323,13 @@ func handleCommands() *exrouter.Route {
 						sinceID = discordTimestampToSnowflake("2006-01-02", since)
 					} else if isNumeric(since) {
 						sinceID = since
+					} else { // try to parse duration
+						dur, err := time.ParseDuration(since)
+						if err == nil {
+							sinceID = discordTimestampToSnowflake("2006-01-02 15:04:05.999999999 -0700 MST", time.Now().Add(-dur).Format("2006-01-02 15:04:05.999999999 -0700 MST"))
+						}
 					}
-					if config.Debug {
+					if config.Debug && sinceID != "" {
 						log.Println(lg("Command", "History", color.CyanString, "Date since range applied, snowflake %s, converts back to %s",
 							sinceID, discordSnowflakeToTimestamp(sinceID, "2006-01-02T15:04:05.000Z07:00")))
 					}

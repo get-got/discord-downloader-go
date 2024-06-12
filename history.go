@@ -328,10 +328,15 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 			var beforeRange = before
 			if beforeRange != "" {
-				if isDate(beforeRange) {
+				if isDate(beforeRange) { // user has input YYYY-MM-DD
 					beforeRange = discordTimestampToSnowflake("2006-01-02", beforeID)
+				} else { // try to parse duration
+					dur, err := time.ParseDuration(beforeRange)
+					if err == nil {
+						beforeRange = discordTimestampToSnowflake("2006-01-02 15:04:05.999999999 -0700 MST", time.Now().Add(-dur).Format("2006-01-02 15:04:05.999999999 -0700 MST"))
+					}
 				}
-				if isNumeric(beforeRange) {
+				if isNumeric(beforeRange) { // did we convert something (or was it always a number)?
 					rangeContent += fmt.Sprintf("**Before:** `%s`\n", beforeRange)
 				}
 				before = beforeRange
@@ -339,10 +344,15 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 
 			var sinceRange = since
 			if sinceRange != "" {
-				if isDate(sinceRange) {
+				if isDate(sinceRange) { // user has input YYYY-MM-DD
 					sinceRange = discordTimestampToSnowflake("2006-01-02", sinceRange)
+				} else { // try to parse duration
+					dur, err := time.ParseDuration(sinceRange)
+					if err == nil {
+						sinceRange = discordTimestampToSnowflake("2006-01-02 15:04:05.999999999 -0700 MST", time.Now().Add(-dur).Format("2006-01-02 15:04:05.999999999 -0700 MST"))
+					}
 				}
-				if isNumeric(sinceRange) {
+				if isNumeric(sinceRange) { // did we convert something (or was it always a number)?
 					rangeContent += fmt.Sprintf("**Since:** `%s`\n", sinceRange)
 				}
 				since = sinceRange
