@@ -25,11 +25,12 @@ import (
 
 var (
 	// General
-	err                error
-	loop               chan os.Signal
-	mainWg             sync.WaitGroup
-	startTime          time.Time
-	ddgUpdateAvailable bool = false
+	err                  error
+	loop                 chan os.Signal
+	mainWg               sync.WaitGroup
+	startTime            time.Time
+	ddgUpdateAvailable   bool = false
+	autoHistoryInitiated bool = false
 
 	// Downloads
 	timeLastUpdated      time.Time
@@ -147,6 +148,7 @@ func main() {
 	//#region [Loops] History Job Processing
 	go func() {
 		for {
+			newJobCount := 0
 			// Empty Local Cache
 			nhistoryJobCnt,
 				nhistoryJobCntWaiting,
@@ -178,15 +180,14 @@ func main() {
 				if nhistoryJobCntRunning < config.HistoryMaxJobs || config.HistoryMaxJobs < 1 {
 					openSlots := config.HistoryMaxJobs - nhistoryJobCntRunning
 					newJobs := make([]historyJob, openSlots)
-					filledSlots := 0
 					// Find Jobs
 					for pair := historyJobs.Oldest(); pair != nil; pair = pair.Next() {
-						if filledSlots == openSlots {
+						if newJobCount == openSlots {
 							break
 						}
 						if pair.Value.Status == historyStatusWaiting {
 							newJobs = append(newJobs, pair.Value)
-							filledSlots++
+							newJobCount++
 						}
 					}
 					// Start Jobs
@@ -210,6 +211,13 @@ func main() {
 
 			// Wait before checking again
 			time.Sleep(time.Duration(config.HistoryManagerRate) * time.Second)
+
+			// Auto Exit
+			if config.AutoHistoryExit && autoHistoryInitiated &&
+				historyJobs.Len() > 0 && newJobCount == 0 && historyJobCntWaiting == 0 && historyJobCntRunning == 0 {
+				log.Println(lg("History", "", color.HiCyanString, "Exiting due to auto history completion..."))
+				properExit()
+			}
 		}
 	}()
 	//#endregion
@@ -294,6 +302,7 @@ func main() {
 			//TODO: signals for this and typical history cmd??
 		}
 	}
+	autoHistoryInitiated = true
 	if len(autoHistoryChannels) > 0 {
 		log.Println(lg("History", "Autorun", color.HiYellowString,
 			"History Autoruns completed (for %d channel%s)",

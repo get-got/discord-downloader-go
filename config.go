@@ -163,6 +163,7 @@ func defaultConfiguration() configuration {
 		// History
 		HistoryMaxJobs:        defConfig_HistoryMaxJobs,
 		AutoHistory:           false,
+		AutoHistoryExit:       false,
 		AutoHistoryBefore:     "",
 		AutoHistorySince:      "",
 		SendHistoryStatus:     true,
@@ -297,6 +298,7 @@ type configuration struct {
 	// History
 	HistoryMaxJobs        int    `json:"historyMaxJobs" yaml:"historyMaxJobs"`
 	AutoHistory           bool   `json:"autoHistory" yaml:"autoHistory"`
+	AutoHistoryExit       bool   `json:"autoHistoryExit" yaml:"autoHistoryExit"`
 	AutoHistoryBefore     string `json:"autoHistoryBefore" yaml:"autoHistoryBefore"`
 	AutoHistorySince      string `json:"autoHistorySince" yaml:"autoHistorySince"`
 	SendAutoHistoryStatus bool   `json:"sendAutoHistoryStatus" yaml:"sendAutoHistoryStatus"`
