@@ -1,6 +1,8 @@
 <div align="center">
     <img src="https://i.imgur.com/8KSripJ.png" alt="Discord Downloader Go"/>
     <p>Maintained since late 2020</p>
+    <p>Current development is slow, pull requests welcome</p>
+    <p><i>NOTE: User Accounts currently have rate limiting issues.</i></p>
 </div>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Travis Build">
