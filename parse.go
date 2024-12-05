@@ -93,8 +93,21 @@ func botLoadAPIs() {
 
 				if twitterImport() != nil {
 					twitterScraper.ClearCookies()
-					if err := twitterScraper.Login(config.Credentials.TwitterUsername, config.Credentials.TwitterPassword); err != nil {
-						log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", err.Error()))
+					var loginerr error
+					if config.Credentials.TwitterAuthToken != "" && config.Credentials.TwitterCT0 != "" {
+						twitterScraper.SetAuthToken(twitterscraper.AuthToken{
+							Token: config.Credentials.TwitterAuthToken, CSRFToken: config.Credentials.TwitterCT0})
+					} else if config.Credentials.Twitter2FA != "" {
+						loginerr = twitterScraper.Login(
+							config.Credentials.TwitterUsername, config.Credentials.TwitterPassword,
+							config.Credentials.Twitter2FA)
+					} else {
+						loginerr = twitterScraper.Login(
+							config.Credentials.TwitterUsername, config.Credentials.TwitterPassword)
+					}
+
+					if loginerr != nil {
+						log.Println(lg("API", "Twitter", color.HiRedString, "Login Error: %s", loginerr.Error()))
 						if twitterLoginCount <= 3 {
 							goto do_twitter_login
 						} else {
@@ -102,10 +115,10 @@ func botLoadAPIs() {
 								"Failed to login to Twitter (X), the bot will not fetch this media..."))
 						}
 					} else {
-						twitterConnected = true
-						defer twitterExport()
 						if twitterScraper.IsLoggedIn() {
 							log.Println(lg("API", "Twitter", color.HiMagentaString, fmt.Sprintf("Connected to @%s via new login", config.Credentials.TwitterUsername)))
+							twitterConnected = true
+							defer twitterExport()
 						} else {
 							log.Println(lg("API", "Twitter", color.HiRedString,
 								"Scraper login seemed successful but bot is not logged in, Twitter (X) parsing may not work..."))
