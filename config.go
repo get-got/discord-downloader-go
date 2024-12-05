@@ -41,7 +41,7 @@ type configurationCredentials struct {
 	TwitterAuthEnabled       *bool   `json:"twitterEnabled" yaml:"twitterEnabled"`
 	TwitterUsername          string  `json:"twitterUsername" yaml:"twitterUsername"`
 	TwitterPassword          string  `json:"twitterPassword" yaml:"twitterPassword"`
-	Twitter2FA               string  `json:"Twitter2FA,omitempty" yaml:"Twitter2FA,omitempty"`
+	Twitter2FA               string  `json:"twitter2FA,omitempty" yaml:"twitter2FA,omitempty"`
 	TwitterProxy             string  `json:"twitterProxy,omitempty" yaml:"twitterProxy,omitempty"`
 	TwitterAuthToken         string  `json:"twitterAuthToken" yaml:"twitterAuthToken"`
 	TwitterCT0               string  `json:"twitterCT0" yaml:"twitterCT0"`
