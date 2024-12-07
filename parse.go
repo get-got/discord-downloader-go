@@ -31,8 +31,10 @@ func botLoadAPIs() {
 	if *config.Credentials.TwitterAuthEnabled {
 		go func() {
 			twitterScraper = twitterscraper.New()
-			if config.Credentials.TwitterUsername != "" &&
-				config.Credentials.TwitterPassword != "" {
+			if (config.Credentials.TwitterUsername != "" &&
+			config.Credentials.TwitterPassword != "") ||
+			(config.Credentials.TwitterAuthToken != "" &&
+			config.Credentials.TwitterCT0 != "") {
 				log.Println(lg("API", "Twitter", color.MagentaString, "Connecting..."))
 
 				// Proxy
