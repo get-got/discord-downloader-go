@@ -249,17 +249,6 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 			})
 		}
 
-		// Description checking removed because it causes absolute chaos,
-		// fetching every random link from the description of things like YouTube videos.
-		/*if embed.Description != "" {
-			foundLinks = xurls.Strict().FindAllString(embed.Description, -1)
-			for _, foundLink := range foundLinks {
-				links = append(links, &fileItem{
-					Link: foundLink,
-				})
-			}
-		}*/
-
 		if embed.Image != nil && embed.Image.URL != "" {
 			links = append(links, &fileItem{
 				Link: embed.Image.URL,
@@ -270,6 +259,49 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 			links = append(links, &fileItem{
 				Link: embed.Video.URL,
 			})
+		}
+
+		// Description checking removed because it causes absolute chaos,
+		// fetching every random link from the description of things like YouTube videos.
+		/*if embed.Description != "" {
+			foundLinks = xurls.Strict().FindAllString(embed.Description, -1)
+			for _, foundLink := range foundLinks {
+				links = append(links, &fileItem{
+					Link: foundLink,
+				})
+			}
+		}*/
+	}
+
+	// Search Discord Message Snapshots (forwarded messages)
+	for _, snapshot := range m.MessageSnapshots {
+		// Attachments
+		for _, attachment := range snapshot.Message.Attachments {
+			links = append(links, &fileItem{
+				Link:         attachment.URL,
+				Filename:     attachment.Filename,
+				AttachmentID: attachment.ID,
+			})
+		}
+		// Embeds
+		for _, embed := range snapshot.Message.Embeds {
+			if embed.URL != "" {
+				links = append(links, &fileItem{
+					Link: embed.URL,
+				})
+			}
+
+			if embed.Image != nil && embed.Image.URL != "" {
+				links = append(links, &fileItem{
+					Link: embed.Image.URL,
+				})
+			}
+
+			if embed.Video != nil && embed.Video.URL != "" {
+				links = append(links, &fileItem{
+					Link: embed.Video.URL,
+				})
+			}
 		}
 	}
 

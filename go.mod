@@ -50,4 +50,4 @@ require (
 	golang.org/x/sys v0.28.0 // indirect
 )
 
-replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.27.0-gg.3
+replace github.com/bwmarrin/discordgo => github.com/get-got/discordgo v0.27.0-gg.4

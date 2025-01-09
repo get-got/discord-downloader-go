@@ -2,7 +2,7 @@
     <img src="https://i.imgur.com/8KSripJ.png" alt="Discord Downloader Go"/>
     <p>Maintained since late 2020</p>
     <p>Current development is slow, pull requests welcome</p>
-    <p><i>NOTE: User Accounts currently have rate limiting issues.</i></p>
+    <p><i><b>NOTE:</b> User Accounts currently have rate limiting issues.</i></p>
 </div>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Travis Build">
@@ -31,7 +31,7 @@
 </p>
 <h2 align="center">
     <a href="https://discord.com/invite/6Z6FJZVaDV">
-        <b>Need help? Have suggestions? Join the Discord server!</b>
+        <b>Need help? Have suggestions? Join the Discord server</b>
     </a>
     <br/><br/>
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
