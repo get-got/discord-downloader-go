@@ -313,6 +313,16 @@ func getRawLinks(m *discordgo.Message) []*fileItem {
 		})
 	}
 
+	// Search Detected Links in Discord Message Snapshots (forwarded messages)
+	for _, snapshot := range m.MessageSnapshots {
+		foundLinks := xurls.Strict().FindAllString(snapshot.Message.Content, -1)
+		for _, foundLink := range foundLinks {
+			links = append(links, &fileItem{
+				Link: foundLink,
+			})
+		}
+	}
+
 	return links
 }
 
