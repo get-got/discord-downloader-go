@@ -106,6 +106,18 @@ While this project works for user logins, I do not recommend it as you risk acco
 
 ---
 
+## ❔ FAQ
+
+- **_Q: How do I install?_**
+- **A: [SEE #getting-started](https://github.com/get-got/discord-downloader-go/wiki/Getting-Started)**
+
+---
+
+- **_Q: How do I convert from Seklfreak's discord-image-downloader-go?_**
+- **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
+
+---
+
 ### Differences from [Seklfreak's _discord-image-downloader-go_](https://github.com/Seklfreak/discord-image-downloader-go) & Why I made this
 
 - _Better command formatting & support_
@@ -119,18 +131,6 @@ While this project works for user logins, I do not recommend it as you risk acco
 - _Various fixes, improvements, and dependency updates that I also contributed to Seklfreak's original project._
 
 > I've been a user of Seklfreak's project since ~2018 and it's been great for my uses, but there were certain aspects I wanted to expand upon, one of those being customization of channel configuration, and other features like message reactions upon success, differently formatted statuses, etc. If some aspects are rudimentary or messy, please make a pull request, as this is my first project using Go and I've learned everything from observation & Stack Overflow.
-
----
-
-## ❔ FAQ
-
-- **_Q: How do I install?_**
-- **A: [SEE #getting-started](https://github.com/get-got/discord-downloader-go/wiki/Getting-Started)**
-
----
-
-- **_Q: How do I convert from Seklfreak's discord-image-downloader-go?_**
-- **A: Place your config.ini from that program in the same directory as this program and delete any settings.json file if present. The program will import your settings from the old project and make a new settings.json. It will still re-download files that DIDG already downloaded, as the database layout is different and the old database is not imported.**
 
 ---
 
