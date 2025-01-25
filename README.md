@@ -6,13 +6,13 @@
 </div>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Travis Build">
-        <img src="https://travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
-    </a>
-    <a href="https://hub.docker.com/r/getgot/discord-downloader-go" alt="Docker Build">
-        <img src="https://img.shields.io/docker/cloud/build/getgot/discord-downloader-go" />
+        <img src="https://api.travis-ci.com/get-got/discord-downloader-go.svg?branch=master" />
     </a>
     <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Report Card">
         <img src="https://goreportcard.com/badge/github.com/get-got/discord-downloader-go" />
+    </a>
+    <a href="https://goreportcard.com/report/github.com/get-got/discord-downloader-go" alt="Go Version">
+        <img src="https://img.shields.io/github/go-mod/go-version/get-got/discord-downloader-go" />
     </a>
     <br>
     <a href="https://github.com/get-got/discord-downloader-go/releases" alt="All Releases">
