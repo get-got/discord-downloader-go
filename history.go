@@ -486,22 +486,22 @@ func handleHistory(commandingMessage *discordgo.Message, subjectChannelID string
 					}
 					time.Sleep(time.Second * time.Duration(config.HistoryRequestDelay))
 				}
-				if messages, err := bot.ChannelMessages(channel.ID, config.HistoryRequestCount, beforeID, sinceID, ""); err != nil {
+				if messages, fetcherr := bot.ChannelMessages(channel.ID, config.HistoryRequestCount, beforeID, sinceID, ""); fetcherr != nil {
 					// Error requesting messages
 					if sendStatus {
 						if !hasPermsToRespond {
 							log.Println(lg("History", "", color.HiRedString,
 								logPrefix+fmtBotSendPerm, responseMsg.ChannelID))
 						} else {
-							_, err = replyEmbed(responseMsg, "Command — History",
-								fmt.Sprintf("Encountered an error requesting messages for %s: %s", channel.ID, err.Error()))
-							if err != nil {
+							_, senderr := replyEmbed(responseMsg, "Command — History",
+								fmt.Sprintf("Encountered an error requesting messages for %s: %s", channel.ID, fetcherr.Error()))
+							if senderr != nil {
 								log.Println(lg("History", "", color.HiRedString,
-									logPrefix+"Failed to send error message:\t%s", err))
+									logPrefix+"Failed to send error message:\t%s", senderr))
 							}
 						}
 					}
-					log.Println(lg("History", "", color.HiRedString, logPrefix+"Error requesting messages:\t%s", err))
+					log.Println(lg("History", "", color.HiRedString, logPrefix+"Error requesting messages:\t%s", fetcherr))
 					if job, exists := historyJobs.Get(subjectChannelID); exists {
 						job.Status = historyStatusErrorRequesting
 						job.Updated = time.Now()
