@@ -391,6 +391,10 @@ func handleMessage(m *discordgo.Message, c *discordgo.Channel, edited bool, hist
 			if file.Link == "" {
 				continue
 			}
+			if (*sourceConfig.IgnoreEmojis && strings.HasPrefix(file.Link, "https://cdn.discordapp.com/emojis/")) ||
+				(*sourceConfig.IgnoreStickers && strings.HasPrefix(file.Link, "https://media.discordapp.net/stickers/")) {
+				continue
+			}
 			// Filter Checks
 			shouldAbort := false
 			if sourceConfig.Filters.BlockedLinkContent != nil {

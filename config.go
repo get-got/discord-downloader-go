@@ -145,10 +145,12 @@ func defaultConfiguration() configuration {
 		StickersFilenameFormat: "{{ID}} {{name}}",
 
 		// Source Setup Defaults
-		Save:          true,
-		AllowCommands: true,
-		ScanEdits:     true,
-		IgnoreBots:    true,
+		Save:           true,
+		AllowCommands:  true,
+		ScanEdits:      true,
+		IgnoreBots:     true,
+		IgnoreEmojis:   true,
+		IgnoreStickers: true,
 
 		SendErrorMessages: false,
 		SendFileToChannel: "",
@@ -266,6 +268,9 @@ type configuration struct {
 	DownloadTimeout      int    `json:"downloadTimeout" yaml:"downloadTimeout"`
 	DownloadRetryMax     int    `json:"downloadRetryMax" yaml:"downloadRetryMax"`
 	SendErrorMessages    bool   `json:"sendErrorMessages" yaml:"sendErrorMessages"`
+	IgnoreEmojis         bool   `json:"ignoreEmojis" yaml:"ignoreEmojis"`
+	IgnoreStickers       bool   `json:"ignoreStickers" yaml:"ignoreStickers"`
+	IgnoreEmojisWEBP     *bool  `json:"ignoreEmojisWEBP" yaml:"ignoreEmojisWEBP"`
 
 	// Discord Emojis & Stickers
 	EmojisServers          *[]string `json:"emojisServers" yaml:"emojisServers"`
@@ -373,12 +378,14 @@ type configurationSource struct {
 	Aliases           *[]string `json:"aliases,omitempty" yaml:"aliases,omitempty"`
 
 	// Setup
-	Enabled       *bool   `json:"enabled" yaml:"enabled"`
-	Save          *bool   `json:"save" yaml:"save"`
-	AllowCommands *bool   `json:"allowCommands" yaml:"allowCommands"`
-	ScanEdits     *bool   `json:"scanEdits" yaml:"scanEdits"`
-	IgnoreBots    *bool   `json:"ignoreBots" yaml:"ignoreBots"`
-	CommandPrefix *string `json:"commandPrefix" yaml:"commandPrefix"`
+	Enabled        *bool   `json:"enabled" yaml:"enabled"`
+	Save           *bool   `json:"save" yaml:"save"`
+	AllowCommands  *bool   `json:"allowCommands" yaml:"allowCommands"`
+	ScanEdits      *bool   `json:"scanEdits" yaml:"scanEdits"`
+	IgnoreBots     *bool   `json:"ignoreBots" yaml:"ignoreBots"`
+	CommandPrefix  *string `json:"commandPrefix" yaml:"commandPrefix"`
+	IgnoreEmojis   *bool   `json:"ignoreEmojis" yaml:"ignoreEmojis"`
+	IgnoreStickers *bool   `json:"ignoreStickers" yaml:"ignoreStickers"`
 
 	SendErrorMessages  *bool     `json:"sendErrorMessages" yaml:"sendErrorMessages"`
 	SendFileToChannel  *string   `json:"sendFileToChannel" yaml:"sendFileToChannel"`
@@ -1021,6 +1028,12 @@ func sourceDefault(source *configurationSource) {
 	}
 	if source.IgnoreBots == nil {
 		source.IgnoreBots = &config.IgnoreBots
+	}
+	if source.IgnoreEmojis == nil {
+		source.IgnoreEmojis = &config.IgnoreEmojis
+	}
+	if source.IgnoreStickers == nil {
+		source.IgnoreStickers = &config.IgnoreStickers
 	}
 
 	if source.SendErrorMessages == nil {

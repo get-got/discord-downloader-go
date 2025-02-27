@@ -482,12 +482,6 @@ func getParsedLinks(inputURL string, m *discordgo.Message) map[string]string {
 		}
 	}
 
-	// Ignore Discord emojis / stickers
-	if strings.HasPrefix(inputURL, "https://cdn.discordapp.com/emojis/") ||
-		strings.HasPrefix(inputURL, "https://media.discordapp.net/stickers/") {
-		return nil
-	}
-
 	// Try without queries
 	/*parsedURL, err := url.Parse(inputURL)
 	if err == nil {
@@ -525,6 +519,42 @@ func getLinksByMessage(m *discordgo.Message) []*fileItem {
 				AttachmentID: rawLink.AttachmentID,
 			})
 		}
+	}
+
+	// Scrape Emojis from message
+	for _, emoji := range m.GetCustomEmojis() {
+		emojisWEBP := false
+		if config.IgnoreEmojisWEBP != nil {
+			emojisWEBP = *config.IgnoreEmojisWEBP
+		}
+
+		link := "https://cdn.discordapp.com/emojis/" + emoji.ID + ".png"
+		if emojisWEBP {
+			link = "https://cdn.discordapp.com/emojis/" + emoji.ID + ".webp"
+		}
+		if emoji.Animated {
+			link = "https://cdn.discordapp.com/emojis/" + emoji.ID + ".gif"
+			if emojisWEBP {
+				link = "https://cdn.discordapp.com/emojis/" + emoji.ID + ".webp?animated=true"
+			}
+		}
+
+		fileItems = append(fileItems, &fileItem{
+			Link:         link,
+			Filename:     "Emoji " + emoji.Name,
+			Time:         linkTime,
+			AttachmentID: "",
+		})
+	}
+
+	// Scrape Stickers from message
+	for _, sticker := range m.StickerItems {
+		fileItems = append(fileItems, &fileItem{
+			Link:         "https://media.discordapp.net/stickers/" + sticker.ID + ".png",
+			Filename:     "Sticker " + sticker.Name,
+			Time:         linkTime,
+			AttachmentID: "",
+		})
 	}
 
 	return trimDuplicateLinks(fileItems)
