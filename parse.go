@@ -32,9 +32,9 @@ func botLoadAPIs() {
 		go func() {
 			twitterScraper = twitterscraper.New()
 			if (config.Credentials.TwitterUsername != "" &&
-			config.Credentials.TwitterPassword != "") ||
-			(config.Credentials.TwitterAuthToken != "" &&
-			config.Credentials.TwitterCT0 != "") {
+				config.Credentials.TwitterPassword != "") ||
+				(config.Credentials.TwitterAuthToken != "" &&
+					config.Credentials.TwitterCT0 != "") {
 				log.Println(lg("API", "Twitter", color.MagentaString, "Connecting..."))
 
 				// Proxy
@@ -97,13 +97,25 @@ func botLoadAPIs() {
 					twitterScraper.ClearCookies()
 					var loginerr error
 					if config.Credentials.TwitterAuthToken != "" && config.Credentials.TwitterCT0 != "" {
+						if config.Debug {
+							log.Println(lg("API", "Twitter", color.YellowString,
+								"Attempting login Auth Token & CT0..."))
+						}
 						twitterScraper.SetAuthToken(twitterscraper.AuthToken{
 							Token: config.Credentials.TwitterAuthToken, CSRFToken: config.Credentials.TwitterCT0})
 					} else if config.Credentials.Twitter2FA != "" {
+						if config.Debug {
+							log.Println(lg("API", "Twitter", color.YellowString,
+								"Attempting login with 2FA/Username/Password..."))
+						}
 						loginerr = twitterScraper.Login(
 							config.Credentials.TwitterUsername, config.Credentials.TwitterPassword,
 							config.Credentials.Twitter2FA)
 					} else {
+						if config.Debug {
+							log.Println(lg("API", "Twitter", color.YellowString,
+								"Attempting login with Username/Password..."))
+						}
 						loginerr = twitterScraper.Login(
 							config.Credentials.TwitterUsername, config.Credentials.TwitterPassword)
 					}
