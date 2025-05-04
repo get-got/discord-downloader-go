@@ -302,6 +302,11 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 	if err != nil {
 		return nil, err
 	}
+
+	// Sometimes it fails to fetch actual content on first request.
+	retryCount := 0
+retryTwitter:
+	retryCount++
 	tweet, err := twitterScraper.GetTweet(matches[4])
 	if err != nil {
 		return nil, err
@@ -325,6 +330,15 @@ func getTwitterStatusUrls(inputURL string, m *discordgo.Message) (map[string]str
 		for foundUrlKey, foundUrlValue := range foundUrls {
 			links[foundUrlKey] = foundUrlValue
 		}
+	}
+
+	// Sometimes it fails to fetch actual content on first request.
+	if len(links) == 0 && retryCount < 3 {
+		if config.Debug {
+			log.Println(lg("API", "Twitter", color.HiRedString, "No content found in post, retrying %s...", matches[4]))
+		}
+		time.Sleep(1 * time.Second)
+		goto retryTwitter
 	}
 
 	return links, nil

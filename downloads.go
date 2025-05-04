@@ -1047,7 +1047,7 @@ func (download downloadRequestStruct) tryDownload() (downloadStatusStruct, int64
 		}
 
 		// Swap Extensions
-		if download.Extension == ".jfif" {
+		if download.Extension == ".jfif" || download.Extension == ".jpglarge" || download.Extension == ".jpeglarge" {
 			download.Extension = ".jpg"
 			download.Filename = strings.ReplaceAll(download.Filename, ".jfif", ".jpg")
 		}

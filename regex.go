@@ -7,7 +7,7 @@ import (
 //TODO: Reddit short url ... https://redd.it/post_code
 
 const (
-	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png)((\:[a-z]+)?)$`
+	regexpUrlTwitter              = `^http(s?):\/\/pbs(-[0-9]+)?\.twimg\.com\/media\/[^\./]+\.(jpg|png|jpglarge)((\:[a-z]+)?)$`
 	regexpUrlTwitterStatus        = `^http(s?):\/\/(www\.)?twitter\.com\/([A-Za-z0-9-_\.]+\/status\/|statuses\/|i\/web\/status\/)([0-9]+)$`
 	regexpUrlInstagram            = `^http(s?):\/\/(www\.)?instagram\.com\/p\/[^/]+\/(\?[^/]+)?$`
 	regexpUrlInstagramReel        = `^http(s?):\/\/(www\.)?instagram\.com\/reel\/[^/]+\/(\?[^/]+)?$`
