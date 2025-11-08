@@ -30,10 +30,6 @@
     </a>
 </p>
 <h2 align="center">
-    <a href="https://discord.com/invite/6Z6FJZVaDV">
-        <b>Need help? Have suggestions? Join the Discord server</b>
-    </a>
-    <br/><br/>
     <a href="https://github.com/get-got/discord-downloader-go/releases/latest">
         <b>DOWNLOAD LATEST RELEASE</b>
     </a>
