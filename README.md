@@ -1,8 +1,8 @@
 <div align="center">
     <img src="https://i.imgur.com/8KSripJ.png" alt="Discord Downloader Go"/>
-    <p>Maintained 2020-2024</p>
+    <p>Maintained Late 2020 - Early 2025</p>
     <p>Unfortunately I no longer have the free time or interest in continuing development and support for this project. Inactive/archived until further notice.</p>
-    <p><i><b>NOTE:</b> User Accounts currently have rate limiting issues.</i></p>
+    <p><i><b>NOTE:</b> User Accounts / Self-bots often have rate limiting / connection issues.</i></p>
 </div>
 <p align="center">
     <a href="https://travis-ci.com/get-got/discord-downloader-go" alt="Travis Build">
